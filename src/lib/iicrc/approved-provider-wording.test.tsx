@@ -45,9 +45,14 @@ vi.mock('@/hooks/use-toast', async (importOriginal) => ({
 
 const ROOT = process.cwd();
 
-/** The retired wording. Built from parts so this file never spells it. */
+/**
+ * The retired wording: an "accredit" word directly beside IICRC or CEC, "accredited provider", or
+ * "accredited" followed within four words by IICRC or CEC ("accredited as an IICRC CEC provider",
+ * "accredited by the IICRC"). A negation in the two words before "accredited" ("not accredited by
+ * the IICRC", "not nationally accredited and awards no IICRC CECs") is a true statement and passes.
+ */
 export const RETIRED_PROVIDER_WORDING =
-  /\b(?:IICRC|CECs?)[\s-]+accredit\w*|\baccredit\w*[\s-]+(?:IICRC|CECs?)\b|\baccredited[\s-]+provider\b/gi;
+  /\b(?:IICRC|CECs?)[\s-]+accredit\w*|\baccredit\w*[\s-]+(?:IICRC|CECs?)\b|\baccredited[\s-]+provider\b|(?<!\b(?:not|never)(?:[\s-]+\w+)?[\s-]+)\baccredited(?:[\s-]+[\w'’]+){0,4}?[\s-]+(?:IICRC|CECs?)\b/gi;
 
 /**
  * Dated records of the past: audits, handoffs, session notes, specs, decision logs and applied
@@ -178,6 +183,9 @@ describe('the retired-wording pattern (positive and negative controls)', () => {
     'IICRC ' + 'accredited',
     'an accredited ' + 'IICRC CEC provider',
     'CEC ' + 'accreditation',
+    // GP-704 review round 1: a few words between "accredited" and the IICRC.
+    'CARSI is accredited as an ' + 'IICRC CEC provider',
+    'CARSI courses are accredited by the ' + 'IICRC',
   ];
   for (const s of retired) {
     it(`flags "${s}"`, () => {
@@ -189,6 +197,8 @@ describe('the retired-wording pattern (positive and negative controls)', () => {
     APPROVED_FOR_IICRC_CECS,
     'not a nationally accredited VET qualification',
     'accredited by the RTO',
+    'CARSI courses are not accredited by the IICRC',
+    'it is not nationally accredited and awards no IICRC CECs',
   ];
   for (const s of allowed) {
     it(`leaves "${s}" alone`, () => {

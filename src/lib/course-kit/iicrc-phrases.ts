@@ -53,7 +53,7 @@ export const BANNED_PHRASE_RULES: BannedPhraseRule[] = [
   {
     re: /\bIICRC[\s-]+courses?[\s-]+accredit\w*\b/i,
     allow: null,
-    message: `Do not imply that CARSI's courses are accredited by the IICRC — a single approved class is "${APPROVED_FOR_IICRC_CECS}".`,
+    message: `Do not imply that the IICRC approves CARSI's courses as a whole — a single approved class is "${APPROVED_FOR_IICRC_CECS}".`,
   },
   {
     re: /\bIICRC[\s-]+Approved[\s-]+(School|Instructor)\b/i,
