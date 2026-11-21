@@ -154,7 +154,7 @@ describe('GoogleAnalytics waits for the visitor to say yes (GP-731)', () => {
     const views = calls.filter((c) => c[0] === 'event' && c[1] === 'page_view');
     expect(views).toHaveLength(1);
     expect((views[0][2] as Record<string, unknown>).page_location).toBe(
-      'http://localhost:3000/courses/water'
+      'http://localhost:3000/courses/:slug'
     );
   });
 
@@ -167,12 +167,26 @@ describe('GoogleAnalytics waits for the visitor to say yes (GP-731)', () => {
     const views = calls.filter((c) => c[0] === 'event' && c[1] === 'page_view');
     expect(views).toHaveLength(1);
     expect((views[0][2] as Record<string, unknown>).page_location).toBe(
-      'http://localhost:3000/courses/water?utm_source=newsletter'
+      'http://localhost:3000/courses/:slug?utm_source=newsletter'
     );
     const everything = JSON.stringify(calls);
     expect(everything).not.toContain('jane');
     expect(everything).not.toContain('abc123');
     expect(everything).not.toContain('cs_test_1');
+  });
+
+  it('sends nothing the page wrote: no document title, no typed path value, no odd campaign value', async () => {
+    storeChoice(true);
+    installGtag();
+    document.title = 'Call 0412 345 678 | jane@example.com';
+    await renderAt('/courses/0412-345-678?utm_campaign=0412-345-678&utm_source=news');
+    const views = calls.filter((c) => c[0] === 'event' && c[1] === 'page_view');
+    expect(views).toHaveLength(1); // positive control: a page view did leave
+    const everything = JSON.stringify(calls);
+    for (const bit of ['0412', '345', 'jane', '@']) expect(everything).not.toContain(bit);
+    expect((views[0][2] as Record<string, unknown>).page_location).toBe(
+      'http://localhost:3000/courses/:slug?utm_source=news'
+    );
   });
 
   it('sends no page view, and no private address, for a signed-in page', async () => {

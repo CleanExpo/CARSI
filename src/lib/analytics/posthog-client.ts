@@ -10,7 +10,13 @@
 
 import posthog, { type CaptureResult } from 'posthog-js';
 
-import { isCountedPath, safeLocationOf, safeReferrer } from './consent';
+import {
+  isAllowedTextParam,
+  isCountedPath,
+  safeLocation,
+  safePathname,
+  safeReferrer,
+} from './consent';
 import { getAnalyticsChoice, onAnalyticsWithdrawn } from './consent-client';
 
 import type {
@@ -27,34 +33,90 @@ const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST?.trim() || 'https://us.
 let initialised = false;
 let optedOut = false;
 
-const URL_PROPERTIES = ['$current_url', '$initial_current_url'];
-const REFERRER_PROPERTIES = ['$referrer', '$initial_referrer'];
+/**
+ * PostHog's own bookkeeping that is kept as it is: ids PostHog generates itself, the library
+ * version and the browser, screen and time zone. None of it is written by the page or the visitor.
+ */
+const POSTHOG_OWN_KEYS: ReadonlySet<string> = new Set([
+  'token',
+  'distinct_id',
+  '$device_id',
+  '$session_id',
+  '$window_id',
+  '$insert_id',
+  '$time',
+  '$lib',
+  '$lib_version',
+  '$lib_custom_api_host',
+  '$config_defaults',
+  '$is_identified',
+  '$process_person_profile',
+  '$browser',
+  '$browser_version',
+  '$browser_language',
+  '$browser_language_prefix',
+  '$os',
+  '$os_version',
+  '$device',
+  '$device_type',
+  '$screen_height',
+  '$screen_width',
+  '$viewport_height',
+  '$viewport_width',
+  '$timezone',
+  '$timezone_offset',
+  '$configured_session_timeout_ms',
+  '$lib_rate_limit_remaining_tokens',
+]);
 
-function scrubProperties(properties: Record<string, unknown> | undefined, origin: string): void {
-  if (!properties) return;
-  for (const key of URL_PROPERTIES) {
-    if (key in properties) properties[key] = safeLocationOf(properties[key], origin);
+/**
+ * The properties sent, rebuilt from an allow-list (GP-731): the address as its route form
+ * (/courses/:slug) with only plain campaign tags, the referrer as its clean form, the event's own
+ * listed parameters, and PostHog's own bookkeeping. Every other property (a title, a campaign
+ * value, a search, anything added later) is dropped rather than cleaned.
+ */
+function allowedProperties(
+  properties: Record<string, unknown> | undefined,
+  origin: string,
+  address: string
+): Record<string, unknown> {
+  const kept: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(properties ?? {})) {
+    if (POSTHOG_OWN_KEYS.has(key)) {
+      if (typeof value === 'string' && (value.includes('@') || value.includes('://'))) continue;
+      kept[key] = value;
+    } else if (!key.startsWith('$') && isAllowedTextParam(key, value)) {
+      kept[key] = value;
+    }
   }
-  for (const key of REFERRER_PROPERTIES) {
-    if (key in properties) properties[key] = safeReferrer(properties[key], origin) || '$direct';
-  }
+  kept.$current_url = address;
+  kept.$host = new URL(origin).host;
+  kept.$pathname = safePathname(window.location.pathname);
+  const referrer = safeReferrer(properties?.$referrer, origin);
+  kept.$referrer = referrer || '$direct';
+  kept.$referring_domain = referrer ? new URL(referrer).host : '$direct';
+  return kept;
 }
 
 /**
- * The same address rules as Google Analytics (GP-731): nothing about a private page, and only the
- * clean address and referrer of a public one.
+ * The same rules as Google Analytics (GP-731): nothing without a yes, nothing about a private
+ * page, and for a public page only the allow-listed properties. Person properties ($set,
+ * $set_once) are never sent.
  */
 export function scrubPostHogEvent(event: CaptureResult | null): CaptureResult | null {
   if (!event || typeof window === 'undefined') return null;
   if (getAnalyticsChoice() !== 'granted') return null;
-  const { origin, pathname } = window.location;
+  const { origin, pathname, search } = window.location;
   if (!isCountedPath(pathname)) return null;
-  scrubProperties(event.properties as Record<string, unknown>, origin);
-  if ('$pathname' in (event.properties ?? {}))
-    (event.properties as Record<string, unknown>).$pathname = pathname;
-  scrubProperties(event.$set as Record<string, unknown> | undefined, origin);
-  scrubProperties(event.$set_once as Record<string, unknown> | undefined, origin);
-  return event;
+  const address = safeLocation(origin, pathname, search);
+  if (address === '') return null;
+  const scrubbed = {
+    ...event,
+    properties: allowedProperties(event.properties as Record<string, unknown>, origin, address),
+  } as CaptureResult;
+  delete (scrubbed as { $set?: unknown }).$set;
+  delete (scrubbed as { $set_once?: unknown }).$set_once;
+  return scrubbed;
 }
 
 function ensureInitialised(): boolean {
@@ -75,6 +137,9 @@ function ensureInitialised(): boolean {
     person_profiles: 'identified_only',
     capture_pageview: false,
     autocapture: false,
+    // Campaign tags and the referrer are not stored on the visitor's person record (GP-731).
+    save_campaign_params: false,
+    save_referrer: false,
     before_send: scrubPostHogEvent,
   });
   initialised = true;

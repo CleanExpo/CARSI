@@ -10,11 +10,15 @@
  *  1. Nothing loads or leaves before the visitor says yes (the stored choice is exactly
  *     `analytics: true` under the current notice version).
  *  2. Only public pages are counted. Signed-in, admin, auth, token and credential pages are not.
- *  3. The address sent is origin + path + the three plain campaign keys. Every other query key
- *     (email, token, session id, click id, search text) is stripped.
+ *  3. The address sent is origin + the page's route form (/courses/:slug, never the value in a
+ *     [param] segment) + the three campaign keys, each kept only when its value is plain
+ *     lower-case words. Every other query key is stripped. The title sent is the route form,
+ *     never document.title. These are allow-lists: nothing is sent because it "looks safe".
  *  4. The same rules are applied again to each request at the moment the browser sends it
  *     (`screenCollect`), because the Google library adds data of its own.
  */
+
+import { PUBLIC_ROUTES } from './public-routes';
 
 // ---------------------------------------------------------------------------
 // The stored choice
@@ -133,22 +137,8 @@ export const IDENTIFIER_ROUTES: readonly string[] = ['/calendar', '/jobs'];
 
 const MAX_PATH = 200;
 const PATH_SHAPE = /^\/[a-z0-9\-_/]*$/;
+/** Used only by the wire check on event parameter values; addresses and titles never need it. */
 const DIGIT_RUN = /\d{6,}/;
-
-/**
- * A segment that looks like an identifier rather than a page name: a run of six or more digits,
- * an email-like '@', a long letters-and-digits token with no hyphen (a cuid, uuid or session id),
- * or anything over 80 characters.
- */
-function isTokenLikeSegment(segment: string): boolean {
-  if (segment.length > 80) return true;
-  if (DIGIT_RUN.test(segment)) return true;
-  if (segment.length >= 20 && !segment.includes('-') && /\d/.test(segment) && /[a-z]/.test(segment))
-    return true;
-  // A uuid, with or without its hyphens.
-  if (/^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}/.test(segment)) return true;
-  return false;
-}
 
 /**
  * A path in its one accepted spelling, or null. Upper case, percent escapes, dots, doubled
@@ -164,16 +154,49 @@ export function normalisePath(pathname: unknown): string | null {
   return pathname;
 }
 
+const ROUTE_SEGMENTS = PUBLIC_ROUTES.map((route) =>
+  route === '/' ? [] : route.slice(1).split('/')
+);
+
+/**
+ * The public route a path belongs to, as it is sent: `/courses/[slug]` is sent as
+ * `/courses/:slug`. Null when the path matches no public page. A static segment must match exactly;
+ * a [param] segment matches any one segment, and its value is never sent.
+ */
+export function routeOf(pathname: unknown): string | null {
+  const path = normalisePath(pathname);
+  if (path === null) return null;
+  const segments = path === '/' ? [] : path.slice(1).split('/');
+  let best: string[] | null = null;
+  for (const pattern of ROUTE_SEGMENTS) {
+    if (pattern.length !== segments.length) continue;
+    if (!pattern.every((part, i) => part.startsWith('[') || part === segments[i])) continue;
+    // Prefer the pattern with the most static segments (/jobs/submit over /jobs/[id]).
+    const statics = pattern.filter((part) => !part.startsWith('[')).length;
+    if (best === null || statics > best.filter((part) => !part.startsWith('[')).length)
+      best = pattern;
+  }
+  if (best === null) return null;
+  return `/${best.map((part) => (part.startsWith('[') ? `:${part.slice(1, -1)}` : part)).join('/')}`;
+}
+
+/** Every route form that may be sent (for example /courses/:slug), for the wire check. */
+const SENT_ROUTES: ReadonlySet<string> = new Set(
+  PUBLIC_ROUTES.map((route) => route.replace(/\[[^\]]+\]/g, 'x'))
+    .filter((path) => isCountedPath(path))
+    .map((path) => routeOf(path))
+    .filter((route): route is string => route !== null)
+);
+
 export function isCountedPath(pathname: unknown): boolean {
   const path = normalisePath(pathname);
   if (path === null) return false;
-  if (path === '/') return true;
   const segments = path.slice(1).split('/');
   if (PRIVATE_FIRST_SEGMENTS.has(segments[0])) return false;
   if (PRIVATE_PATH_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`)))
     return false;
   if (IDENTIFIER_ROUTES.some((route) => path.startsWith(`${route}/`))) return false;
-  return !segments.some(isTokenLikeSegment);
+  return routeOf(path) !== null;
 }
 
 // ---------------------------------------------------------------------------
@@ -185,7 +208,12 @@ export function isCountedPath(pathname: unknown): boolean {
  * phone number, so they are stripped with every other key.
  */
 export const KEPT_QUERY_KEYS: readonly string[] = ['utm_source', 'utm_medium', 'utm_campaign'];
-const PLAIN_VALUE = /^[A-Za-z0-9_.~+ -]{1,100}$/;
+/**
+ * A campaign value is kept only when it is plain lower-case words: letters, hyphens and
+ * underscores, no digits, no spaces. Anything else is dropped, not cleaned: this is an allow-list,
+ * so no shape of personal data (a phone number with separators, a name, an email) can pass.
+ */
+const CAMPAIGN_VALUE = /^[a-z_-]{1,64}$/;
 const ORIGIN_SHAPE = /^https?:\/\/[A-Za-z0-9.-]+(:\d{1,5})?$/;
 
 function keptQuery(search: unknown): string {
@@ -198,22 +226,23 @@ function keptQuery(search: unknown): string {
   }
   const kept = KEPT_QUERY_KEYS.flatMap((key) => {
     const values = params.getAll(key);
-    if (values.length !== 1) return [];
-    const value = values[0];
-    if (!PLAIN_VALUE.test(value) || DIGIT_RUN.test(value)) return [];
-    return [`${key}=${encodeURIComponent(value)}`];
+    if (values.length !== 1 || !CAMPAIGN_VALUE.test(values[0])) return [];
+    return [`${key}=${values[0]}`];
   });
   return kept.length > 0 ? `?${kept.join('&')}` : '';
 }
 
 /**
- * The address sent for a counted page: origin and path plus the plain campaign keys. Empty when
- * the page is not counted or the origin is not a plain web origin.
+ * The address sent for a counted page: origin, the route it belongs to (never the values in its
+ * [param] segments) and the plain campaign keys. Empty when the page is not counted or the origin
+ * is not a plain web origin. An address already in its sent form is returned as it is.
  */
 export function safeLocation(origin: unknown, pathname: unknown, search: unknown): string {
   if (typeof origin !== 'string' || !ORIGIN_SHAPE.test(origin)) return '';
+  if (typeof pathname === 'string' && SENT_ROUTES.has(pathname))
+    return `${origin}${pathname}${keptQuery(search)}`;
   if (!isCountedPath(pathname)) return '';
-  return `${origin}${pathname as string}${keptQuery(search)}`;
+  return `${origin}${routeOf(pathname)}${keptQuery(search)}`;
 }
 
 /** The same rule for a whole address. Empty when it is not on `origin` or not counted. */
@@ -229,8 +258,14 @@ export function safeLocationOf(address: unknown, origin: unknown): string {
   return safeLocation(origin, url.pathname, url.search);
 }
 
+/** The route form of a page on this site, or '' (for PostHog's $pathname). */
+export function safePathname(pathname: unknown): string {
+  if (typeof pathname === 'string' && SENT_ROUTES.has(pathname)) return pathname;
+  return isCountedPath(pathname) ? (routeOf(pathname) ?? '') : '';
+}
+
 /**
- * The referrer sent. This site: origin and path of a counted page, otherwise empty. Another site:
+ * The referrer sent. This site: origin and route of a counted page, otherwise empty. Another site:
  * its origin only. Anything that cannot be read: empty.
  */
 export function safeReferrer(referrer: unknown, origin: unknown): string {
@@ -242,24 +277,27 @@ export function safeReferrer(referrer: unknown, origin: unknown): string {
     return '';
   }
   if (url.protocol !== 'https:' && url.protocol !== 'http:') return '';
-  if (url.origin === origin) return isCountedPath(url.pathname) ? `${origin}${url.pathname}` : '';
+  if (url.origin === origin) {
+    const route = safePathname(url.pathname);
+    return route ? `${origin}${route}` : '';
+  }
   return url.origin;
 }
 
-/** True when a page title may be sent: short, and nothing that reads like an email or a number. */
+/** The title sent when there is no page: the site name. */
+export const SITE_TITLE = 'CARSI';
+
+/**
+ * True when a page title may be sent: only the site name or a route form. The document title is
+ * never sent, because a page can write anything into it.
+ */
 export function isSafeTitle(title: unknown): title is string {
-  return (
-    typeof title === 'string' &&
-    title.length <= 200 &&
-    !title.includes('@') &&
-    !title.includes('://') &&
-    !DIGIT_RUN.test(title)
-  );
+  return title === SITE_TITLE || (typeof title === 'string' && SENT_ROUTES.has(title));
 }
 
-/** The title sent for a counted page: the document title when it is safe, else 'CARSI'. */
-export function safeTitle(title: unknown): string {
-  return isSafeTitle(title) && title.trim() !== '' ? title : 'CARSI';
+/** The title sent for a page: its route form (for example /courses/:slug), or the site name. */
+export function safeTitle(pathname: unknown): string {
+  return safePathname(pathname) || SITE_TITLE;
 }
 
 // ---------------------------------------------------------------------------
@@ -408,6 +446,32 @@ function cleanReferrer(value: string, context: WireContext): boolean {
   return value === '' || safeReferrer(value, context.origin) === value;
 }
 
+/** Parameters with a fixed set of values: anything else is not sent. */
+const FIXED_PARAM_VALUES: ReadonlyMap<string, ReadonlySet<string>> = new Map([
+  ['purchase_mode', new Set(['self', 'team'])],
+  ['currency', new Set(['AUD'])],
+  ['is_free', new Set(['true', 'false', '1', '0'])],
+  ['checkout_enabled', new Set(['true', 'false', '1', '0'])],
+]);
+const SLUG_VALUE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+/**
+ * True when an event parameter may be sent, for Google Analytics and PostHog alike. Fixed
+ * parameters must hold one of their listed values. course_slug and course_title are read from
+ * the course record the page loaded (CourseViewTracker, EnrolButton, GuestEnrolForm), never from
+ * the address or a form, so they are catalogue text; they are still refused when they carry an
+ * address, an email or a long number.
+ */
+export function isAllowedTextParam(name: string, value: unknown): boolean {
+  if (typeof value === 'number') return ALLOWED_NUMBER_PARAMS.has(name) && Number.isFinite(value);
+  if (typeof value === 'boolean') value = String(value);
+  if (typeof value !== 'string' || !ALLOWED_TEXT_PARAMS.has(name)) return false;
+  const fixed = FIXED_PARAM_VALUES.get(name);
+  if (fixed !== undefined) return fixed.has(value);
+  if (value.length > 200 || looksPersonal(value) || DIGIT_RUN.test(value)) return false;
+  return name !== 'course_slug' || SLUG_VALUE.test(value);
+}
+
 /**
  * The rules for one event as it appears in a request. `complete` is false for the shared part of a
  * batched request: there a field may be missing, but one that is present must still pass.
@@ -452,7 +516,7 @@ function eventAllowed(
         if (!cleanReferrer(value, context)) return false;
       } else if (name === 'page_title') {
         if (!isSafeTitle(value)) return false;
-      } else if (!ALLOWED_TEXT_PARAMS.has(name) || looksPersonal(value) || DIGIT_RUN.test(value)) {
+      } else if (!isAllowedTextParam(name, value)) {
         return false;
       }
       continue;

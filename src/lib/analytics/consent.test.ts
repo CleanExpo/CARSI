@@ -2,7 +2,7 @@
  * GP-731: the pure rules behind the analytics consent gate. Each rule is asserted on the inputs it
  * must refuse as well as the ones it must allow, so a rule that silently allows everything fails.
  */
-import { readdirSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
@@ -13,6 +13,7 @@ import {
   IDENTIFIER_ROUTES,
   PRIVATE_FIRST_SEGMENTS,
   isCollectionUrl,
+  isAllowedTextParam,
   isCountedPath,
   libraryUrl,
   readAnalyticsChoice,
@@ -24,6 +25,7 @@ import {
   writeAnalyticsChoice,
   type WireContext,
 } from './consent';
+import { PUBLIC_ROUTES } from './public-routes';
 
 const ORIGIN = 'https://carsi.com.au';
 const ID = 'G-LF86765F5C';
@@ -163,6 +165,35 @@ describe('which pages are counted', () => {
   });
 });
 
+describe('the public route list matches the real pages', () => {
+  it('lists every public page in app/ and nothing else', () => {
+    // A page missing from the list is not counted; a listed route with no page is a stale entry.
+    const appDir = resolve(__dirname, '../../../app');
+    const pages = new Set<string>();
+    const walk = (dir: string, urlParts: string[]) => {
+      if (existsSync(join(dir, 'page.tsx'))) pages.add(`/${urlParts.join('/')}`);
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        if (!entry.isDirectory()) continue;
+        const name = entry.name;
+        walk(join(dir, name), name.startsWith('(') ? urlParts : [...urlParts, name]);
+      }
+    };
+    walk(appDir, []);
+    const isPrivate = (route: string) => {
+      const first = route.split('/')[1];
+      return (
+        first === 'api' ||
+        PRIVATE_FIRST_SEGMENTS.has(first) ||
+        route === '/events/ccw-roadshow/checkin' ||
+        route.startsWith('/events/ccw-roadshow/checkin/')
+      );
+    };
+    const publicPages = [...pages].filter((route) => !isPrivate(route)).sort();
+    expect(publicPages.length).toBeGreaterThan(50);
+    expect([...PUBLIC_ROUTES].sort()).toEqual(publicPages);
+  });
+});
+
 describe('the address that is sent', () => {
   it('keeps only the three plain campaign keys and strips every other key', () => {
     expect(
@@ -171,7 +202,7 @@ describe('the address that is sent', () => {
         '/courses/water',
         '?email=jane%40example.com&token=abc123&utm_source=newsletter&session_id=cs_test_1&gclid=x&utm_medium=email&utm_term=jane&utm_campaign=nov'
       )
-    ).toBe(`${ORIGIN}/courses/water?utm_source=newsletter&utm_medium=email&utm_campaign=nov`);
+    ).toBe(`${ORIGIN}/courses/:slug?utm_source=newsletter&utm_medium=email&utm_campaign=nov`);
   });
 
   it('drops a campaign value that carries an email, a phone number or odd characters', () => {
@@ -192,16 +223,17 @@ describe('the address that is sent', () => {
       'https://www.google.com'
     );
     expect(safeReferrer(`${ORIGIN}/courses/water?email=a@b.c`, ORIGIN)).toBe(
-      `${ORIGIN}/courses/water`
+      `${ORIGIN}/courses/:slug`
     );
     expect(safeReferrer(`${ORIGIN}/dashboard/student/profile`, ORIGIN)).toBe('');
     expect(safeReferrer('not a url', ORIGIN)).toBe('');
   });
 
-  it('replaces a title that reads like an email or a number', () => {
-    expect(safeTitle('Water Damage Restoration | CARSI')).toBe('Water Damage Restoration | CARSI');
-    expect(safeTitle('Welcome jane@example.com')).toBe('CARSI');
-    expect(safeTitle('Order 12345678')).toBe('CARSI');
+  it('sends the route form of the page as its title, never what the page wrote', () => {
+    expect(safeTitle('/courses/water')).toBe('/courses/:slug');
+    expect(safeTitle('/about')).toBe('/about');
+    expect(safeTitle('/dashboard')).toBe('CARSI');
+    expect(safeTitle('Water Damage Restoration | CARSI')).toBe('CARSI');
   });
 
   it('builds the library address only for a valid id', () => {
@@ -219,7 +251,7 @@ describe('the wire: each request to Google is screened again as it leaves', () =
       cid: '123.456',
       ...fields,
     })}`;
-  const clean = { en: 'page_view', dl: `${ORIGIN}/courses/water`, dt: 'Water | CARSI' };
+  const clean = { en: 'page_view', dl: `${ORIGIN}/courses/:slug`, dt: '/courses/:slug' };
 
   it('recognises collection addresses and leaves the library file alone', () => {
     expect(isCollectionUrl('https://region1.google-analytics.com/g/collect?v=2')).toBe(true);
@@ -256,7 +288,7 @@ describe('the wire: each request to Google is screened again as it leaves', () =
   });
 
   it('trims the bad events out of a batch and keeps the good ones', () => {
-    const url = `https://region1.google-analytics.com/g/collect?v=2&tid=${ID}&cid=1.2&dl=${encodeURIComponent(`${ORIGIN}/courses/water`)}`;
+    const url = `https://region1.google-analytics.com/g/collect?v=2&tid=${ID}&cid=1.2&dl=${encodeURIComponent(`${ORIGIN}/courses/:slug`)}`;
     const body = [
       'en=course_view&ep.course_slug=water',
       'en=scroll&epn.percent_scrolled=90',
@@ -265,5 +297,76 @@ describe('the wire: each request to Google is screened again as it leaves', () =
     const screened = screenCollect(url, body, context);
     expect(screened?.body).toBe('en=course_view&ep.course_slug=water');
     expect(screenCollect(url, 'en=scroll\nen=form_start', context)).toBeNull();
+  });
+});
+
+describe('personal data never reaches analytics, whatever shape it takes (GP-731 round 4)', () => {
+  const context: WireContext = { origin: ORIGIN, measurementId: ID, choice: 'granted' };
+  const wire = (fields: Record<string, string>) =>
+    `https://region1.google-analytics.com/g/collect?${new URLSearchParams({
+      v: '2',
+      tid: ID,
+      cid: '123.456',
+      en: 'page_view',
+      ...fields,
+    })}`;
+  const PERSONAL = ['0412', '345', '678', 'jane', '@'];
+  const carriesNone = (value: unknown) => {
+    const text = JSON.stringify(value);
+    return PERSONAL.filter((bit) => text.includes(bit));
+  };
+
+  it.each(['?utm_campaign=0412-345-678', '?utm_campaign=0412%20345%20678', '?utm_source=Jane'])(
+    'drops a campaign value that is not plain lower-case words: %s',
+    (search) => {
+      const sent = safeLocation(ORIGIN, '/courses', search);
+      expect(sent).toBe(`${ORIGIN}/courses`);
+      expect(carriesNone(sent)).toEqual([]);
+    }
+  );
+
+  it('keeps a plain campaign value', () => {
+    expect(
+      safeLocation(ORIGIN, '/courses', '?utm_source=news_letter&utm_campaign=nov-launch')
+    ).toBe(`${ORIGIN}/courses?utm_source=news_letter&utm_campaign=nov-launch`);
+  });
+
+  it('never sends the value typed into a page address segment', () => {
+    for (const path of ['/courses/0412-345-678', '/courses/jane-smith', '/research/0412345678']) {
+      const sent = safeLocation(ORIGIN, path, '');
+      expect(carriesNone(sent)).toEqual([]);
+      expect(carriesNone(safeReferrer(`${ORIGIN}${path}`, ORIGIN))).toEqual([]);
+    }
+    expect(safeLocation(ORIGIN, '/0412-345-678', '')).toBe('');
+  });
+
+  it('never sends a page title written by the page; only a name built from the route', () => {
+    for (const title of ['Call 0412 345 678 | CARSI', 'Welcome jane@example.com', 'Jane Smith']) {
+      expect(carriesNone(safeTitle(title))).toEqual([]);
+      expect(
+        screenCollect(wire({ dl: `${ORIGIN}/courses`, dt: title }), undefined, context)
+      ).toBeNull();
+    }
+  });
+
+  it('sends a fixed event parameter only with one of its listed values', () => {
+    expect(isAllowedTextParam('purchase_mode', 'team')).toBe(true);
+    expect(isAllowedTextParam('purchase_mode', '0412 345 678')).toBe(false);
+    expect(isAllowedTextParam('currency', 'jane')).toBe(false);
+    expect(isAllowedTextParam('is_free', true)).toBe(true);
+    expect(isAllowedTextParam('course_slug', 'water-damage-restoration')).toBe(true);
+    expect(isAllowedTextParam('course_slug', 'Jane Smith')).toBe(false);
+    expect(isAllowedTextParam('user_email', 'x')).toBe(false);
+    expect(isAllowedTextParam('value', 99)).toBe(true);
+  });
+
+  it('the wire drops a phone number in a campaign value or in the address', () => {
+    for (const dl of [
+      `${ORIGIN}/courses?utm_campaign=0412-345-678`,
+      `${ORIGIN}/courses?utm_campaign=0412 345 678`,
+      `${ORIGIN}/courses/0412-345-678`,
+    ]) {
+      expect(screenCollect(wire({ dl }), undefined, context)).toBeNull();
+    }
   });
 });

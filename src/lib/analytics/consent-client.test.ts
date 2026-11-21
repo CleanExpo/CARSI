@@ -31,7 +31,7 @@ function collect(fields: Record<string, string>): string {
     tid: ID,
     cid: '1.2',
     en: 'page_view',
-    dl: `${ORIGIN}/courses/water`,
+    dl: `${ORIGIN}/courses/:slug`,
     ...fields,
   })}`;
 }
@@ -138,7 +138,7 @@ describe('the wire guard', () => {
 
   it('trims the bad events from a batched body and sends the rest', () => {
     saveAnalyticsChoice(true);
-    const url = `https://region1.google-analytics.com/g/collect?v=2&tid=${ID}&cid=1.2&dl=${encodeURIComponent(`${ORIGIN}/courses/water`)}`;
+    const url = `https://region1.google-analytics.com/g/collect?v=2&tid=${ID}&cid=1.2&dl=${encodeURIComponent(`${ORIGIN}/courses/:slug`)}`;
     navigator.sendBeacon(url, 'en=course_view&ep.course_slug=water\nen=scroll');
     expect(beacon).toHaveBeenCalledWith(url, 'en=course_view&ep.course_slug=water');
   });

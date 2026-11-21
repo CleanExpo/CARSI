@@ -103,12 +103,13 @@ export function GoogleAnalytics() {
       previousAddress.current === null
         ? safeReferrer(document.referrer, origin)
         : previousAddress.current;
-    previousAddress.current = address ? `${origin}${path}` : '';
+    previousAddress.current = address ? safeReferrer(`${origin}${path}`, origin) : '';
     if (!isCountedPath(path) || !address) return;
     window.gtag('event', 'page_view', {
       page_location: address,
       page_referrer: referrer,
-      page_title: safeTitle(document.title),
+      // Never document.title: a page can write anything into it. The route form is sent instead.
+      page_title: safeTitle(path),
     });
   }, [granted, isReady, pathname]);
 
