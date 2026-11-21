@@ -12,14 +12,17 @@ import { readLmsUserNow } from '@/lib/server/lms-auth';
  *   - the user is active (a deactivated/deleted user loses access within the TTL, not 7 days);
  *   - it carries the user's current session generation (GP-760: a successful password reset ends
  *     every other session of that user);
- *   - its role is the user's effective database role now (GP-760: a demoted admin or instructor
- *     stops passing token-role checks within the TTL). The client then renews through
+ *   - its role is the user's effective database role now. The client then renews through
  *     /api/auth/refresh, which mints the current role from the database.
  *
- * Fail-open on DB error (the JWT is already signature-verified; we don't want a transient DB blip
- * to 401 the whole site) — but an explicit "user not found" is treated as inactive (deleted
- * account → revoke). Admin access does NOT use this cache: getAdminSessionOrNull reads the
- * database on every request and fails closed.
+ * STAFF TOKENS ARE NEVER CACHED (GP-760, Phill's ruling 22/11/2026: admin and instructor role
+ * gates follow a demotion within one request). A token claiming a staff role is re-read from the
+ * database on every request and refused if the read fails (fail closed), because these claims feed
+ * staff gates (staff lesson auto-enrolment, practical-assessment review, course authoring).
+ *
+ * Learner tokens use the cache and fail OPEN on a DB error (the JWT is already
+ * signature-verified; a transient DB blip must not 401 the whole site) — but an explicit "user not
+ * found" is treated as inactive (deleted account → revoke).
  */
 export const ACTIVE_TTL_MS = 30_000;
 
@@ -85,8 +88,29 @@ async function fetchSessionState(id: string): Promise<UserSessionState> {
   return { active: user.active, role: user.role, generation: user.generation };
 }
 
+/** Roles whose token is re-read on every request (see the file comment). */
+const STAFF_ROLES = new Set(['admin', 'instructor']);
+
+/** True for a token that claims a staff role, so it must never be served from the cache. */
+export function isStaffTokenRole(role: string): boolean {
+  return STAFF_ROLES.has(role.trim().toLowerCase());
+}
+
 /** True when the user is active, the session generation is current and its role is current. */
 export async function isLmsSessionCurrent(claims: SessionClaims): Promise<boolean> {
+  if (isStaffTokenRole(claims.role)) {
+    try {
+      const state = await fetchSessionState(claims.sub);
+      cache.set(claims.sub, { state, expiresAt: Date.now() + ACTIVE_TTL_MS });
+      return sessionMatchesState(claims, state);
+    } catch (e) {
+      console.error(
+        '[auth] staff session re-check failed; refusing:',
+        e instanceof Error ? e.message : String(e)
+      );
+      return false;
+    }
+  }
   const state = await resolveSessionState(claims.sub, Date.now(), fetchSessionState);
   if (!state) return true; // fail open, see above
   return sessionMatchesState(claims, state);
