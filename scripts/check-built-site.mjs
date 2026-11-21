@@ -32,7 +32,14 @@ export const SKIP_SUFFIXES = ['.map', '.nft.json'];
 export const SERVED_EXT = /\.(?:html?|js|mjs|cjs|rsc|body|json|txt|xml|meta)$/i;
 
 const HTML_COMMENT = /<!--[\s\S]*?-->/g;
-const HTML_TAG = /<\/?[A-Za-z][^>"']*(?:(?:"[^"]*"|'[^']*')[^>"']*)*>/g;
+/**
+ * One tag, quoted attribute values included. No part of it may contain `<`: React escapes `<` in
+ * attribute values (`&lt;`), so a served tag never holds one, and stopping there keeps the regex
+ * linear. The source scanner's form (`[^>"']*` runs) retries to the end of the line from every
+ * `<` that never closes, so a long line of unclosed tags (inline script text, minified markup)
+ * cost 2.1s at 128k characters and 12x that at 4x the length (GP-711).
+ */
+export const HTML_TAG = /<\/?[A-Za-z](?:[^<>"']|"[^"<]*"|'[^'<]*')*>/g;
 
 /**
  * Walk `root`, returning the files to scan and what was excluded and why.

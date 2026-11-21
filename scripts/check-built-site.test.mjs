@@ -16,7 +16,8 @@ import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node
 import { tmpdir } from 'node:os';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkBuiltSite, listServedFiles, scanBuiltFile } from './check-built-site.mjs';
+import { checkBuiltSite, HTML_TAG, listServedFiles, scanBuiltFile } from './check-built-site.mjs';
+import { bannedRules, neutraliseCecExemptions } from './check-iicrc-terminology.mjs';
 
 const SCRIPT = join(dirname(fileURLToPath(import.meta.url)), 'check-built-site.mjs');
 let failed = 0;
@@ -35,6 +36,59 @@ const minified = (len) => UNIT.repeat(Math.ceil(len / UNIT.length)).slice(0, len
 const PLANT_CHUNK = 'children:"Get IICRC certified with CARSI today"';
 const PLANT_HTML_SPLIT = '<p>Browse our <strong>IICRC</strong> courses today</p>';
 const PLANT_UNSERVED = 'Enrol in our IICRC courses and get IICRC certified with CARSI';
+// A source-map `mappings` line: base64 VLQ with `;` and `,` and no `.`, `!` or `?`. This is the
+// shape that made terminology rule #4 (the CEC-claim rule) quadratic before GP-656 (#1192).
+const VLQ = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/;,';
+const vlq = (len) => Array.from({ length: len }, (_, i) => VLQ[(i * 7919) % VLQ.length]).join('');
+
+// Long-line bounds (GP-711). Each scan is timed at two sizes: a linear scan grows about 4x for 4x
+// the input, a quadratic one about 16x. Before GP-656, rule #4 took 21.8s on a 64k-character
+// VLQ line and did not finish 256k in 120s. The absolute caps are loose for slow CI machines.
+console.log('long lines');
+const timed = (fn) => {
+  const t = performance.now();
+  const out = fn();
+  return [performance.now() - t, out];
+};
+{
+  const rules = bannedRules();
+  const cec = rules.findIndex((r) => r.neutralise === neutraliseCecExemptions);
+  ok(cec >= 0, 'rule #4 (CEC claim) is found by its neutralise function');
+  const rule4 = (line) => rules[cec].re.test(neutraliseCecExemptions(line));
+  const [small] = timed(() => rule4(vlq(262_144)));
+  const [large] = timed(() => rule4(vlq(1_048_576)));
+  ok(
+    large < 5_000 && large / Math.max(small, 1) < 8,
+    `rule #4 is linear on a VLQ line: 256k ${small.toFixed(0)}ms, 1M ${large.toFixed(0)}ms`
+  );
+  ok(
+    rule4(`${vlq(500_000)};This course earns 8 IICRC CECs;${vlq(500_000)}`),
+    'rule #4 still catches a CEC claim in the middle of a 1M-character line'
+  );
+
+  const line = `${vlq(500_000)},${PLANT_CHUNK},${vlq(500_000)}`;
+  const [whole, found] = timed(() => scanBuiltFile('static/chunks/big.js', line));
+  const [quarter] = timed(() => scanBuiltFile('static/chunks/big.js', line.slice(0, 250_000)));
+  ok(
+    whole < 30_000 && whole / Math.max(quarter, 1) < 8,
+    `every rule is linear on a 1M-character minified line: 250k ${quarter.toFixed(0)}ms, 1M ${whole.toFixed(0)}ms`
+  );
+  ok(found.length > 0, 'a phrase planted mid-way through a 1M-character served line is flagged');
+
+  // Served HTML with long runs of tags that never close (inline script text, minified markup).
+  const unclosed = (n) => `<a class="x" href='y' `.repeat(Math.ceil(n / 22));
+  const page = (n) => `<html><body>${unclosed(n)}${PLANT_HTML_SPLIT}</body></html>`;
+  // The old tag regex took 2.1s on 128k of these and grew 12x for 4x the input; this one takes
+  // about 1ms. Timed on its own: the rules' share of the page scan is linear and measured above.
+  const [tag] = timed(() => unclosed(524_288).replace(HTML_TAG, ' '));
+  ok(tag < 1_000, `tag stripping is linear on 512k of unclosed tags (${tag.toFixed(0)}ms)`);
+  const hFound = scanBuiltFile('server/app/x.html', page(131_072));
+  ok(hFound.length > 0, 'a tag-split phrase after 128k of unclosed tags is flagged');
+  ok(
+    '<p title="a > b" data-x=\'c\'>IICRC</p>'.replace(HTML_TAG, '|') === '|IICRC|',
+    'a tag whose quoted attribute holds `>` is still one tag'
+  );
+}
 
 function buildFixture(root) {
   const put = (rel, text) => {
@@ -180,6 +234,37 @@ try {
   ok(
     run('--dir', join(tmp, 'missing')).status === 2,
     'exits 2 when the build directory is missing'
+  );
+
+  // The only banned phrase is in served HTML, after a 300k-character minified inline script.
+  const htmlOnly = join(tmp, 'html-only');
+  mkdirSync(join(htmlOnly, 'server/app'), { recursive: true });
+  writeFileSync(
+    join(htmlOnly, 'server/app/index.html'),
+    `<html><body><script>${minified(300_000)}</script>${PLANT_HTML_SPLIT}</body></html>`
+  );
+  const htmlRun = run('--dir', htmlOnly);
+  ok(htmlRun.status === 1, `exits 1 on a phrase only in served HTML (got ${htmlRun.status})`);
+
+  // A banned phrase that exists ONLY in a source map is not reported. Safe because a map is
+  // never served (Next.js emits no browser maps unless productionBrowserSourceMaps is set, and
+  // next.config.ts does not set it), and what it carries is already covered: `sourcesContent`
+  // is the original source, which check:iicrc-terminology scans, and `mappings` is base64 VLQ
+  // with no copy in it. The served files of the same fixture are scanned and pass.
+  console.log('source map only');
+  const mapOnly = join(tmp, 'map-only');
+  mkdirSync(join(mapOnly, 'static/chunks'), { recursive: true });
+  writeFileSync(join(mapOnly, 'static/chunks/main.js'), minified(50_000));
+  writeFileSync(
+    join(mapOnly, 'static/chunks/main.js.map'),
+    JSON.stringify({ version: 3, mappings: vlq(500_000), sourcesContent: [PLANT_UNSERVED] })
+  );
+  const mapRun = run('--dir', mapOnly);
+  ok(mapRun.status === 0, `a phrase only in a .map is not reported (exit ${mapRun.status})`);
+  ok(
+    /scanned 1 files/.test(mapRun.stdout) &&
+      /excluded \*\.map \(not served\): 1 files/.test(mapRun.stdout),
+    'the served chunk beside it is still scanned, and the map exclusion is printed'
   );
 } finally {
   rmSync(tmp, { recursive: true, force: true });
