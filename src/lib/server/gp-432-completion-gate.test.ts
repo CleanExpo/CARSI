@@ -348,44 +348,146 @@ describe('GP-432 path 3: a published practical assessment gates completion', () 
   });
 });
 
-describe('GP-432 path 4b: one gated writer of a completed enrolment', () => {
-  it('no code outside syncEnrollmentCompletion and the cohort attendance finalisation writes status completed', () => {
-    // Allow-list: the admin manual IICRC send used to write `status: 'completed'` itself and so
-    // skipped the assessment gate. Any new writer must go through syncEnrollmentCompletion.
-    const root = join(__dirname, '..', '..', '..');
-    const allowed = new Set([
-      join('src', 'lib', 'server', 'ccw-attendance', 'provision.ts'), // cohort attendance (GP-736)
-    ]);
-    const writer = /lmsEnrollment\.(update|updateMany|upsert|create)\([\s\S]{0,400}?data:\s*\{[^}]*status:\s*'completed'/;
-    const offenders: string[] = [];
-    const walk = (dir: string) => {
-      for (const name of readdirSync(dir)) {
-        if (name === 'node_modules' || name === 'generated' || name.startsWith('.')) continue;
-        const path = join(dir, name);
-        if (statSync(path).isDirectory()) {
-          walk(path);
-          continue;
+// ---------------------------------------------------------------------------------------------
+// Path 4b: one gated writer of a completed enrolment.
+//
+// Design (after review found a ternary `status: done ? 'completed' : 'active'` slipping past a
+// shape-matching regex): an ALLOW-LIST OF FILES, not a list of bad shapes. Every non-test file
+// under app/ and src/ that writes lms_enrollments (Prisma or raw SQL) and whose write call
+// mentions `completed` in any form, or sets `status` from anything but a string literal, is an
+// offender unless it is named below with its reason. Inside enrollment-service.ts such a write
+// is allowed only within syncEnrollmentCompletion.
+// ---------------------------------------------------------------------------------------------
+
+const ENROLMENT_WRITE = /lmsEnrollment\s*\.\s*(update|updateMany|upsert|create|createMany)\s*\(|\b(UPDATE|INSERT\s+INTO)\s+"?lms_enrollments\b/gi;
+
+/** Text of the call starting at `start`: up to its balanced closing paren or template end. */
+function callText(text: string, start: number): string {
+  const open = text.indexOf('(', start);
+  const tick = text.indexOf('`', start);
+  if (tick !== -1 && (open === -1 || tick < open)) {
+    // Raw SQL: the statement runs to the closing backtick.
+    const end = text.indexOf('`', tick + 1);
+    return text.slice(start, end === -1 ? undefined : end);
+  }
+  let depth = 0;
+  for (let i = open; i < text.length; i += 1) {
+    if (text[i] === '(') depth += 1;
+    else if (text[i] === ')') {
+      depth -= 1;
+      if (depth === 0) return text.slice(start, i + 1);
+    }
+  }
+  return text.slice(start);
+}
+
+/** The call with its filters removed: Prisma `where: {...}` objects and SQL WHERE tails. */
+function withoutFilters(call: string): string {
+  let out = call.replace(/\bWHERE\b[\s\S]*$/, '');
+  for (;;) {
+    const m = /\bwhere\s*:\s*\{/.exec(out);
+    if (!m) return out;
+    let depth = 0;
+    let end = out.length;
+    for (let i = m.index + m[0].length - 1; i < out.length; i += 1) {
+      if (out[i] === '{') depth += 1;
+      else if (out[i] === '}') {
+        depth -= 1;
+        if (depth === 0) {
+          end = i + 1;
+          break;
         }
-        if (!/\.(ts|tsx)$/.test(name) || /\.test\.tsx?$/.test(name)) continue;
-        const rel = relative(root, path);
-        if (allowed.has(rel)) continue;
-        if (writer.test(readFileSync(path, 'utf8'))) offenders.push(rel);
       }
-    };
-    walk(join(root, 'app'));
-    walk(join(root, 'src'));
-    expect(offenders).toEqual([]);
+    }
+    out = out.slice(0, m.index) + out.slice(end);
+  }
+}
+
+/** Offsets of enrolment writes that can set `completed` (literally, by ternary or dynamically). */
+function completedWriteOffsets(text: string): number[] {
+  const out: number[] = [];
+  for (const m of text.matchAll(ENROLMENT_WRITE)) {
+    const call = withoutFilters(callText(text, m.index ?? 0));
+    const mentionsCompleted = /['"`]completed['"`]/.test(call);
+    const dynamicStatus = /\bstatus\s*:\s*(?!['"`])[A-Za-z_$]/.test(call);
+    const sqlSetsStatus = /\bstatus\s*=\s*(?!'(active|revoked|refunded|pending)')/i.test(call) && /lms_enrollments/i.test(call);
+    if (mentionsCompleted || dynamicStatus || sqlSetsStatus) out.push(m.index ?? 0);
+  }
+  return out;
+}
+
+function functionSpan(text: string, name: string): [number, number] {
+  const start = text.indexOf(`export async function ${name}(`);
+  if (start === -1) return [-1, -1];
+  const next = text.indexOf('\nexport ', start + 1);
+  return [start, next === -1 ? text.length : next];
+}
+
+const COMPLETED_WRITER_ALLOW = new Map<string, string>([
+  [join('src', 'lib', 'server', 'ccw-attendance', 'provision.ts'), 'cohort attendance finalisation (GP-736)'],
+]);
+const GATED_WRITER_FILE = join('src', 'lib', 'server', 'enrollment-service.ts');
+
+function completedWriterOffenders(root: string): string[] {
+  const offenders: string[] = [];
+  const walk = (dir: string) => {
+    for (const name of readdirSync(dir)) {
+      if (name === 'node_modules' || name === 'generated' || name.startsWith('.')) continue;
+      const path = join(dir, name);
+      if (statSync(path).isDirectory()) {
+        walk(path);
+        continue;
+      }
+      if (!/\.(ts|tsx)$/.test(name) || /\.test\.tsx?$/.test(name)) continue;
+      const rel = relative(root, path);
+      if (COMPLETED_WRITER_ALLOW.has(rel)) continue;
+      const text = readFileSync(path, 'utf8');
+      const offsets = completedWriteOffsets(text);
+      if (offsets.length === 0) continue;
+      if (rel === GATED_WRITER_FILE) {
+        const [s, e] = functionSpan(text, 'syncEnrollmentCompletion');
+        for (const o of offsets) if (o < s || o >= e) offenders.push(`${rel}@${o}`);
+        continue;
+      }
+      offenders.push(rel);
+    }
+  };
+  walk(join(root, 'app'));
+  walk(join(root, 'src'));
+  return offenders;
+}
+
+describe('GP-432 path 4b: one gated writer of a completed enrolment', () => {
+  const root = join(__dirname, '..', '..', '..');
+
+  it('no code outside syncEnrollmentCompletion and the allow-listed files can write a completed enrolment', () => {
+    expect(completedWriterOffenders(root)).toEqual([]);
   });
 
-  it('the guard pattern catches the old manual-send writer (positive control)', () => {
-    const oldManualSend = `await prisma.$transaction(async (tx) => {
-    await tx.lmsEnrollment.update({
-      where: { id: enrollmentId },
-      data: {
-        status: 'completed',
-        completedAt,
-      },
-    });`;
-    expect(/lmsEnrollment\.(update|updateMany|upsert|create)\([\s\S]{0,400}?data:\s*\{[^}]*status:\s*'completed'/.test(oldManualSend)).toBe(true);
+  it('the gated writer itself is still found (the scan is not blind)', () => {
+    const text = readFileSync(join(root, GATED_WRITER_FILE), 'utf8');
+    const [s, e] = functionSpan(text, 'syncEnrollmentCompletion');
+    expect(s).toBeGreaterThan(-1);
+    expect(completedWriteOffsets(text).some((o) => o >= s && o < e)).toBe(true);
+  });
+
+  it.each([
+    ['literal', `await tx.lmsEnrollment.update({ where: { id }, data: { status: 'completed', completedAt } });`],
+    ['ternary', `await prisma.lmsEnrollment.update({ where: { id }, data: { status: done ? 'completed' : 'active' } });`],
+    ['variable', `const next = 'completed';\nawait prisma.lmsEnrollment.updateMany({ where: { id }, data: { status: next } });`],
+    ['spaced call', `await prisma.lmsEnrollment . upsert ({ where: { id }, create: { status: "completed" }, update: {} });`],
+    ['raw SQL', "await tx.$executeRaw`UPDATE lms_enrollments SET status = 'completed', completed_at = NOW() WHERE id = ${id}::uuid`;"],
+    ['raw SQL parameter', "await tx.$executeRaw`UPDATE lms_enrollments SET status = ${s} WHERE id = ${id}::uuid`;"],
+  ])('positive control: the scan flags a %s completed write', (_label, src) => {
+    expect(completedWriteOffsets(src).length).toBeGreaterThan(0);
+  });
+
+  it.each([
+    ['revocation', `await prisma.lmsEnrollment.update({ where: { id }, data: { status: 'revoked', completedAt: null } });`],
+    ['certificate stamp', `await prisma.lmsEnrollment.update({ where: { id }, data: { certificateIssuedAt: new Date() } });`],
+    ['filter on completed', `await prisma.lmsEnrollment.updateMany({ where: { id, status: 'completed' }, data: { certificateIssuedAt: new Date() } });`],
+    ['SQL filter on completed', "await tx.$executeRaw`UPDATE lms_enrollments SET certificate_issued_at = NOW() WHERE status = 'completed'`;"],
+  ])('negative control: the scan leaves a %s write alone', (_label, src) => {
+    expect(completedWriteOffsets(src)).toEqual([]);
   });
 });

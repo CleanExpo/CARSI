@@ -68,6 +68,12 @@ export async function POST(request: NextRequest) {
         { status: 404 },
       );
     }
+    if (msg === 'ENROLLMENT_REVOKED') {
+      return NextResponse.json(
+        { detail: 'A revoked or refunded enrolment cannot be marked complete.' },
+        { status: 409 },
+      );
+    }
     return NextResponse.json({ detail: 'Failed to mark courses complete' }, { status: 500 });
   }
 }

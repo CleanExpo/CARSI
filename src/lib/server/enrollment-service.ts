@@ -345,15 +345,20 @@ export async function forceCompleteEnrollment(
 
   const en = await prisma.lmsEnrollment.findFirst({
     where: { id: enrollmentId, studentId },
-    select: { id: true, studentId: true, courseId: true },
+    select: { id: true, studentId: true, courseId: true, status: true },
   });
   if (!en) throw new Error('ENROLLMENT_NOT_FOUND');
+  // A revoked or refunded enrolment is left exactly as it is: no lesson writes, no audit row.
+  if (isRevokedStatus(en.status)) throw new Error('ENROLLMENT_REVOKED');
 
   const { ids, total } = await lessonTotalsForCourse(en.courseId);
   const now = new Date();
 
   const admin = await prisma.$transaction(async (tx) => {
     const current = await requireCurrentAdmin(tx, options.session);
+    // Re-read inside the transaction so a revocation that lands after the check above still wins.
+    const live = await tx.lmsEnrollment.findUnique({ where: { id: en.id }, select: { status: true } });
+    if (!live || isRevokedStatus(live.status)) throw new Error('ENROLLMENT_REVOKED');
     for (const lessonId of ids) {
       await tx.lmsLessonProgress.upsert({
         where: { studentId_lessonId: { studentId: en.studentId, lessonId } },
@@ -418,6 +423,30 @@ export async function recordFirstCompletion(
     where: { id: enrollmentId, firstCompletedAt: null },
     data: { firstCompletedAt: at },
   });
+}
+
+/**
+ * GP-432: passing an assessment can be the last thing an enrolment needs (lessons already
+ * done, possibly by an admin). Every writer of a passed quiz attempt or a passed practical
+ * calls this after its transaction commits, so completion and the IICRC auto-submit follow
+ * the pass without waiting for an unrelated lesson write. It runs the same gated
+ * syncEnrollmentCompletion. It never throws: the pass is already recorded, and any later
+ * sync (lesson write, certificate request) reaches the same result.
+ */
+export async function syncCompletionAfterAssessmentPassed(
+  studentId: string,
+  courseId: string,
+): Promise<void> {
+  try {
+    const row = await prisma.lmsEnrollment.findFirst({
+      where: { studentId, courseId, status: 'active' },
+      select: { id: true },
+    });
+    if (!row) return;
+    await syncEnrollmentCompletion(row.id, studentId, courseId);
+  } catch (e) {
+    console.error('[enrollment] completion sync after an assessment pass', studentId, courseId, e);
+  }
 }
 
 export async function syncEnrollmentCompletion(

@@ -10,6 +10,7 @@ import {
 } from '@/lib/server/course-catalog-sync';
 import type { AdminSessionProvenance } from '@/lib/server/current-admin';
 import { forceCompleteEnrollment } from '@/lib/server/enrollment-service';
+import { isRevokedStatus } from '@/lib/server/enrollment-access';
 
 function isWorkbookInfrastructureError(message: string): boolean {
   const m = message.toLowerCase();
@@ -173,12 +174,18 @@ export async function adminMarkEnrollmentsComplete(params: {
 
   const owned = await prisma.lmsEnrollment.findMany({
     where: { id: { in: uniqueIds }, studentId: params.studentId },
-    select: { id: true },
+    select: { id: true, status: true },
   });
   if (owned.length !== uniqueIds.length) {
     throw new Error('ENROLLMENT_NOT_FOUND');
   }
+  // Refuse the whole batch before any write when one enrolment is revoked or refunded.
+  if (owned.some((row) => isRevokedStatus(row.status))) {
+    throw new Error('ENROLLMENT_REVOKED');
+  }
 
+  // Each enrolment commits on its own; a failure part-way through (for example the admin's
+  // access removed between rows) leaves earlier rows done and audited. `results` lists them.
   const results: MarkCompleteResult[] = [];
   for (const enrollmentId of uniqueIds) {
     const r = await forceCompleteEnrollment(enrollmentId, params.studentId, {

@@ -29,6 +29,13 @@ const RUNNABLE = TARGET.runnable;
 const CEC_SLUG = 'introduction-to-porous-materials-drying';
 const BOOTSTRAP_ADMIN = 'gp432-bootstrap-admin@pg-test.invalid';
 
+// The completion sync after an assessment pass fires the IICRC auto-submit; nothing is sent here.
+const iicrcAutoSubmit = vi.hoisted(() => vi.fn(async () => {}));
+vi.mock('./iicrc-cec-submission', async (original) => ({
+  ...(await original<typeof import('./iicrc-cec-submission')>()),
+  processIicrcCecSubmissionForEnrollment: iicrcAutoSubmit,
+}));
+
 if (!RUNNABLE) {
   describe('GP-432 learner record (real PostgreSQL)', () => {
     const refusal = TARGET.refusal;
@@ -173,6 +180,30 @@ describe.runIf(RUNNABLE)('GP-432 learner record (real PostgreSQL)', () => {
         course_ref: ids.course,
       },
     ]);
+  });
+
+  it('passing the last quiz after an admin force-complete completes the enrolment', async () => {
+    await addQuiz(ids.quiz);
+    await addAttempt(ids.quiz, false);
+    await service.forceCompleteEnrollment(ids.enrolment, ids.learner, { session, reason: 'Lessons failed to record' });
+    expect(await status()).toBe('active');
+
+    await addAttempt(ids.quiz, true);
+    await service.syncCompletionAfterAssessmentPassed(ids.learner, ids.course);
+    expect(await status()).toBe('completed');
+    expect(iicrcAutoSubmit).toHaveBeenCalledWith(ids.enrolment, expect.anything());
+  });
+
+  it('admin force-complete refuses a revoked enrolment and leaves the record untouched', async () => {
+    await db.query("UPDATE lms_enrollments SET status = 'revoked' WHERE id = $1", [ids.enrolment]);
+    await expect(
+      service.forceCompleteEnrollment(ids.enrolment, ids.learner, { session, reason: 'Support request' }),
+    ).rejects.toThrow('ENROLLMENT_REVOKED');
+    expect(await status()).toBe('revoked');
+    const progress = await db.query('SELECT 1 FROM lms_lesson_progress WHERE student_id = $1', [ids.learner]);
+    expect(progress.rows).toEqual([]);
+    const audit = await db.query('SELECT 1 FROM lms_learner_admin_audit_events WHERE student_ref = $1', [ids.learner]);
+    expect(audit.rows).toEqual([]);
   });
 
   it('quiz-attempt reset voids failed attempts, keeps the passed one, frees the attempt limit and audits it', async () => {

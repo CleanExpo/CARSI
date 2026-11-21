@@ -15,6 +15,8 @@ vi.mock('@/lib/server/course-prerequisites', async (original) => ({
   findEnrolledCoursePrerequisiteBlock: vi.fn(async () => null),
 }));
 vi.mock('@/lib/server/upstream-api', () => ({ getUpstreamBaseUrl: mocks.upstream }));
+// The completion sync after a pass (GP-432) is covered in gp-432-completion-triggers.test.ts.
+vi.mock('@/lib/server/enrollment-service', () => ({ syncCompletionAfterAssessmentPassed: vi.fn(async () => {}) }));
 vi.mock('@/lib/server/lesson-checkpoint', async (original) => ({
   ...(await original<typeof import('./lesson-checkpoint')>()), getVersionBoundQuizForAttempt: mocks.graph,
 }));

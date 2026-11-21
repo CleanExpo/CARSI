@@ -43,7 +43,7 @@ vi.mock('@/lib/prisma', () => ({
       findUnique: vi.fn(async () => ({ slug: 'cec-course', modules: [{ lessons: [{ id: 'l1' }, { id: 'l2' }] }] })),
     },
     lmsEnrollment: {
-      findMany: vi.fn(async () => [{ id: ENROLLMENT_ID }]),
+      findMany: vi.fn(async () => [{ id: ENROLLMENT_ID, status: state.enrollment?.status }]),
       findFirst: vi.fn(async () => state.enrollment),
       findUnique: vi.fn(async () => state.enrollment),
       update: vi.fn(async (args: { data: Record<string, unknown> }) => {
@@ -141,6 +141,28 @@ describe('GP-432 path 4: admin force-complete', () => {
     const res = await POST(request({ studentId: STUDENT_ID, enrollmentIds: [ENROLLMENT_ID], reason: 'Support request' }));
 
     expect(res.status).toBe(403);
+    expect(state.progressWrites).toBe(0);
+    expect(state.audits).toEqual([]);
+  });
+
+  it.each(['revoked', 'refunded'])('refuses a %s enrolment before any write (409)', async (status) => {
+    state.enrollment = { ...state.enrollment, status };
+
+    const res = await POST(request({ studentId: STUDENT_ID, enrollmentIds: [ENROLLMENT_ID], reason: 'Support request' }));
+
+    expect(res.status).toBe(409);
+    expect(state.progressWrites).toBe(0);
+    expect(state.audits).toEqual([]);
+    expect(state.enrollment?.status).toBe(status);
+  });
+
+  it('refuses when the enrolment is revoked after the batch check (re-read in the transaction)', async () => {
+    const { prisma } = await import('@/lib/prisma');
+    vi.mocked(prisma.lmsEnrollment.findUnique).mockResolvedValueOnce({ ...state.enrollment, status: 'revoked' } as never);
+
+    const res = await POST(request({ studentId: STUDENT_ID, enrollmentIds: [ENROLLMENT_ID], reason: 'Support request' }));
+
+    expect(res.status).toBe(409);
     expect(state.progressWrites).toBe(0);
     expect(state.audits).toEqual([]);
   });

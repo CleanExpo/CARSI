@@ -182,7 +182,27 @@ describe('GP-432 path 5: every attempt counter ignores voided attempts', () => {
     expect(seen[0]).toMatch(/voided_at\s+IS\s+NULL/i);
   });
 
-  it('no attempt count is taken anywhere except that helper', () => {
+
+  // Design (after review found `COUNT ( * )` slipping past a shape-matching regex): an
+  // ALLOW-LIST OF FILES that read quiz attempts at all, each with its reason. A new reader
+  // anywhere under app/ or src/ fails this test until someone checks it ignores voided
+  // attempts and adds it here. Allowed readers other than the count helper must also not
+  // count attempts in any form.
+  const ATTEMPT_READ =
+    /lmsQuizAttempt\s*\.\s*(count|findMany|findFirst|findUnique|aggregate|groupBy)\b|\blms_quiz_attempts\b|\bquizAttempts\b|_count[\s\S]{0,80}?\battempts\b/;
+  const ATTEMPT_COUNT =
+    /lmsQuizAttempt\s*\.\s*(count|aggregate|groupBy)\b|\bCOUNT\s*\([\s\S]{0,300}?\blms_quiz_attempts\b|_count[\s\S]{0,80}?\battempts\b/i;
+  const READER_ALLOW = new Map<string, string>([
+    [join('src', 'lib', 'server', 'quiz-attempt-count.ts'), 'the one counter; excludes voided attempts'],
+    [join('src', 'lib', 'server', 'quiz-attempt-reset.ts'), 'reads failed attempts to void them'],
+    [join('src', 'lib', 'server', 'enrollment-service.ts'), 'reads passed attempts only (never voided)'],
+    [join('src', 'lib', 'server', 'lesson-checkpoint.ts'), 'reads the passed attempt only'],
+    [join('app', 'api', 'lms', 'quizzes', '[quizId]', 'attempt', 'route.ts'), 'inserts attempts; counts via the helper'],
+    [join('src', 'lib', 'lms', 'quiz-seed.ts'), 'mentions the table in a comment only'],
+  ]);
+  const COUNTER = join('src', 'lib', 'server', 'quiz-attempt-count.ts');
+
+  it('every reader of quiz attempts is allow-listed, and only the helper counts them', () => {
     const root = join(__dirname, '..', '..', '..');
     const offenders: string[] = [];
     const walk = (dir: string) => {
@@ -195,15 +215,32 @@ describe('GP-432 path 5: every attempt counter ignores voided attempts', () => {
         }
         if (!/\.(ts|tsx)$/.test(name) || /\.test\.tsx?$/.test(name)) continue;
         const rel = relative(root, path);
-        if (rel === join('src', 'lib', 'server', 'quiz-attempt-count.ts')) continue;
         const text = readFileSync(path, 'utf8');
-        if (/lmsQuizAttempt\.count\s*\(/.test(text) || /COUNT\([^)]*\)[^`]*FROM\s+lms_quiz_attempts/i.test(text)) {
-          offenders.push(rel);
-        }
+        if (!ATTEMPT_READ.test(text)) continue;
+        if (!READER_ALLOW.has(rel)) offenders.push(`${rel}: unlisted reader`);
+        else if (rel !== COUNTER && ATTEMPT_COUNT.test(text)) offenders.push(`${rel}: counts attempts`);
       }
     };
     walk(join(root, 'app'));
     walk(join(root, 'src'));
     expect(offenders).toEqual([]);
+  });
+
+  it('every allow-listed reader still exists and still reads attempts (the list is not stale)', () => {
+    const root = join(__dirname, '..', '..', '..');
+    for (const rel of READER_ALLOW.keys()) {
+      expect(ATTEMPT_READ.test(readFileSync(join(root, rel), 'utf8')), rel).toBe(true);
+    }
+  });
+
+  it.each([
+    ['Prisma count', `await prisma.lmsQuizAttempt.count({ where: { quizId, studentId } })`],
+    ['spaced SQL COUNT', 'await tx.$queryRaw`SELECT COUNT ( * )::int AS count FROM lms_quiz_attempts WHERE quiz_id = ${q}`'],
+    ['SQL COUNT(id)', 'await tx.$queryRaw`SELECT COUNT(id) FROM lms_quiz_attempts`'],
+    ['relation _count', `await prisma.lmsQuiz.findUnique({ where: { id }, select: { _count: { select: { attempts: true } } } })`],
+    ['aggregate', `await prisma.lmsQuizAttempt.aggregate({ _count: true, where: { quizId } })`],
+  ])('positive control: the scan flags a %s', (_label, src) => {
+    expect(ATTEMPT_READ.test(src)).toBe(true);
+    expect(ATTEMPT_COUNT.test(src)).toBe(true);
   });
 });
