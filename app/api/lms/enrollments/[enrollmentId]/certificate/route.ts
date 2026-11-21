@@ -6,6 +6,7 @@ import {
   buildCompletionCertificatePdf,
   completionCertificateDataFromEnrollment,
 } from '@/lib/server/certificate-pdf';
+import { getAppOrigin } from '@/lib/server/app-url';
 import { canIssueCertificate } from '@/lib/server/certificate-name';
 import { getEnrollmentForCertificate, markCertificateIssued } from '@/lib/server/enrollment-service';
 import { captureServerError } from '@/lib/server/sentry';
@@ -70,9 +71,7 @@ export async function GET(request: NextRequest, ctx: Ctx) {
       );
     }
 
-    const origin =
-      process.env.NEXT_PUBLIC_APP_URL?.trim() ||
-      new URL(request.url).origin;
+    const origin = getAppOrigin(request);
     const pdf = await buildCompletionCertificatePdf(
       completionCertificateDataFromEnrollment(row, origin)
     );

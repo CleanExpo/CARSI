@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
+import { getAppOrigin } from '@/lib/server/app-url';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { addCourseTeamMemberByEmail } from '@/lib/server/team-member-provision';
 import { countTeamSeatsUsed, generateInviteToken, repairAndGetTeamForUser } from '@/lib/server/teams';
@@ -111,11 +112,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const appUrl = (
-      process.env.NEXT_PUBLIC_APP_URL ||
-      process.env.NEXT_PUBLIC_FRONTEND_URL ||
-      'http://localhost:3000'
-    ).replace(/\/$/, '');
+    const appUrl = getAppOrigin();
 
     return NextResponse.json({
       id: invite.id,
