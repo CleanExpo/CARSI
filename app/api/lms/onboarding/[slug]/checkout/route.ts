@@ -189,10 +189,6 @@ export async function POST(request: NextRequest, ctx: Ctx) {
     });
     return NextResponse.json({ checkout_url });
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (msg === 'INVALID_AMOUNT') {
-      return NextResponse.json({ detail: 'Invalid program price configuration' }, { status: 400 });
-    }
     console.error('[onboarding/checkout]', e);
     return NextResponse.json({ detail: 'Could not start checkout' }, { status: 500 });
   }

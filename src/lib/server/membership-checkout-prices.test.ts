@@ -126,7 +126,8 @@ beforeEach(() => {
     price_individual: price('price_individual', 79_500),
     price_owner: price('price_owner', 129_500),
     price_owner_monthly_old: price('price_owner_monthly_old', 129_500, 'month'),
-    price_team_starter: price('price_team_starter', 69_500),
+    // Teams Starter shows $299 a year for 5 seats; checkout bills unit x 5, so the unit is A$59.80.
+    price_team_starter: price('price_team_starter', 5_980),
   };
   mocks.pricesRetrieve.mockImplementation(async (id: string) => {
     const p = catalogue[id];
@@ -250,11 +251,26 @@ describe('onboarding checkout (the same business owner plan)', () => {
 });
 
 describe('Teams checkout', () => {
-  it('accepts no promotion codes', async () => {
+  it('bills exactly the tier total shown ($299 for 5 seats) and accepts no promotion codes', async () => {
     const res = await teams(request({ tier: 'starter' }));
     expect(res.status).toBe(200);
-    expect(lastSessionArgs()).not.toHaveProperty('allow_promotion_codes');
+    const args = lastSessionArgs();
+    expect(args.line_items).toEqual([{ price: 'price_team_starter', quantity: 5 }]);
+    expect(args).not.toHaveProperty('allow_promotion_codes');
   });
+
+  for (const [label, wrong] of [
+    ['a A$695 unit (5 x 695 = $3,475, not the $299 shown)', price('price_team_starter', 69_500)],
+    ['a monthly unit', price('price_team_starter', 5_980, 'month')],
+    ['another currency', price('price_team_starter', 5_980, 'year', 'usd')],
+  ] as const) {
+    it(`refuses a tier Price with ${label}, and Stripe Checkout is never opened`, async () => {
+      catalogue.price_team_starter = wrong;
+      const res = await teams(request({ tier: 'starter' }));
+      expect(res.status).toBe(503);
+      expect(mocks.sessionsCreate).not.toHaveBeenCalled();
+    });
+  }
 });
 
 describe('extra staff seats: A$695 per year each', () => {
