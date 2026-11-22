@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 
 import { isCarsiEventName } from '@/lib/analytics/carsi-events';
+import { safePathname } from '@/lib/analytics/consent';
 import { resolveCarsiDataEventTarget } from '@/lib/analytics/resolve-carsi-data-event-target';
 import { trackCarsiProductEvent } from '@/lib/analytics/track-carsi-product-event';
 
@@ -21,10 +22,17 @@ export function CarsiProductEventCollector() {
       if (!name || !isCarsiEventName(name)) return;
 
       const context = el.getAttribute('data-carsi-context')?.trim() || undefined;
-      const href =
-        el instanceof HTMLAnchorElement ? el.href : undefined;
+      let link_path: string | undefined;
+      if (el instanceof HTMLAnchorElement) {
+        try {
+          const path = safePathname(new URL(el.href).pathname);
+          if (path) link_path = path;
+        } catch {
+          /* ignore bad href */
+        }
+      }
 
-      trackCarsiProductEvent({ name, context, href });
+      trackCarsiProductEvent({ name, context, link_path });
     };
 
     document.addEventListener('click', onClick, { capture: true });

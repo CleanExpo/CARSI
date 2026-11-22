@@ -4,6 +4,8 @@
 
 ## Automated gate (local or CI-shaped)
 
+After pulling schema changes from `main`, run `npm run prisma:generate` once so `tsc` sees new columns (e.g. GP-729 `critical`).
+
 ```bash
 npm run verify:product-excellence
 ```
@@ -28,7 +30,7 @@ This runs unit tests on conversion/coaching summary helpers, coaching visual she
 6. Active subscriber home — quick links, month summary, marketing spotlight.
 7. Build or open marketing pack → downloads → proposed fix on admin queue → approve → member actions.
 8. Sessions — book CTA uses `CARSI_COACHING_BOOKING_URL` when set (else support mailto).
-9. Analytics — click a role-guide **Start here** course card; confirm `course_cta` in GA4 DebugView / PostHog live (when keys are set). Marketing pack **Build** should emit `marketing_pack_build`.
+9. Analytics — accept cookies first, then click a role-guide **Start here** course card; confirm `course_cta` (+ `carsi_context`) in GA4 DebugView / PostHog live (when keys are set). Marketing pack **Build** should emit `marketing_pack_build`.
 
 ### Trust
 

@@ -19,6 +19,7 @@ const STEPS = [
       '--config',
       'config/vitest.config.ts',
       'src/lib/analytics/resolve-carsi-data-event-target.test.ts',
+      'src/lib/analytics/consent.test.ts',
     ],
   },
   {

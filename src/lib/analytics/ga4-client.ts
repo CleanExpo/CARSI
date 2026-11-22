@@ -126,6 +126,6 @@ export function trackMembershipCheckoutStarted(payload: MembershipCheckoutStarte
 export function trackCarsiProductEvent(payload: CarsiProductEventPayload): void {
   sendGa4Event(payload.name, {
     ...(payload.context ? { carsi_context: payload.context } : {}),
-    ...(payload.href ? { link_url: payload.href } : {}),
+    ...(payload.link_path ? { link_path: payload.link_path } : {}),
   });
 }

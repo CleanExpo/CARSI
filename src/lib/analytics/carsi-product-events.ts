@@ -4,6 +4,6 @@ export interface CarsiProductEventPayload {
   name: CarsiEventName;
   /** From `data-carsi-context` — never PII. */
   context?: string;
-  /** Present for link clicks (absolute URL). */
-  href?: string;
+  /** Counted route only (no query, no external host) — GP-731. */
+  link_path?: string;
 }
