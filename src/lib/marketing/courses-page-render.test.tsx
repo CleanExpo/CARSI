@@ -207,8 +207,13 @@ const REVIEWED_SOURCE_SHA256: Record<string, string> = {
   // back from that block (src/lib/seo/course-references.ts NAMES_IICRC_RE) pending GP-639 review.
   // Row 19 (NZ) re-pin: `locale: 'en_AU'` → `...OG_LOCALE_FIELDS` (en_AU + alternate en_NZ) and its
   // import. Metadata only; no IICRC, CEC, certification, accreditation or approval sentence changed.
+  // GP-748 re-pin: the learning-outcome sentences moved to src/lib/courses/course-credential-copy.ts
+  // and now name the IICRC only for a CEC-approved course; the page passes `cecApproved` to the
+  // schema and detail components. No IICRC sentence was added; a non-approved course page names
+  // none (pinned by src/lib/courses/course-credential-copy.test.tsx). Re-pinned again after the
+  // #1205 review: the audience list now takes the same `cecApproved` flag (one argument added).
   'app/(public)/courses/[slug]/page.tsx':
-    'd944bbd59dfd53e62f5bcb85ff0d615a8e94aa9d7f69c04cd47d957cfb604b97',
+    'f72265818e4ea739166a6376e000b1d2d91d45a88ca6e4041ba249cd8139e437',
   // Row 19 (NZ) re-pin: `locale: 'en_AU'` → `...OG_LOCALE_FIELDS` (en_AU + alternate en_NZ) and its
   // import. Metadata only; no IICRC, CEC, certification, accreditation or approval sentence changed.
   'app/(public)/pathways/[slug]/page.tsx':

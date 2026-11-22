@@ -16,6 +16,7 @@ import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase'
 import { isPrerequisiteNotMetError, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
 import { computeDiscountedAud, findActiveUserDiscount } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
+import { getAppOrigin } from '@/lib/server/app-url';
 
 /**
  * Finalise enrolment after Stripe Checkout (session_id) or confirm free enrolment
@@ -145,7 +146,7 @@ export async function POST(request: NextRequest) {
       void sendEnrollmentWelcomeEmail({
         studentId: claims.sub,
         courseSlug: slug,
-        appOrigin: request.nextUrl.origin,
+        appOrigin: getAppOrigin(request),
       }).catch((e) => console.error('[enrollments/confirm] email', e));
 
       notifyCrmEnrollmentCreated({

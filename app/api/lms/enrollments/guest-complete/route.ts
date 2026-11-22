@@ -14,6 +14,7 @@ import { captureServerError } from '@/lib/server/sentry';
 import { getTeamForUser } from '@/lib/server/teams';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
 import { prisma } from '@/lib/prisma';
+import { getAppOrigin } from '@/lib/server/app-url';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const origin = request.nextUrl.origin;
+    const origin = getAppOrigin(request);
 
     if (!fulfilled.alreadyEnrolled && fulfilled.enrollmentId && fulfilled.courseId) {
       void sendEnrollmentWelcomeEmail({

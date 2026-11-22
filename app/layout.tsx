@@ -1,4 +1,5 @@
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { CarsiProductEventCollector } from '@/components/analytics/CarsiProductEventCollector';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { AuthProvider } from '@/components/auth/auth-provider';
 import { ServiceWorkerRegistration } from '@/components/lms/ServiceWorkerRegistration';
@@ -150,6 +151,7 @@ export default function RootLayout({
         {/* Analytics loads only after the visitor accepts in this banner (GP-731). */}
         <CookieConsentBanner />
         <GoogleAnalytics />
+        <CarsiProductEventCollector />
       </body>
     </html>
   );

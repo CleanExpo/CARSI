@@ -61,7 +61,10 @@ export function RoleGuidesHubHero() {
 
 export function RoleGuidesHubGrid() {
   return (
-    <section className="border-t border-slate-200/70 bg-white py-16 md:py-24">
+    <section
+      id="role-guides-audiences"
+      className="border-t border-slate-200/70 bg-white py-16 md:py-24 scroll-mt-24"
+    >
       <div className={PUBLIC_SHELL_INNER_CLASS}>
         <p className={LANDING_EYEBROW_CLASS}>Six audiences</p>
         <h2 className={`mt-3 max-w-2xl ${LANDING_DISPLAY_H2_CLASS}`}>
