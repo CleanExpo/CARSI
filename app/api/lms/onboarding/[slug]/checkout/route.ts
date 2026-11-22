@@ -74,6 +74,15 @@ export async function POST(request: NextRequest, ctx: Ctx) {
 
   if (teamSubscriptionsEnabled()) {
     const priceId = await resolveOrgAnnualPriceId();
+    if (!priceId) {
+      // GP-773: fail closed. A missing, unreadable or mismatched business owner Price (not
+      // A$1,295 AUD yearly) opens no checkout, rather than falling through to the inline
+      // purchase, which would sell the plan with no organisation record.
+      return NextResponse.json(
+        { detail: 'Organisation subscription purchasing is not yet available.' },
+        { status: 503 }
+      );
+    }
     if (priceId) {
       if (organisationName.length < 2) {
         return NextResponse.json({ detail: 'Organisation name is required.' }, { status: 400 });

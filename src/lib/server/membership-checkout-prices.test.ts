@@ -215,6 +215,18 @@ describe('onboarding checkout (the same business owner plan)', () => {
     expect(args).not.toHaveProperty('allow_promotion_codes');
   });
 
+  for (const [label, setUp] of [
+    ['a monthly A$1,295 Price', () => (catalogue.price_owner = price('price_owner', 129_500, 'month'))],
+    ['no Price at all', () => vi.stubEnv('STRIPE_PRICE_ORG_ANNUAL', '')],
+  ] as const) {
+    it(`org path with ${label}: refuses (503) and opens no checkout, not even the inline one`, async () => {
+      setUp();
+      const res = await onboarding(request({ organisation_name: 'Acme Restoration' }), onboardingCtx);
+      expect(res.status).toBe(503);
+      expect(mocks.sessionsCreate).not.toHaveBeenCalled();
+    });
+  }
+
   it('inline fallback: A$1,295 billed yearly as a subscription, whatever the course meta says', async () => {
     await createOnboardingStripeCheckout({
       slug: 'floor-care',

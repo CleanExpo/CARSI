@@ -1,8 +1,4 @@
-import {
-  BUSINESS_OWNER_PLAN,
-  formatMembershipAud,
-  membershipAmountAud,
-} from '@/lib/lms/membership-prices';
+import { BUSINESS_OWNER_PLAN, formatMembershipAud } from '@/lib/lms/membership-prices';
 
 /** Umbrella brand for CARSI Maintenance Company B2B onboarding programs. */
 export const ONBOARDING_BRAND = 'CARSI Maintenance Company Onboarding';
@@ -100,11 +96,6 @@ export function getPhasesForSlug(slug: string): OnboardingPhase[] {
 export function formatOnboardingPrice(pricing?: OnboardingPricingMeta | null): string {
   const seats = pricing?.seats === 'unlimited' ? ' · unlimited learners' : '';
   return `AUD ${formatMembershipAud(BUSINESS_OWNER_PLAN)}/year incl. GST${seats}`;
-}
-
-/** Organisation subscription amount in whole AUD: always the business owner plan (GP-773). */
-export function resolveOnboardingAmountAud(_meta?: OnboardingCourseMeta | null): number {
-  return membershipAmountAud(BUSINESS_OWNER_PLAN);
 }
 
 export function getPhaseForModuleIndex(

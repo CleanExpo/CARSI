@@ -27,7 +27,7 @@ import {
 } from '@/lib/lms/membership-prices';
 import { MEMBERSHIP_PRICE_AUD } from '@/lib/membership-checkout';
 import { RWR_MEMBERSHIP_ANNUAL_CENTS } from '@/lib/metrics/rwr';
-import { formatOnboardingPrice, resolveOnboardingAmountAud } from '@/lib/onboarding/enterprise';
+import { formatOnboardingPrice } from '@/lib/onboarding/enterprise';
 
 describe('the source of truth holds the founder prices', () => {
   it('individual membership is A$795 per year', () => {
@@ -83,11 +83,6 @@ describe('every price reader uses the source', () => {
       expect(label).not.toContain('/month');
       expect(label).not.toContain('+ GST');
     }
-  });
-
-  it('the onboarding fallback amount is the business owner price, whatever course meta says', () => {
-    expect(resolveOnboardingAmountAud(null)).toBe(1295);
-    expect(resolveOnboardingAmountAud({ pricing: { amountAud: 99 } })).toBe(1295);
   });
 });
 
