@@ -621,13 +621,29 @@ const NEVER = [
 ];
 
 /**
+ * Where the course cards begin: after the role-guide "Start here" and employer-trust sections,
+ * whose plain course links carry no price and are not cards. The whole page is still checked for
+ * stray dollar amounts and never-claim strings; only the card lookup starts later.
+ */
+function cardsFrom(html: string): number {
+  const trust = html.indexOf('data-testid="role-guide-employer-trust"');
+  if (trust === -1) return 0;
+  const close = html.indexOf('</section>', trust);
+  return close === -1 ? 0 : close;
+}
+
+/**
  * GP-695: each course card's HTML, from its first link to the first link of a different course.
  * Prices may only be removed inside these segments, never from shared page text.
  */
-function cardSegments(html: string, slugs: readonly string[]): Array<{ slug: string; start: number; end: number }> {
+function cardSegments(
+  html: string,
+  slugs: readonly string[]
+): Array<{ slug: string; start: number; end: number }> {
   const out: Array<{ slug: string; start: number; end: number }> = [];
+  const from = cardsFrom(html);
   for (const slug of slugs) {
-    const start = html.indexOf(`href="/courses/${slug}"`);
+    const start = html.indexOf(`href="/courses/${slug}"`, from);
     if (start === -1) continue;
     const rest = html.slice(start);
     const next = rest.search(new RegExp(`href="/courses/(?!${slug}")`));

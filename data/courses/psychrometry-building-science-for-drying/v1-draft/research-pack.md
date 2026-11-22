@@ -8,7 +8,8 @@ human summary of the course evidence ledger:
 (pointed to by `meta.evidenceLedger`; schema per the `course-truth` and `carsi-course-production`
 skills).
 
-Standards are referenced **by name only**. ANSI/IICRC S500:2025 is named once, in the description.
+The course names no IICRC standard (GP-748, 22/11/2026: it is not CEC-approved). The S500 name was removed
+from the description and `meta.standardsReferenced` on 22/11/2026.
 No IICRC (or other) standard text was read, reproduced, paraphrased or entered into any AI tool.
 The psychrometric formulas come from public US National Weather Service worksheets, NIST data and
 the CC BY 4.0 ABCB Condensation in buildings handbook, never from a standard.
@@ -86,7 +87,7 @@ evidence that they are good enough for this course.
 | PSY-033 | Phill (SME), licensed S520 | Stop and plan under mould training before any air mover runs where growth is visible or suspected (lesson 2.2, field tool 2) | substantiate |
 | PSY-066 | Phill (SME), field practice | Condensation-or-leak pattern questions (lesson 4.2, field tool 4) | substantiate |
 | PSY-115 | Phill (SME), field practice | A collapsing depression while still wet points to the unit (lesson 6.2, field tool 6) | substantiate |
-| PSY-118 | Phill (SME), licensed S500 | The course framing (dry standard from unaffected material, g/kg monitoring) sits comfortably with ANSI/IICRC S500:2025, named in the description | substantiate |
+| PSY-118 | Phill (SME), licensed S500 | The course framing (dry standard from unaffected material, g/kg monitoring) sits comfortably with ANSI/IICRC S500:2025. The name was removed from the description on 22/11/2026 (GP-748), so no course surface makes this claim now; the row stays GAP until Phill records it as CUT | founder to CUT |
 | PSY-121 | founder | Stated length 4 h (live entry says 8 h) | substantiate |
 | PSY-122 | founder | `L1-foundation`, and the foundation step for the Water and Structural Drying Practitioner designations | substantiate |
 
