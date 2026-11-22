@@ -169,4 +169,67 @@ describe.runIf(RUNNABLE)('course publish gate (real PostgreSQL)', () => {
       )
     ).rejects.toMatchObject({ code: '23514' });
   });
+
+  /** The body the admin course editor sends: built from the same DTO the editor loads. */
+  async function editorPayload(overrides: Record<string, unknown> = {}, textContent?: string) {
+    const loaded = await prisma.lmsCourse.findUniqueOrThrow({
+      where: { id: ids.course },
+      include: (await import('@/lib/server/course-catalog-sync')).courseWithCurriculum,
+    });
+    const dto = service.courseToAdminDto(loaded) as unknown as {
+      title: string; description: string; thumbnailUrl: string; isFree: boolean; priceAud: number | string;
+      published: boolean; level: string | null; category: string | null; iicrcDiscipline: string | null;
+      durationHours: string | null; modules: { id: string; title: string; textContent?: string; videoUrl?: string }[];
+    };
+    return {
+      title: dto.title, description: dto.description, thumbnailUrl: dto.thumbnailUrl, isFree: dto.isFree,
+      priceAud: Number(dto.priceAud), published: dto.published, level: dto.level, category: dto.category,
+      iicrcDiscipline: dto.iicrcDiscipline, durationHours: dto.durationHours == null ? null : Number(dto.durationHours),
+      modules: dto.modules.map((m) => ({ id: m.id, title: m.title, textContent: textContent ?? m.textContent, videoUrl: m.videoUrl })),
+      ...overrides,
+    };
+  }
+  const lessonRows = async () =>
+    (await watcher.query('SELECT id, title, content_body FROM lms_lessons WHERE module_id = $1 ORDER BY order_index', [ids.module])).rows;
+  const makeLiveEditorCourse = async () => {
+    await watcher.query("UPDATE lms_courses SET status = 'published', is_published = true WHERE id = $1", [ids.course]);
+    await watcher.query("UPDATE lms_lessons SET title = 'Goals — Reading', is_preview = true WHERE id = $1", [ids.lesson]);
+  };
+
+  it('a live course saved from the editor with only a price change is saved, content untouched', async () => {
+    await makeLiveEditorCourse();
+    const before = await lessonRows();
+    await service.adminUpdateCourse(ids.course, (await editorPayload({ priceAud: 149 })) as never);
+    const row = (await watcher.query('SELECT status, is_published, price_aud FROM lms_courses WHERE id = $1', [ids.course])).rows[0];
+    expect(row).toMatchObject({ status: 'published', is_published: true, price_aud: '149.00' });
+    expect(await lessonRows()).toEqual(before);
+  });
+
+  it('a live course saved from the editor with a changed lesson body is refused and unchanged', async () => {
+    await makeLiveEditorCourse();
+    const before = await lessonRows();
+    await expect(
+      service.adminUpdateCourse(ids.course, (await editorPayload({ priceAud: 149 }, '<p>Rewritten by the optimiser.</p>')) as never)
+    ).rejects.toThrow('PUBLISHED_COURSE_CONTENT_LOCKED');
+    expect(await lessonRows()).toEqual(before);
+    expect((await watcher.query('SELECT price_aud FROM lms_courses WHERE id = $1', [ids.course])).rows[0]).toEqual({ price_aud: '99.00' });
+  });
+
+  it('a live imported course whose lesson the editor would rename is refused, not silently retitled', async () => {
+    await watcher.query("UPDATE lms_courses SET status = 'published', is_published = true WHERE id = $1", [ids.course]);
+    const before = await lessonRows();
+    await expect(service.adminUpdateCourse(ids.course, (await editorPayload({ priceAud: 149 })) as never)).rejects.toThrow(
+      'PUBLISHED_COURSE_CONTENT_LOCKED'
+    );
+    expect(await lessonRows()).toEqual(before);
+  });
+
+  it('saving a row whose legacy flag says live but whose status is draft does not make it public', async () => {
+    await watcher.query("UPDATE lms_courses SET status = 'draft', is_published = true WHERE id = $1", [ids.course]);
+    await watcher.query("UPDATE lms_lessons SET title = 'Goals — Reading', is_preview = true WHERE id = $1", [ids.lesson]);
+    const payload = await editorPayload();
+    expect(payload.published).toBe(true);
+    await service.adminUpdateCourse(ids.course, payload as never);
+    expect(await courseRow()).toEqual({ status: 'draft', is_published: true });
+  });
 });

@@ -50,6 +50,10 @@ export type PublishGateCourse = {
   shortDescription: string | null;
   thumbnailUrl: string | null;
   meta?: unknown;
+  level?: string | null;
+  category?: string | null;
+  iicrcDiscipline?: string | null;
+  durationHours?: number | null;
   status: string | null;
   isPublished: boolean | null;
   modules: Array<{
@@ -121,9 +125,10 @@ function metaString(meta: unknown, key: string): string | null {
 }
 
 /**
- * sha256 of everything a learner reads: titles, descriptions, cover, intro video, lesson bodies
- * and resources, and quiz questions. Price, publication state and the rest of `meta` are left
- * out, so a price change or a stored optimiser draft is not a content change.
+ * sha256 of everything a learner reads: titles, descriptions, cover, intro video, level,
+ * category, discipline, duration, lesson bodies and resources, and quiz questions. Price,
+ * publication state and the rest of `meta` are left out, so a price change or a stored
+ * optimiser draft is not a content change.
  */
 export function courseContentSha256(course: PublishGateCourse): string {
   const content = {
@@ -133,6 +138,10 @@ export function courseContentSha256(course: PublishGateCourse): string {
     description: course.description,
     shortDescription: course.shortDescription,
     thumbnailUrl: course.thumbnailUrl,
+    level: course.level ?? null,
+    category: course.category ?? null,
+    iicrcDiscipline: course.iicrcDiscipline ?? null,
+    durationHours: course.durationHours ?? null,
     modules: [...course.modules]
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map((m) => ({
@@ -312,6 +321,7 @@ function complianceBlockers(course: PublishGateCourse): PublishBlocker[] {
       ),
     ];
     const where = [...new Set(texts.filter(([, t]) => t && IICRC_OR_CEC_RE.test(t)).map(([w]) => w))];
+    if (course.iicrcDiscipline?.trim()) where.push('its IICRC discipline field');
     if (where.length > 0) {
       out.push({
         check: 'compliance',

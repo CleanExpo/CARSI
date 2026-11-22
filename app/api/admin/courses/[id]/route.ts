@@ -90,7 +90,7 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
       return NextResponse.json(
         {
           detail:
-            'This course is live, so its content cannot be changed here. Select Save draft to take it offline, make the change, then submit it for review again.',
+            'This course is live, so its content cannot be changed here. Save draft takes it off sale; it then returns only after review, a new approval and the publish checks (evidence ledger, visuals, compliance) all pass.',
         },
         { status: 409 }
       );

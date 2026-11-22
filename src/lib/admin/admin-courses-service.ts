@@ -1013,10 +1013,12 @@ export async function adminUpdateCourse(
               introVideoUrl: input.introVideoUrl,
               introThumbnailUrl: input.introThumbnailUrl,
             }) ?? undefined,
-          status: published ? 'published' : 'draft',
+          // A live course that stays live keeps its stored state untouched: writing 'published'
+          // here would make a row with status 'draft' or 'unlisted' and the legacy
+          // is_published flag set go public without the gate (GP-776).
+          ...(guardLiveContent ? {} : { status: 'draft', isPublished: false }),
           priceAud,
           isFree: Boolean(input.isFree),
-          isPublished: published,
           ...(input.cecHours !== undefined ? { cecHours: input.cecHours } : {}),
           ...(input.durationHours !== undefined ? { durationHours: input.durationHours } : {}),
           ...(input.iicrcDiscipline !== undefined

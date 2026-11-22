@@ -226,6 +226,15 @@ describe('workflow publish gate', () => {
     expect(r.body.blockers?.map((b) => b.check)).toEqual(['compliance']);
   });
 
+  it('refuses publish when a non-approved course carries an IICRC discipline', async () => {
+    db.course = course({ iicrcDiscipline: 'WRT' });
+    approveCurrent();
+    const r = await workflow('publish');
+    expect(r.status).toBe(409);
+    expect(r.body.blockers?.map((b) => b.check)).toEqual(['compliance']);
+    expect(r.body.blockers?.[0].message).toMatch(/IICRC discipline field/);
+  });
+
   it('refuses approve outside review', async () => {
     db.course = course({ status: 'draft' });
     const r = await workflow('approve');
