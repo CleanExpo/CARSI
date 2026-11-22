@@ -252,14 +252,14 @@ describe('workflow publish gate', () => {
   });
 
   it('refuses publish when a non-approved course mentions IICRC only in a quiz title', async () => {
-    db.course = course({ quizzes: [{ id: 'q1', title: 'Get IICRC certified with CARSI', passPercentage: 80,
+    db.course = course({ quizzes: [{ id: 'q1', title: 'IICRC S500 drying quiz', passPercentage: 80,
       attemptsAllowed: 3, questions: [] }] });
     approveCurrent();
     const r = await workflow('publish');
     expect(r.status).toBe(409);
-    // Both the banned-phrase scan and the GP-748 rule see the quiz title.
+    // The GP-748 rule sees the quiz title.
     expect(new Set(r.body.blockers?.map((b) => b.check))).toEqual(new Set(['compliance']));
-    expect(r.body.blockers?.map((b) => b.message).join(' ')).toMatch(/not on the IICRC CEC approvals register.*quiz "Get IICRC certified with CARSI"/);
+    expect(r.body.blockers?.map((b) => b.message).join(' ')).toMatch(/not on the IICRC CEC approvals register.*quiz "IICRC S500 drying quiz"/);
   });
 
   // Nothing a learner can read is skipped, whatever its shape (a word then a colon looks like
@@ -322,7 +322,7 @@ describe('workflow publish gate', () => {
   });
 
   it('refuses publish when page wording in meta mentions IICRC', async () => {
-    db.course = course({ meta: { eyebrow: 'IICRC approved training' } });
+    db.course = course({ meta: { eyebrow: 'Aligned with IICRC S500' } });
     approveCurrent();
     const r = await workflow('publish');
     expect(r.status).toBe(409);
