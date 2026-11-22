@@ -45,15 +45,17 @@ function lineIcon(line: string) {
 export function CoachingMonthSummaryCard({
   summary,
   testId = 'coaching-month-summary',
+  className = '',
 }: {
   summary: CoachingHomeMonthSummary;
   testId?: string;
+  className?: string;
 }) {
   const tone = TONE_STYLES[summary.tone];
 
   return (
     <section
-      className={`${coachingCard} ${tone.ring} lg:col-span-2`}
+      className={`${coachingCard} ${tone.ring} lg:col-span-2 ${className}`.trim()}
       data-testid={testId}
       aria-labelledby={`${testId}-title`}
     >

@@ -200,6 +200,8 @@ function ActiveHome() {
         testId="coaching-home-quick-links"
       />
 
+      <CoachingMonthSummaryCard summary={monthSummary} className="mb-2" />
+
       {marketing.profileReady ? (
         <CoachingFeatureSpotlight
           testId="home-marketing-pack-spotlight"
@@ -257,39 +259,43 @@ function ActiveHome() {
           </section>
         )}
 
-        <section className={coachingCard}>
-          <h2 className="text-sm font-semibold text-slate-300">Your next action</h2>
-          {actions.nextAction ? (
-            <>
-              <p className="mt-2 text-lg font-semibold text-white">{actions.nextAction.title}</p>
-              {actions.nextAction.dueDate ? (
-                <p className={`mt-1 text-xs text-slate-500`}>
-                  Due{' '}
-                  {new Date(actions.nextAction.dueDate).toLocaleDateString('en-AU', {
-                    day: 'numeric',
-                    month: 'short',
-                  })}
-                </p>
-              ) : null}
-              <Link
-                href="/dashboard/coaching/actions"
-                className={`mt-4 inline-flex ${coachingPrimaryBtn}`}
-              >
-                View action
-              </Link>
-            </>
-          ) : (
-            <>
-              <p className={`mt-2 ${coachingMuted}`}>No actions assigned yet.</p>
-              <Link
-                href="/dashboard/coaching/actions"
-                className={`mt-4 inline-flex ${coachingSecondaryBtn}`}
-              >
-                Action board
-              </Link>
-            </>
-          )}
-        </section>
+        {!monthSummary.ctas.some((c) =>
+          /next action|proposed fix|action board/i.test(c.label)
+        ) ? (
+          <section className={coachingCard} data-testid="coaching-home-next-action">
+            <h2 className="text-sm font-semibold text-slate-300">Your next action</h2>
+            {actions.nextAction ? (
+              <>
+                <p className="mt-2 text-lg font-semibold text-white">{actions.nextAction.title}</p>
+                {actions.nextAction.dueDate ? (
+                  <p className={`mt-1 text-xs text-slate-500`}>
+                    Due{' '}
+                    {new Date(actions.nextAction.dueDate).toLocaleDateString('en-AU', {
+                      day: 'numeric',
+                      month: 'short',
+                    })}
+                  </p>
+                ) : null}
+                <Link
+                  href="/dashboard/coaching/actions"
+                  className={`mt-4 inline-flex ${coachingPrimaryBtn}`}
+                >
+                  View action
+                </Link>
+              </>
+            ) : (
+              <>
+                <p className={`mt-2 ${coachingMuted}`}>No actions assigned yet.</p>
+                <Link
+                  href="/dashboard/coaching/actions"
+                  className={`mt-4 inline-flex ${coachingSecondaryBtn}`}
+                >
+                  Action board
+                </Link>
+              </>
+            )}
+          </section>
+        ) : null}
 
         <section className={coachingCard}>
           <h2 className="text-sm font-semibold text-slate-300">Upcoming coaching session</h2>
@@ -349,8 +355,6 @@ function ActiveHome() {
         </section>
 
         <CoachingCheckInCard className="lg:col-span-2" />
-
-        <CoachingMonthSummaryCard summary={monthSummary} />
 
         <CoachingAskCoachPanel className="lg:col-span-2" />
       </div>

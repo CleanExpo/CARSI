@@ -13,6 +13,7 @@ import {
   IDENTIFIER_ROUTES,
   PRIVATE_FIRST_SEGMENTS,
   isAllowedTextParam,
+  isValidCarsiContext,
   isCollectionUrl,
   isCountedPath,
   libraryUrl,
@@ -378,6 +379,11 @@ describe('personal data never reaches analytics, whatever shape it takes (GP-731
     expect(isAllowedTextParam('carsi_context', 'hub')).toBe(true);
     expect(isAllowedTextParam('carsi_context', 'hub:pathfinder:courses')).toBe(true);
     expect(isAllowedTextParam('carsi_context', 'role-guide:nsw-builders:employer-2')).toBe(true);
+    expect(isAllowedTextParam('carsi_context', 'role-guide:nsw-builders:catalogue-fallback')).toBe(
+      true
+    );
+    expect(isValidCarsiContext('hub:pathfinder:coaching')).toBe(true);
+    expect(isValidCarsiContext('not-allowed@host')).toBe(false);
     expect(isAllowedTextParam('carsi_context', 'role-guide:nsw-builders:start-1')).toBe(true);
     expect(isAllowedTextParam('carsi_context', 'role-guide:nsw-builders')).toBe(true);
     expect(isAllowedTextParam('carsi_context', 'jane@example.com')).toBe(false);

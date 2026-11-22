@@ -36,8 +36,9 @@ We did not only “wire the tickets.” We tightened the **discover → trust �
 
 | Before                               | After                                                            | Customer benefit                       |
 | ------------------------------------ | ---------------------------------------------------------------- | -------------------------------------- |
-| Generic progress text                | **Month at a glance** with tone pill + progress bar + icons      | Monthly rhythm visible in 3 seconds    |
-| Multiple cards to find “what’s next” | **Smart CTAs** on summary card (proposed fixes / pack / actions) | One tap to the highest-value task      |
+| Generic progress text                | **Month at a glance** first on home — tone, bar, icons           | Monthly rhythm before scrolling the grid |
+| Duplicate “next action” tiles        | Month card owns CTAs; redundant tile hidden                      | One source of truth for priorities     |
+| Analytics forgery / off-site leakage | `isValidCarsiContext` + same-origin `link_path` only           | GP-731 hardened measurement            |
 | Marketing pack unclear               | First-win steps + polished **build panel** on marketing page     | First pack feels guided, not technical |
 
 **Show (subscribed member):** Home → month card primary CTA → actions or marketing pack; marketing page build panel.

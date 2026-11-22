@@ -19,6 +19,8 @@ const STEPS = [
       '--config',
       'config/vitest.config.ts',
       'src/lib/analytics/resolve-carsi-data-event-target.test.ts',
+      'src/lib/analytics/carsi-link-path.test.ts',
+      'src/components/analytics/CarsiProductEventCollector.test.tsx',
       'src/lib/analytics/consent.test.ts',
     ],
   },
@@ -42,6 +44,8 @@ const STEPS = [
       '--config',
       'config/vitest.config.ts',
       'src/lib/coaching-portal/coaching-home-month-summary.test.ts',
+      'src/lib/coaching-portal/coaching-home-month-summary.matrix.test.ts',
+      'src/components/marketing/RoleGuidesHubPathfinder.test.tsx',
     ],
   },
   {
