@@ -111,6 +111,7 @@ function CourseEditorFormContent({ courseId }: { courseId?: string }) {
     'draft'
   );
   const [workflowBusy, setWorkflowBusy] = useState(false);
+  const [workflowBlockers, setWorkflowBlockers] = useState<string[]>([]);
   const [cecHours, setCecHours] = useState('');
   const [durationHours, setDurationHours] = useState('');
   const [iicrcDiscipline, setIicrcDiscipline] = useState('');
@@ -201,9 +202,10 @@ function CourseEditorFormContent({ courseId }: { courseId?: string }) {
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, [isDirty, saving]);
 
-  async function runWorkflow(action: 'save_draft' | 'submit_review' | 'publish') {
+  async function runWorkflow(action: 'save_draft' | 'submit_review' | 'approve' | 'publish') {
     if (!courseId) return;
     setWorkflowBusy(true);
+    setWorkflowBlockers([]);
     try {
       const res = await fetch(`/api/admin/courses/${courseId}/workflow`, {
         method: 'POST',
@@ -211,7 +213,18 @@ function CourseEditorFormContent({ courseId }: { courseId?: string }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action }),
       });
-      if (!res.ok) throw new Error('Workflow failed');
+      if (!res.ok) {
+        const failed = (await res.json().catch(() => ({}))) as {
+          detail?: string;
+          blockers?: { message?: string }[];
+        };
+        // GP-776: the publish gate names each blocker and the next action; show them as text.
+        const messages = (failed.blockers ?? [])
+          .map((b) => b.message)
+          .filter((m): m is string => typeof m === 'string');
+        setWorkflowBlockers(messages);
+        throw new Error(typeof failed.detail === 'string' ? failed.detail : 'Workflow update failed');
+      }
       const data = (await res.json()) as { course: CourseDto };
       setWorkflowStatus(data.course.workflow_status ?? 'draft');
       setPublished(data.course.published);
@@ -219,12 +232,17 @@ function CourseEditorFormContent({ courseId }: { courseId?: string }) {
         title:
           action === 'publish'
             ? 'Course published'
-            : action === 'submit_review'
-              ? 'Submitted for review'
-              : 'Saved as draft',
+            : action === 'approve'
+              ? 'Approval recorded'
+              : action === 'submit_review'
+                ? 'Submitted for review'
+                : 'Saved as draft',
       });
-    } catch {
-      toast({ title: 'Workflow update failed', variant: 'destructive' });
+    } catch (err) {
+      toast({
+        title: err instanceof Error ? err.message : 'Workflow update failed',
+        variant: 'destructive',
+      });
     } finally {
       setWorkflowBusy(false);
     }
@@ -584,20 +602,44 @@ function CourseEditorFormContent({ courseId }: { courseId?: string }) {
                       <button
                         type="button"
                         disabled={workflowBusy}
+                        onClick={() => void runWorkflow('approve')}
+                        className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-100 hover:bg-emerald-500/15 disabled:opacity-50"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        type="button"
+                        disabled={workflowBusy}
                         onClick={() => void runWorkflow('publish')}
                         className="rounded-lg bg-[#2490ed] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1f82d4] disabled:opacity-50"
                       >
                         Publish
                       </button>
                     </div>
+                    <p className="text-xs leading-relaxed text-white/45">
+                      A course is published only from review, after a named reviewer selects
+                      Approve, its evidence ledger has no open gaps, every lesson has its visuals
+                      and the compliance checks pass. Any content change needs a new approval.
+                    </p>
+                    {workflowBlockers.length > 0 ? (
+                      <div
+                        role="alert"
+                        className="rounded-lg border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-xs text-amber-100"
+                      >
+                        <p className="font-semibold">Before this course can go ahead:</p>
+                        <ul className="mt-1 list-disc space-y-1 pl-4">
+                          {workflowBlockers.map((m) => (
+                            <li key={m}>{m}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
                   </>
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <Switch id="pub" checked={published} onCheckedChange={setPublished} />
-                    <Label htmlFor="pub" className="cursor-pointer text-sm text-white/75">
-                      Published on create
-                    </Label>
-                  </div>
+                  <p className="text-xs leading-relaxed text-white/45">
+                    New courses are saved as drafts. After saving, submit the course for review;
+                    it can be published once a named reviewer approves it.
+                  </p>
                 )}
               </div>
             </section>

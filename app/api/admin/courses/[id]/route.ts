@@ -77,6 +77,24 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
     if (msg === 'MODULES_REQUIRED') {
       return NextResponse.json({ detail: 'At least one module is required' }, { status: 400 });
     }
+    if (msg === 'COURSE_PUBLISH_REQUIRES_WORKFLOW') {
+      return NextResponse.json(
+        {
+          detail:
+            'Saving does not publish a course. Submit it for review, record an approval, then use Publish.',
+        },
+        { status: 409 }
+      );
+    }
+    if (msg === 'PUBLISHED_COURSE_CONTENT_LOCKED') {
+      return NextResponse.json(
+        {
+          detail:
+            'This course is live, so its content cannot be changed here. Select Save draft to take it offline, make the change, then submit it for review again.',
+        },
+        { status: 409 }
+      );
+    }
     console.error('[admin/courses PATCH]', e);
     return NextResponse.json({ detail: 'Failed to update course' }, { status: 500 });
   }

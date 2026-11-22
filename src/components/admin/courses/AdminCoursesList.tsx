@@ -756,15 +756,6 @@ export function AdminCoursesList() {
             </button>
             <button
               type="button"
-              onClick={() => void bulkSetPublished(true)}
-              disabled={bulkBusy}
-              className="rounded-lg px-3 py-2 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-50"
-              style={{ background: '#2490ed' }}
-            >
-              Publish
-            </button>
-            <button
-              type="button"
               onClick={() => void bulkSetPublished(false)}
               disabled={bulkBusy}
               className="rounded-lg border border-amber-500/45 bg-amber-500/15 px-3 py-2 text-xs font-semibold text-amber-100 hover:bg-amber-500/25 disabled:opacity-50"

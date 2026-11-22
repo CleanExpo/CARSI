@@ -19,6 +19,11 @@ import {
   type CourseWithCurriculum,
 } from '@/lib/server/course-catalog-sync';
 import { writeQuizQuestions } from '@/lib/lms/quiz-explanation-carry';
+import {
+  CoursePublishBlockedError,
+  courseContentSha256,
+  evaluatePublishGate,
+} from '@/lib/admin/course-publish-gate';
 
 /** Interactive tx default is 5s; remote Postgres + many modules/lessons exceeds that (P2028). */
 const ADMIN_COURSE_WRITE_TX_OPTIONS = {
@@ -827,6 +832,10 @@ export async function adminCreateCourse(
     throw new Error('MODULES_REQUIRED');
   }
 
+  // GP-776: a new course is always a draft. Publishing goes through review, a recorded approval
+  // and the publish gate (adminTransitionCourseWorkflow), never through create.
+  if (input.published) throw new Error('COURSE_CREATE_PUBLISHED_REFUSED');
+
   const preferredSlug = slugify(input.slug?.trim() || input.title);
   if (structured && getCecApproval(preferredSlug)) throw new Error('INVALID_STRUCTURED_CURRICULUM');
   if (!structured) await ensureCatalogInstructor();
@@ -835,7 +844,6 @@ export async function adminCreateCourse(
   if (structured && getCecApproval(slug)) throw new Error('INVALID_STRUCTURED_CURRICULUM');
   const courseId = randomUUID();
   const priceAud = new Prisma.Decimal(Number.isFinite(input.priceAud) ? input.priceAud : 0);
-  const published = Boolean(input.published);
 
   await prisma.$transaction(
     async (tx) => {
@@ -854,7 +862,7 @@ export async function adminCreateCourse(
               introThumbnailUrl: input.introThumbnailUrl,
             }) ?? undefined,
           instructorId: DEFAULT_INSTRUCTOR_ID,
-          status: published ? 'published' : 'draft',
+          status: 'draft',
           priceAud,
           isFree: Boolean(input.isFree),
           level: input.level?.trim() || null,
@@ -862,7 +870,7 @@ export async function adminCreateCourse(
           cecHours: input.cecHours ?? null,
           durationHours: input.durationHours ?? null,
           iicrcDiscipline: input.iicrcDiscipline?.trim() || null,
-          isPublished: published,
+          isPublished: false,
         },
       });
 
@@ -973,9 +981,27 @@ export async function adminUpdateCourse(
 
   const priceAud = new Prisma.Decimal(Number.isFinite(input.priceAud) ? input.priceAud : 0);
   const published = Boolean(input.published);
+  // GP-776: saving the form never publishes. A course reaches published only through the
+  // workflow publish gate. A live course may stay published (published: true) or be taken down.
+  const wasPublished =
+    resolveCourseWorkflowStatus(existing.status, existing.isPublished) === 'published';
+  if (published && !wasPublished) throw new Error('COURSE_PUBLISH_REQUIRES_WORKFLOW');
+  // A live course's content was approved (or predates the gate). Changing what learners read
+  // while it stays published is refused; take it back to draft, edit, then review it again.
+  const guardLiveContent = published && wasPublished;
 
   await prisma.$transaction(
     async (tx) => {
+      let liveSha256: string | null = null;
+      if (guardLiveContent) {
+        await tx.$executeRaw`SELECT id FROM lms_courses WHERE id = ${id}::uuid FOR UPDATE`;
+        const before = await tx.lmsCourse.findUnique({ where: { id }, include: courseWithCurriculum });
+        if (!before) throw new Error('NOT_FOUND');
+        if (resolveCourseWorkflowStatus(before.status, before.isPublished) !== 'published') {
+          throw new Error('COURSE_PUBLISH_REQUIRES_WORKFLOW');
+        }
+        liveSha256 = courseContentSha256(before);
+      }
       await tx.lmsCourse.update({
         where: { id },
         data: {
@@ -1068,6 +1094,13 @@ export async function adminUpdateCourse(
       }
 
       await pruneOrphanQuizzes(tx, id, usedQuizIds);
+
+      if (liveSha256 !== null) {
+        const after = await tx.lmsCourse.findUnique({ where: { id }, include: courseWithCurriculum });
+        if (!after || courseContentSha256(after) !== liveSha256) {
+          throw new Error('PUBLISHED_COURSE_CONTENT_LOCKED');
+        }
+      }
     },
     ADMIN_COURSE_WRITE_TX_OPTIONS
   );
@@ -1109,6 +1142,9 @@ export async function adminBulkSetCoursePublication(
   if (unique.length > ADMIN_BULK_PUBLICATION_MAX_IDS) {
     throw new Error('TOO_MANY_IDS');
   }
+  // GP-776: bulk may take courses down, never put them live. Each course is published on its
+  // own through review, a recorded approval and the publish gate.
+  if (published) throw new Error('BULK_PUBLISH_REFUSED');
 
   const result = await prisma.lmsCourse.updateMany({
     where: { id: { in: unique } },
@@ -1152,30 +1188,77 @@ export async function adminBulkDeleteCourses(ids: string[]): Promise<number> {
   return result.count;
 }
 
+export type CourseWorkflowAction = 'save_draft' | 'submit_review' | 'approve' | 'publish';
+
+/**
+ * Move a course through draft -> in_review -> (approve) -> published (GP-776).
+ *
+ * `approve` records the acting admin's approval of the current content, and is allowed only in
+ * review. `publish` is allowed only when the publish gate (course-publish-gate.ts) reports no
+ * blocker, which includes an approval of exactly the current content; it records who published.
+ * Both run under a row lock so an edit cannot slip between the check and the write.
+ */
 export async function adminTransitionCourseWorkflow(
   courseId: string,
-  action: 'save_draft' | 'submit_review' | 'publish'
+  action: CourseWorkflowAction,
+  actorEmail: string
 ): Promise<CourseWorkflowStatus> {
-  let status: string;
-  let isPublished: boolean;
-  switch (action) {
-    case 'submit_review':
-      status = 'in_review';
-      isPublished = false;
-      break;
-    case 'publish':
-      status = 'published';
-      isPublished = true;
-      break;
-    default:
-      status = 'draft';
-      isPublished = false;
+  if (action === 'approve' || action === 'publish') {
+    const actor = actorEmail.trim();
+    if (!actor) throw new Error('ACTOR_REQUIRED');
+    return prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT id FROM lms_courses WHERE id = ${courseId}::uuid FOR UPDATE`;
+      const course = await tx.lmsCourse.findUnique({
+        where: { id: courseId },
+        include: courseWithCurriculum,
+      });
+      if (!course) throw new Error('NOT_FOUND');
+      const contentSha256 = courseContentSha256(course);
+      if (action === 'approve') {
+        if (resolveCourseWorkflowStatus(course.status, course.isPublished) !== 'in_review') {
+          throw new CoursePublishBlockedError([
+            { check: 'workflow', message: 'Only a course in review can be approved. Select Submit for review first.' },
+          ]);
+        }
+        await tx.lmsCourseApproval.create({
+          data: {
+            courseRef: course.id,
+            courseSlug: course.slug,
+            action: 'approve',
+            actorEmail: actor,
+            contentSha256,
+          },
+        });
+        return 'in_review';
+      }
+      const approval = await tx.lmsCourseApproval.findFirst({
+        where: { courseRef: course.id, action: 'approve' },
+        orderBy: { createdAt: 'desc' },
+      });
+      const blockers = evaluatePublishGate(course, approval);
+      if (blockers.length > 0 || !approval) throw new CoursePublishBlockedError(blockers);
+      await tx.lmsCourse.update({
+        where: { id: courseId },
+        data: { status: 'published', isPublished: true },
+      });
+      await tx.lmsCourseApproval.create({
+        data: {
+          courseRef: course.id,
+          courseSlug: course.slug,
+          action: 'publish',
+          actorEmail: actor,
+          contentSha256,
+          approvalRef: approval.id,
+        },
+      });
+      return 'published';
+    }, ADMIN_COURSE_WRITE_TX_OPTIONS);
   }
 
+  const status = action === 'submit_review' ? 'in_review' : 'draft';
   await prisma.lmsCourse.update({
     where: { id: courseId },
-    data: { status, isPublished },
+    data: { status, isPublished: false },
   });
-
-  return resolveCourseWorkflowStatus(status, isPublished);
+  return resolveCourseWorkflowStatus(status, false);
 }
