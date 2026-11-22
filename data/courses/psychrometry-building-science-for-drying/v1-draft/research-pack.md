@@ -87,7 +87,7 @@ evidence that they are good enough for this course.
 | PSY-033 | Phill (SME), licensed S520 | Stop and plan under mould training before any air mover runs where growth is visible or suspected (lesson 2.2, field tool 2) | substantiate |
 | PSY-066 | Phill (SME), field practice | Condensation-or-leak pattern questions (lesson 4.2, field tool 4) | substantiate |
 | PSY-115 | Phill (SME), field practice | A collapsing depression while still wet points to the unit (lesson 6.2, field tool 6) | substantiate |
-| PSY-118 | Phill (SME), licensed S500 | The course framing (dry standard from unaffected material, g/kg monitoring) sits comfortably with ANSI/IICRC S500:2025. The S500 title was removed from the description on 23/11/2026 (GP-748); the row stays GAP until the SME decides it | substantiate |
+| PSY-118 | Phill (SME), licensed S500 | Question for the SME: is the course framing (dry standard from unaffected material, g/kg monitoring) consistent with ANSI/IICRC S500:2025? Only the licensed copy can answer it. The course does not name S500 (removed from the description on 23/11/2026, GP-748) | substantiate |
 | PSY-121 | founder | Stated length 4 h (live entry says 8 h) | substantiate |
 | PSY-122 | founder | `L1-foundation`, and the foundation step for the Water and Structural Drying Practitioner designations | substantiate |
 
