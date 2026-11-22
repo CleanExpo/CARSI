@@ -208,7 +208,7 @@
     "prisma": "7.10.1",
     "tailwindcss": "^4.1.18",
     "tsx": "^4.23.15",
-    "typescript": "^5.7.2",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.9"
   },
   "overrides": {
