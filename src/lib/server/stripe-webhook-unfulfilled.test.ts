@@ -98,6 +98,11 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
+// Serialisable transactions run against the same fake table (one in-memory client).
+vi.mock('@/lib/server/db-tx', async () => {
+  const { prisma } = await import('@/lib/prisma');
+  return { runSerializable: (fn: (tx: unknown) => Promise<unknown>) => fn(prisma) };
+});
 vi.mock('@/lib/server/stripe-webhook-idempotency', () => ({
   claimStripeWebhookEvent: h.claim,
   markStripeWebhookEventProcessed: h.markProcessed,
@@ -369,6 +374,34 @@ describe('GP-759 (a): the refund handler records the reversal before any success
     expect((await deliver()).status).toBe(200);
 
     expect(record('cs_test_reversed')?.processedAt).toBeInstanceOf(Date);
+  });
+
+  it('a full refund delivered BEFORE the checkout event still keeps the session off the admin list', async () => {
+    reversalEvent('charge.refunded', { amount: 14_900, amount_refunded: 14_900 });
+    expect((await deliver()).status).toBe(200);
+
+    checkoutCompleted({
+      id: 'cs_test_reversed',
+      customer_email: 'nobody@unfulfilled-test.invalid',
+      metadata: { course_slug: 'paid-course' },
+    });
+    expect((await deliver()).status).toBe(200);
+
+    expect(record('cs_test_reversed')?.processedAt).toBeInstanceOf(Date);
+  });
+
+  it('control: a dispute delivered before the checkout event leaves the session listed (it may be won)', async () => {
+    reversalEvent('charge.dispute.created', { id: 'dp_order', amount: 14_900 });
+    await deliver();
+
+    checkoutCompleted({
+      id: 'cs_test_reversed',
+      customer_email: 'nobody@unfulfilled-test.invalid',
+      metadata: { course_slug: 'paid-course' },
+    });
+    await deliver();
+
+    expect(record('cs_test_reversed')?.processedAt).toBeNull();
   });
 
   it('control: a partial refund leaves an unfulfilled session on the admin list', async () => {

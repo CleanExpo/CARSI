@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { runSerializable } from '@/lib/server/db-tx';
 
 /**
  * GP-759: two durable payment facts, kept in `stripe_webhook_events` (the Stripe idempotency
@@ -67,10 +68,20 @@ export async function recordCheckoutPaymentReversed(
   const id = reversalId(checkoutSessionId);
   const type = `${REVERSED_TYPE_PREFIX}${reason}`;
   if (reason === 'refunded') {
-    await prisma.stripeWebhookEvent.upsert({
-      where: { id },
-      create: { id, type, processedAt: eventAt },
-      update: { type, processedAt: eventAt },
+    // The refund marker and the unfulfilled record are settled together, in one serialisable
+    // transaction, so the order Stripe delivers the refund and the checkout in cannot matter
+    // (recordUnfulfilledPayment reads this marker in its own serialisable transaction).
+    await runSerializable(async (tx) => {
+      await tx.stripeWebhookEvent.upsert({
+        where: { id },
+        create: { id, type, processedAt: eventAt },
+        update: { type, processedAt: eventAt },
+      });
+      // A full refund means nothing is owed: no admin may grant it by hand.
+      await tx.stripeWebhookEvent.updateMany({
+        where: { id: unfulfilledId(checkoutSessionId), processedAt: null },
+        data: { processedAt: new Date() },
+      });
     });
     return;
   }
@@ -137,10 +148,19 @@ export async function recordUnfulfilledPayment(
     stripeObjectId,
     reason,
   });
-  await prisma.stripeWebhookEvent.upsert({
-    where: { id },
-    create: { id, type },
-    update: { type, processedAt: null },
+  await runSerializable(async (tx) => {
+    // A fully refunded checkout session is owed nothing: keep it off the open list whichever
+    // order Stripe delivered the refund and the checkout in. A dispute stays listed (it may
+    // yet be won).
+    const marker = await tx.stripeWebhookEvent.findUnique({
+      where: { id: reversalId(stripeObjectId) },
+    });
+    const refunded = marker?.type === `${REVERSED_TYPE_PREFIX}refunded`;
+    await tx.stripeWebhookEvent.upsert({
+      where: { id },
+      create: { id, type, ...(refunded ? { processedAt: new Date() } : {}) },
+      update: refunded ? { type } : { type, processedAt: null },
+    });
   });
 }
 
