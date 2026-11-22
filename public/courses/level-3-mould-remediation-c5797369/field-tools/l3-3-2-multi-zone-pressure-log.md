@@ -7,7 +7,7 @@ Australian-produced. Metric units. Use on site, then file it in the job record.
 Job address: ______________________   Date: ____/____/______   Supervisor: ______________________
 
 - [ ] One logger per zone. Serial number, zone, tube positions (zone and reference) recorded.
-- [ ] Logging interval set and written down. Alarm limit set (no less negative than −5 Pa).
+- [ ] Logging interval set and written down. Alarm limit set at the pressure target in your plan.
 - [ ] Alarm tested on day one by briefly opening the zone door. Who receives the alarm.
 - [ ] Cascade readings taken at set-up: occupied area 0 Pa, clean room, dirty room, work zone.
 - [ ] Daily download of every logger, graph filed, time out of limit noted.
