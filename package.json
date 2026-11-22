@@ -188,7 +188,7 @@
     "@ffprobe-installer/ffprobe": "^2.1.2",
     "@playwright/test": "^1.65.0",
     "@reticlehq/core": "^2.14.0",
-    "@reticlehq/next": "^2.14.0",
+    "@reticlehq/next": "^3.10.7",
     "@reticlehq/react": "^3.9.0",
     "@tailwindcss/postcss": "^4.3.5",
     "@types/node": "^22.10.0",
