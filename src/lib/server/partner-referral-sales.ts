@@ -47,6 +47,24 @@ export async function recordPartnerReferralSale(
     return null;
   }
 
+  // Copy the partner's terms in force when the sale was paid onto the row, so a later change of
+  // terms never rewrites what an earlier sale was agreed under. No terms row is a setup error:
+  // the sale is still recorded (with empty terms) and alerted, never dropped or guessed.
+  const terms = await prisma.referralPartnerTerms.findFirst({
+    where: {
+      partnerId,
+      effectiveFrom: { lte: paidAt },
+      OR: [{ effectiveTo: null }, { effectiveTo: { gt: paidAt } }],
+    },
+    orderBy: { version: 'desc' },
+    select: { id: true, version: true, rewardOption: true, commissionRateBps: true, discountRateBps: true },
+  });
+  if (!terms) {
+    const error = new Error('Partner referral sale recorded without terms: no terms in force for the partner');
+    console.error('[partner-referral]', error.message, { transactionId, partnerId });
+    void captureServerError(error, { route: '/api/lms/webhooks/stripe', tags: { partnerId } });
+  }
+
   const row = {
     partnerId,
     transactionId,
@@ -54,6 +72,11 @@ export async function recordPartnerReferralSale(
     amountPaidCents: amount,
     currency,
     paidAt,
+    termsId: terms?.id ?? null,
+    termsVersion: terms?.version ?? null,
+    rewardOption: terms?.rewardOption ?? null,
+    commissionRateBps: terms?.commissionRateBps ?? null,
+    discountRateBps: terms?.discountRateBps ?? null,
   };
   await prisma.partnerReferralSale.upsert({
     where: { transactionId },
@@ -69,9 +92,13 @@ const CSV_HEADER = [
   'course',
   'amount_paid',
   'currency',
+  'gst_estimate',
+  'net_ex_gst_estimate',
   'refunded',
   'refunded_amount',
   'dispute_not_won',
+  'reward_option',
+  'terms_version',
   'stripe_checkout_session',
 ];
 
@@ -145,6 +172,9 @@ export async function getPartnerReferralSalesCsv(partner: string): Promise<strin
     // The ledger records a dispute opening and a dispute won, not a dispute lost, so this is
     // "a dispute was opened and not won": still open, or lost.
     const disputeNotWon = reduceAttributionReversals(facts)?.reason === 'disputed';
+    // ESTIMATE only: assumes the amount paid is GST-inclusive at 10% (total / 11). The real GST
+    // comes from the tax invoice lines; settlement is not built.
+    const gstEstimateCents = Math.round(sale.amountPaidCents / 11);
     lines.push(
       [
         settlementDate(sale.paidAt),
@@ -152,9 +182,13 @@ export async function getPartnerReferralSalesCsv(partner: string): Promise<strin
         sale.courseSlug,
         money(sale.amountPaidCents),
         sale.currency,
+        money(gstEstimateCents),
+        money(sale.amountPaidCents - gstEstimateCents),
         refundedCents > 0 ? 'yes' : 'no',
         money(refundedCents),
         disputeNotWon ? 'yes' : 'no',
+        sale.rewardOption ?? '',
+        sale.termsVersion == null ? '' : String(sale.termsVersion),
         sale.transactionId,
       ]
         .map(csvCell)

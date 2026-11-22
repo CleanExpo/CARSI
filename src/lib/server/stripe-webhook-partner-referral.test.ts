@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => ({
   findUser: vi.fn(),
   welcome: vi.fn(),
   upsertSale: vi.fn(),
+  findTerms: vi.fn(),
   recordStage: vi.fn(),
 }));
 
@@ -48,6 +49,7 @@ vi.mock('@/lib/prisma', () => ({
   prisma: {
     stripeWebhookEvent: { create: vi.fn(), update: vi.fn(), delete: vi.fn(), findUnique: vi.fn() },
     partnerReferralSale: { upsert: mocks.upsertSale },
+    referralPartnerTerms: { findFirst: mocks.findTerms },
     lmsUser: { findUnique: mocks.findUser },
   },
 }));
@@ -99,6 +101,13 @@ beforeEach(() => {
   mocks.fulfil.mockResolvedValue({ alreadyEnrolled: true });
   mocks.recordStage.mockResolvedValue(undefined);
   mocks.upsertSale.mockResolvedValue({});
+  mocks.findTerms.mockResolvedValue({
+    id: 'terms-ccw-1',
+    version: 1,
+    rewardOption: 'A',
+    commissionRateBps: 1_000,
+    discountRateBps: 0,
+  });
   mocks.claimsFor.mockResolvedValue({ sub: 'student-1', email: 'buyer@example.test' });
   mocks.findUser.mockResolvedValue(null);
   mocks.welcome.mockResolvedValue(undefined);
@@ -125,9 +134,38 @@ describe('Stripe webhook partner referral sale (GP-767)', () => {
       amountPaidCents: 9_900,
       currency: 'AUD',
       paidAt: new Date(1_795_000_000_000),
+      termsId: 'terms-ccw-1',
+      termsVersion: 1,
+      rewardOption: 'A',
+      commissionRateBps: 1_000,
+      discountRateBps: 0,
     });
     expect(args.update).toEqual({});
+    // The terms in force when the sale was paid, not whatever is current later.
+    const termsQuery = mocks.findTerms.mock.calls[0][0];
+    expect(termsQuery.where.partnerId).toBe('ccw');
+    expect(termsQuery.where.effectiveFrom).toEqual({ lte: new Date(1_795_000_000_000) });
+    expect(termsQuery.where.OR).toEqual([
+      { effectiveTo: null },
+      { effectiveTo: { gt: new Date(1_795_000_000_000) } },
+    ]);
     expect(mocks.markProcessed).toHaveBeenCalled();
+  });
+
+  it('a partner with no terms in force still records the sale, with empty terms and an alert', async () => {
+    mocks.construct.mockReturnValue(completedSession({ referral_partner: 'ccw' }));
+    mocks.findTerms.mockResolvedValue(null);
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const response = await deliver();
+
+    expect(response.status).toBe(200);
+    const create = mocks.upsertSale.mock.calls[0][0].create;
+    expect(create.partnerId).toBe('ccw');
+    expect(create.termsId).toBeNull();
+    expect(create.rewardOption).toBeNull();
+    expect(create.commissionRateBps).toBeNull();
+    expect(error).toHaveBeenCalled();
   });
 
   it('a purchase with no ref records no partner sale', async () => {
@@ -138,6 +176,7 @@ describe('Stripe webhook partner referral sale (GP-767)', () => {
     expect(response.status).toBe(200);
     expect(mocks.fulfil).toHaveBeenCalledTimes(1);
     expect(mocks.upsertSale).not.toHaveBeenCalled();
+    expect(mocks.findTerms).not.toHaveBeenCalled();
   });
 
   it('an unknown ref in the metadata is ignored', async () => {

@@ -4,8 +4,11 @@
  * in the first-party `carsi_ref` cookie for 30 days, the course checkout copies it into the Stripe
  * Checkout Session metadata, and the Stripe webhook stores a partner sale row for settlement.
  *
- * This list is the allow-list: a ref, cookie or metadata value not named here is ignored.
- * Commission terms are not set (founder decision), so nothing here calculates a payout.
+ * The partner record and its versioned reward terms live in the database (`referral_partners`,
+ * `referral_partner_terms`, seeded by the GP-767 migration); the webhook copies the terms in
+ * force onto each sale. This list is the request-path allow-list (the proxy and checkout must
+ * not wait on the database): a ref, cookie or metadata value not named here is ignored. A test
+ * fails if a partner here has no seeded row. Nothing here calculates or pays commission.
  */
 
 export const REFERRAL_PARTNERS = {
