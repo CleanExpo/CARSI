@@ -1,5 +1,41 @@
 import { prisma } from '@/lib/prisma';
 
+type SeatDb = Pick<typeof prisma, 'lmsTeamCoursePurchase' | 'lmsEnrollment'>;
+
+/**
+ * GP-759 (c), Phill's ruling 22/11/2026: "Only seats that team paid for." The ONE owner of what
+ * counts as a seat this team paid for in a course, used by the refund rule and the seat check:
+ * live (active or completed) enrolments in the course whose payment reference is the team's own
+ * seat reference (`team:<teamId>`) or the checkout of one of the team's seat blocks for that
+ * course (the buyer's own seat). A member whose access was paid for elsewhere (another team, or
+ * their own purchase) is not counted and is never revoked by this team's refund. Newest first.
+ */
+export async function teamPaidSeatHolders(
+  db: SeatDb,
+  teamId: string,
+  courseId: string,
+  courseSlug: string,
+): Promise<Array<{ id: string; studentId: string; paymentReference: string | null }>> {
+  const slug = courseSlug.trim().toLowerCase();
+  const blockRefs = (
+    await db.lmsTeamCoursePurchase.findMany({
+      where: { teamId },
+      select: { courseSlug: true, paymentReference: true },
+    })
+  )
+    .filter((p) => p.courseSlug.trim().toLowerCase() === slug && p.paymentReference)
+    .map((p) => p.paymentReference as string);
+  return db.lmsEnrollment.findMany({
+    where: {
+      courseId,
+      status: { in: ['active', 'completed'] },
+      paymentReference: { in: [`team:${teamId}`, ...blockRefs] },
+    },
+    orderBy: { enrolledAt: 'desc' },
+    select: { id: true, studentId: true, paymentReference: true },
+  });
+}
+
 /**
  * GP-759 (c): a full refund of a team seat checkout takes those seats back.
  *
@@ -13,7 +49,8 @@ import { prisma } from '@/lib/prisma';
  *  2. The team's `seatLimit` becomes the sum of its remaining blocks, so no new member can join
  *     on the refunded seats.
  *  3. Seats the remaining blocks for that course no longer cover are revoked, newest member
- *     seat first (latest `enrolledAt`). Only `team:<teamId>` seats are revoked here; the buyer's
+ *     seat first (latest `enrolledAt`). Only seats this team paid for are counted
+ *     (`teamPaidSeatHolders`), and only `team:<teamId>` seats are revoked here; the buyer's
  *     own enrolment is revoked by its checkout session in the caller. Team membership is not
  *     removed, and revoked rows keep their history (`revokedReason = 'refunded'`).
  *
@@ -57,23 +94,8 @@ export async function revokeTeamSeatBlocksForRefund(
 
       const course = await tx.lmsCourse.findUnique({ where: { slug }, select: { id: true } });
       if (!course) return 0;
-      const members = await tx.lmsTeamMember.findMany({
-        where: { teamId: block.teamId },
-        select: { userId: true },
-      });
-      if (members.length === 0) return 0;
 
-      // Seats still held in this course by the team's members (the buyer included, unless the
-      // caller already revoked the buyer's own enrolment for this refund).
-      const holders = await tx.lmsEnrollment.findMany({
-        where: {
-          courseId: course.id,
-          studentId: { in: members.map((m) => m.userId) },
-          status: { in: ['active', 'completed'] },
-        },
-        orderBy: { enrolledAt: 'desc' },
-        select: { id: true, paymentReference: true },
-      });
+      const holders = await teamPaidSeatHolders(tx, block.teamId, course.id, slug);
       const excess = holders.length - courseSeats;
       if (excess <= 0) return 0;
 
@@ -134,19 +156,8 @@ export async function teamCourseSeatIsFree(
 
   const course = await prisma.lmsCourse.findUnique({ where: { slug }, select: { id: true } });
   if (!course) return true; // the enrolment writer reports COURSE_NOT_FOUND
-  const others = (
-    await prisma.lmsTeamMember.findMany({ where: { teamId }, select: { userId: true } })
-  )
-    .map((m) => m.userId)
-    .filter((id) => id !== userId);
-  if (others.length === 0) return true;
-  const holders = await prisma.lmsEnrollment.findMany({
-    where: {
-      courseId: course.id,
-      studentId: { in: others },
-      status: { in: ['active', 'completed'] },
-    },
-    select: { id: true },
-  });
+  const holders = (await teamPaidSeatHolders(prisma, teamId, course.id, slug)).filter(
+    (h) => h.studentId !== userId,
+  );
   return holders.length < courseSeats;
 }

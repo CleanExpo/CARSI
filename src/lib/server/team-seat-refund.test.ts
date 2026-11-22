@@ -133,12 +133,21 @@ vi.mock('@/lib/prisma', () => {
     },
     lmsEnrollment: {
       findMany: vi.fn(
-        async (args: { where: { courseId: string; studentId: { in: string[] }; status: { in: string[] } } }) =>
+        async (args: {
+          where: {
+            courseId: string;
+            studentId?: { in: string[] };
+            status: { in: string[] };
+            paymentReference?: { in: string[] };
+          };
+        }) =>
           db.enrolments
             .filter(
               (e) =>
                 e.courseId === args.where.courseId &&
-                args.where.studentId.in.includes(e.studentId) &&
+                (args.where.studentId === undefined || args.where.studentId.in.includes(e.studentId)) &&
+                (args.where.paymentReference === undefined ||
+                  args.where.paymentReference.in.includes(e.paymentReference)) &&
                 args.where.status.in.includes(e.status),
             )
             .sort((a, b) => b.enrolledAt.getTime() - a.enrolledAt.getTime()),
@@ -282,5 +291,36 @@ describe('GP-759 (c): refunding a team seat purchase revokes those seats', () =>
 
     expect(enrolSpy).toHaveBeenCalledTimes(1);
     expect(db.enrolments.find((e) => e.studentId === 'm6')?.status).toBe('active');
+  });
+  it("Phill's ruling: members paid for elsewhere keep access and never use up this team's paid seats", async () => {
+    // m7 holds the course through another team; m8 bought it themselves. Both joined team-1 last.
+    db.members.push('m7', 'm8');
+    db.enrolments.push(
+      { id: 'e-m7', studentId: 'm7', courseId: COURSE.id, status: 'active', paymentReference: 'team:team-2', enrolledAt: new Date(Date.UTC(2026, 10, 20)), revokedReason: null },
+      { id: 'e-m8', studentId: 'm8', courseId: COURSE.id, status: 'active', paymentReference: 'cs_test_self_paid', enrolledAt: new Date(Date.UTC(2026, 10, 21)), revokedReason: null },
+    );
+
+    await refund('cs_test_second');
+
+    // Team-1 paid seats held: owner + m1..m6 = 7, 5 still paid: only m5 and m6 go.
+    expect(active()).toEqual(['owner', 'm1', 'm2', 'm3', 'm4', 'm7', 'm8']);
+    expect(db.enrolments.find((e) => e.studentId === 'm7')?.status).toBe('active');
+    expect(db.enrolments.find((e) => e.studentId === 'm8')?.status).toBe('active');
+
+    // The same rule decides the seat check: 5 paid seats, 5 team-paid holders, none free.
+    await enrollTeamMemberInPurchasedCourse('m6', 'team-1');
+    expect(enrolSpy).not.toHaveBeenCalled();
+  });
+
+  it("control: with a team-paid seat free, a member is enrolled even though others hold the course elsewhere", async () => {
+    db.members.push('m7');
+    db.enrolments.push(
+      { id: 'e-m7', studentId: 'm7', courseId: COURSE.id, status: 'active', paymentReference: 'team:team-2', enrolledAt: new Date(Date.UTC(2026, 10, 20)), revokedReason: null },
+    );
+    db.enrolments.find((e) => e.studentId === 'm6')!.status = 'revoked';
+
+    await enrollTeamMemberInPurchasedCourse('m6', 'team-1');
+
+    expect(enrolSpy).toHaveBeenCalledTimes(1);
   });
 });
