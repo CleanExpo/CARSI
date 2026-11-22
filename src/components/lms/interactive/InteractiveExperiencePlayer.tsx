@@ -25,6 +25,8 @@ interface InteractiveExperiencePlayerProps {
   enterprise?: boolean;
   lessonCompleted?: boolean;
   onAllComplete?: () => void;
+  /** Wider marketing layout on public demo pages. */
+  layout?: 'default' | 'immersive';
 }
 
 export function InteractiveExperiencePlayer({
@@ -34,7 +36,9 @@ export function InteractiveExperiencePlayer({
   enterprise,
   lessonCompleted,
   onAllComplete,
+  layout = 'default',
 }: InteractiveExperiencePlayerProps) {
+  const immersive = layout === 'immersive';
   const key = useMemo(() => storageKey(experience.id, progressKey), [experience.id, progressKey]);
   const maxXp = maxXpForExperience(experience);
   const completionBannerRef = useRef<HTMLDivElement>(null);
@@ -57,6 +61,7 @@ export function InteractiveExperiencePlayer({
 
   useEffect(() => {
     const stored = readInteractiveProgress(experience.id, progressKey, experience);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate stored progress from localStorage after mount (not readable during SSR); behaviour-preserving
     setSnapshot(stored ?? emptySnapshot);
     setHydrated(true);
   }, [experience, progressKey, emptySnapshot]);
@@ -72,6 +77,7 @@ export function InteractiveExperiencePlayer({
 
   useEffect(() => {
     if (!allDone || completionNotified) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot completion latch; behaviour-preserving, came in with the interactive pilot (5593ab7e)
     setCompletionNotified(true);
     onAllComplete?.();
     completionBannerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -147,10 +153,13 @@ export function InteractiveExperiencePlayer({
     <section
       aria-label={label ?? experience.title}
       className={cn(
-        'rounded-xl border p-5 sm:p-6',
+        'rounded-xl border',
+        immersive ? 'p-6 sm:p-8 lg:p-9' : 'p-5 sm:p-6',
         enterprise
           ? 'border-slate-200 bg-white shadow-sm'
-          : 'border-[#2490ed]/25 bg-gradient-to-b from-[#f4f9ff] to-white'
+          : immersive
+            ? 'border-slate-200/90 bg-white shadow-[0_24px_60px_-32px_rgba(15,23,42,0.18)]'
+            : 'border-[#2490ed]/25 bg-gradient-to-b from-[#f4f9ff] to-white'
       )}
     >
       <p ref={liveRef} className="sr-only" aria-live="polite" />
@@ -164,7 +173,14 @@ export function InteractiveExperiencePlayer({
         <p className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
           {label ?? 'Interactive experience'}
         </p>
-        <h2 className="text-lg font-bold text-slate-900 sm:text-xl">{experience.title}</h2>
+        <h2
+          className={cn(
+            'font-bold text-slate-900',
+            immersive ? 'text-xl sm:text-2xl' : 'text-lg sm:text-xl'
+          )}
+        >
+          {experience.title}
+        </h2>
         {experience.subtitle ? (
           <p className="text-sm text-slate-600">{experience.subtitle}</p>
         ) : null}
@@ -191,7 +207,13 @@ export function InteractiveExperiencePlayer({
         </span>
       </div>
 
-      <nav aria-label="Activities" className="mt-4 flex gap-2 overflow-x-auto pb-1">
+      <nav
+        aria-label="Activities"
+        className={cn(
+          'mt-4 gap-2 pb-1',
+          immersive ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'flex overflow-x-auto'
+        )}
+      >
         {experience.activities.map((a, i) => {
           const done = snapshot.completedActivityIds.includes(a.id);
           const active = i === snapshot.activityIndex;
@@ -203,7 +225,8 @@ export function InteractiveExperiencePlayer({
               disabled={locked}
               onClick={() => selectActivity(i)}
               className={cn(
-                'flex shrink-0 items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium',
+                'flex items-center gap-1.5 rounded-xl border px-3 py-2 text-left text-xs font-medium',
+                immersive ? 'min-h-[2.75rem]' : 'shrink-0 rounded-full py-1',
                 active
                   ? 'border-[#146fc2] bg-[#146fc2]/10 text-[#146fc2]'
                   : 'border-slate-200 bg-white text-slate-600',
@@ -217,7 +240,9 @@ export function InteractiveExperiencePlayer({
               ) : (
                 <Circle className="h-3.5 w-3.5 opacity-40" aria-hidden />
               )}
-              <span className="max-w-[10rem] truncate">{a.title}</span>
+              <span className={cn(immersive ? 'line-clamp-2' : 'max-w-[10rem] truncate')}>
+                {a.title}
+              </span>
             </button>
           );
         })}

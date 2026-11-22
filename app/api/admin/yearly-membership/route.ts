@@ -10,6 +10,7 @@ import {
   releaseYearlyMembershipClaim,
   YEARLY_MEMBERSHIP_REGRANT_WINDOW_MS,
 } from '@/lib/admin/yearly-membership-claim';
+import { getAppOrigin } from '@/lib/server/app-url';
 
 export async function GET() {
   const session = await getAdminSessionOrNull();
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
       email,
       fullName,
       priceAud,
-      appOrigin: request.nextUrl.origin,
+      appOrigin: getAppOrigin(request),
     });
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {

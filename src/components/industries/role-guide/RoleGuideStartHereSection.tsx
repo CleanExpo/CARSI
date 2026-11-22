@@ -184,8 +184,8 @@ export function RoleGuideStartHereSection({
                 Training records and WHS alignment
               </h2>
               <p className={`mt-3 text-sm text-slate-600 md:text-base ${LANDING_LEAD_CLASS}`}>
-                Claim-safe paths for team pricing, fundamentals, and proof you can request from
-                CARSI — not legal advice.
+                Paths for team pricing, fundamentals and the training records you can request from
+                CARSI.
               </p>
             </div>
             <BadgeCheck className="hidden h-10 w-10 text-[#146fc2]/35 md:block" aria-hidden />
