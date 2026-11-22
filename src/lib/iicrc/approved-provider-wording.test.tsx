@@ -89,6 +89,10 @@ const HISTORICAL = [
  * is served. Exact paths only.
  */
 const DETECTORS = [
+  // Dated record that quotes the retired wording as its "before" text.
+  'docs/governance/reports/gp-525-carpet-cec-reconciliation.md',
+  // Header comment quotes the founder rule, which uses the retired phrase.
+  'scripts/check-iicrc-scope.mjs',
   'scripts/check-iicrc-compliance.mjs',
   'scripts/check-iicrc-compliance.test.mjs',
   'scripts/check-iicrc-terminology.mjs',
