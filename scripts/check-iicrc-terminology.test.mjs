@@ -12,7 +12,13 @@
  * The allow-cases matter as much as the block-cases: every one is a phrasing CLAUDE.md
  * explicitly permits, and a guard that blocks them would be turned off within a week.
  */
-import { bannedRules, inScope, scanFile, scanText } from './check-iicrc-terminology.mjs';
+import {
+  bannedRules,
+  inScope,
+  neutraliseCecExemptions,
+  scanFile,
+  scanText,
+} from './check-iicrc-terminology.mjs';
 import { IICRC_CODES } from './iicrc-codes.mjs';
 
 const F = 'app/(public)/fixture/page.tsx';
@@ -1079,6 +1085,88 @@ for (const [name, file, src, drop] of LIST_FIXTURES) {
     if (ms > 100) {
       console.error(
         `✖ long near-miss line took ${ms.toFixed(0)}ms (> 100ms): ${line.slice(0, 40)}…`
+      );
+      failed++;
+    }
+  }
+}
+
+// GP-656: the CEC-claim exemptions are linear, and delete exactly what the old regex deleted.
+{
+  // The pre-GP-656 regex, kept here only as the reference the linear version must match.
+  const OLD =
+    /[^.!?]*\b(?:not|never|cannot|isn't|doesn't|does\s+not)\b\s*(?:\w+\s+){0,2}?\b(?:earns?|earning|awards?|awarding|carr(?:y|ies|ying)|counts?|counting|confers?|accredit\w*|eligible|approved|grants?|toward)\b[^.!?]{0,40}?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\bno\s+(?:IICRC\s+)?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\w\?|[^.!?]*\b(?:assert\w*|exclude|refuses?|gate|gated|only\s+wh(?:en|ere)|filed)\b[^.!?]*?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*|\b1\s+CEC\s*=[^.!?]*/gi;
+  const words = [
+    'not',
+    'never',
+    "doesn't",
+    'does not',
+    'earn',
+    'earns',
+    'award',
+    'toward',
+    'eligible',
+    'CEC',
+    'CECs',
+    'cecs',
+    'XCEC',
+    'continuing education credits',
+    'continuing-education credit',
+    'no',
+    'No IICRC',
+    'IICRC',
+    'gate',
+    'gated',
+    'assertion',
+    'only when',
+    'filed',
+    '1 CEC =',
+    '1',
+    '=',
+    'this',
+    'course',
+    'x',
+    '.',
+    '!',
+    '?',
+    '??',
+    ' ',
+    '\t',
+    '\n',
+    ',',
+    'ok?',
+    'e.g.',
+  ];
+  let seed = 7;
+  const pick = (n) => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) % n;
+  let mismatches = 0;
+  for (let k = 0; k < 20000; k++) {
+    let s = '';
+    for (let i = 1 + pick(14); i > 0; i--) s += words[pick(words.length)] + (pick(3) ? ' ' : '');
+    if (s.replace(OLD, ' ') !== neutraliseCecExemptions(s) && mismatches++ < 3) {
+      console.error(`✖ GP-656 exemption differs from the old regex on: ${JSON.stringify(s)}`);
+      failed++;
+    }
+  }
+  const cecRule = bannedRules().filter((r) =>
+    r.message.startsWith('Do not claim a CARSI course earns')
+  );
+  // Before GP-656: ~200ms for the digits, ~2.5s for `not earn`, and minutes for `gate`.
+  for (const line of [
+    '1'.repeat(10000),
+    'not '.repeat(2500),
+    'not earn '.repeat(1200),
+    'no '.repeat(3000),
+    'gate '.repeat(2000),
+    `gate ${'x'.repeat(10000)}`,
+    '1 CEC '.repeat(1700),
+  ]) {
+    const t0 = performance.now();
+    scanText(F, line, cecRule);
+    const ms = performance.now() - t0;
+    if (ms > 50) {
+      console.error(
+        `✖ GP-656 CEC-claim rule took ${ms.toFixed(0)}ms (> 50ms): ${line.slice(0, 20)}…`
       );
       failed++;
     }
