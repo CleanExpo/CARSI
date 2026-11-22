@@ -4,7 +4,9 @@
 
 CARSI’s first **interactive learning experience** ships as a lesson resource on **Water Restoration Practitioner** Module 3, lesson _Identify the hazards first_. It replaces passive reading-only study with six connected activities aligned to existing course copy and diagrams.
 
-**Public demo:** `/courses/water-damage-restoration-fundamentals/interactive-pilot`  
+**Advisor hub (all disciplines):** `/interactive-learning`  
+**Public experience (water, live):** `/interactive-learning/water-damage-module-3-pilot`  
+**Legacy redirect:** `/courses/water-damage-restoration-fundamentals/interactive-pilot`  
 **Enrolled path:** `/dashboard/learn/water-damage-restoration-fundamentals` → Module 3 → _Identify the hazards first_
 
 ## Activities
