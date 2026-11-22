@@ -10,12 +10,12 @@
       "attemptsAllowed": 3,
       "questions": [
         {
-          "questionText": "Which standard is the primary reference for cleaning carpet and other textile floor coverings?",
+          "questionText": "Which kind of work is the primary job of a carpet technician?",
           "options": [
-            "ANSI/IICRC S220",
-            "ANSI/IICRC S500",
-            "ANSI/IICRC S700",
-            "ANSI/IICRC S100"
+            "Mould remediation after a leak",
+            "Water damage restoration after a flood",
+            "Fire and smoke restoration after a blaze",
+            "Cleaning carpet and other textile floor coverings"
           ],
           "correctIndex": 3,
           "points": 1
