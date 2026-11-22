@@ -33,6 +33,8 @@ export const PUBLIC_ROUTES: readonly string[] = [
   '/events/ccw-roadshow',
   '/events/ccw-roadshow/success',
   '/ideas',
+  '/interactive-learning',
+  '/interactive-learning/[experienceId]',
   '/iicrc-cec-courses',
   '/industries',
   '/industries/aged-care',

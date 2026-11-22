@@ -4,7 +4,7 @@ import { InteractiveLearningHubView } from '@/components/lms/interactive/Interac
 import { listInteractiveLearningOffers } from '@/lib/lms/interactive-learning-catalog';
 
 export const metadata: Metadata = {
-  title: 'Interactive practice — explore CARSI courses by doing | CARSI',
+  title: 'Interactive practice — explore CARSI courses by doing',
   description:
     'CARSI interactive learning advisor: live job-site scenarios and mastery practice across water, moisture, microbial, carpet, and indoor environment courses.',
   openGraph: {

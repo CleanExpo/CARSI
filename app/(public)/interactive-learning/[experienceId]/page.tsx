@@ -4,10 +4,7 @@ import { notFound } from 'next/navigation';
 
 import { InteractiveLearningExperienceView } from '@/components/lms/interactive/InteractiveLearningExperienceView';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
-import {
-  getInteractiveLearningOffer,
-  interactiveLearningPath,
-} from '@/lib/lms/interactive-learning-catalog';
+import { getInteractiveLearningOffer } from '@/lib/lms/interactive-learning-catalog';
 import { getInteractiveExperienceById } from '@/lib/lms/interactive-experience-registry';
 import { marketingBtnPrimary, marketingBtnSecondary, marketingPanel } from '@/lib/marketing/marketing-ui';
 import { cn } from '@/lib/utils';
@@ -17,9 +14,9 @@ type Props = { params: Promise<{ experienceId: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { experienceId } = await params;
   const offer = getInteractiveLearningOffer(experienceId);
-  if (!offer) return { title: 'Interactive experience | CARSI' };
+  if (!offer) return { title: 'Interactive experience' };
   return {
-    title: `${offer.courseTitle} — interactive practice | CARSI`,
+    title: `${offer.courseTitle} — interactive practice`,
     description: offer.teaser,
   };
 }
