@@ -345,10 +345,10 @@ export default function StudentProfilePage() {
               </div>
               <p className="mb-6 text-sm text-slate-500">
                 The monthly board highlights completion-based activity for the current calendar
-                month (Australia/Sydney). It is{' '}
-                <span className="text-slate-700">anonymous by default</span> — only an optional
-                label you enter here can appear publicly. Your email and account name are never
-                shown on the board.
+                month (Australia/Sydney). Taking part is{' '}
+                <span className="text-slate-700">optional and off by default</span> — you are only
+                listed if you turn it on here, and you can turn it off at any time. Your email and
+                account name are never shown on the board.
               </p>
               <form
                 onSubmit={saveRecognition}
@@ -364,10 +364,11 @@ export default function StudentProfilePage() {
                   />
                   <div>
                     <label htmlFor="lb_show" className="text-sm font-medium text-slate-800">
-                      Show my chosen public label on the monthly recognition board
+                      Appear on the monthly recognition board
                     </label>
                     <p className="mt-1 text-xs text-slate-400">
-                      If off, you appear as a neutral professional identifier (not your real name).
+                      If off, you are not listed or ranked. If on, you appear under the label below,
+                      or a neutral identifier (not your real name) if you leave it blank.
                     </p>
                   </div>
                 </div>

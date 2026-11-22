@@ -27,9 +27,13 @@ export interface User {
   iicrc_expiry_date?: string | null;
   iicrc_card_image_url?: string | null;
   iicrc_certifications?: IicrcCertificationEntry[] | null;
-  /** When true, `leaderboard_display_name` may appear on the public monthly leaderboard. */
+  /**
+   * Leaderboard consent (GP-775). Off by default: the learner is not ranked or listed at all.
+   * When true, the learner appears on the signed-in monthly board under `leaderboard_display_name`,
+   * or an anonymous label when that is empty.
+   */
   leaderboard_show_display_name?: boolean;
-  /** Optional label for the leaderboard only (never your legal name unless you type it here). */
+  /** Optional label for the leaderboard only; a label equal to the legal name is never shown. */
   leaderboard_display_name?: string | null;
 }
 
@@ -155,7 +159,7 @@ export const authApi = {
   async confirmPasswordReset(
     token: string,
     newPassword: string,
-    next?: string | null,
+    next?: string | null
   ): Promise<{ message: string; redirect_to?: string; signed_in?: boolean }> {
     const res = await fetch('/api/auth/reset-password', {
       method: 'POST',

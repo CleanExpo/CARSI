@@ -7,25 +7,28 @@ export const XP_LESSON_COMPLETE = 10;
 export const XP_COURSE_COMPLETE = 100;
 
 /** Per-student XP in GROUP BY — COUNT * literal avoids PostgreSQL `sum(unknown)` (42725). */
-const SQL_LESSON_XP_TOTAL = Prisma.raw(
-  `(COUNT(*)::bigint * ${XP_LESSON_COMPLETE}::bigint)`
-);
-const SQL_COURSE_XP_TOTAL = Prisma.raw(
-  `(COUNT(*)::bigint * ${XP_COURSE_COMPLETE}::bigint)`
-);
+const SQL_LESSON_XP_TOTAL = Prisma.raw(`(COUNT(*)::bigint * ${XP_LESSON_COMPLETE}::bigint)`);
+const SQL_COURSE_XP_TOTAL = Prisma.raw(`(COUNT(*)::bigint * ${XP_COURSE_COMPLETE}::bigint)`);
 
+/**
+ * Engagement labels only (GP-775). XP counts activity, not competence, so a level must never read
+ * as a trade, occupational or qualification title.
+ */
 const LEVEL_TITLES = [
-  'Apprentice',
-  'Trainee',
-  'Technician',
-  'Senior Technician',
-  'Specialist',
-  'Master Restorer',
+  'Getting started',
+  'Building momentum',
+  'Steady learner',
+  'Consistent learner',
+  'Dedicated learner',
+  'Committed learner',
 ] as const;
 
 const LEVEL_THRESHOLDS = [0, 500, 1500, 3500, 7000, 12000] as const;
 
-export function levelTitleFromLifetimeXp(totalXp: number): { current_level: number; level_title: string } {
+export function levelTitleFromLifetimeXp(totalXp: number): {
+  current_level: number;
+  level_title: string;
+} {
   let level = 1;
   for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
     if (totalXp >= LEVEL_THRESHOLDS[i]) {
@@ -58,14 +61,20 @@ export function sanitizeLeaderboardDisplayName(raw: string | null | undefined): 
   return s.length > 0 ? s : null;
 }
 
+const normaliseName = (s: string) => s.replace(/\s+/g, ' ').trim().toLowerCase();
+
+/**
+ * Public label for a learner who has opted in to the board: their chosen label, or the anonymous
+ * label when none is set. A chosen label equal to the account's legal name is never shown.
+ */
 export function publicLeaderboardDisplayName(
   userId: string,
-  showName: boolean,
-  storedName: string | null | undefined
+  storedName: string | null | undefined,
+  legalName?: string | null
 ): string {
-  if (showName) {
-    const cleaned = sanitizeLeaderboardDisplayName(storedName ?? null);
-    if (cleaned) return cleaned;
+  const cleaned = sanitizeLeaderboardDisplayName(storedName ?? null);
+  if (cleaned && !(legalName && normaliseName(cleaned) === normaliseName(legalName))) {
+    return cleaned;
   }
   return anonymousLeaderboardLabel(userId);
 }
@@ -264,31 +273,37 @@ export async function getMonthlyLeaderboard(params: {
   const course = await courseXpGrouped(start, end, params.courseSlugs);
   const periodTotals = mergeXpMaps(lesson, course);
 
-  const sorted = [...periodTotals.entries()]
-    .filter(([, xp]) => xp > 0)
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .slice(0, params.limit);
+  const withXp = [...periodTotals.entries()].filter(([, xp]) => xp > 0);
+  const empty = {
+    period_label,
+    period_timezone: 'Australia/Sydney',
+    start,
+    end,
+    items: [] as LeaderboardPeriodRow[],
+  };
+  if (withXp.length === 0) return empty;
 
-  const ids = sorted.map(([id]) => id);
-  if (ids.length === 0) {
-    return {
-      period_label,
-      period_timezone: 'Australia/Sydney',
-      start,
-      end,
-      items: [],
-    };
-  }
-
+  // Consent (GP-775): only learners who opted in are ranked. The column defaults to false, so a
+  // learner who never chose is not on the board, and opting out removes them on the next read.
+  // Filter before ranking and the limit, so excluded learners take no slot and leave no rank gap.
   const users = await prisma.lmsUser.findMany({
-    where: { id: { in: ids } },
+    where: { id: { in: withXp.map(([id]) => id) }, leaderboardShowDisplayName: true },
     select: {
       id: true,
       leaderboardShowDisplayName: true,
       leaderboardDisplayName: true,
+      fullName: true,
     },
   });
-  const userMap = new Map(users.map((u) => [u.id, u]));
+  const userMap = new Map(
+    users.filter((u) => u.leaderboardShowDisplayName === true).map((u) => [u.id, u])
+  );
+
+  const sorted = withXp
+    .filter(([id]) => userMap.has(id))
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, params.limit);
+  if (sorted.length === 0) return empty;
 
   const lifetimeLessonAll = await lessonXpGrouped(null, null, null);
   const lifetimeCourseAll = await courseXpGrouped(null, null, null);
@@ -298,8 +313,8 @@ export async function getMonthlyLeaderboard(params: {
     const u = userMap.get(studentId);
     const displayName = publicLeaderboardDisplayName(
       studentId,
-      u?.leaderboardShowDisplayName ?? false,
-      u?.leaderboardDisplayName
+      u?.leaderboardDisplayName,
+      u?.fullName
     );
     const lifetime = lifetimeAllCourses.get(studentId) ?? periodXp;
     const { current_level, level_title } = levelTitleFromLifetimeXp(lifetime);

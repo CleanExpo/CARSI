@@ -49,7 +49,7 @@ export const PRO_FEATURES = [
   'Odour control courses',
   'PDF certificates for every course',
   'CEC tracking dashboard',
-  'Monthly activity recognition (anonymous by default) & streak tracker',
+  'Optional monthly activity recognition (off unless you opt in) & streak tracker',
   'Priority email support',
 ];
 

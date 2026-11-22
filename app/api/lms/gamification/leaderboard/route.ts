@@ -1,15 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getDesignationDefinition } from '@/lib/designations/registry';
+import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { getMonthlyLeaderboard, leaderboardPeriodLabelNow } from '@/lib/server/leaderboard-xp';
 
 /**
- * Public monthly leaderboard (Australia/Sydney calendar month).
+ * Monthly leaderboard (Australia/Sydney calendar month), for signed-in learners only.
  * Rankings use XP from lesson + course completions in the selected period, optionally limited to
  * one CARSI designation's pathway courses (`?designation=<slug>`). It never filters or labels by
- * an IICRC discipline code. Display names are anonymous unless the learner opts in from their profile.
+ * an IICRC discipline code. Only learners who opted in from their profile are ranked (GP-775), under
+ * their chosen label or an anonymous one; a real name or email is never returned.
  */
 export async function GET(request: NextRequest) {
+  // The only consumer is the signed-in Achievements page; nobody needs an anonymous public board.
+  const claims = await getSessionClaimsFromRequest(request);
+  if (!claims) {
+    return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   // A filter key that is present always counts, whatever its value: an empty or bare key must
   // not fall through to the unfiltered board.

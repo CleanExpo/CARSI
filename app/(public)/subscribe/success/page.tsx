@@ -123,8 +123,8 @@ function SubscribeSuccess() {
             <li className="flex items-start gap-3">
               <span className="mt-0.5 font-mono tabular-nums text-[#00F5FF]">4.</span>
               <span>
-                Optional: appear on the monthly recognition board — anonymous by default; you can opt
-                in to a display name from your profile.
+                Optional: appear on the monthly recognition board — off unless you turn it on from
+                your profile, under a label you choose or a neutral identifier.
               </span>
             </li>
           </ol>
