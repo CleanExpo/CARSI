@@ -82,6 +82,15 @@ vi.mock('@/lib/server/lms-auth', () => ({
   sessionClaimsForUserId: vi.fn(async (userId: string) => ({ sub: userId, email: `${userId}@seat-refund-test.invalid` })),
 }));
 
+vi.mock('@/lib/server/team-course-purchase-db', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/server/team-course-purchase-db')>()),
+  findTeamCoursePurchasesByTeamId: vi.fn(async (teamId: string) =>
+    db.purchases
+      .filter((p) => p.teamId === teamId)
+      .map((p) => ({ ...p, purchasedAt: new Date(Date.UTC(2026, 10, 1)) })),
+  ),
+}));
+
 vi.mock('@/lib/prisma', () => {
   const client = {
     lmsTeamCoursePurchase: {
@@ -130,6 +139,7 @@ vi.mock('@/lib/prisma', () => {
       findUnique: vi.fn(async (args: { where: { slug: string } }) =>
         args.where.slug === COURSE.slug ? { id: COURSE.id } : null,
       ),
+      findMany: vi.fn(async () => [{ slug: COURSE.slug, title: 'Team course' }]),
     },
     lmsEnrollment: {
       findMany: vi.fn(
@@ -152,6 +162,15 @@ vi.mock('@/lib/prisma', () => {
             )
             .sort((a, b) => b.enrolledAt.getTime() - a.enrolledAt.getTime()),
       ),
+      count: vi.fn(
+        async (args: { where: { courseId: string; studentId: { in: string[] }; status: { notIn: string[] } } }) =>
+          db.enrolments.filter(
+            (e) =>
+              e.courseId === args.where.courseId &&
+              args.where.studentId.in.includes(e.studentId) &&
+              !args.where.status.notIn.includes(e.status),
+          ).length,
+      ),
       updateMany: vi.fn(async (args: { where: { id: { in: string[] } }; data: Partial<Enrolment> }) => {
         let count = 0;
         for (const e of db.enrolments) {
@@ -172,6 +191,10 @@ vi.mock('@/lib/prisma', () => {
 
 const { POST } = await import('../../../app/api/lms/webhooks/stripe/route');
 const { provisionTeamCoursePurchase, enrollTeamMemberInPurchasedCourse } = await import('./team-course-purchase');
+const { assertCourseSeatsAvailable } = await import('./team-course-seats');
+const { prisma: prismaClient } = await import('@/lib/prisma');
+const prismaFake = () => prismaClient as never;
+const { countTeamPaidSeatsUsed } = await import('./team-seat-refund');
 
 let seq = 0;
 async function refund(sessionId: string, amountRefunded = 100_000) {
@@ -322,5 +345,26 @@ describe('GP-759 (c): refunding a team seat purchase revokes those seats', () =>
     await enrollTeamMemberInPurchasedCourse('m6', 'team-1');
 
     expect(enrolSpy).toHaveBeenCalledTimes(1);
+  });
+  it("after a refund and a new purchase, the owner's direct invite has the new paid seats", async () => {
+    await refund('cs_test_second');
+    await refund('cs_test_first');
+    // The team buys a fresh 5-seat block.
+    db.purchases.push({ id: 'p-3', teamId: 'team-1', courseSlug: COURSE.slug, seatLimit: 5, paymentReference: 'cs_test_third' });
+    db.team.seatLimit = 5;
+
+    // Refunded (revoked) seats and members paid elsewhere do not use up the new seats.
+    await expect(assertCourseSeatsAvailable('team-1', [COURSE.slug])).resolves.toBeUndefined();
+    // The token-invite and accept paths read the same count.
+    expect(await countTeamPaidSeatsUsed(prismaFake(), 'team-1')).toBe(0);
+  });
+
+  it('control: the direct invite is refused when every paid seat is held', async () => {
+    // 8 paid seats, owner + 6 members hold 7: one free. Fill it, then the next is refused.
+    db.members.push('m7');
+    db.enrolments.push({ id: 'e-m7', studentId: 'm7', courseId: COURSE.id, status: 'active', paymentReference: 'team:team-1', enrolledAt: new Date(Date.UTC(2026, 10, 22)), revokedReason: null });
+
+    await expect(assertCourseSeatsAvailable('team-1', [COURSE.slug])).rejects.toThrow('COURSE_SEATS_FULL');
+    expect(await countTeamPaidSeatsUsed(prismaFake(), 'team-1')).toBe(8);
   });
 });

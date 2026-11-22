@@ -37,6 +37,31 @@ export async function teamPaidSeatHolders(
 }
 
 /**
+ * Seats in use against a course-purchase team's own seat limit (the sum of its seat blocks), by
+ * the same rule: every seat this team paid for that is held, across the team's courses. Returns
+ * null when the team has no seat blocks (Teams subscription and older teams), where the caller's
+ * member count applies as before.
+ */
+export async function countTeamPaidSeatsUsed(
+  db: SeatDb & Pick<typeof prisma, 'lmsCourse'>,
+  teamId: string,
+): Promise<number | null> {
+  const blocks = await db.lmsTeamCoursePurchase.findMany({
+    where: { teamId },
+    select: { courseSlug: true },
+  });
+  if (blocks.length === 0) return null;
+  const slugs = [...new Set(blocks.map((b) => b.courseSlug.trim().toLowerCase()))];
+  let used = 0;
+  for (const slug of slugs) {
+    const course = await db.lmsCourse.findUnique({ where: { slug }, select: { id: true } });
+    if (!course) continue;
+    used += (await teamPaidSeatHolders(db, teamId, course.id, slug)).length;
+  }
+  return used;
+}
+
+/**
  * GP-759 (c): a full refund of a team seat checkout takes those seats back.
  *
  * Before this, `charge.refunded` revoked only the buyer's own enrolment (keyed by the checkout

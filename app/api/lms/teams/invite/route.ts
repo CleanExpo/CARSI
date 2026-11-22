@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { addCourseTeamMemberByEmail } from '@/lib/server/team-member-provision';
+import { countTeamPaidSeatsUsed } from '@/lib/server/team-seat-refund';
 import { countTeamSeatsUsed, generateInviteToken, repairAndGetTeamForUser } from '@/lib/server/teams';
 
 /** POST /api/lms/teams/invite — owner/admin adds a member by email with selected courses. */
@@ -79,7 +80,10 @@ export async function POST(request: NextRequest) {
         : null;
     const effectiveSeatLimit = teamSub ? teamSub.seatLimit : team.seatLimit;
 
-    const seatsUsed = await countTeamSeatsUsed(team.id);
+    // GP-759: a course-purchase team counts only seats it paid for (one owner,
+    // teamPaidSeatHolders); other teams count members as before.
+    const paidSeatsUsed = teamSub ? null : await countTeamPaidSeatsUsed(prisma, team.id);
+    const seatsUsed = paidSeatsUsed ?? (await countTeamSeatsUsed(team.id));
     const pending = team.invites.length;
     if (seatsUsed + pending >= effectiveSeatLimit) {
       if (teamSub) {
