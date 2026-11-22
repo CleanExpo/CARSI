@@ -161,8 +161,11 @@ export async function PATCH(request: NextRequest) {
         where: { id: claims.sub },
         data: update,
       });
-    } catch {
-      /* user row may not exist */
+    } catch (e) {
+      // Never acknowledge a change that was not stored (GP-775): a swallowed failure here told a
+      // learner their leaderboard opt-out was saved while they stayed on the board.
+      console.error('[auth/me PATCH]', e);
+      return NextResponse.json({ detail: 'Could not save your settings' }, { status: 500 });
     }
   }
 
