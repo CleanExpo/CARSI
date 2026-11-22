@@ -14,6 +14,7 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 import { buildIndustryMetadata } from '@/lib/marketing/industry-metadata';
 import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
@@ -62,8 +63,7 @@ const faqs = [
   },
   {
     question: 'Can government facility staff complete this training online?',
-    answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, suitable for council and agency staff across metropolitan and regional Australia. Courses issue verifiable digital credentials for audit and procurement records. Bulk seat licensing is available for departments and councils.',
+    answer: `Yes. CARSI, an ${IICRC_APPROVED_CEC_PROVIDER}, offers courses online and self-paced, suitable for council and agency staff across metropolitan and regional Australia. Courses issue verifiable digital credentials for audit and procurement records. Bulk seat licensing is available for departments and councils.`,
   },
 ];
 

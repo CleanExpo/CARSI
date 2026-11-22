@@ -517,21 +517,22 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
       re: /\bIICRC[\s-]*Accredited\b/i,
       allow: null,
       message:
-        'Say "IICRC CEC Accredited", never bare "IICRC Accredited" — CARSI is accredited as a CEC provider, not accredited by IICRC generally.',
+        'Say "IICRC Approved CEC Provider" (GP-704); never call CARSI or a course accredited.',
     },
     {
       // "IICRC-accredited course(s)" / "IICRC accredited course(s)" (no CEC) —
       // implies IICRC accredits the course/certification itself.
       re: /\bIICRC[\s-]*accredited[\s-]+courses?\b/i,
       allow: null,
-      message: 'CARSI courses are not "IICRC-accredited" — say "IICRC CEC Accredited course(s)".',
+      message:
+        'CARSI courses are not accredited — a single approved class is "approved for IICRC CECs".',
     },
     {
       // "IICRC course(s) accredited/accreditation" (reversed word order).
       re: /\bIICRC[\s-]+courses?[\s-]+accredit\w*\b/i,
       allow: null,
       message:
-        'Do not imply IICRC accredits CARSI\'s courses — say "IICRC CEC Accredited course(s)".',
+        'Do not imply the IICRC accredits CARSI\'s courses — a single approved class is "approved for IICRC CECs".',
     },
     {
       // "IICRC Approved School" / "IICRC Approved Instructor" as a positive claim about

@@ -99,7 +99,7 @@ export async function getIndustryCoursesFromDb(
 
 /**
  * Published courses for industry pages, pinned to specific catalogue slugs
- * (IICRC CEC Accredited intros) rather than IICRC discipline codes.
+ * (intros approved for IICRC CECs) rather than IICRC discipline codes.
  */
 export async function getIndustryCoursesBySlugs(
   slugs: readonly string[]
