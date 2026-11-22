@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { extractQuizIdFromLesson } from './quiz-from-lesson';
 import {
   isFlashcardResource,
+  isInteractiveLessonResource,
   isSlidesResource,
   parseLessonResources,
 } from './lesson-resources';
@@ -167,6 +168,21 @@ describe('parseLessonResources', () => {
         ],
       },
     ]);
+  });
+
+  it('passes interactive resources through from experienceId', () => {
+    const out = parseLessonResources([
+      {
+        kind: 'interactive',
+        label: 'Interactive job-site experience',
+        experienceId: 'water-damage-module-3-pilot',
+      },
+    ]);
+    expect(out).toHaveLength(1);
+    expect(isInteractiveLessonResource(out[0])).toBe(true);
+    if (isInteractiveLessonResource(out[0])) {
+      expect(out[0].experience.activities.length).toBeGreaterThan(0);
+    }
   });
 
   it('does not break quiz extraction from resources', () => {

@@ -12,8 +12,9 @@ import {
   CONSENT_STORAGE_KEY,
   IDENTIFIER_ROUTES,
   PRIVATE_FIRST_SEGMENTS,
-  isCollectionUrl,
   isAllowedTextParam,
+  isValidCarsiContext,
+  isCollectionUrl,
   isCountedPath,
   libraryUrl,
   readAnalyticsChoice,
@@ -265,6 +266,23 @@ describe('the wire: each request to Google is screened again as it leaves', () =
     expect(screenCollect(collect(clean), undefined, context)).not.toBeNull();
   });
 
+  it('lets Phase 5 product events through with allow-listed params', () => {
+    const dl = `${ORIGIN}/role-guides`;
+    expect(
+      screenCollect(
+        collect({
+          en: 'course_cta',
+          dl,
+          dt: '/role-guides',
+          'ep.carsi_context': 'role-guide:nsw-builders:start-1',
+          'ep.link_path': '/courses/:slug',
+        }),
+        undefined,
+        context
+      )
+    ).not.toBeNull();
+  });
+
   it('sends nothing at all without a stored yes', () => {
     expect(screenCollect(collect(clean), undefined, { ...context, choice: 'unset' })).toBeNull();
     expect(screenCollect(collect(clean), undefined, { ...context, choice: 'denied' })).toBeNull();
@@ -358,6 +376,19 @@ describe('personal data never reaches analytics, whatever shape it takes (GP-731
     expect(isAllowedTextParam('course_slug', 'Jane Smith')).toBe(false);
     expect(isAllowedTextParam('user_email', 'x')).toBe(false);
     expect(isAllowedTextParam('value', 99)).toBe(true);
+    expect(isAllowedTextParam('carsi_context', 'hub')).toBe(true);
+    expect(isAllowedTextParam('carsi_context', 'hub:pathfinder:courses')).toBe(true);
+    expect(isAllowedTextParam('carsi_context', 'role-guide:nsw-builders:employer-2')).toBe(true);
+    expect(isAllowedTextParam('carsi_context', 'role-guide:nsw-builders:catalogue-fallback')).toBe(
+      true
+    );
+    expect(isValidCarsiContext('hub:pathfinder:coaching')).toBe(true);
+    expect(isValidCarsiContext('not-allowed@host')).toBe(false);
+    expect(isAllowedTextParam('carsi_context', 'role-guide:nsw-builders:start-1')).toBe(true);
+    expect(isAllowedTextParam('carsi_context', 'role-guide:nsw-builders')).toBe(true);
+    expect(isAllowedTextParam('carsi_context', 'jane@example.com')).toBe(false);
+    expect(isAllowedTextParam('link_path', '/courses/:slug')).toBe(true);
+    expect(isAllowedTextParam('link_path', '/dashboard')).toBe(false);
   });
 
   it('the wire drops a phone number in a campaign value or in the address', () => {
