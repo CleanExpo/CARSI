@@ -188,6 +188,7 @@ function buildDocument(bodyHtml) {
   * { box-sizing: border-box; }
   body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-kerning: none; /* kerning offsets split words ("WR T") in the extracted PDF text the licence inventory scans */
     color: #1e293b;
     font-size: 10.5pt;
     line-height: 1.55;

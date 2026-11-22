@@ -61,6 +61,7 @@ export function InteractiveExperiencePlayer({
 
   useEffect(() => {
     const stored = readInteractiveProgress(experience.id, progressKey, experience);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate stored progress from localStorage after mount (not readable during SSR); behaviour-preserving
     setSnapshot(stored ?? emptySnapshot);
     setHydrated(true);
   }, [experience, progressKey, emptySnapshot]);
@@ -76,6 +77,7 @@ export function InteractiveExperiencePlayer({
 
   useEffect(() => {
     if (!allDone || completionNotified) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot completion latch; behaviour-preserving, came in with the interactive pilot (5593ab7e)
     setCompletionNotified(true);
     onAllComplete?.();
     completionBannerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });

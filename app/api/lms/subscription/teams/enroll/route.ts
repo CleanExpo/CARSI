@@ -41,6 +41,7 @@ import { getTeamEntitlements } from '@/lib/server/entitlements';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { getPublishedCourseForCheckout } from '@/lib/server/public-courses-list';
 import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
+import { getAppOrigin } from '@/lib/server/app-url';
 
 /**
  * The seat's prerequisite lock as the lesson routes will see it. Fails CLOSED: an error
@@ -132,7 +133,7 @@ export async function POST(request: NextRequest) {
       void sendEnrollmentWelcomeEmail({
         studentId: claims.sub,
         courseSlug: slug,
-        appOrigin: request.nextUrl.origin,
+        appOrigin: getAppOrigin(request),
       }).catch((e) => console.error('[subscription/teams/enroll] email', e));
       notifyCrmEnrollmentCreated({
         enrollmentId: result.enrollmentId,

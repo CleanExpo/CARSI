@@ -11,7 +11,7 @@ const PATHS = [
   {
     id: 'courses',
     title: 'Enrol in a live course',
-    detail: 'Browse IICRC-aligned CEC courses and start learning today.',
+    detail: 'Browse CARSI courses, including IICRC CEC Accredited courses, and start learning today.',
     href: '/courses',
     event: COURSE_CTA_EVENT,
     context: 'hub:pathfinder:courses',
