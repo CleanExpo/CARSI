@@ -53,9 +53,10 @@ export function anonymousLeaderboardLabel(userId: string): string {
 const DISPLAY_NAME_MAX = 48;
 
 /**
- * The one rule for a leaderboard label, used when it is saved (PATCH /api/lms/auth/me) and again
- * when it is shown. NFKC folds look-alike characters first, so a full-width or small at sign
- * (U+FF20, U+FE6B) is caught by the same '@' check as the ASCII one (GP-775 r1).
+ * The rule for a stored (legacy) leaderboard label, applied only when it is saved
+ * (PATCH /api/lms/auth/me). The board never reads stored labels; it shows only the anonymous
+ * label (founder ruling 22/11/2026). NFKC folds look-alike characters first, so a full-width or
+ * small at sign (U+FF20, U+FE6B) is caught by the same '@' check as the ASCII one (GP-775 r1).
  */
 export function sanitizeLeaderboardDisplayName(raw: string | null | undefined): string | null {
   if (raw == null) return null;
