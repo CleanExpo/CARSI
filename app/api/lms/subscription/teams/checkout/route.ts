@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
             seat_count: String(seats),
           },
         },
-        allow_promotion_codes: true,
+        // GP-773: no promotion codes on a membership (founder ruling: "no further discounts").
       },
       {
         idempotencyKey: checkoutSessionIdempotencyKey('team', teamId, reservedAt),

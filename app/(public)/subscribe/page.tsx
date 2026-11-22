@@ -14,6 +14,8 @@ import {
   MembershipLibrary,
   MembershipSteps,
 } from '@/components/membership/MembershipLanding';
+import { INDIVIDUAL_MEMBERSHIP, membershipAmountAud } from '@/lib/lms/membership-prices';
+
 import { SubscribeCta } from './SubscribeCta';
 
 // `subscriptionsEnabled()` reads process.env at render time. Without this the
@@ -31,9 +33,9 @@ export const metadata: Metadata = {
 
 const PLAN = {
   name: 'Yearly membership',
-  price: 795,
+  price: membershipAmountAud(INDIVIDUAL_MEMBERSHIP),
   suffix: 'AUD / year',
-  helper: 'That is about $66/month · GST included',
+  helper: `That is about $${Math.round(membershipAmountAud(INDIVIDUAL_MEMBERSHIP) / 12)}/month · GST included`,
 };
 
 export const PRO_FEATURES = [

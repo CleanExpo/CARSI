@@ -10,7 +10,7 @@ import {
   createOnboardingStripeCheckout,
 } from '@/lib/server/onboarding-checkout';
 import { getOnboardingCourseBySlug } from '@/lib/server/onboarding-programs';
-import { resolveOrgMonthlyPriceId } from '@/lib/server/org-subscription-price';
+import { resolveOrgAnnualPriceId } from '@/lib/server/org-subscription-price';
 import { provisionOrgSubscriptionContainer } from '@/lib/server/org-subscription-provision';
 import {
   checkoutSessionIdempotencyKey,
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest, ctx: Ctx) {
   ).slice(0, 200);
 
   if (teamSubscriptionsEnabled()) {
-    const priceId = await resolveOrgMonthlyPriceId();
+    const priceId = await resolveOrgAnnualPriceId();
     if (priceId) {
       if (organisationName.length < 2) {
         return NextResponse.json({ detail: 'Organisation name is required.' }, { status: 400 });
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest, ctx: Ctx) {
                 onboarding_slug: slug,
               },
             },
-            allow_promotion_codes: true,
+            // GP-773: no promotion codes on a membership (founder ruling: "no further discounts").
           },
           {
             idempotencyKey: checkoutSessionIdempotencyKey('onboarding', teamId, reservedAt),
