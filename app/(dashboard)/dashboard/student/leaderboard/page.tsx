@@ -266,7 +266,7 @@ export default function LeaderboardPage() {
             </p>
           ) : entries.length === 0 ? (
             <p className={`${surface} px-5 py-5 text-[14px] ${muted}`}>
-              No one has chosen to appear on this month&apos;s board yet.
+              Nothing to show on this month&apos;s board yet.
             </p>
           ) : (
             <ol className={`${surface} divide-y divide-white/10`}>

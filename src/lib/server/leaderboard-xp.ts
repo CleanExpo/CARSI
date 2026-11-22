@@ -52,20 +52,35 @@ export function anonymousLeaderboardLabel(userId: string): string {
 
 const DISPLAY_NAME_MAX = 48;
 
+/**
+ * The one rule for a leaderboard label, used when it is saved (PATCH /api/lms/auth/me) and again
+ * when it is shown. NFKC folds look-alike characters first, so a full-width or small at sign
+ * (U+FF20, U+FE6B) is caught by the same '@' check as the ASCII one (GP-775 r1).
+ */
 export function sanitizeLeaderboardDisplayName(raw: string | null | undefined): string | null {
   if (raw == null) return null;
-  let s = raw.replace(/[\u0000-\u001F\u007F]/g, '').trim();
+  let s = raw
+    .normalize('NFKC')
+    .replace(/[\u0000-\u001F\u007F]|\p{Cf}/gu, '')
+    .trim();
   if (s.length === 0) return null;
   if (s.includes('@')) return null;
   if (s.length > DISPLAY_NAME_MAX) s = s.slice(0, DISPLAY_NAME_MAX).trim();
   return s.length > 0 ? s : null;
 }
 
-const normaliseName = (s: string) => s.replace(/\s+/g, ' ').trim().toLowerCase();
+/** Letters and digits only, accents and case removed: "Zoë Hart." and "zoe-hart" fold alike. */
+const foldName = (s: string) =>
+  s
+    .normalize('NFKD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]/gu, '');
 
 /**
  * Public label for a learner who has opted in to the board: their chosen label, or the anonymous
- * label when none is set. A chosen label equal to the account's legal name is never shown.
+ * label when none is set. A label that contains the account's legal name, in any spacing,
+ * punctuation, case, accent or width, is never shown.
  */
 export function publicLeaderboardDisplayName(
   userId: string,
@@ -73,7 +88,8 @@ export function publicLeaderboardDisplayName(
   legalName?: string | null
 ): string {
   const cleaned = sanitizeLeaderboardDisplayName(storedName ?? null);
-  if (cleaned && !(legalName && normaliseName(cleaned) === normaliseName(legalName))) {
+  const legal = legalName ? foldName(legalName) : '';
+  if (cleaned && !(legal && foldName(cleaned).includes(legal))) {
     return cleaned;
   }
   return anonymousLeaderboardLabel(userId);

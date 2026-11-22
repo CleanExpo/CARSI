@@ -44,6 +44,8 @@ export async function GET(request: NextRequest) {
       period_timezone: 'Australia/Sydney',
       designation: slug,
       items: [],
+      // No data source: say so, so the page never presents it as an empty month (GP-775 r1).
+      unavailable: true,
     });
   }
 

@@ -12,7 +12,7 @@ vi.mock('@/lib/prisma', () => ({
 vi.mock('@/lib/server/auth-from-request', () => ({ getSessionClaimsFromRequest: mocks.claims }));
 
 import { GET } from '../../../app/api/lms/gamification/leaderboard/route';
-import { anonymousLeaderboardLabel } from './leaderboard-xp';
+import { anonymousLeaderboardLabel, sanitizeLeaderboardDisplayName } from './leaderboard-xp';
 
 /**
  * GP-775 (founder mission rules, 22/11/2026): leaderboards are optional, nobody is ranked
@@ -201,11 +201,68 @@ describe('leaderboard consent (GP-775)', () => {
     expect((await board()).items).toEqual([]);
   });
 
+  it('reports the board unavailable, not empty, when no database is configured', async () => {
+    vi.stubEnv('DATABASE_URL', '');
+    const body = (await (await GET(req())).json()) as { items: unknown[]; unavailable?: boolean };
+    expect(body.items).toEqual([]);
+    expect(body.unavailable).toBe(true);
+  });
+
   it('requires a signed-in learner', async () => {
     mocks.claims.mockResolvedValue(null);
     const res = await GET(req(false));
     expect(res.status).toBe(401);
     expect(mocks.queryRaw).not.toHaveBeenCalled();
     expect(mocks.findMany).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * Review r1 (discovery) of 10a4e46e: a chosen label could still carry identity. A full-width
+ * at sign (U+FF20) passed the ASCII '@' check, and a legal name with punctuation, accents or an
+ * extra word passed the case/whitespace comparison. The label rule now compares Unicode-folded,
+ * letters-only forms and rejects any at-sign look-alike.
+ */
+describe('a chosen label never carries an email or the legal name (GP-775 r1)', () => {
+  const variant = (n: number, fullName: string, label: string): FixtureUser => ({
+    id: `10000000-0000-4000-8000-0000000cc${String(n).padStart(3, '0')}`,
+    email: `variant${n}@example.test`,
+    fullName,
+    leaderboardShowDisplayName: true,
+    leaderboardDisplayName: label,
+    xp: 10 + n,
+  });
+
+  it.each([
+    ['a full-width at sign', 'Jordan Pemberton', 'jordan＠example.com'],
+    ['a small at sign', 'Jordan Pemberton', 'jordan﹫example.com'],
+    ['the legal name with a trailing full stop', 'Jordan Pemberton', 'Jordan Pemberton.'],
+    ['the legal name with a hyphen', 'Mary Jane Watts', 'Mary-Jane Watts'],
+    ['the legal name without its accent', 'Zoë Hart', 'Zoe Hart'],
+    ['the legal name inside a longer label', 'Jordan Pemberton', 'Jordan Pemberton (QLD)'],
+    ['the legal name in full-width letters', 'Jordan Pemberton', 'Ｊordan Pemberton'],
+  ])('%s falls back to the anonymous label', async (_label, fullName, label) => {
+    const u = variant(1, fullName, label);
+    users = [u, OPTED_IN_LABEL];
+    const res = await GET(req());
+    const raw = await res.text();
+    const body = JSON.parse(raw) as { items: Array<{ display_name: string }> };
+    const names = body.items.map((i) => i.display_name);
+    expect(names).toContain('Alex K., QLD'); // the board really rendered
+    expect(names).toContain(anonymousLeaderboardLabel(u.id));
+    expect(names).not.toContain(label);
+    expect(raw.normalize('NFKC')).not.toMatch(/[@﹫＠]/);
+  });
+
+  it('the shared save-time sanitiser rejects at-sign look-alikes too', () => {
+    // PATCH /api/lms/auth/me stores labels through this same function.
+    expect(sanitizeLeaderboardDisplayName('jordan\uff20example.com')).toBeNull();
+    expect(sanitizeLeaderboardDisplayName('jordan\ufe6bexample.com')).toBeNull();
+    expect(sanitizeLeaderboardDisplayName('Alex K., QLD')).toBe('Alex K., QLD');
+  });
+
+  it('keeps an ordinary chosen label that is not the legal name', async () => {
+    users = [variant(2, 'Alexandra Kingsford', 'Alex K., QLD')];
+    expect((await board()).items.map((i) => i.display_name)).toEqual(['Alex K., QLD']);
   });
 });

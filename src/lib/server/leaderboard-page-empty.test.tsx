@@ -21,7 +21,9 @@ import LeaderboardPage from '../../../app/(dashboard)/dashboard/student/leaderbo
  * GP-775: a leaderboard is optional and there may be no board at all. With nobody opted in the
  * page must say so neutrally, and a failed read must not look like an empty month.
  */
-const EMPTY = /no one has chosen to appear on this month's board/i;
+// Neutral: an empty list says nothing about who has or has not opted in (review r1).
+const EMPTY = /nothing to show on this month's board yet/i;
+const CONSENT_INFERENCE = /no one has chosen|nobody has chosen|no one has opted/i;
 const UNAVAILABLE = /monthly board could not be loaded/i;
 
 let container: HTMLDivElement;
@@ -79,6 +81,7 @@ describe('leaderboard page with no board (GP-775)', () => {
     const text = await render();
     expect(text).toContain('First course completed'); // the page really rendered
     expect(text).toMatch(EMPTY);
+    expect(text).not.toMatch(CONSENT_INFERENCE);
     expect(text).not.toMatch(UNAVAILABLE);
   });
 
