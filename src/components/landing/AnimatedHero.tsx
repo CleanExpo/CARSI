@@ -8,12 +8,13 @@ import { carsiCoachingMonthlyPath } from '@/lib/marketing/carsi-coaching-monthly
 import Link from 'next/link';
 import { useRef, type ReactNode } from 'react';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 const easeOut = [0.16, 1, 0.3, 1] as const;
 const springSoft = { type: 'spring' as const, stiffness: 120, damping: 22, mass: 0.8 };
 
 const trustItems = [
   'Free courses to start',
-  'IICRC CEC Accredited provider',
+  IICRC_APPROVED_CEC_PROVIDER,
   'Certificates anyone can verify',
 ];
 
@@ -155,10 +156,10 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
                 <span className="absolute inline-flex h-full w-full rounded-full bg-[#2490ed] opacity-60 motion-safe:animate-ping" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#146fc2]" />
               </span>
-              Accredited
+              Approved
             </span>
             <span className="text-[12px] font-medium text-slate-600">
-              IICRC CEC Accredited provider, made in Australia
+              {IICRC_APPROVED_CEC_PROVIDER}, made in Australia
             </span>
           </motion.div>
 
