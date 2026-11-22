@@ -182,12 +182,32 @@ describe('AdminShell responsive navigation', () => {
     expect(document.querySelector('[role="dialog"]')).toBeNull();
   });
 
-  it('keeps desktop navigation sizing while the phone drawer can scroll', async () => {
+  it('desktop sidebar nav scrolls when the window is too short for every link', async () => {
+    desktop = true;
     await render();
     const nav = container.querySelector('aside nav')!;
+    // GP-689: a shrinkable, scrolling nav inside the fixed-height sidebar, at every width.
+    expect(nav.classList.contains('flex-1')).toBe(true);
+    expect(nav.classList.contains('min-h-0')).toBe(true);
     expect(nav.classList.contains('overflow-y-auto')).toBe(true);
-    expect(nav.classList.contains('md:overflow-visible')).toBe(true);
-    expect(nav.classList.contains('md:min-h-auto')).toBe(true);
     expect(nav.classList.contains('whitespace-nowrap')).toBe(true);
+    // No breakpoint class may switch the scroll off or stop the nav shrinking.
+    const overrides = Array.from(nav.classList).filter((name) =>
+      /^(sm|md|lg|xl|2xl):(overflow|min-h)/.test(name)
+    );
+    expect(overrides).toEqual([]);
+  });
+
+  it('phone-to-desktop resize moves focus to the desktop sidebar', async () => {
+    await render();
+    const dialog = await open();
+    expect(dialog.contains(document.activeElement)).toBe(true);
+    // The window grows past the breakpoint while focus is in the drawer.
+    desktop = true;
+    await act(async () => onBreakpoint?.({ matches: true }));
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    // The menu button sits in the md:hidden header, so focus must not go back to it.
+    const firstSidebarLink = container.querySelector<HTMLAnchorElement>('aside nav a');
+    await vi.waitFor(() => expect(document.activeElement).toBe(firstSidebarLink));
   });
 });

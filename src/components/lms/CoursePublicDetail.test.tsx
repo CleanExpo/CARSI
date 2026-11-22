@@ -42,7 +42,9 @@ function renderCourse(cec_hours: string | null): string {
       priceLabel: '$29',
       priceNum: 29,
       learningOutcomes: [],
-      audienceItems: getCourseAudienceItems(course, null),
+      // An in-force approval is what gives a course CEC hours; the page passes both (GP-748).
+      audienceItems: getCourseAudienceItems(course, null, cec_hours !== null),
+      cecApproved: cec_hours !== null,
     })
   );
 }

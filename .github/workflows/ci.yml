@@ -161,6 +161,13 @@ jobs:
       - name: Quiz option balance guard
         run: npm run check:quiz-balance -- --enforce=psychrometry-building-science-for-drying,moisture-meters-readings-and-dry-standards
 
+      # GP-740: reads what draft courses say (data/courses/*/v1-draft): exposure-limit dates and
+      # jurisdictions, workplace limits used as home levels, unsourced health claims, copied
+      # standard text. Report only while the existing drafts' findings go to SME review; exits 2
+      # if it scans nothing.
+      - name: Draft course content check (report only)
+        run: npm run check:draft-content
+
       # Licence-critical backstop: scans all course-content + marketing surfaces
       # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC
       # placements, banned "IICRC-approved"/"certified with CARSI" phrasing, and
@@ -194,6 +201,16 @@ jobs:
       # legitimate recert-cadence facts and generic no-number framing. An inert rule turns this red.
       - name: IICRC / CEC compliance guard self-test
         run: npm run test:iicrc-compliance
+
+      # GP-748 (founder, 21/11/2026): a course that is not CEC-approved in
+      # data/seed/cec-approvals.json may not name the IICRC, an IICRC standard or an IICRC
+      # certification on any learner-facing surface. BLOCKING. The self-test plants a hit on
+      # every surface and proves an approved course is left alone.
+      - name: IICRC scope guard (non-approved courses)
+        run: npm run check:iicrc-scope
+
+      - name: IICRC scope guard self-test
+        run: npm run test:iicrc-scope
 
       - name: Live buy-path guard self-test (GP-638)
         run: npm run test:live-buy-path
