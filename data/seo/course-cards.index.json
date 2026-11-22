@@ -408,8 +408,8 @@
   ],
   "faq": [
    {
-    "q": "Does this course award IICRC CECs?",
-    "a": "No. This is professional development and contract-readiness training. It is not accredited by the IICRC and does not award IICRC Continuing Education Credits (CECs). Where it references a standard such as ANSI/IICRC S100, it treats it as a recognised standard of care, not law."
+    "q": "What kind of course is this?",
+    "a": "This is professional development and contract-readiness training. It is a CARSI course and a CARSI credential."
    },
    {
     "q": "What floor-care services does the course cover?",
@@ -428,7 +428,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Commercial Floor Care for Schools & Childcare Contracts",
-   "description": "A CARSI professional-development course taking experienced cleaners to a contract-ready floor-care service for Australian schools and childcare centres, covering carpet, tile and grout, vinyl strip and seal, and pressure washing, each paired with the WHS, SDS, child-safety, slip-resistance and run-off requirements a contract expects. This is contract-readiness training; it is not accredited by the IICRC and does not award IICRC Continuing Education Credits (CECs).",
+   "description": "A CARSI professional-development course taking experienced cleaners to a contract-ready floor-care service for Australian schools and childcare centres, covering carpet, tile and grout, vinyl strip and seal, and pressure washing, each paired with the WHS, SDS, child-safety, slip-resistance and run-off requirements a contract expects. This is a CARSI course and a CARSI credential.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -629,8 +629,8 @@
     "a": "It is the internal induction for CARSI Maintenance Company floor-care technicians, supervisors and facilities staff who deliver cleaning, polishing, sealing, maintenance and hygiene services across schools, childcare, education, public buildings and high-traffic commercial sites."
    },
    {
-    "q": "Does this course award IICRC CECs?",
-    "a": "No. It is an internal operational-readiness induction and does not award continuing education credits. It supports good judgement and does not replace the SDS/TDS, standards, or a site's own rules."
+    "q": "What kind of course is this?",
+    "a": "It is an internal operational-readiness induction, and a CARSI course and a CARSI credential. It supports good judgement and does not replace the SDS/TDS, standards, or a site's own rules."
    },
    {
     "q": "What does the final assessment involve?",
@@ -645,7 +645,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "CARSI Maintenance Company Onboarding — Professional Floor Care & Operational Readiness",
-   "description": "CARSI Maintenance Company's internal onboarding for floor-care technicians and supervisors, covering health and hygiene, WHS and chemical safety, surface identification, cleaning and sealing methods, machinery, site setup, conduct and a final practical assessment. This is an internal induction and does not award continuing education credits (CECs).",
+   "description": "CARSI Maintenance Company's internal onboarding for floor-care technicians and supervisors, covering health and hygiene, WHS and chemical safety, surface identification, cleaning and sealing methods, machinery, site setup, conduct and a final practical assessment. This is an internal induction: a CARSI course and a CARSI credential.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",

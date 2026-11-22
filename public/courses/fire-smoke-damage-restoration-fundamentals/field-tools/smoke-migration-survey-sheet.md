@@ -1,7 +1,7 @@
 # Smoke migration survey sheet
 
 **CARSI Fire & Smoke Restoration Practitioner — field tool (Module 2)**
-*DRAFT v1 for SME review. Australian and New Zealand. 230 V / 50 Hz, metric, AS/NZS. Standards named only (aligned to the principles of ANSI/IICRC S700:2025); no standard text reproduced.*
+*DRAFT v1 for SME review. Australian and New Zealand. 230 V / 50 Hz, metric, AS/NZS.*
 
 ## For each room, tick the pathways you found evidence of
 

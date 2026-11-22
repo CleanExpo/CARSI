@@ -202,6 +202,16 @@ jobs:
       - name: IICRC / CEC compliance guard self-test
         run: npm run test:iicrc-compliance
 
+      # GP-748 (founder, 21/11/2026): a course that is not CEC-approved in
+      # data/seed/cec-approvals.json may not name the IICRC, an IICRC standard or an IICRC
+      # certification on any learner-facing surface. BLOCKING. The self-test plants a hit on
+      # every surface and proves an approved course is left alone.
+      - name: IICRC scope guard (non-approved courses)
+        run: npm run check:iicrc-scope
+
+      - name: IICRC scope guard self-test
+        run: npm run test:iicrc-scope
+
       - name: Live buy-path guard self-test (GP-638)
         run: npm run test:live-buy-path
 
