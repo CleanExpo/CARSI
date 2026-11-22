@@ -29,7 +29,10 @@ export function CredentialVerificationPageContent({
   cecSubmittedAt = null,
 }: Props) {
   const pdfUrl = `/api/lms/credentials/${encodeURIComponent(credentialId)}?pdf=1`;
-  const cecSubmitted = cecSubmissionStatus === 'sent';
+  // A sent submission row alone is not enough to name the IICRC: the course must be approved on
+  // the register now. An old row, or a course since taken off the register, shows no banner (GP-757).
+  const cecSubmitted =
+    cecSubmissionStatus === 'sent' && credential.certificate_wording.approved;
   const isOnboardingCredential =
     courseSlug != null &&
     isOnboardingCourse({ slug: courseSlug });

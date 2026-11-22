@@ -50,12 +50,16 @@ function credential(slug: string): PublicCredentialJson {
   };
 }
 
-function renderVerifyPage(slug: string): string {
+function renderVerifyPage(
+  slug: string,
+  submission: { cecSubmissionStatus?: string | null; cecSubmittedAt?: string | null } = {}
+): string {
   return text(
     renderToStaticMarkup(
       <CredentialVerificationPageContent
         credential={credential(slug)}
         credentialId="00000000-0000-0000-0000-000000000001"
+        {...submission}
       />
     )
   );
@@ -71,6 +75,21 @@ describe('public credential verify page (GP-757)', () => {
 
   it('a credential for a registry-approved course renders "Course approved for IICRC CECs"', () => {
     expect(renderVerifyPage(APPROVED_SLUG)).toContain('Course approved for IICRC CECs');
+  });
+
+  it('a sent IICRC submission row on a course not on the register shows no "submitted to IICRC" banner', () => {
+    // An old submission row, or a course since taken off the register, must not name the IICRC.
+    const out = renderVerifyPage(NOT_APPROVED_SLUG, { cecSubmissionStatus: 'sent' });
+    expect(out).not.toContain('submitted to IICRC');
+    expect(out).not.toMatch(/IICRC/i);
+  });
+
+  it('a sent IICRC submission row on a registry-approved course still shows the banner', () => {
+    const out = renderVerifyPage(APPROVED_SLUG, {
+      cecSubmissionStatus: 'sent',
+      cecSubmittedAt: '2026-03-02T00:00:00.000Z',
+    });
+    expect(out).toContain('CEC submitted to IICRC');
   });
 
   it('no credential verify page renders "Accredited"', () => {
