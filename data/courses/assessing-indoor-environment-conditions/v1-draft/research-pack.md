@@ -7,8 +7,8 @@ Linear GP-468. This pack is the human summary of the course's **evidence ledger*
 (pointed to by `meta.evidenceLedger`; schema per the `course-truth` and `carsi-course-production`
 skills and the evidence-layer template).
 
-Standards are referenced **by name only** (AS-IICRC S520, in the description and Lesson 4.1, as the standard that takes over if
-a job moves to remediation). No IICRC (or other) standard text was reproduced, paraphrased or
+The course names no IICRC standard (GP-748, 22/11/2026: it is not CEC-approved). Lesson 4.1 says only that "the mould
+remediation standard" takes over if a job moves to remediation. No IICRC (or other) standard text was reproduced, paraphrased or
 entered into any AI tool, and no claim is made about what any standard contains or omits.
 
 ## How the research was done (21/11/2026)
@@ -113,7 +113,7 @@ threshold (IEA-041, IEA-071, IEA-076).
 
 | Row | Claim | Owner | Action |
 | --- | --- | --- | --- |
-| IEA-001 | Edition of AS-IICRC S520 named (nominative only); `founder_only` | Phill (SME) — licensed S520 | substantiate |
+| IEA-001 | S520 name removed from the description, meta and Lesson 4.1 on 22/11/2026 (GP-748); `founder_only`, so the row stays GAP until the founder records it as CUT | Phill (founder) | founder to CUT |
 | IEA-054 | Interpreting spore-trap results against outdoor and unaffected-indoor comparison samples; spore-trap method limits | Phill (SME); occupational hygienist review | substantiate |
 | IEA-056 | New Zealand public-health position on household mould testing (lesson currently says "check your public health service and local council") | Phill (SME) | substantiate |
 | IEA-070 | Queensland amending regulation for the WEL list and 15-substance transition actually made (WorkSafe Qld guidance states it; a practitioner source said on 12/11/2026 the regulation was not yet on the register) | Phill (SME); founder | substantiate |
