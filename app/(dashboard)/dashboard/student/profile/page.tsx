@@ -120,6 +120,13 @@ export default function StudentProfilePage() {
         leaderboard_display_name: leaderboardName.trim() || null,
       });
       setProfile(data);
+      // Show what was actually stored, and confirm only when the stored choice is the one asked
+      // for (GP-775): a learner must never be told they left the board while still on it.
+      setLeaderboardShow(data.leaderboard_show_display_name ?? false);
+      setLeaderboardName(data.leaderboard_display_name ?? '');
+      if ((data.leaderboard_show_display_name ?? false) !== leaderboardShow) {
+        throw new Error('leaderboard choice not stored');
+      }
       await refreshUser();
       toast({ title: 'Achievement preferences saved' });
     } catch {
@@ -368,7 +375,8 @@ export default function StudentProfilePage() {
                     </label>
                     <p className="mt-1 text-xs text-slate-400">
                       If off, you are not listed or ranked. If on, you appear under the label below,
-                      or a neutral identifier (not your real name) if you leave it blank.
+                      or a neutral identifier (not your real name) if you leave it blank or it
+                      contains your name or email.
                     </p>
                   </div>
                 </div>

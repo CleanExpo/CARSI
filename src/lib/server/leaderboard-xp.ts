@@ -77,20 +77,33 @@ const foldName = (s: string) =>
     .toLowerCase()
     .replace(/[^\p{L}\p{N}]/gu, '');
 
+/** Folded identity words of 3+ characters: each legal-name word, and the email's local part. */
+function identityWords(legalName: string | null | undefined, email: string | null | undefined) {
+  const words = (legalName ?? '')
+    .split(/[\s,.'’\-_]+/)
+    .map(foldName)
+    .filter((w) => w.length >= 3);
+  const local = foldName((email ?? '').split('@')[0] ?? '');
+  if (local.length >= 3) words.push(local);
+  return words;
+}
+
 /**
  * Public label for a learner who has opted in to the board: their chosen label, or the anonymous
- * label when none is set. A label that contains the account's legal name, in any spacing,
- * punctuation, case, accent or width, is never shown.
+ * label when none is set. A label containing any word of the account's legal name (3+ letters, in
+ * any order, spacing, punctuation, case, accent or width) or the email's local part is never
+ * shown. Named limit: a nickname or a name written in another script is not detected.
  */
 export function publicLeaderboardDisplayName(
   userId: string,
   storedName: string | null | undefined,
-  legalName?: string | null
+  legalName?: string | null,
+  email?: string | null
 ): string {
   const cleaned = sanitizeLeaderboardDisplayName(storedName ?? null);
-  const legal = legalName ? foldName(legalName) : '';
-  if (cleaned && !(legal && foldName(cleaned).includes(legal))) {
-    return cleaned;
+  if (cleaned) {
+    const label = foldName(cleaned);
+    if (!identityWords(legalName, email).some((w) => label.includes(w))) return cleaned;
   }
   return anonymousLeaderboardLabel(userId);
 }
@@ -309,6 +322,7 @@ export async function getMonthlyLeaderboard(params: {
       leaderboardShowDisplayName: true,
       leaderboardDisplayName: true,
       fullName: true,
+      email: true, // read only to keep it out of the label; never returned
     },
   });
   const userMap = new Map(
@@ -330,7 +344,8 @@ export async function getMonthlyLeaderboard(params: {
     const displayName = publicLeaderboardDisplayName(
       studentId,
       u?.leaderboardDisplayName,
-      u?.fullName
+      u?.fullName,
+      u?.email
     );
     const lifetime = lifetimeAllCourses.get(studentId) ?? periodXp;
     const { current_level, level_title } = levelTitleFromLifetimeXp(lifetime);

@@ -241,6 +241,11 @@ describe('a chosen label never carries an email or the legal name (GP-775 r1)', 
     ['the legal name without its accent', 'Zoë Hart', 'Zoe Hart'],
     ['the legal name inside a longer label', 'Jordan Pemberton', 'Jordan Pemberton (QLD)'],
     ['the legal name in full-width letters', 'Jordan Pemberton', 'Ｊordan Pemberton'],
+    // Review r3 sweep: word order, an initial, one name word, and the email name.
+    ['the legal name reversed', 'Jordan Pemberton', 'Pemberton, Jordan'],
+    ['an initial and the surname', 'Jordan Pemberton', 'J. Pemberton'],
+    ['the surname alone', 'Jordan Pemberton', 'Pemberton'],
+    ['the email name', 'Jordan Pemberton', 'Variant 1 here'],
   ])('%s falls back to the anonymous label', async (_label, fullName, label) => {
     const u = variant(1, fullName, label);
     users = [u, OPTED_IN_LABEL];
