@@ -140,13 +140,13 @@ describe('leaderboard consent (GP-775)', () => {
   it('an opted-out learner never appears, even with the highest XP and a chosen label', async () => {
     const body = await board();
     const names = body.items.map((i) => i.display_name);
-    expect(names).toContain('Alex K., QLD'); // the board really rendered opted-in entries
+    expect(names).toContain(anonymousLeaderboardLabel(OPTED_IN_LABEL.id)); // opted-in entries rendered
     expect(names).not.toContain('Bob the Top Scorer');
     expect(names).not.toContain(anonymousLeaderboardLabel(OPTED_OUT.id));
     expect(body.items.map((i) => i.total_xp)).not.toContain(OPTED_OUT.xp);
     // Ranks are contiguous from 1: an excluded learner leaves no gap that reveals them.
     expect(body.items.map((i) => i.rank)).toEqual(body.items.map((_, n) => n + 1));
-    expect(body.items[0].display_name).toBe('Alex K., QLD');
+    expect(body.items[0].display_name).toBe(anonymousLeaderboardLabel(OPTED_IN_LABEL.id));
   });
 
   it('the default is opted out: a learner who never chose is not ranked', async () => {
@@ -162,7 +162,9 @@ describe('leaderboard consent (GP-775)', () => {
   });
 
   it('opting out removes the learner on the next read', async () => {
-    expect((await board()).items.map((i) => i.display_name)).toContain('Alex K., QLD');
+    expect((await board()).items.map((i) => i.display_name)).toContain(
+      anonymousLeaderboardLabel(OPTED_IN_LABEL.id)
+    );
     users = users.map((u) =>
       u.id === OPTED_IN_LABEL.id ? { ...u, leaderboardShowDisplayName: false } : u
     );
@@ -218,15 +220,14 @@ describe('leaderboard consent (GP-775)', () => {
 });
 
 /**
- * Review r1 (discovery) of 10a4e46e: a chosen label could still carry identity. A full-width
- * at sign (U+FF20) passed the ASCII '@' check, and a legal name with punctuation, accents or an
- * extra word passed the case/whitespace comparison. The label rule now compares Unicode-folded,
- * letters-only forms and rejects any at-sign look-alike.
+ * Founder ruling 22/11/2026 ("Anonymous label only"): an opted-in learner appears only under the
+ * anonymous label. A chosen label is never shown on the board, whatever it says, so no label can
+ * carry a name or an email. The stored label is kept, not deleted.
  */
-describe('a chosen label never carries an email or the legal name (GP-775 r1)', () => {
-  const variant = (n: number, fullName: string, label: string): FixtureUser => ({
+describe('the board shows only anonymous labels (GP-775 ruling)', () => {
+  const chosen = (n: number, fullName: string, label: string): FixtureUser => ({
     id: `10000000-0000-4000-8000-0000000cc${String(n).padStart(3, '0')}`,
-    email: `variant${n}@example.test`,
+    email: `chosen${n}@example.test`,
     fullName,
     leaderboardShowDisplayName: true,
     leaderboardDisplayName: label,
@@ -234,40 +235,30 @@ describe('a chosen label never carries an email or the legal name (GP-775 r1)', 
   });
 
   it.each([
-    ['a full-width at sign', 'Jordan Pemberton', 'jordan＠example.com'],
-    ['a small at sign', 'Jordan Pemberton', 'jordan﹫example.com'],
-    ['the legal name with a trailing full stop', 'Jordan Pemberton', 'Jordan Pemberton.'],
-    ['the legal name with a hyphen', 'Mary Jane Watts', 'Mary-Jane Watts'],
-    ['the legal name without its accent', 'Zoë Hart', 'Zoe Hart'],
-    ['the legal name inside a longer label', 'Jordan Pemberton', 'Jordan Pemberton (QLD)'],
-    ['the legal name in full-width letters', 'Jordan Pemberton', 'Ｊordan Pemberton'],
-    // Review r3 sweep: word order, an initial, one name word, and the email name.
+    ['a first name', 'Jane/Smith', 'Jane'],
+    ['an ordinary label', 'Alexandra Kingsford', 'Alex K., QLD'],
+    ['a full-width at sign', 'Jordan Pemberton', 'jordan\uff20example.com'],
     ['the legal name reversed', 'Jordan Pemberton', 'Pemberton, Jordan'],
-    ['an initial and the surname', 'Jordan Pemberton', 'J. Pemberton'],
-    ['the surname alone', 'Jordan Pemberton', 'Pemberton'],
-    ['the email name', 'Jordan Pemberton', 'Variant 1 here'],
-  ])('%s falls back to the anonymous label', async (_label, fullName, label) => {
-    const u = variant(1, fullName, label);
-    users = [u, OPTED_IN_LABEL];
+    ['a nickname', 'Robert Privately', 'Bobby'],
+  ])('a chosen label (%s) never appears in the response', async (_kind, fullName, label) => {
+    const u = chosen(1, fullName, label);
+    users = [u, OPTED_IN_NO_LABEL];
     const res = await GET(req());
     const raw = await res.text();
     const body = JSON.parse(raw) as { items: Array<{ display_name: string }> };
-    const names = body.items.map((i) => i.display_name);
-    expect(names).toContain('Alex K., QLD'); // the board really rendered
-    expect(names).toContain(anonymousLeaderboardLabel(u.id));
-    expect(names).not.toContain(label);
-    expect(raw.normalize('NFKC')).not.toMatch(/[@﹫＠]/);
+    // Higher XP first: the no-label learner (30) then the learner with a chosen label (11).
+    expect(body.items.map((i) => i.display_name)).toEqual([
+      anonymousLeaderboardLabel(OPTED_IN_NO_LABEL.id),
+      anonymousLeaderboardLabel(u.id),
+    ]);
+    expect(raw).not.toContain(label);
+    expect(raw.normalize('NFKC')).not.toMatch(/@/);
   });
 
-  it('the shared save-time sanitiser rejects at-sign look-alikes too', () => {
-    // PATCH /api/lms/auth/me stores labels through this same function.
+  it('the save-time sanitiser still rejects at-sign look-alikes in the stored label', () => {
+    // PATCH /api/lms/auth/me still stores the label (kept, never shown on the board).
     expect(sanitizeLeaderboardDisplayName('jordan\uff20example.com')).toBeNull();
     expect(sanitizeLeaderboardDisplayName('jordan\ufe6bexample.com')).toBeNull();
     expect(sanitizeLeaderboardDisplayName('Alex K., QLD')).toBe('Alex K., QLD');
-  });
-
-  it('keeps an ordinary chosen label that is not the legal name', async () => {
-    users = [variant(2, 'Alexandra Kingsford', 'Alex K., QLD')];
-    expect((await board()).items.map((i) => i.display_name)).toEqual(['Alex K., QLD']);
   });
 });

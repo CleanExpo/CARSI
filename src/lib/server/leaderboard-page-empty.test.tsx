@@ -97,7 +97,7 @@ describe('leaderboard page with no board (GP-775)', () => {
       items: [
         {
           rank: 1,
-          display_name: 'Alex K., QLD',
+          display_name: 'Professional · AAA1',
           total_xp: 40,
           current_level: 1,
           level_title: 'Getting started',
@@ -105,7 +105,7 @@ describe('leaderboard page with no board (GP-775)', () => {
       ],
     });
     const text = await render();
-    expect(text).toContain('Alex K., QLD');
+    expect(text).toContain('Professional · AAA1');
     expect(text).not.toMatch(EMPTY);
   });
 });

@@ -69,45 +69,6 @@ export function sanitizeLeaderboardDisplayName(raw: string | null | undefined): 
   return s.length > 0 ? s : null;
 }
 
-/** Letters and digits only, accents and case removed: "Zoë Hart." and "zoe-hart" fold alike. */
-const foldName = (s: string) =>
-  s
-    .normalize('NFKD')
-    .replace(/\p{M}/gu, '')
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}]/gu, '');
-
-/** Folded identity words of 3+ characters: each legal-name word, and the email's local part. */
-function identityWords(legalName: string | null | undefined, email: string | null | undefined) {
-  const words = (legalName ?? '')
-    .split(/[\s,.'’\-_]+/)
-    .map(foldName)
-    .filter((w) => w.length >= 3);
-  const local = foldName((email ?? '').split('@')[0] ?? '');
-  if (local.length >= 3) words.push(local);
-  return words;
-}
-
-/**
- * Public label for a learner who has opted in to the board: their chosen label, or the anonymous
- * label when none is set. A label containing any word of the account's legal name (3+ letters, in
- * any order, spacing, punctuation, case, accent or width) or the email's local part is never
- * shown. Named limit: a nickname or a name written in another script is not detected.
- */
-export function publicLeaderboardDisplayName(
-  userId: string,
-  storedName: string | null | undefined,
-  legalName?: string | null,
-  email?: string | null
-): string {
-  const cleaned = sanitizeLeaderboardDisplayName(storedName ?? null);
-  if (cleaned) {
-    const label = foldName(cleaned);
-    if (!identityWords(legalName, email).some((w) => label.includes(w))) return cleaned;
-  }
-  return anonymousLeaderboardLabel(userId);
-}
-
 type MonthBounds = { start: Date; end: Date };
 
 async function queryMonthBoundsSydney(): Promise<MonthBounds | null> {
@@ -315,15 +276,11 @@ export async function getMonthlyLeaderboard(params: {
   // Consent (GP-775): only learners who opted in are ranked. The column defaults to false, so a
   // learner who never chose is not on the board, and opting out removes them on the next read.
   // Filter before ranking and the limit, so excluded learners take no slot and leave no rank gap.
+  // Founder ruling 22/11/2026, "Anonymous label only": an entry shows only the anonymous label, so
+  // no name, chosen label or email is even read here.
   const users = await prisma.lmsUser.findMany({
     where: { id: { in: withXp.map(([id]) => id) }, leaderboardShowDisplayName: true },
-    select: {
-      id: true,
-      leaderboardShowDisplayName: true,
-      leaderboardDisplayName: true,
-      fullName: true,
-      email: true, // read only to keep it out of the label; never returned
-    },
+    select: { id: true, leaderboardShowDisplayName: true },
   });
   const userMap = new Map(
     users.filter((u) => u.leaderboardShowDisplayName === true).map((u) => [u.id, u])
@@ -340,18 +297,11 @@ export async function getMonthlyLeaderboard(params: {
   const lifetimeAllCourses = mergeXpMaps(lifetimeLessonAll, lifetimeCourseAll);
 
   const items: LeaderboardPeriodRow[] = sorted.map(([studentId, periodXp], index) => {
-    const u = userMap.get(studentId);
-    const displayName = publicLeaderboardDisplayName(
-      studentId,
-      u?.leaderboardDisplayName,
-      u?.fullName,
-      u?.email
-    );
     const lifetime = lifetimeAllCourses.get(studentId) ?? periodXp;
     const { current_level, level_title } = levelTitleFromLifetimeXp(lifetime);
     return {
       rank: index + 1,
-      display_name: displayName,
+      display_name: anonymousLeaderboardLabel(studentId),
       total_xp: periodXp,
       current_level,
       level_title,

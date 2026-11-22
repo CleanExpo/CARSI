@@ -29,11 +29,11 @@ export interface User {
   iicrc_certifications?: IicrcCertificationEntry[] | null;
   /**
    * Leaderboard consent (GP-775). Off by default: the learner is not ranked or listed at all.
-   * When true, the learner appears on the signed-in monthly board under `leaderboard_display_name`,
-   * or an anonymous label when that is empty.
+   * When true, the learner appears on the signed-in monthly board, only under the anonymous label
+   * (founder ruling 22/11/2026).
    */
   leaderboard_show_display_name?: boolean;
-  /** Optional label for the leaderboard only; a label equal to the legal name is never shown. */
+  /** Legacy stored label. Kept, never shown on the board (founder ruling 22/11/2026). */
   leaderboard_display_name?: string | null;
 }
 

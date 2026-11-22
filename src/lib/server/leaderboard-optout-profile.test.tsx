@@ -39,7 +39,7 @@ const STORED_IN = {
   email: 'learner@example.test',
   full_name: 'Learner',
   leaderboard_show_display_name: true,
-  leaderboard_display_name: 'Alex K., QLD',
+  leaderboard_display_name: 'Jane', // legacy stored label: kept, never shown (ruling 22/11)
 };
 
 let container: HTMLDivElement;
@@ -99,6 +99,15 @@ describe('profile opt-out is confirmed only when stored (GP-775 r3)', () => {
     const box = await optOutAndSave();
     expect(toastTitles()).not.toContain(SAVED);
     expect(box.checked).toBe(true);
+  });
+
+  it('the profile neither shows nor sends a chosen label (founder ruling 22/11/2026)', async () => {
+    mocks.patch.mockResolvedValue({ ...STORED_IN, leaderboard_show_display_name: false });
+    await optOutAndSave();
+    expect(container.querySelector('#lb_name')).toBeNull();
+    expect(container.textContent ?? '').not.toContain('Jane');
+    const sent = mocks.patch.mock.calls[0][1] as Record<string, unknown>;
+    expect(sent).toEqual({ leaderboard_show_display_name: false });
   });
 
   it('a stored opt-out is announced as saved', async () => {

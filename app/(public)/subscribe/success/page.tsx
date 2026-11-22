@@ -124,7 +124,7 @@ function SubscribeSuccess() {
               <span className="mt-0.5 font-mono tabular-nums text-[#00F5FF]">4.</span>
               <span>
                 Optional: appear on the monthly recognition board — off unless you turn it on from
-                your profile, under a label you choose or a neutral identifier.
+                your profile, under a neutral identifier.
               </span>
             </li>
           </ol>

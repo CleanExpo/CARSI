@@ -8,8 +8,9 @@ import { getMonthlyLeaderboard, leaderboardPeriodLabelNow } from '@/lib/server/l
  * Monthly leaderboard (Australia/Sydney calendar month), for signed-in learners only.
  * Rankings use XP from lesson + course completions in the selected period, optionally limited to
  * one CARSI designation's pathway courses (`?designation=<slug>`). It never filters or labels by
- * an IICRC discipline code. Only learners who opted in from their profile are ranked (GP-775), under
- * their chosen label or an anonymous one; a real name or email is never returned.
+ * an IICRC discipline code. Only learners who opted in from their profile are ranked (GP-775),
+ * only under the anonymous label (founder ruling 22/11/2026); no name, chosen label or email is
+ * returned.
  */
 export async function GET(request: NextRequest) {
   // The only consumer is the signed-in Achievements page; nobody needs an anonymous public board.
