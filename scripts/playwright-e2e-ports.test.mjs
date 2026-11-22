@@ -94,44 +94,60 @@ test('a local PORT equal to a default for another server moves that default asid
 });
 
 // The whole allocation, every kind of collision at once (UNI-3472: three review rounds each found
-// another collision). One child process walks a grid of main/membership/survey inputs, including
-// every default port as an explicit value, and checks the three servers always get three ports.
-test('allocateE2EPorts gives three distinct ports for every non-colliding explicit input', () => {
-  const script = `const { allocateE2EPorts } = await import(${JSON.stringify(
-    pathToFileURL(join(root, 'config', 'e2e-ports.ts')).href
-  )});
+// another collision). One child process walks a grid of E2E_PORT, PORT, E2E_PORT_2 and E2E_PORT_3
+// values, including every default port as an explicit value and as PORT. Every combination must
+// either give three distinct ports (explicit values kept) or throw, and it must throw exactly
+// when two explicit values, or an explicit value and the main port, are the same.
+const GRID_SCRIPT = (href) => `const { allocateE2EPorts } = await import(${JSON.stringify(href)});
 const vals = [undefined, '3000', '3100', '3101', '3102', '3103', '3104', '3105', '4999', '45002'];
-const bad = []; let n = 0;
-for (const main of vals) for (const a of vals) for (const b of vals) {
+const mains = [undefined, '3100', '4999'];
+const bad = []; let n = 0, threw = 0;
+for (const e2ePort of mains) for (const port of vals) for (const a of vals) for (const b of vals) {
   const env = {};
-  if (main) env.PORT = main;
+  if (e2ePort) env.E2E_PORT = e2ePort;
+  if (port) env.PORT = port;
   if (a) env.E2E_PORT_2 = a;
   if (b) env.E2E_PORT_3 = b;
-  const m = main ?? '3000';
-  if ((a && a === m) || (b && b === m)) continue;
-  if (a && b && a === b) {
-    let threw = false;
-    try { allocateE2EPorts(env); } catch { threw = true; }
-    if (!threw) bad.push(['no-throw', main, a, b]);
+  const m = e2ePort ?? port ?? '3000';
+  const collides = (a && a === m) || (b && b === m) || (a && b && a === b);
+  n++;
+  let r = null, error = null;
+  try { r = allocateE2EPorts(env); } catch (e) { error = e; }
+  if (collides) {
+    threw++;
+    if (!error) bad.push(['no-throw', e2ePort, port, a, b, r]);
     continue;
   }
-  n++;
-  const r = allocateE2EPorts(env);
-  if (new Set([r.main, r.membership, r.survey]).size !== 3) bad.push([main, a, b, r]);
-  if (a && r.membership !== a) bad.push(['explicit2 lost', main, a, b, r]);
-  if (b && r.survey !== b) bad.push(['explicit3 lost', main, a, b, r]);
+  if (error) { bad.push(['threw', e2ePort, port, a, b, String(error)]); continue; }
+  if (new Set([r.main, r.membership, r.survey]).size !== 3) bad.push(['dup', e2ePort, port, a, b, r]);
+  if (r.main !== m) bad.push(['main', e2ePort, port, a, b, r]);
+  if (a && r.membership !== a) bad.push(['explicit2 lost', e2ePort, port, a, b, r]);
+  if (b && r.survey !== b) bad.push(['explicit3 lost', e2ePort, port, a, b, r]);
 }
-console.log(JSON.stringify({ n, bad }));`;
-  const r = spawnSync(process.execPath, ['--import', 'tsx', '--input-type=module', '-e', script], {
-    cwd: root,
-    env: { PATH: process.env.PATH, HOME: process.env.HOME },
-    encoding: 'utf8',
-    timeout: 60_000,
-  });
+let message = '';
+try { allocateE2EPorts({ PORT: '3100', E2E_PORT_2: '3100' }); } catch (e) { message = String(e.message); }
+console.log(JSON.stringify({ n, threw, bad, message }));`;
+
+test('allocateE2EPorts gives three distinct ports or throws, for every combination', () => {
+  const href = pathToFileURL(join(root, 'config', 'e2e-ports.ts')).href;
+  const r = spawnSync(
+    process.execPath,
+    ['--import', 'tsx', '--input-type=module', '-e', GRID_SCRIPT(href)],
+    {
+      cwd: root,
+      env: { PATH: process.env.PATH, HOME: process.env.HOME },
+      encoding: 'utf8',
+      timeout: 60_000,
+    }
+  );
   assert.equal(r.status, 0, r.stderr);
   const out = JSON.parse(r.stdout.trim().split('\n').pop());
-  assert.ok(out.n > 300, `grid too small: ${out.n}`);
+  assert.equal(out.n, 3 * 10 * 10 * 10, `grid size: ${out.n}`);
+  assert.ok(out.threw > 100, `the throwing half of the grid is too small: ${out.threw}`);
   assert.deepEqual(out.bad, []);
+  // The CodeRabbit case on #1225: PORT=3100 with E2E_PORT_2=3100 puts main and membership on one
+  // port. It throws, and the message names all three final ports.
+  assert.match(out.message, /main=3100, membership=3100, survey=\d+/);
 });
 
 test('an explicit PLAYWRIGHT_BASE_URL still wins over E2E_PORT', () => {

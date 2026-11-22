@@ -22,14 +22,16 @@ export function allocateE2EPorts(
   const main = env.E2E_PORT || env.PORT || '3000';
   const explicit2 = env.E2E_PORT_2 || undefined;
   const explicit3 = env.E2E_PORT_3 || undefined;
-  if (explicit2 && explicit3 && explicit2 === explicit3) {
-    throw new Error(
-      `E2E_PORT_2 and E2E_PORT_3 are both ${explicit2}; the servers need different ports`
-    );
-  }
   const free = (candidates: string[], taken: Array<string | undefined>) =>
     candidates.find((p) => !taken.includes(p))!;
   const membership = explicit2 ?? free(MEMBERSHIP_CANDIDATES, [main, explicit3]);
   const survey = explicit3 ?? free(SURVEY_CANDIDATES, [main, membership]);
+  // The one rule, checked on the final three ports whatever produced them: two servers on one
+  // port cannot start, so refuse here instead of letting Playwright fail later.
+  if (new Set([main, membership, survey]).size !== 3) {
+    throw new Error(
+      `E2E ports must be three different values, got main=${main}, membership=${membership}, survey=${survey}`
+    );
+  }
   return { main, membership, survey };
 }
