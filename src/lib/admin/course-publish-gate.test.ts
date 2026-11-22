@@ -348,6 +348,16 @@ describe('workflow publish gate', () => {
     expect(r.status).toBe(200);
   });
 
+  // Status is the canonical published state (#137). An in-review course carrying the legacy
+  // live flag is not "already published"; it goes through the same gate.
+  it('treats status, not the legacy flag, as published', () => {
+    const inReviewFlagged = course({ status: 'in_review', isPublished: true });
+    expect(gate.evaluatePublishGate(inReviewFlagged as never, null, root).map((b) => b.check)).not.toContain('workflow');
+    const live = course({ status: 'published', isPublished: false });
+    expect(gate.evaluatePublishGate(live as never, null, root)[0]).toMatchObject({ check: 'workflow',
+      message: 'The course is already published.' });
+  });
+
   it('refuses approve outside review', async () => {
     db.course = course({ status: 'draft' });
     const r = await workflow('approve');

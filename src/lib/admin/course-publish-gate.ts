@@ -38,6 +38,7 @@ import {
 import { htmlToText } from '@/lib/course-kit/html-extract';
 import { scanCourseForBannedPhrases, scanCourseForStandardExcerpts } from '@/lib/course-kit/scaffold';
 import type { KitCourse } from '@/lib/course-kit/types';
+import { isPublishedCourseStatus } from '@/lib/courses/course-status';
 import { getCurrentCecApproval } from '@/lib/seed/cec-approvals';
 
 export type PublishGateCheck = 'workflow' | 'evidence' | 'visuals' | 'compliance' | 'approval';
@@ -425,9 +426,10 @@ export function evaluatePublishGate(
   approval: RecordedApproval | null,
   root: string = process.cwd()
 ): PublishBlocker[] {
+  // Status is the canonical published state (#137); the legacy isPublished flag does not decide.
   const state = (course.status ?? '').toLowerCase();
   const workflow: PublishBlocker[] =
-    course.isPublished === true || state === 'published'
+    isPublishedCourseStatus(course.status)
       ? [{ check: 'workflow', message: 'The course is already published.' }]
       : state !== 'in_review'
         ? [{ check: 'workflow', message: 'The course is not in review. Select Submit for review first.' }]
