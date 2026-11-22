@@ -194,11 +194,12 @@ export function courseContentSha256(course: PublishGateCourse): string {
   return createHash('sha256').update(JSON.stringify(stable(learnerContent(course)))).digest('hex');
 }
 
-const LINK_RE = /^(?:[a-z][a-z0-9+.-]*:|\/)\S*$/i;
-
-/** Every string leaf of a value except bare links and file paths, which carry no wording. */
+/**
+ * Every string leaf of a value. Nothing is skipped by shape (links and paths included): a skip
+ * rule is a way round the scan, and an over-match only blocks, never publishes.
+ */
 function leafText(value: unknown): string[] {
-  if (typeof value === 'string') return value.trim() && !LINK_RE.test(value.trim()) ? [value] : [];
+  if (typeof value === 'string') return value.trim() ? [value] : [];
   if (Array.isArray(value)) return value.flatMap(leafText);
   if (value && typeof value === 'object') return Object.values(value as Record<string, unknown>).flatMap(leafText);
   return [];

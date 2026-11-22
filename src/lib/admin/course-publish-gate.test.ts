@@ -262,6 +262,24 @@ describe('workflow publish gate', () => {
     expect(r.body.blockers?.map((b) => b.message).join(' ')).toMatch(/not on the IICRC CEC approvals register.*quiz "Get IICRC certified with CARSI"/);
   });
 
+  // Nothing a learner can read is skipped, whatever its shape (a word then a colon looks like
+  // a link scheme; a path or address is scanned too, so the scan fails closed).
+  it.each([
+    ['a scheme-shaped title', (c: Row) => { c.title = 'IICRC:'; }],
+    ['a scheme-shaped resource label', (c: Row) => {
+      (c.modules as Row[])[0].lessons[0].resources = [{ kind: 'link', label: 'IICRC:S500', url: 'https://example.test' }];
+    }],
+    ['a link address', (c: Row) => {
+      (c.modules as Row[])[0].lessons[0].resources = [{ kind: 'link', label: 'Standard', url: 'https://iicrc.example/IICRC' }];
+    }],
+  ])('refuses publish when a non-approved course mentions IICRC in %s', async (_label, mutate) => {
+    mutate(db.course as Row);
+    approveCurrent();
+    const r = await workflow('publish');
+    expect(r.status).toBe(409);
+    expect(new Set(r.body.blockers?.map((b) => b.check))).toEqual(new Set(['compliance']));
+  });
+
   it('refuses publish when page wording in meta mentions IICRC', async () => {
     db.course = course({ meta: { eyebrow: 'IICRC approved training' } });
     approveCurrent();
