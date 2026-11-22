@@ -3,7 +3,8 @@
     "Frozen gaps for scripts/check-course-visuals.mjs (Course Standard v1 section 4.1 items 1-3, Linear GP-752), taken on origin/main 9f709922, 21/11/2026.",
     "Each entry is a known missing cover, lesson image or diagram, keyed by course slug, lesson id and kind; it covers that lesson in the seed catalogue and in its v1-draft copy.",
     "This file only shrinks: when you add the missing visual, delete its entry in the same change (the check fails until you do). Adding an entry needs the founder's or lead's written approval in that PR; it is never a quiet way to let a new lesson through.",
-    "GP-772 (22/11/2026): 24 entries for assessing-indoor-environment-conditions (12 lesson images, 12 diagrams) in its GP-468 v1-draft, added with the founder's written approval on GP-772. Each entry is deleted when its visual lands (GP-468); the visuals stay required before that course is published."
+    "GP-772 (22/11/2026): 24 entries for assessing-indoor-environment-conditions (12 lesson images, 12 diagrams) in its GP-468 v1-draft, added with the founder's written approval on GP-772. Each entry is deleted when its visual lands (GP-468); the visuals stay required before that course is published.",
+    "PSY (22/11/2026): 26 entries for psychrometry-building-science-for-drying (13 lesson images, 13 diagrams) in its GP-471 v1-draft from #1188, added with the user's written approval in the CARSI release session on 22/11/2026 to unblock red main (PR #1269). Each entry is deleted when its visual lands; the visuals stay required before that course is published."
   ],
   "gaps": [
     {
@@ -706,6 +707,162 @@
       "slug": "mould-remediation-fundamentals",
       "lessonId": "d2e87f23-e9be-45a5-81de-f41ba8bc7dbd",
       "lessonTitle": "Case study: writing the defensible job file",
+      "missing": "image"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "102a0311-cda3-4964-ba5c-df136b3d6b25",
+      "lessonTitle": "The building envelope: NCC climate zones, walls, subfloors and NZ rules",
+      "missing": "diagram"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "102a0311-cda3-4964-ba5c-df136b3d6b25",
+      "lessonTitle": "The building envelope: NCC climate zones, walls, subfloors and NZ rules",
+      "missing": "image"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "12a4443e-5261-48f2-a88c-6abd54a31f85",
+      "lessonTitle": "Vapour pressure, humidity ratio and dew point: doing the calculation",
+      "missing": "diagram"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "12a4443e-5261-48f2-a88c-6abd54a31f85",
+      "lessonTitle": "Vapour pressure, humidity ratio and dew point: doing the calculation",
+      "missing": "image"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "2581fed0-2d04-4f9a-b73c-54a3c1e5999d",
+      "lessonTitle": "Reading climate data for a job: Brisbane and Canberra compared",
+      "missing": "diagram"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "2581fed0-2d04-4f9a-b73c-54a3c1e5999d",
+      "lessonTitle": "Reading climate data for a job: Brisbane and Canberra compared",
+      "missing": "image"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "384cc2c0-6d70-46a7-b166-a767fb369318",
+      "lessonTitle": "Ventilate or dehumidify? Comparing inside and outside air in g/kg",
+      "missing": "diagram"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "384cc2c0-6d70-46a7-b166-a767fb369318",
+      "lessonTitle": "Ventilate or dehumidify? Comparing inside and outside air in g/kg",
+      "missing": "image"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "596778a2-6978-4c8b-a4c4-78bf47aa05fe",
+      "lessonTitle": "Moist air: the four numbers, and why RH alone misleads",
+      "missing": "diagram"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "596778a2-6978-4c8b-a4c4-78bf47aa05fe",
+      "lessonTitle": "Moist air: the four numbers, and why RH alone misleads",
+      "missing": "image"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "72261aa3-30a0-47a5-b60e-443e510619ea",
+      "lessonTitle": "Air changes per hour: from airflow, and from a CO2 decay test",
+      "missing": "diagram"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "72261aa3-30a0-47a5-b60e-443e510619ea",
+      "lessonTitle": "Air changes per hour: from airflow, and from a CO2 decay test",
+      "missing": "image"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "9d6f184b-5150-4d30-87fe-a105f71344c9",
+      "lessonTitle": "Equilibrium moisture content: why there is no universal dry number",
+      "missing": "diagram"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "9d6f184b-5150-4d30-87fe-a105f71344c9",
+      "lessonTitle": "Equilibrium moisture content: why there is no universal dry number",
+      "missing": "image"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "d22b54e2-2951-45b8-8efd-d20372c58927",
+      "lessonTitle": "Evaporation: the vapour pressure difference that drives drying",
+      "missing": "diagram"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "d22b54e2-2951-45b8-8efd-d20372c58927",
+      "lessonTitle": "Evaporation: the vapour pressure difference that drives drying",
+      "missing": "image"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "de581cf9-4fa9-451f-aae3-a34870c5986f",
+      "lessonTitle": "Warm the material or dry the air? Choosing the lever by climate",
+      "missing": "diagram"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "de581cf9-4fa9-451f-aae3-a34870c5986f",
+      "lessonTitle": "Warm the material or dry the air? Choosing the lever by climate",
+      "missing": "image"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "e7dd8da4-7b46-4668-94f0-2284177142e3",
+      "lessonTitle": "Heat flow, U-values and inside surface temperature",
+      "missing": "diagram"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "e7dd8da4-7b46-4668-94f0-2284177142e3",
+      "lessonTitle": "Heat flow, U-values and inside surface temperature",
+      "missing": "image"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "f48efa5a-2b21-476e-b856-904cfcd8e137",
+      "lessonTitle": "Moisture content: the oven-dry method, meters and WME",
+      "missing": "diagram"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "f48efa5a-2b21-476e-b856-904cfcd8e137",
+      "lessonTitle": "Moisture content: the oven-dry method, meters and WME",
+      "missing": "image"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "fb69b393-59f4-464e-a182-b685ddbe8b50",
+      "lessonTitle": "Daily monitoring: readings you can trust and grain depression in g/kg",
+      "missing": "diagram"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "fb69b393-59f4-464e-a182-b685ddbe8b50",
+      "lessonTitle": "Daily monitoring: readings you can trust and grain depression in g/kg",
+      "missing": "image"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "fce81c98-fc8f-4cbe-966f-a9844cabfd28",
+      "lessonTitle": "The surface condensation check: Canberra windows and Brisbane walls",
+      "missing": "diagram"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "fce81c98-fc8f-4cbe-966f-a9844cabfd28",
+      "lessonTitle": "The surface condensation check: Canberra windows and Brisbane walls",
       "missing": "image"
     },
     {
