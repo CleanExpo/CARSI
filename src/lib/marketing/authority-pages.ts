@@ -1,5 +1,6 @@
 import { z } from 'zod/v3';
 
+import { MAX_INDUSTRY_SLUGS } from '@/lib/marketing/industry-slugs';
 import { healthcareRecommendedSlugs } from '@/lib/marketing/industry-track1-topics';
 import { roleGuidePagePath } from '@/lib/marketing/role-guides-path';
 
@@ -716,6 +717,17 @@ export function authoritySitemapPaths(
     .map((p) => roleGuidePagePath(p.slug));
 }
 
+/** GP-695: a claim source must parse as https with a real host (`https://#x` has none). */
+function isHttpsUrlWithHost(value: string): boolean {
+  if (/\s/.test(value)) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && url.hostname.length > 0 && url.hostname.includes('.');
+  } catch {
+    return false;
+  }
+}
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 const NINETY_DAYS_MS = 90 * DAY_MS;
 
@@ -776,7 +788,10 @@ const approvedEntrySchema = z
     scopeNote: nonBlank,
     bundle: z
       .object({
-        publishedSlugs: nonEmpty(nonBlank),
+        publishedSlugs: nonEmpty(nonBlank).max(
+          MAX_INDUSTRY_SLUGS,
+          `lists at most ${MAX_INDUSTRY_SLUGS} courses (the loader's limit)`
+        ),
         awaitingCatalogueSlugs: z.array(nonBlank),
         plannedModules: z.array(
           z
@@ -881,7 +896,7 @@ export function validateAuthorityPage(
   }
   for (const claim of entry.claims) {
     const label = claim.text.slice(0, 40);
-    if (!/^https:\/\/\S+$/.test(claim.sourceUrl)) {
+    if (!isHttpsUrlWithHost(claim.sourceUrl)) {
       problems.push(`claim sourceUrl must be https: ${label}`);
     }
     if (claim.tag !== 'O') problems.push(`claim tag must be O: ${label}`);

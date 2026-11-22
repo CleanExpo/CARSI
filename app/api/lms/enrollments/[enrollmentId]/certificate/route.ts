@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getAppOrigin } from '@/lib/server/app-url';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import {
@@ -70,9 +71,7 @@ export async function GET(request: NextRequest, ctx: Ctx) {
       );
     }
 
-    const origin =
-      process.env.NEXT_PUBLIC_APP_URL?.trim() ||
-      new URL(request.url).origin;
+    const origin = getAppOrigin(request);
     const pdf = await buildCompletionCertificatePdf(
       completionCertificateDataFromEnrollment(row, origin)
     );
