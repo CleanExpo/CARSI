@@ -125,6 +125,7 @@
     "db:gate-onboarding-off-free": "npx tsx scripts/gate-onboarding-course-off-free.ts",
     "test:e2e": "playwright test --config config/playwright.config.ts e2e",
     "test:smoke": "playwright test --config config/playwright.config.ts e2e/smoke.spec.ts",
+    "test:smoke:live": "playwright test --config config/playwright.live.config.ts",
     "test:a11y": "playwright test --config config/playwright.config.ts e2e/a11y.spec.ts",
     "test:unit": "vitest run --config config/vitest.config.ts",
     "test:pg": "vitest run --config config/vitest.pg.config.ts",
