@@ -287,6 +287,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   }, [curriculum, lessonFromQuery, moduleFromQuery, flatLessons]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset the practice gate when the lesson changes; behaviour-preserving, came in with the interactive pilot (5593ab7e)
     setInteractivePracticeReady(false);
   }, [activeLessonId]);
 
