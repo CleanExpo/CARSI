@@ -1,6 +1,6 @@
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { authorityPath } from '@/lib/marketing/authority';
-import { publishableAuthorityPaths } from '@/lib/server/authority-page-data';
+import { authoritySitemapPaths } from '@/lib/marketing/authority-pages';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 import { ROLE_GUIDES_HUB_PATH } from '@/lib/marketing/role-guides-path';
 import { startSmartBasePath, startSmartPages } from '@/lib/marketing/start-smart';
@@ -147,11 +147,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const basePages = directory.live ? [...staticPages, professionalDirectoryPage] : staticPages;
   // Published LMS catalogue (empty when the database is unavailable).
   const dbCourses = await getPublishedCourseSlugsFromDatabase();
-  // /for/* authority pages are listed only when publishable, decided by the same per-bundle
-  // course read the page and its metadata use (GP-695), never a newest-N catalogue window.
+  // /for/* authority pages are listed only when publishable: approved and valid against the
+  // database catalogue. The remote API fallback below is not used for this decision.
   const pages = [
     ...basePages,
-    ...(await publishableAuthorityPaths()).map((path) => ({
+    ...authoritySitemapPaths(new Set(dbCourses.map((c) => c.slug))).map((path) => ({
       path,
       priority: 0.6,
       changeFreq: 'monthly' as const,

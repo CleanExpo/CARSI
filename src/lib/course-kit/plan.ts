@@ -8,7 +8,7 @@
 import type { KitCourse } from './types';
 
 /** The resource kinds the LMS player renders inline or as links. */
-export type AttachedResourceKind = 'flashcards' | 'slides' | 'audio' | 'image' | 'video' | 'link';
+export type AttachedResourceKind = 'flashcards' | 'slides' | 'interactive' | 'audio' | 'image' | 'video' | 'link';
 
 /**
  * Inspect a course's lessons and report which resource kinds are attached and
@@ -38,6 +38,9 @@ export function detectAttachedResources(course: KitCourse): {
           has = true;
         } else if (r.kind === 'slides') {
           kinds.add('slides');
+          has = true;
+        } else if (r.kind === 'interactive') {
+          kinds.add('interactive');
           has = true;
         } else if (r.kind === 'audio') {
           kinds.add('audio');

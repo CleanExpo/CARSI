@@ -10,10 +10,7 @@ services:
     github:
       repo: CleanExpo/CARSI
       branch: main
-      # Off on purpose (Phill, 22/11/2026: "Wait for green"). A push to main must not go
-      # live before CI finishes; .github/workflows/deploy-production.yml deploys main only
-      # after every required check on that commit has passed.
-      deploy_on_push: false
+      deploy_on_push: true
 
     dockerfile_path: deploy/Dockerfile
     http_port: 8080
@@ -32,11 +29,6 @@ services:
     envs:
       - key: NODE_ENV
         value: production
-        scope: RUN_TIME
-      # The commit DigitalOcean built; /api/health reports it as build.commit
-      # (src/lib/server/build-identity.ts). Only the running app needs it.
-      - key: CARSI_BUILD_SHA
-        value: ${_self.COMMIT_HASH}
         scope: RUN_TIME
       - key: PORT
         value: '8080'

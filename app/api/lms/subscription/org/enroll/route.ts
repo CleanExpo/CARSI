@@ -24,7 +24,6 @@ import { isPrerequisiteNotMetError, prerequisiteBlockBody } from '@/lib/server/c
 import { getOrgEntitlements } from '@/lib/server/entitlements';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
-import { getAppOrigin } from '@/lib/server/app-url';
 
 export async function POST(request: NextRequest) {
   if (!teamSubscriptionsEnabled()) {
@@ -91,7 +90,7 @@ export async function POST(request: NextRequest) {
       void sendEnrollmentWelcomeEmail({
         studentId: claims.sub,
         courseSlug: slug,
-        appOrigin: getAppOrigin(request),
+        appOrigin: request.nextUrl.origin,
       }).catch((e) => console.error('[subscription/org/enroll] email', e));
       notifyCrmEnrollmentCreated({
         enrollmentId: result.enrollmentId,

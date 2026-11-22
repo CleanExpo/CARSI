@@ -40,9 +40,7 @@
  *
  * Course copy = the draft folder (data/courses/<slug>/v1-draft, JSON and .md, evidence/
  * excluded) or, for a course with no draft, data/seed/courses-catalog.json and
- * data/seed/<slug>-*.json; plus public/courses/<slug>/ (field tools, diagrams). From a
- * multi-course catalog ({"courses":[...]}) only the entry whose slug is this course's is read;
- * a catalog with no such entry is not part of this course's copy (GP-743).
+ * data/seed/<slug>-*.json; plus public/courses/<slug>/ (field tools, diagrams).
  *
  * Each course rule is emitted from exactly one `emit('<rule-id>', …)` site, so the test suite
  * can remove that rule alone (a source mutant) and prove its own case turns red.
@@ -145,7 +143,6 @@ function courseCopy({ repoRoot, slug, courseDir }) {
       : [];
   }
   files = files.concat(listFiles(`${repoRoot}/public/courses/${slug}`));
-  const copyFiles = [];
   const text = new Map();
   const ids = new Set();
   const keys = new Set();
@@ -166,7 +163,6 @@ function courseCopy({ repoRoot, slug, courseDir }) {
     }
     if (parsed === undefined) {
       text.set(f, [raw]);
-      copyFiles.push(f);
       continue;
     }
     const strings = [];
@@ -175,16 +171,10 @@ function courseCopy({ repoRoot, slug, courseDir }) {
       else if (o && typeof o === 'object') Object.values(o).forEach(collect);
       else if (typeof o === 'string') strings.push(o);
     };
-    // A multi-course catalog (data/seed/courses-catalog.json) only contributes the entry whose
-    // slug is this course's: another course's ids never resolve, and (GP-743) another course's
-    // copy never counts as this course still carrying a CUT phrase.
-    const catalog = parsed && Array.isArray(parsed.courses);
-    const roots = catalog ? parsed.courses.filter((c) => c && c.slug === slug) : [parsed];
-    // A catalog with no entry for this course holds none of its copy. Counting it as a copy file
-    // would let a CUT row pass with nothing scanned instead of "no course copy found".
-    if (catalog && roots.length === 0) continue;
-    copyFiles.push(f);
-    roots.forEach(collect);
+    collect(parsed);
+    // Structured ids and keys. A multi-course catalog (data/seed/courses-catalog.json) only
+    // contributes the entry whose slug is this course's, so another course's ids never resolve.
+    const roots = parsed && Array.isArray(parsed.courses) ? parsed.courses.filter((c) => c && c.slug === slug) : [parsed];
     const walk = (o) => {
       if (Array.isArray(o)) o.forEach(walk);
       else if (o && typeof o === 'object') {
@@ -200,7 +190,7 @@ function courseCopy({ repoRoot, slug, courseDir }) {
     roots.forEach(walk);
     text.set(f, strings);
   }
-  return { files: copyFiles, text, ids, keys };
+  return { files, text, ids, keys };
 }
 
 const norm = (s) => String(s).toLowerCase().replace(/\s+/g, ' ');

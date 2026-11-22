@@ -136,20 +136,6 @@ function PlayerVignette() {
   );
 }
 
-/**
- * Illustrative ledger rows for the station 03 mock-up. Not learner data.
- *
- * GP-537: the counter used to read a hard-coded 14.0 over rows that add to 6.0. 14 is the IICRC
- * renewal figure in RENEWAL_CEC_REQUIRED, so the mock-up looked like a completed renewal, and it
- * did not add up. The total is now the sum of these rows, and the vignette shows no target: the
- * real per-learner target lives in the learner dashboard (src/lib/renewal-progress.ts).
- */
-const LEDGER_ROWS = [
-  { label: 'Logged 14 Jul', hours: 4 },
-  { label: 'Logged 2 Jun', hours: 2 },
-] as const;
-const LEDGER_TOTAL = LEDGER_ROWS.reduce((sum, row) => sum + row.hours, 0);
-
 /** Station 03: a small CEC ledger with the hours counter ticking up. */
 function LedgerVignette() {
   return (
@@ -164,21 +150,22 @@ function LedgerVignette() {
       </div>
       <p className="mt-2.5 flex items-baseline gap-1.5">
         <span className="font-[family-name:var(--font-display)] text-[1.9rem] leading-none font-semibold tracking-[-0.02em] text-slate-950">
-          <CecHoursCounter to={LEDGER_TOTAL} />
+          <CecHoursCounter to={14} />
         </span>
         <span className="text-[10px] text-slate-400">hours logged</span>
       </p>
       <div className="mt-3 space-y-2 border-t border-slate-100 pt-2.5">
-        {LEDGER_ROWS.map((row) => (
+        {[
+          { label: 'Logged 14 Jul', value: '4.0' },
+          { label: 'Logged 2 Jun', value: '2.0' },
+        ].map((row) => (
           <div key={row.label} className="flex items-center gap-2 text-[10px]">
             <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
               <Check className="h-2 w-2" />
             </span>
             <span className="shrink-0 text-slate-500">{row.label}</span>
             <span className="h-px min-w-4 flex-1 bg-gradient-to-r from-slate-200 to-transparent" />
-            <span className="shrink-0 font-semibold text-slate-700 tabular-nums">
-              {row.hours.toFixed(1)}
-            </span>
+            <span className="shrink-0 font-semibold text-slate-700 tabular-nums">{row.value}</span>
           </div>
         ))}
       </div>

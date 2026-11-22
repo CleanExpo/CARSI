@@ -9,7 +9,6 @@ import {
 import { addRegistrationToCalendar } from '@/lib/server/ccw-roadshow-calendar';
 import { sendAndLogRoadshowEmail } from '@/lib/server/ccw-roadshow-email-log';
 import { prisma } from '@/lib/prisma';
-import { getAppOrigin } from '@/lib/server/app-url';
 
 export async function POST(request: NextRequest) {
   const session = await getAdminSessionOrNull();
@@ -63,7 +62,7 @@ export async function POST(request: NextRequest) {
           venueAddress: `${event.streetAddress}, ${event.suburbStatePostcode}`,
           seatCount: registration.seatCount,
           freeEntryToken: registration.freeEntryToken,
-          appOrigin: getAppOrigin(request),
+          appOrigin: request.nextUrl.origin,
         });
         emailSent = outcome.sent;
         emailReason = outcome.reason;

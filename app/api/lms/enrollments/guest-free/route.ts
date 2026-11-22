@@ -12,7 +12,6 @@ import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 import { captureServerError } from '@/lib/server/sentry';
 import { verifyTurnstileToken } from '@/lib/server/turnstile';
-import { getAppOrigin } from '@/lib/server/app-url';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 // Anonymous account-creation endpoint — cap per-IP attempts so it can't be used
@@ -131,7 +130,7 @@ export async function POST(request: NextRequest) {
       void sendEnrollmentWelcomeEmail({
         studentId: claims.sub,
         courseSlug: slug,
-        appOrigin: getAppOrigin(request),
+        appOrigin: request.nextUrl.origin,
       }).catch((e) => console.error('[guest-free] email', e));
       notifyCrmEnrollmentCreated({
         enrollmentId: result.enrollmentId,

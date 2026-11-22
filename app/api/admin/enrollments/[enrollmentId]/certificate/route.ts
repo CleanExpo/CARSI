@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
-import { getAppOrigin } from '@/lib/server/app-url';
 import {
   buildCompletionCertificatePdf,
   completionCertificateDataFromEnrollment,
@@ -59,7 +58,10 @@ export async function GET(request: NextRequest, context: RouteContext) {
       );
     }
 
-    const origin = getAppOrigin(request);
+    const origin =
+      process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+      process.env.NEXT_PUBLIC_FRONTEND_URL?.trim() ||
+      new URL(request.url).origin;
 
     const pdf = await buildCompletionCertificatePdf(
       completionCertificateDataFromEnrollment(row, origin),

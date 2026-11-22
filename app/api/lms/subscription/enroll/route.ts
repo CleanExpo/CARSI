@@ -27,7 +27,6 @@ import { getEntitlements } from '@/lib/server/entitlements';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { getPublishedCourseForCheckout } from '@/lib/server/public-courses-list';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
-import { getAppOrigin } from '@/lib/server/app-url';
 
 export async function POST(request: NextRequest) {
   if (!subscriptionsEnabled()) {
@@ -87,7 +86,7 @@ export async function POST(request: NextRequest) {
       void sendEnrollmentWelcomeEmail({
         studentId: claims.sub,
         courseSlug: slug,
-        appOrigin: getAppOrigin(request),
+        appOrigin: request.nextUrl.origin,
       }).catch((e) => console.error('[subscription/enroll] email', e));
       notifyCrmEnrollmentCreated({
         enrollmentId: result.enrollmentId,

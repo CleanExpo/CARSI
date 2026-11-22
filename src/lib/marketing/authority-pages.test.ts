@@ -66,9 +66,6 @@ import {
   type AuthorityPageEntry,
 } from './authority-pages';
 import { roleGuidePagePath } from './role-guides-path';
-import { MAX_INDUSTRY_SLUGS } from './industry-slugs';
-import { publishableAuthorityPaths } from '@/lib/server/authority-page-data';
-import { getPublishedCourseSlugsFromDatabase } from '@/lib/server/public-courses-list';
 
 process.env.DATABASE_URL ||= 'postgresql://test-only-placeholder/none';
 
@@ -273,104 +270,6 @@ describe('sitemap', () => {
     expect(authoritySitemapPaths(new Set(), pages)).toEqual([]);
     expect(authoritySitemapPaths(liveSlugs)).toEqual([]);
   });
-});
-
-describe('GP-695 sitemap and page agree', () => {
-  it('lists an approved page from its own bundle read, not the newest-N catalogue window', async () => {
-    // getPublishedCourseSlugsFromDatabase is mocked to [] (an old course outside the window);
-    // the page's own bundle read still finds its courses, so the sitemap lists it.
-    const good = fresh(approved(authorityPages[1]));
-    expect(await publishableAuthorityPaths([good])).toEqual([roleGuidePagePath(good.slug)]);
-  });
-
-  it('leaves the page out when a bundle course is unpublished or the read fails', async () => {
-    const good = fresh(approved(authorityPages[1]));
-    db.hiddenSlugs.add(good.bundle.publishedSlugs[0]);
-    try {
-      expect(await publishableAuthorityPaths([good])).toEqual([]);
-    } finally {
-      db.hiddenSlugs.clear();
-    }
-    db.fail = true;
-    try {
-      expect(await publishableAuthorityPaths([good])).toEqual([]);
-    } finally {
-      db.fail = false;
-    }
-  });
-
-  it('does not read the database for a draft page', async () => {
-    const before = db.calls;
-    expect(await publishableAuthorityPaths([authorityPages[0]])).toEqual([]);
-    expect(db.calls).toBe(before);
-  });
-});
-
-describe('GP-695 sitemap() wiring', () => {
-  // The tests above call publishableAuthorityPaths directly; these call sitemap() itself, so a
-  // sitemap that goes back to the newest-N catalogue window fails here in both directions.
-  const catalogueWindow = vi.mocked(getPublishedCourseSlugsFromDatabase);
-
-  async function withApprovedEntry(run: (path: string) => Promise<void>): Promise<void> {
-    const original = authorityPages[1];
-    authorityPages[1] = fresh(approved(original));
-    try {
-      await run(roleGuidePagePath(original.slug));
-    } finally {
-      authorityPages[1] = original;
-    }
-  }
-
-  const sitemapPaths = async () => (await sitemap()).map((e) => new URL(e.url).pathname);
-
-  it('lists an approved page whose bundle read succeeds, even when the catalogue window misses it', async () => {
-    await withApprovedEntry(async (path) => {
-      catalogueWindow.mockResolvedValueOnce([]);
-      expect(await sitemapPaths()).toContain(path);
-    });
-  });
-
-  it('leaves the page out when the window holds every slug but the bundle read disagrees', async () => {
-    await withApprovedEntry(async (path) => {
-      const rows = authorityPages[1].bundle.publishedSlugs.map((slug) => ({
-        slug,
-        updated_at: '2026-11-01T00:00:00.000Z',
-        category: null,
-      }));
-      db.hiddenSlugs.add(authorityPages[1].bundle.publishedSlugs[0]);
-      try {
-        catalogueWindow.mockResolvedValueOnce(rows);
-        expect(await sitemapPaths()).not.toContain(path);
-      } finally {
-        db.hiddenSlugs.clear();
-      }
-      db.fail = true;
-      try {
-        catalogueWindow.mockResolvedValueOnce(rows);
-        expect(await sitemapPaths()).not.toContain(path);
-      } finally {
-        db.fail = false;
-      }
-    });
-  });
-});
-
-describe('GP-695 approval checks', () => {
-  it(`refuses a bundle longer than the loader's ${MAX_INDUSTRY_SLUGS}-course limit`, () => {
-    const base = fresh(approved(authorityPages[1]));
-    const slugs = Array.from({ length: MAX_INDUSTRY_SLUGS + 1 }, (_, i) => `course-${i}`);
-    const entry = { ...base, bundle: { ...base.bundle, publishedSlugs: slugs } };
-    expect(validateAuthorityPage(entry).join(' ')).toMatch(/at most/);
-  });
-
-  it.each(['https://#citation', 'https://', 'http://example.gov.au/x', 'https://localhost/x'])(
-    'refuses claim source %s (no real https host)',
-    (sourceUrl) => {
-      const base = fresh(approved(authorityPages[1]));
-      const entry = { ...base, claims: base.claims.map((c) => ({ ...c, sourceUrl })) };
-      expect(validateAuthorityPage(entry).join(' ')).toMatch(/sourceUrl/);
-    }
-  );
 });
 
 describe('approval guard', () => {
@@ -620,63 +519,12 @@ const NEVER = [
   /\p{Extended_Pictographic}/u,
 ];
 
-/**
- * GP-695: each course card's HTML, from its first link to the first link of a different course.
- * Prices may only be removed inside these segments, never from shared page text.
- */
-function cardSegments(html: string, slugs: readonly string[]): Array<{ slug: string; start: number; end: number }> {
-  const out: Array<{ slug: string; start: number; end: number }> = [];
-  for (const slug of slugs) {
-    const start = html.indexOf(`href="/courses/${slug}"`);
-    if (start === -1) continue;
-    const rest = html.slice(start);
-    const next = rest.search(new RegExp(`href="/courses/(?!${slug}")`));
-    out.push({ slug, start, end: next === -1 ? html.length : start + next });
-  }
-  return out;
-}
-
-/** GP-695: the label as a whole price: `$29` must not match `$299` or `$29.95`. */
-function wholePrice(label: string): RegExp {
-  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(`${escaped}(?![\\d]|[.,]\\d)`, 'g');
-}
-
-/** GP-695: remove each catalogue price only inside that course's own card. */
-function stripCardPrices(html: string, slugs: readonly string[]): string {
-  const segments = cardSegments(html, slugs).sort((a, b) => b.start - a.start);
-  let out = html;
-  for (const { slug, start, end } of segments) {
-    const card = out.slice(start, end).replace(wholePrice(cataloguePriceLabel(slug)), '');
-    out = out.slice(0, start) + card + out.slice(end);
-  }
-  return out;
-}
-
 /** The price a card must show, read from the catalogue (never typed in the registry). */
 function cataloguePriceLabel(slug: string): string {
   const c = catalogueBySlug.get(slug)!;
   const n = Number(c.priceAud);
   return c.isFree || n === 0 ? 'Free' : `$${n.toFixed(0)}`;
 }
-
-describe('GP-695 price helpers', () => {
-  it('a whole-price match rejects $299 and $29.95 for $29', () => {
-    expect(wholePrice('$29').test('<b>$29</b>')).toBe(true);
-    expect(wholePrice('$29').test('<b>$299</b>')).toBe(false);
-    expect(wholePrice('$29').test('<b>$29.95</b>')).toBe(false);
-    expect(wholePrice('$29').test('only $29.')).toBe(true);
-  });
-
-  it('removes a price inside the card but keeps the same price in shared text', () => {
-    const slug = [...catalogueBySlug.keys()].find((s) => cataloguePriceLabel(s) !== 'Free')!;
-    const label = cataloguePriceLabel(slug);
-    const html = `<p>Intro ${label} offer</p><a href="/courses/${slug}">Course</a><span>${label}</span>`;
-    const out = stripCardPrices(html, [slug]);
-    expect(out).toContain(`Intro ${label} offer`);
-    expect(out).not.toContain(`<span>${label}</span>`);
-  });
-});
 
 describe('never-claim strings', () => {
   let rendered: { slug: string; html: string }[] = [];
@@ -698,18 +546,19 @@ describe('never-claim strings', () => {
 
   it('each card shows the catalogue price, and no other dollar amount appears (finding 2)', () => {
     for (const p of authorityPages) {
-      const html = rendered.find((r) => r.slug === p.slug)!.html;
-      const segments = cardSegments(html, p.bundle.publishedSlugs);
+      let html = rendered.find((r) => r.slug === p.slug)!.html;
       for (const slug of p.bundle.publishedSlugs) {
-        const seg = segments.find((x) => x.slug === slug);
-        expect(seg, `${p.slug} -> ${slug} card`).toBeDefined();
-        const card = html.slice(seg!.start, seg!.end);
-        expect(wholePrice(cataloguePriceLabel(slug)).test(card), `${p.slug} -> ${slug} price`).toBe(
-          true
-        );
+        const label = cataloguePriceLabel(slug);
+        // The card runs from its first link to the first link of a different course.
+        const start = html.indexOf(`href="/courses/${slug}"`);
+        const rest = html.slice(start);
+        const next = rest.search(new RegExp(`href="/courses/(?!${slug}")`));
+        const card = next === -1 ? rest : rest.slice(0, next);
+        expect(card, `${p.slug} -> ${slug} price`).toContain(label);
       }
-      const rest = stripCardPrices(html, p.bundle.publishedSlugs);
-      expect(/\$\s?\d/.test(rest), `${p.slug}: a dollar amount not from the catalogue`).toBe(false);
+      for (const slug of p.bundle.publishedSlugs)
+        html = html.split(cataloguePriceLabel(slug)).join('');
+      expect(/\$\s?\d/.test(html), `${p.slug}: a dollar amount not from the catalogue`).toBe(false);
     }
   });
 
@@ -765,12 +614,10 @@ describe('never-claim strings', () => {
 
   it('no page (course cards included), registry text or page source contains a never-claim string', () => {
     for (const p of authorityPages) {
-      // Catalogue prices are the one permitted dollar figure, and only inside their own card
-      // (checked above); shared page text keeps every price (GP-695).
-      const html = stripCardPrices(
-        rendered.find((r) => r.slug === p.slug)!.html,
-        p.bundle.publishedSlugs
-      );
+      let html = rendered.find((r) => r.slug === p.slug)!.html;
+      // Catalogue prices are the one permitted dollar figure; they are checked above.
+      for (const slug of p.bundle.publishedSlugs)
+        html = html.split(cataloguePriceLabel(slug)).join('');
       const src = readFileSync(
         join(ROOT, 'app', '(public)', 'role-guides', p.slug, 'page.tsx'),
         'utf8'

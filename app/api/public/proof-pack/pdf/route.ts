@@ -3,7 +3,6 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { verifyProofPackShareToken } from '@/lib/auth/session-jwt';
 import { buildProofPackPdf } from '@/lib/server/proof-pack-pdf';
 import { getProofPackPayloadForStudent } from '@/lib/server/proof-pack';
-import { getAppOrigin } from '@/lib/server/app-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +24,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ detail: 'Service unavailable' }, { status: 503 });
   }
 
-  const payload = await getProofPackPayloadForStudent(userId, getAppOrigin(request));
+  const payload = await getProofPackPayloadForStudent(userId, request.nextUrl.origin);
   if (!payload) {
     return NextResponse.json({ detail: 'Not found' }, { status: 404 });
   }

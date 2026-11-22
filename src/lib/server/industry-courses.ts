@@ -1,4 +1,3 @@
-import { MAX_INDUSTRY_SLUGS } from '@/lib/marketing/industry-slugs';
 import { prisma } from '@/lib/prisma';
 import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
 
@@ -96,6 +95,7 @@ export async function getIndustryCoursesFromDb(
   return combined;
 }
 
+const MAX_INDUSTRY_SLUGS = 24;
 
 /**
  * Published courses for industry pages, pinned to specific catalogue slugs

@@ -9,7 +9,6 @@ import {
   mintCheckInToken,
   type CheckInDayIndex,
 } from '@/lib/server/ccw-attendance/checkin-token';
-import { getAppOrigin } from '@/lib/server/app-url';
 
 /**
  * POST /api/admin/ccw-roadshow/checkin-token — mint the event-day check-in token
@@ -69,7 +68,7 @@ export async function POST(request: NextRequest) {
   const { dateStamp } = dayGuard;
   const token = await mintCheckInToken({ eventSlug: event.slug, dayIndex, dateStamp });
 
-  const checkInUrl = `${getAppOrigin(request)}/events/ccw-roadshow/checkin?event=${encodeURIComponent(
+  const checkInUrl = `${request.nextUrl.origin}/events/ccw-roadshow/checkin?event=${encodeURIComponent(
     event.slug
   )}&day=${dayIndex}&t=${encodeURIComponent(token)}`;
 

@@ -70,7 +70,7 @@ Government procurement officers evaluate contractors on documented competency. I
 
 - IICRC certification numbers for key personnel
 - Evidence of continuing education (CECs)
-- Alignment with IICRC S500 (water), S520 (mould), S100 (carpet) and S300 (upholstery) standards
+- Alignment with IICRC S500 (water), S520 (mould), and S300 (carpet) standards
 - Current certification status (not expired)
 
 ### Essential Certifications by Service Type

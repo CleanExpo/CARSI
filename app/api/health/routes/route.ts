@@ -2,7 +2,6 @@ import fs from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 
-import { getAppOrigin } from '@/lib/server/app-url';
 import { requireCron } from '@/lib/server/cron-auth';
 
 interface RouteInfo {
@@ -155,9 +154,10 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const verify = searchParams.get('verify') === 'true';
 
-  // Base URL for verification. GP-700: the canonical origin, never the request's Host header,
-  // so a forged Host cannot point this server's own fetches at another site.
-  const baseUrl = getAppOrigin(request);
+  // Get base URL for verification
+  const protocol = request.headers.get('x-forwarded-proto') || 'http';
+  const host = request.headers.get('host') || 'localhost:3000';
+  const baseUrl = `${protocol}://${host}`;
 
   // Discover routes from filesystem
   const apiDir = path.join(process.cwd(), 'app', 'api');

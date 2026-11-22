@@ -186,11 +186,11 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 **Variation A — Competitive Edge**
 
-> **Hook:** Credentialed cleaning crews stand out when remediation contracts go to tender.
+> **Hook:** Cleaning companies with IICRC certifications win 3x more remediation contracts.
 >
-> **Body:** Verifiable CARSI credentials show your team has trained in mould remediation, water damage extraction and carpet cleaning. CARSI is an IICRC CEC Accredited provider — your crew completes online courses between jobs.
+> **Body:** IICRC credentials prove your team can handle mould remediation, water damage extraction and carpet cleaning to international standards. CARSI delivers 40+ approved online courses — your crew completes them between jobs.
 >
-> Stand out in tenders. Win bigger contracts. CEC hours are shown only on courses the IICRC has approved.
+> Stand out in tenders. Win bigger contracts. Earn real CECs.
 >
 > **CTA:** View Cleaning Industry Courses →
 
@@ -206,7 +206,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 **Variation C — Franchise**
 
-> **Hook:** Franchise owners — train your entire network on one platform.
+> **Hook:** Franchise owners — certify your entire network with one training platform.
 >
 > **Body:** CARSI offers group licensing for cleaning franchises. IICRC CEC Accredited courses in carpet cleaning, mould remediation and water damage restoration. Track team progress, verify certificates, and demonstrate competence to clients.
 >

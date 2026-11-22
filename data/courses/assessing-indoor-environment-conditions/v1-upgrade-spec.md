@@ -63,8 +63,8 @@ re-purposed. Retired on promotion (recorded in `meta.retiredFromSeedOnPromotion`
 - **`australian` / `licence`:** AU English, 230 V / 10 A GPO / RCD, metric, AUD with GST; NZ position
   stated alongside (HSWA 2015 s 36, WorkSafe NZ WES as guidance values, healthy homes standards,
   NZ Building Code E2/E3, IANZ, asbestos pre-2000, RCS 0.025 mg/m³, 111). No CEC claim, no IICRC
-  discipline acronym, no AQF/RTO/"nationally recognised", NABERS or endorsement claim. S520 named
-  only, no content claim.
+  discipline acronym, no AQF/RTO/"nationally recognised", NABERS or endorsement claim. S520 no longer
+  named (removed 22/11/2026 under GP-748, check:iicrc-scope); no content claim.
 
 ## 4. Depth math (floor 5.3)
 

@@ -177,7 +177,7 @@ CTA: See the restoration pathway →
 | --- | ------------------------------------------------- | --------------------------------------------------- |
 | 0   | Welcome: Your path from cleaning to restoration   | Revenue gap overview, pathway introduction          |
 | 3   | "I wish I'd done this 5 years ago"                | Case study: cleaning company that added restoration |
-| 7   | The 3 skill areas that unlock restoration revenue | water damage restoration, carpet repair and odour control overview; CEC hours only where the IICRC has approved the course |
+| 7   | The 3 IICRC certs that unlock restoration revenue | water damage restoration, carpet repair and odour control overview with CEC details             |
 | 14  | How [Company Name] can win insurance panel work   | Insurance requirements, IICRC credential value      |
 | 21  | Your team can start today — no downtime needed    | Subscription offer, 7-day free trial CTA            |
 | 30  | Last chance: 15% off annual subscription          | Urgency + discount code (CLEANPLUS15)               |
@@ -191,8 +191,8 @@ CTA: See the restoration pathway →
 | "We're cleaners, not restorers"             | "Every major restoration company started in cleaning. You already have the clients, the access, and the work ethic. IICRC credentials are the only missing piece."                               |
 | "My staff don't have time for training"     | "CARSI courses are 30-minute modules, available 24/7. Your crew can upskill between jobs or after hours — no travel, no classroom bookings."                                                     |
 | "We don't have the equipment"               | "Start with water damage restoration — the core equipment (extractors, dehumidifiers, air movers) is a $15K–25K investment that pays for itself in 2–3 jobs."                                    |
-| "Insurance work is too hard to get into"    | "Insurers are actively looking for credentialed contractors. Ask each panel which IICRC certifications it expects — IICRC certification is obtained only through IICRC-approved schools and examinations. CARSI courses build verifiable CARSI credentials, and CARSI is an IICRC CEC Accredited provider — CEC hours are shown only on courses the IICRC has approved."          |
-| "Online training isn't as good as hands-on" | "CARSI is an IICRC CEC Accredited provider, and every course issues a verifiable CARSI credential. Plus, your crew gets hands-on experience on real job sites, which no classroom can replicate." |
+| "Insurance work is too hard to get into"    | "Insurers are actively looking for credentialed contractors. IICRC certification is the #1 requirement for panel membership. CARSI gets you there faster than any face-to-face course."          |
+| "Online training isn't as good as hands-on" | "CARSI's courses are IICRC board-approved — the same credential standard as any classroom course. Plus, your crew gets hands-on experience on real job sites, which no classroom can replicate." |
 | "$795 per year is too expensive"            | "That's $2.18/day for unlimited courses for your entire team. One restoration job covers the annual cost. Compare that to $2,000–5,000 per person for face-to-face IICRC certification training at approved schools."               |
 
 ---

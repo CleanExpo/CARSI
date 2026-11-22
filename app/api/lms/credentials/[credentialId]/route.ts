@@ -14,7 +14,6 @@ import {
   getPublicCredentialPdfBuffer,
 } from '@/lib/server/credential-public';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
-import { getAppOrigin } from '@/lib/server/app-url';
 
 type Ctx = { params: Promise<{ credentialId: string }> };
 
@@ -49,7 +48,7 @@ async function respondFromLocalDatabase(
     });
   }
 
-  const origin = getAppOrigin(request);
+  const origin = request.nextUrl.origin;
   const json = await getPublicCredentialJson(credentialId, origin);
   if (!json) {
     return NextResponse.json({ detail: 'Credential not found' }, { status: 404 });
