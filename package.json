@@ -169,6 +169,7 @@
     "check:quiz-balance": "node scripts/check-quiz-option-balance.mjs",
     "test:quiz-balance": "node scripts/check-quiz-option-balance.test.mjs",
     "check:sources": "node scripts/check-source-citations.mjs",
+    "check:draft-content": "npx tsx scripts/check-draft-course-content.ts",
     "build:course-references": "tsx scripts/build-course-references.ts",
     "check:course-visibility": "node scripts/check-course-visibility-predicate.mjs",
     "test:course-visibility": "node scripts/check-course-visibility-predicate.test.mjs",

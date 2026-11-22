@@ -166,3 +166,183 @@ test('control: licence section removed from CLAUDE.md fails', () => {
     errs.join('\n')
   );
 });
+
+// ---- GP-692: a rule hidden in Markdown the agent does not read must not count ----
+
+function importHidden(wrap) {
+  return errorsFor((d) => {
+    const p = join(d, '.claude/CLAUDE.md');
+    const text = readFileSync(p, 'utf8');
+    writeFileSync(p, text.replace('@../docs/agents/CLAUDE.md', wrap('@../docs/agents/CLAUDE.md')));
+  });
+}
+const importMissing = (errs) =>
+  errs.some((m) => m.includes('.claude/CLAUDE.md') && m.includes('docs/agents/CLAUDE.md'));
+
+for (const [name, wrap] of [
+  ['a ~~~ fence', (r) => `~~~\n${r}\n~~~`],
+  ['a ``` fence that a ~~~ line does not close', (r) => '```\n~~~\n' + r + '\n```'],
+  ['a ```` fence that a shorter ``` line does not close', (r) => '````\n```\n' + r + '\n````'],
+  ['an unclosed fence', (r) => '~~~\n' + r],
+  ['an HTML comment on one line', (r) => `<!-- ${r} -->`],
+  ['a multi-line HTML comment', (r) => `<!--\n${r}\n-->`],
+  ['an unclosed HTML comment', (r) => `<!--\n${r}`],
+]) {
+  test(`control: import inside ${name} does not count`, () => {
+    const errs = importHidden(wrap);
+    assert.ok(importMissing(errs), errs.join('\n'));
+  });
+}
+
+test('control: import after a closed comment and a closed ~~~ fence still counts', () => {
+  const errs = importHidden((r) => `<!-- x -->\n~~~\ncode\n~~~\n${r}`);
+  assert.ok(!importMissing(errs), errs.join('\n'));
+});
+
+/** Rewrite the licence section of docs/agents/CLAUDE.md: `fn(heading, body)` returns its new text. */
+function licenceSection(fn) {
+  return errorsFor((d) => {
+    const p = join(d, 'docs/agents/CLAUDE.md');
+    const text = readFileSync(p, 'utf8');
+    const start = text.indexOf('## IICRC CEC terminology');
+    const bodyStart = text.indexOf('\n', start) + 1;
+    const next = text.indexOf('\n## ', bodyStart) + 1;
+    const heading = text.slice(start, bodyStart);
+    writeFileSync(
+      p,
+      text.slice(0, start) + fn(heading, text.slice(bodyStart, next)) + text.slice(next)
+    );
+  });
+}
+const licenceGone = (errs) => errs.some((m) => /IICRC CEC terminology/.test(m));
+
+for (const [name, fn] of [
+  ['the heading survives only inside a ~~~ fence', (h, b) => `~~~\n${h}${b}~~~\n`],
+  ['the heading survives only inside a ``` fence', (h, b) => '```md\n' + h + b + '```\n'],
+  ['the heading survives only inside an HTML comment', (h, b) => `<!--\n${h}${b}-->\n`],
+  ['the section holds only a nested ### heading', (h) => `${h}\n### More\n\n`],
+  ['the section holds only *** and ___ breaks', (h) => `${h}\n***\n\n___\n\n- - -\n`],
+  ['the section body is only in a fence', (h) => `${h}\n~~~\nrule text\n~~~\n`],
+  ['the section body is only in an HTML comment', (h, b) => `${h}<!--\n${b}-->\n`],
+]) {
+  test(`control: ${name} fails`, () => {
+    const errs = licenceSection(fn);
+    assert.ok(licenceGone(errs), errs.join('\n'));
+  });
+}
+
+// ---- CodeRabbit on #1192: line endings, literal comment openers, indented headings ----
+
+function rewrite(rel, fn) {
+  return errorsFor((d) => {
+    const p = join(d, rel);
+    writeFileSync(p, fn(readFileSync(p, 'utf8')));
+  });
+}
+const crlf = (t) => t.replace(/\r?\n/g, '\r\n');
+
+test('control: a CRLF copy of the real files still passes', () => {
+  const errs = errorsFor((d) => {
+    for (const rel of [...ENTRYPOINTS.map((e) => e.path), 'docs/agents/CLAUDE.md']) {
+      const p = join(d, rel);
+      writeFileSync(p, crlf(readFileSync(p, 'utf8')));
+    }
+  });
+  assert.deepEqual(errs, []);
+});
+
+for (const [name, eol] of [
+  ['CRLF', '\r\n'],
+  ['CR', '\r'],
+]) {
+  test(`control: import inside a ~~~ fence in a ${name} file does not count`, () => {
+    const errs = rewrite('.claude/CLAUDE.md', (t) =>
+      t
+        .replace('@../docs/agents/CLAUDE.md', '~~~\n@../docs/agents/CLAUDE.md\n~~~')
+        .replace(/\r?\n/g, eol)
+    );
+    assert.ok(importMissing(errs), errs.join('\n'));
+  });
+}
+
+for (const [name, before] of [
+  ['an inline code span', 'Use `<!--` to open a comment.\n\n'],
+  ['a double-backtick code span', 'Write ``<!-- x`` and close it.\n\n'],
+  ['an indented code block', '\n    <!-- example opener\n\n'],
+]) {
+  test(`control: a literal <!-- in ${name} does not hide the imports after it`, () => {
+    const errs = rewrite('.claude/CLAUDE.md', (t) =>
+      t.replace('Licence, course production', `${before}Licence, course production`)
+    );
+    assert.deepEqual(errs, []);
+  });
+}
+
+test('control: a <!-- after an unmatched backtick still opens a comment', () => {
+  const errs = importHidden((r) => `a stray \` then <!--\n${r}\n-->`);
+  assert.ok(importMissing(errs), errs.join('\n'));
+});
+
+test('control: the section holds only an indented nested ### heading fails', () => {
+  for (const pad of [' ', '  ', '   ']) {
+    const errs = licenceSection((h) => `${h}\n${pad}### More\n\n`);
+    assert.ok(licenceGone(errs), JSON.stringify(pad) + '\n' + errs.join('\n'));
+  }
+});
+
+// ---- CodeRabbit on #1192: a code span can run over several lines of one paragraph ----
+
+const importsMissing = (errs) =>
+  ['docs/agents/CLAUDE.md', 'docs/agents/AGENTS.md'].every((doc) =>
+    errs.some((m) => m.includes('.claude/CLAUDE.md') && m.includes(doc))
+  );
+
+test('control: imports inside a multi-line code span do not count', () => {
+  const errs = rewrite('.claude/CLAUDE.md', (t) =>
+    t
+      .replace('@../docs/agents/CLAUDE.md', '')
+      .replace(
+        '@../docs/agents/AGENTS.md',
+        'Example `first line\nmarker <!-- literal -->\n@../docs/agents/CLAUDE.md\n@../docs/agents/AGENTS.md\nlast line`.'
+      )
+  );
+  assert.ok(importsMissing(errs), errs.join('\n'));
+});
+
+test('control: a <!-- inside a multi-line code span does not hide the imports after it', () => {
+  const errs = rewrite('.claude/CLAUDE.md', (t) =>
+    t.replace(
+      'Licence, course production',
+      'Use `literal\nas <!--` in an example.\n\nLicence, course production'
+    )
+  );
+  assert.deepEqual(errs, []);
+});
+
+test('control: a <!-- that starts a line ends the paragraph, so it still opens a comment', () => {
+  // CommonMark: a line starting with <!-- begins an HTML block, which interrupts the paragraph,
+  // so the backtick before it closes nothing (marked lexes it the same way).
+  const errs = rewrite('.claude/CLAUDE.md', (t) =>
+    t.replace(
+      'Licence, course production',
+      'Use `literal\n<!--` in an example.\n\nLicence, course production'
+    )
+  );
+  assert.ok(importsMissing(errs), errs.join('\n'));
+});
+
+for (const [name, wrap] of [
+  ['after an unmatched backtick', (r) => `a stray \` here\n${r}\nmore text`],
+  ['after a `` run that only a ` run follows', (r) => `opens \`\` here\n${r}\ncloses \` only`],
+  [
+    'after a backtick whose match is past a blank line',
+    (r) => `starts \`here\n\n${r}\nends here\``,
+  ],
+  ['after a multi-line span that closed earlier', (r) => `Example \`first\nline\` then\n${r}`],
+  ['after an escaped backtick', (r) => `a \\\` here\n${r}\nand \` there`],
+]) {
+  test(`control: an import ${name} still counts`, () => {
+    const errs = importHidden(wrap);
+    assert.ok(!importMissing(errs), errs.join('\n'));
+  });
+}
