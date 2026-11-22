@@ -8,6 +8,7 @@ import {
   getLessonContextForStudent,
   touchLessonProgress,
 } from '@/lib/server/enrollment-service';
+import { appendWaterDamageInteractivePilot } from '@/lib/lms/append-interactive-pilot';
 import { parseLessonResources } from '@/lib/lms/lesson-resources';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 
@@ -73,6 +74,13 @@ export async function GET(request: NextRequest, ctx: Ctx) {
       ? lesson.contentBody.trim()
       : null;
 
+  const courseSlug = lesson.module.course.slug;
+  const resources = appendWaterDamageInteractivePilot(
+    courseSlug,
+    lesson.id,
+    parseLessonResources(lesson.resources)
+  );
+
   return NextResponse.json({
     lesson: {
       id: lesson.id,
@@ -85,7 +93,7 @@ export async function GET(request: NextRequest, ctx: Ctx) {
       order_index: lesson.orderIndex,
       course_id: lesson.module.courseId,
     },
-    resources: parseLessonResources(lesson.resources),
+    resources,
     enrollment_id: ctxRow.enrollmentId,
     course: {
       id: lesson.module.course.id,

@@ -5,6 +5,7 @@ import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { addCourseTeamMemberByEmail } from '@/lib/server/team-member-provision';
 import { countTeamPaidSeatsUsed } from '@/lib/server/team-seat-refund';
 import { countTeamSeatsUsed, generateInviteToken, repairAndGetTeamForUser } from '@/lib/server/teams';
+import { getAppOrigin } from '@/lib/server/app-url';
 
 /** POST /api/lms/teams/invite — owner/admin adds a member by email with selected courses. */
 export async function POST(request: NextRequest) {
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
         ownerId: claims.sub,
         inviterName,
         email,
-        appOrigin: request.nextUrl.origin,
+        appOrigin: getAppOrigin(request),
         courseSlugs,
       });
 
@@ -115,11 +116,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const appUrl = (
-      process.env.NEXT_PUBLIC_APP_URL ||
-      process.env.NEXT_PUBLIC_FRONTEND_URL ||
-      'http://localhost:3000'
-    ).replace(/\/$/, '');
+    const appUrl = getAppOrigin(request);
 
     return NextResponse.json({
       id: invite.id,

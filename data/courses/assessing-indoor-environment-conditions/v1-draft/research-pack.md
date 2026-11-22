@@ -7,8 +7,9 @@ Linear GP-468. This pack is the human summary of the course's **evidence ledger*
 (pointed to by `meta.evidenceLedger`; schema per the `course-truth` and `carsi-course-production`
 skills and the evidence-layer template).
 
-Standards are referenced **by name only** (AS-IICRC S520, in the description and Lesson 4.1, as the standard that takes over if
-a job moves to remediation). No IICRC (or other) standard text was reproduced, paraphrased or
+No standard is named in the course copy. AS-IICRC S520 was named in the description and Lesson 4.1
+until 22/11/2026, when it was removed because this course is not CEC-approved (check:iicrc-scope, GP-748);
+IEA-001 stays open for Phill to decide whether a named remediation standard returns. No IICRC (or other) standard text was reproduced, paraphrased or
 entered into any AI tool, and no claim is made about what any standard contains or omits.
 
 ## How the research was done (21/11/2026)
