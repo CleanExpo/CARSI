@@ -99,9 +99,28 @@ export function RoleGuideStartHereSection({
               ))}
             </ul>
           ) : (
-            <div className="mt-8 rounded-2xl border border-dashed border-slate-200 bg-white/80 px-5 py-6 text-sm text-slate-600">
-              Live courses for this guide are still publishing — browse the catalogue or contact us
-              for the best starting point for your team.
+            <div className="mt-8 rounded-2xl border border-dashed border-slate-200 bg-white/90 px-5 py-6">
+              <p className="text-sm text-slate-600">
+                Live courses for this guide are still publishing — browse the catalogue or talk to us
+                about the best starting point for your team.
+              </p>
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <Link
+                  href="/courses"
+                  data-carsi-event={COURSE_CTA_EVENT}
+                  data-carsi-context={`role-guide:${entry.slug}:catalogue-fallback`}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#146fc2] px-6 text-sm font-semibold text-white shadow-[0_12px_32px_-14px_rgba(20,111,194,0.45)] hover:bg-[#0f5fa8]"
+                >
+                  Browse courses
+                  <ArrowRight className="h-4 w-4" aria-hidden />
+                </Link>
+                <Link
+                  href="/contact"
+                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-800 hover:border-[#2490ed]/35 hover:text-[#146fc2]"
+                >
+                  Contact CARSI
+                </Link>
+              </div>
             </div>
           )}
 

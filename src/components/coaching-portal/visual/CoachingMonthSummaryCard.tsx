@@ -1,12 +1,15 @@
-import { CalendarClock, CircleCheckBig, ListTodo, Megaphone, TrendingUp } from 'lucide-react';
+import { ArrowRight, CalendarClock, CircleCheckBig, ListTodo, Megaphone, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
 
 import {
   coachingCard,
   coachingCardTitle,
   coachingMuted,
+  coachingPrimaryBtn,
   coachingProgressFill,
   coachingProgressFillStyle,
   coachingProgressTrackClass,
+  coachingSecondaryBtn,
 } from '@/components/coaching-portal/coaching-ui';
 import type { CoachingHomeMonthSummary } from '@/lib/coaching-portal/coaching-home-month-summary';
 
@@ -113,6 +116,30 @@ export function CoachingMonthSummaryCard({
           );
         })}
       </ul>
+
+      {summary.ctas.length > 0 ? (
+        <div
+          className="mt-6 flex flex-col gap-2 border-t border-white/[0.06] pt-5 sm:flex-row sm:flex-wrap"
+          data-testid={`${testId}-actions`}
+        >
+          {summary.ctas.map((cta) => (
+            <Link
+              key={cta.href + cta.label}
+              href={cta.href}
+              className={
+                cta.variant === 'primary'
+                  ? `${coachingPrimaryBtn} inline-flex min-h-11 items-center justify-center gap-2`
+                  : `${coachingSecondaryBtn} inline-flex min-h-11 items-center justify-center gap-2`
+              }
+            >
+              {cta.label}
+              {cta.variant === 'primary' ? (
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              ) : null}
+            </Link>
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }

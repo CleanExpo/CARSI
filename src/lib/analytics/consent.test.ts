@@ -376,6 +376,8 @@ describe('personal data never reaches analytics, whatever shape it takes (GP-731
     expect(isAllowedTextParam('user_email', 'x')).toBe(false);
     expect(isAllowedTextParam('value', 99)).toBe(true);
     expect(isAllowedTextParam('carsi_context', 'hub')).toBe(true);
+    expect(isAllowedTextParam('carsi_context', 'hub:pathfinder:courses')).toBe(true);
+    expect(isAllowedTextParam('carsi_context', 'role-guide:nsw-builders:employer-2')).toBe(true);
     expect(isAllowedTextParam('carsi_context', 'role-guide:nsw-builders:start-1')).toBe(true);
     expect(isAllowedTextParam('carsi_context', 'role-guide:nsw-builders')).toBe(true);
     expect(isAllowedTextParam('carsi_context', 'jane@example.com')).toBe(false);

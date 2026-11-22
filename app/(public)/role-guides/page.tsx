@@ -1,5 +1,6 @@
 import { RoleGuideHubViewTracker } from '@/components/analytics/RoleGuideHubViewTracker';
 import { PlatformContextualNext } from '@/components/marketing/platform/PlatformPagePattern';
+import { RoleGuidesHubPathfinder } from '@/components/marketing/RoleGuidesHubPathfinder';
 import { RoleGuidesHubGrid, RoleGuidesHubHero } from '@/components/marketing/RoleGuidesHub';
 import { StaticMarketingClosingCta } from '@/components/marketing/StaticMarketingClosingCta';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
@@ -29,6 +30,7 @@ export default function ForRoleGuidesHubPage() {
     <>
       <RoleGuideHubViewTracker />
       <RoleGuidesHubHero />
+      <RoleGuidesHubPathfinder />
       <RoleGuidesHubGrid />
       <PlatformContextualNext current={ROLE_GUIDES_HUB_PATH} />
       <StaticMarketingClosingCta />

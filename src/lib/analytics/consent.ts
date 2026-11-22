@@ -470,7 +470,8 @@ const FIXED_PARAM_VALUES: ReadonlyMap<string, ReadonlySet<string>> = new Map([
 ]);
 const SLUG_VALUE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 /** Product-excellence contexts: hub, coaching-marketing, role-guide:slug, role-guide:slug:start-N. */
-const CARSi_CONTEXT_VALUE = /^(?:hub|coaching-marketing|role-guide:[a-z0-9-]+(?::start-[1-3])?)$/;
+const CARSi_CONTEXT_VALUE =
+  /^(?:hub(?::[a-z0-9-]+){0,2}|coaching-marketing|role-guide:[a-z0-9-]+(?::(?:start-[1-3]|employer-[1-9]))?)$/;
 
 /**
  * True when an event parameter may be sent, for Google Analytics and PostHog alike. Fixed

@@ -1,9 +1,20 @@
+import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
+
+export type CoachingHomeMonthSummaryCta = {
+  label: string;
+  href: string;
+  /** Primary is the single best next step this week. */
+  variant: 'primary' | 'secondary';
+};
+
 export type CoachingHomeMonthSummary = {
   headline: string;
   lines: string[];
   tone: 'neutral' | 'good' | 'attention';
   /** When the member has monthly actions on the board. */
   progress: { completed: number; total: number; percent: number } | null;
+  /** One-tap next steps derived from live portal state — no duplicate data entry. */
+  ctas: CoachingHomeMonthSummaryCta[];
 };
 
 export function buildCoachingHomeMonthSummary(input: {
@@ -60,10 +71,40 @@ export function buildCoachingHomeMonthSummary(input: {
         }
       : null;
 
+  const actionsHref = coachingPortalPath('/actions');
+  const marketingHref = coachingPortalPath('/marketing');
+  const sessionsHref = coachingPortalPath('/sessions');
+
+  const ctas: CoachingHomeMonthSummaryCta[] = [];
+
+  if (input.proposedFixCount > 0) {
+    ctas.push({
+      label: `Review ${input.proposedFixCount} proposed fix${input.proposedFixCount === 1 ? '' : 'es'}`,
+      href: actionsHref,
+      variant: 'primary',
+    });
+    ctas.push({ label: 'Marketing pack', href: marketingHref, variant: 'secondary' });
+  } else if (input.profileReady && !input.marketingHasPack) {
+    ctas.push({ label: 'Build marketing pack', href: marketingHref, variant: 'primary' });
+    ctas.push({ label: 'Action board', href: actionsHref, variant: 'secondary' });
+  } else if (input.nextActionTitle) {
+    ctas.push({ label: 'Open next action', href: actionsHref, variant: 'primary' });
+    ctas.push({ label: 'Sessions', href: sessionsHref, variant: 'secondary' });
+  } else if (good && input.marketingHasPack) {
+    ctas.push({ label: 'View action board', href: actionsHref, variant: 'primary' });
+    ctas.push({ label: 'Marketing pack', href: marketingHref, variant: 'secondary' });
+  } else {
+    ctas.push({ label: 'Action board', href: actionsHref, variant: 'primary' });
+    if (input.profileReady) {
+      ctas.push({ label: 'Marketing pack', href: marketingHref, variant: 'secondary' });
+    }
+  }
+
   return {
     headline: 'This month at a glance',
     lines,
     tone: good ? 'good' : attention ? 'attention' : 'neutral',
     progress,
+    ctas,
   };
 }

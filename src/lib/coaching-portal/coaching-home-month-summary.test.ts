@@ -14,5 +14,7 @@ describe('buildCoachingHomeMonthSummary', () => {
     });
     expect(s.lines.some((l) => l.includes('2 marketing fixes'))).toBe(true);
     expect(s.tone).toBe('attention');
+    expect(s.ctas[0]?.label).toMatch(/proposed fix/);
+    expect(s.ctas[0]?.variant).toBe('primary');
   });
 });

@@ -13,3 +13,5 @@
 | 5     | Ops & measurement           | `CarsiProductEventCollector`, `docs/product/analytics-events.md`, coaching env runbook § GP-634 |
 
 Run Phase 0 after every production deploy and before founder demos.
+
+**Client walkthrough:** `docs/product/client-demo-product-evolution.md` — before/after script for Phill.
