@@ -136,8 +136,24 @@ item is not ready to launch or to sell. The full working rules are in the
 6. **Guardrails.** No IICRC standard text in any AI prompt. Australian and New Zealand settings,
    equipment and units. Every image is looked at on a desktop and on a phone before review.
 
-The audit checks only that a visual exists (floor 5.10). It does not yet check for the cover, the
-lesson image or the diagram separately, so human review checks items 1 to 3 until the audit does.
+Floor 5.10 checks only that some visual exists. Items 1 to 3 are checked separately by
+`npm run check:course-visuals` (`scripts/check-course-visuals.mjs`, test
+`npm run test:course-visuals`), for every `meta.standard: "v1"` course in the seed catalogue and in
+each `data/courses/<slug>/v1-draft/` or `v1/` catalogue:
+
+- the course has a `thumbnailUrl` (a local file must exist under `public/`);
+- every teaching lesson references a raster lesson image (`.png`, `.jpg`, `.webp` or `.avif`) in
+  an `<img>` or a resource. An SVG never counts as the lesson image;
+- every teaching lesson references a diagram at `/courses/<folder>/diagrams/<name>.svg`, and the
+  file exists, so `check:course-diagrams` covers it.
+
+Gaps that existed on 21/11/2026 are frozen in `scripts/course-visuals-baseline.json`. CI fails on any
+new gap (a new lesson without a visual, or a visual removed) and on any baseline entry that is no
+longer a gap. When you add a missing visual, delete its baseline entry in the same change. Adding
+an entry needs the founder's or lead's written approval in that PR; it is never a quiet way to let
+a new lesson through. Entries are keyed by course slug, lesson id and kind, so one entry covers a
+lesson in the seed and in its draft copy, and survives the draft's promotion to the seed. The check proves each visual exists; human review still
+judges whether it is right for the lesson.
 
 ## 5. Measurable floors
 

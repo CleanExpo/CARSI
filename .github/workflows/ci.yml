@@ -161,6 +161,13 @@ jobs:
       - name: Quiz option balance guard
         run: npm run check:quiz-balance -- --enforce=psychrometry-building-science-for-drying,moisture-meters-readings-and-dry-standards
 
+      # GP-740: reads what draft courses say (data/courses/*/v1-draft): exposure-limit dates and
+      # jurisdictions, workplace limits used as home levels, unsourced health claims, copied
+      # standard text. Report only while the existing drafts' findings go to SME review; exits 2
+      # if it scans nothing.
+      - name: Draft course content check (report only)
+        run: npm run check:draft-content
+
       # Licence-critical backstop: scans all course-content + marketing surfaces
       # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC
       # placements, banned "IICRC-approved"/"certified with CARSI" phrasing, and
@@ -292,6 +299,15 @@ jobs:
 
       - name: Course Standard depth audit self-test
         run: npm run test:course-depth
+
+      # Course Standard v1 section 4.1 items 1-3 (GP-752): a cover, plus a raster lesson image and
+      # an SVG diagram in every teaching lesson. Today's gaps are frozen in
+      # scripts/course-visuals-baseline.json; a new gap, or a fixed gap still listed, fails.
+      - name: Course visuals check (cover, lesson image, diagram)
+        run: npm run check:course-visuals
+
+      - name: Course visuals check self-test
+        run: npm run test:course-visuals
 
       - name: Lint
         run: npm run lint
@@ -507,6 +523,11 @@ jobs:
       # (carsi-course-production, "Course diagrams"). Needs the Chromium installed above.
       - name: Course diagram check
         run: npm run check:course-diagrams
+
+      # GP-752: the water-course diagram wiring script still matches both catalogues (run it with
+      # --write after the GP-748 catalogue PR merges).
+      - name: Water course diagram wiring self-test
+        run: npm run test:wire-water-diagrams
 
       - name: Run E2E tests
         run: npm run test:e2e

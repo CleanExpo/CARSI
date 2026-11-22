@@ -1,86 +1,105 @@
 import type Stripe from 'stripe';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { rows, delegate, sendEmail, sendFounder, sessionsUpdate } = vi.hoisted(() => {
-  const rows = new Map<string, { id: string; type: string; processedAt: Date | null }>();
-  const prismaError = (code: string) => Object.assign(new Error(code), { code });
-  const delegate = {
-    create: vi.fn(async ({ data }: { data: { id: string; type: string } }) => {
-      if (rows.has(data.id)) throw prismaError('P2002');
-      const row = { ...data, processedAt: null };
-      rows.set(data.id, row);
-      return row;
-    }),
-    update: vi.fn(
-      async ({ where, data }: { where: { id: string }; data: { processedAt: Date } }) => {
-        const row = rows.get(where.id);
-        if (!row) throw prismaError('P2025');
-        row.processedAt = data.processedAt;
-        return row;
-      }
-    ),
-    delete: vi.fn(async ({ where }: { where: { id: string } }) => {
-      if (!rows.delete(where.id)) throw prismaError('P2025');
-      return {};
-    }),
-  };
-  return {
-    rows,
-    delegate,
-    sendEmail: vi.fn(),
-    sendFounder: vi.fn(),
-    sessionsUpdate: vi.fn(),
-  };
-});
-
-vi.mock('@/lib/prisma', () => ({
-  prisma: {
-    stripeWebhookEvent: delegate,
-    lmsUser: { findUnique: vi.fn(async () => null) },
-  },
-}));
-vi.mock('@/lib/api/stripe', () => ({
-  getStripeClient: () => ({
-    checkout: { sessions: { update: sessionsUpdate } },
-    subscriptions: { retrieve: vi.fn() },
-  }),
-}));
-vi.mock('@/lib/server/email', () => ({ sendEmail }));
-vi.mock('@/lib/server/carsi-coaching-monthly-notify', () => ({
-  sendCarsiCoachingMonthlyFounderNotificationEmail: sendFounder,
-}));
-vi.mock('@/lib/server/carsi-coaching-subscription-store', () => ({
-  upsertCoachingMonthlySubscription: vi.fn(),
-}));
-
 import { CARSI_COACHING_MONTHLY_CHECKOUT_SOURCE } from '@/lib/server/carsi-coaching-monthly-checkout';
 import {
   isCarsiCoachingMonthlyCheckoutSession,
   processCarsiCoachingMonthlyCheckoutCompleted,
 } from '@/lib/server/carsi-coaching-monthly-fulfillment';
 
-function paidSession(): Stripe.Checkout.Session {
+/**
+ * GP-672: the welcome email and the coach's new-member notice must go out at most once per
+ * checkout session. The webhook and the success page both run fulfilment, and the Stripe
+ * metadata flag that used to be the only record can fail to write. Only the boundaries are
+ * mocked: the database (an in-memory table with a real unique key), Stripe and the mail send.
+ */
+
+const db = vi.hoisted(() => ({
+  rows: new Map<string, { id: string; type: string; processedAt: Date | null }>(),
+}));
+
+const mocks = vi.hoisted(() => ({
+  sendEmail: vi.fn(),
+  sendNotice: vi.fn(),
+  sessionsUpdate: vi.fn(),
+}));
+
+function uniqueViolation(): Error {
+  return Object.assign(new Error('Unique constraint failed on the fields: (`id`)'), {
+    code: 'P2002',
+  });
+}
+
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    lmsUser: { findUnique: vi.fn(async () => null) },
+    stripeWebhookEvent: {
+      create: vi.fn(async ({ data }: { data: { id: string; type: string } }) => {
+        if (db.rows.has(data.id)) throw uniqueViolation();
+        const row = { id: data.id, type: data.type, processedAt: null };
+        db.rows.set(data.id, row);
+        return row;
+      }),
+      update: vi.fn(
+        async ({ where, data }: { where: { id: string }; data: { processedAt: Date } }) => {
+          const row = db.rows.get(where.id);
+          if (!row) throw Object.assign(new Error('not found'), { code: 'P2025' });
+          row.processedAt = data.processedAt;
+          return row;
+        }
+      ),
+      delete: vi.fn(async ({ where }: { where: { id: string } }) => {
+        const row = db.rows.get(where.id);
+        if (!row) throw Object.assign(new Error('not found'), { code: 'P2025' });
+        db.rows.delete(where.id);
+        return row;
+      }),
+    },
+  },
+}));
+
+vi.mock('@/lib/api/stripe', () => ({
+  getStripeClient: () => ({
+    checkout: { sessions: { update: mocks.sessionsUpdate } },
+    subscriptions: {
+      retrieve: vi.fn(async () => {
+        throw new Error('no live Stripe in tests');
+      }),
+    },
+  }),
+}));
+
+vi.mock('@/lib/server/email', () => ({ sendEmail: mocks.sendEmail }));
+
+vi.mock('@/lib/server/carsi-coaching-monthly-notify', () => ({
+  sendCarsiCoachingMonthlyFounderNotificationEmail: mocks.sendNotice,
+}));
+
+function paidSession(id = 'cs_test_gp672'): Stripe.Checkout.Session {
   return {
-    id: 'cs_test_gp672',
+    id,
     payment_status: 'paid',
     status: 'complete',
     mode: 'subscription',
     amount_total: 9900,
-    subscription: null,
-    customer_details: { email: 'member@example.test', name: 'Test Member' },
-    metadata: {
-      source: CARSI_COACHING_MONTHLY_CHECKOUT_SOURCE,
-      carsi_user_id: 'user_1',
-    },
+    customer_details: { email: 'Member@Example.com', name: 'Test Member' },
+    metadata: { source: CARSI_COACHING_MONTHLY_CHECKOUT_SOURCE },
   } as unknown as Stripe.Checkout.Session;
 }
 
-const run = () =>
-  processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), {
-    appOrigin: 'https://example.test',
-  });
+const OPTS = { appOrigin: 'https://carsi.example' };
 
 describe('CARSI coaching monthly fulfillment', () => {
+  beforeEach(() => {
+    db.rows.clear();
+    mocks.sendEmail.mockReset().mockResolvedValue({ sent: true });
+    mocks.sendNotice.mockReset().mockResolvedValue({ sent: true });
+    // The Stripe sent-flag write fails on every call: the GP-672 trigger.
+    mocks.sessionsUpdate.mockReset().mockRejectedValue(new Error('Stripe API unavailable'));
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
   it('recognises coaching checkout sessions by metadata source', () => {
     expect(
       isCarsiCoachingMonthlyCheckoutSession({
@@ -93,88 +112,128 @@ describe('CARSI coaching monthly fulfillment', () => {
       } as Stripe.Checkout.Session)
     ).toBe(false);
   });
-});
 
-describe('GP-672 coaching monthly emails are sent at most once', () => {
-  beforeEach(() => {
-    rows.clear();
-    vi.clearAllMocks();
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    sendEmail.mockResolvedValue({ sent: true });
-    sendFounder.mockResolvedValue({ sent: true });
-    // The Stripe "sent" metadata flag write fails on every run.
-    sessionsUpdate.mockRejectedValue(new Error('stripe unavailable'));
+  it('sends each email once when the Stripe sent-flag write fails and a later delivery repeats', async () => {
+    await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+    // Webhook retry or success-page reload: the session carries no sent flag.
+    await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+
+    expect(mocks.sendEmail).toHaveBeenCalledTimes(1);
+    expect(mocks.sendNotice).toHaveBeenCalledTimes(1);
   });
 
-  it('does not resend either email when the Stripe sent-flag write failed on the first run', async () => {
-    const first = await run();
-    expect(first.customerEmailSent).toBe(true);
-    expect(first.founderEmailSent).toBe(true);
+  it('sends each email once when the webhook and the success page run at the same time', async () => {
+    await Promise.all([
+      processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS),
+      processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS),
+    ]);
 
-    const second = await run();
-    expect(sendEmail).toHaveBeenCalledTimes(1);
-    expect(sendFounder).toHaveBeenCalledTimes(1);
+    expect(mocks.sendEmail).toHaveBeenCalledTimes(1);
+    expect(mocks.sendNotice).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not resend after an uncertain send (timeout or provider error)', async () => {
+    mocks.sendEmail.mockResolvedValueOnce({ sent: false, reason: 'send_failed' });
+    mocks.sendNotice.mockResolvedValueOnce({ sent: false, reason: 'provider_error' });
+    await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+    await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+
+    expect(mocks.sendEmail).toHaveBeenCalledTimes(1);
+    expect(mocks.sendNotice).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not resend the coach notice after it threw mid-send', async () => {
+    mocks.sendNotice.mockRejectedValueOnce(new Error('socket hang up'));
+    await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+    await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+
+    expect(mocks.sendNotice).toHaveBeenCalledTimes(1);
+  });
+
+  it('sends on a later delivery when mail was not configured the first time', async () => {
+    mocks.sendEmail.mockResolvedValueOnce({ sent: false, reason: 'not_configured' });
+    mocks.sendNotice.mockResolvedValueOnce({ sent: false, reason: 'not_configured' });
+    await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+    await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+
+    expect(mocks.sendEmail).toHaveBeenCalledTimes(2);
+    expect(mocks.sendNotice).toHaveBeenCalledTimes(2);
+  });
+
+  it('keys the record by checkout session, so a different checkout still gets its emails', async () => {
+    await processCarsiCoachingMonthlyCheckoutCompleted(paidSession('cs_test_a'), OPTS);
+    await processCarsiCoachingMonthlyCheckoutCompleted(paidSession('cs_test_b'), OPTS);
+
+    expect(mocks.sendEmail).toHaveBeenCalledTimes(2);
+    expect(mocks.sendNotice).toHaveBeenCalledTimes(2);
+  });
+
+  it('still honours the legacy Stripe sent flag on sessions fulfilled before this change', async () => {
+    const session = paidSession();
+    session.metadata = { ...session.metadata, coaching_monthly_emails_sent: 'true' };
+    const { prisma } = await import('@/lib/prisma');
+    vi.mocked(prisma.stripeWebhookEvent.create).mockClear();
+    const result = await processCarsiCoachingMonthlyCheckoutCompleted(session, OPTS);
+
+    expect(result.skipped).toBe('already_emailed');
+    expect(mocks.sendEmail).not.toHaveBeenCalled();
+    expect(mocks.sendNotice).not.toHaveBeenCalled();
+    expect(prisma.stripeWebhookEvent.create).not.toHaveBeenCalled();
+  });
+
+  it('reports each delivery and marks the records processed after a good send', async () => {
+    const first = await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+    expect(first.customerEmailDelivery).toBe('sent');
+    expect(first.founderEmailDelivery).toBe('sent');
+    expect(first.customerEmailSent).toBe(true);
+
+    const records = [...db.rows.values()];
+    expect(records).toHaveLength(2);
+    expect(records.every((r) => r.type === 'carsi_coaching_monthly_email')).toBe(true);
+    expect(records.every((r) => r.processedAt instanceof Date)).toBe(true);
+
+    const second = await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
     expect(second.customerEmailSent).toBe(false);
     expect(second.customerEmailDelivery).toBe('already_claimed');
     expect(second.founderEmailDelivery).toBe('already_claimed');
   });
 
-  it('marks each delivery record processed after a good send', async () => {
-    await run();
-    const records = [...rows.values()];
-    expect(records).toHaveLength(2);
-    expect(records.every((r) => r.type === 'carsi_coaching_monthly_email')).toBe(true);
-    expect(records.every((r) => r.processedAt instanceof Date)).toBe(true);
-  });
+  it('keeps the record and reports failed after an uncertain send', async () => {
+    mocks.sendEmail.mockResolvedValueOnce({ sent: false, reason: 'send_failed' });
+    mocks.sendNotice.mockRejectedValueOnce(new Error('timeout'));
+    const first = await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
 
-  it('two simultaneous runs send each email once', async () => {
-    await Promise.all([run(), run()]);
-    expect(sendEmail).toHaveBeenCalledTimes(1);
-    expect(sendFounder).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not retry after an uncertain send failure (at most once)', async () => {
-    sendEmail.mockResolvedValueOnce({ sent: false, reason: 'send_failed' });
-    sendFounder.mockRejectedValueOnce(new Error('timeout'));
-    const first = await run();
     expect(first.customerEmailDelivery).toBe('failed');
     expect(first.founderEmailDelivery).toBe('failed');
-    await run();
-    expect(sendEmail).toHaveBeenCalledTimes(1);
-    expect(sendFounder).toHaveBeenCalledTimes(1);
-    expect([...rows.values()].every((r) => r.processedAt === null)).toBe(true);
+    expect([...db.rows.values()].every((r) => r.processedAt === null)).toBe(true);
   });
 
-  it('releases the record when mail is not configured, so a later run can send', async () => {
-    sendEmail.mockResolvedValueOnce({ sent: false, reason: 'not_configured' });
-    sendFounder.mockResolvedValueOnce({ sent: false, reason: 'not_configured' });
-    const first = await run();
-    expect(first.customerEmailDelivery).toBe('not_configured');
-    expect(rows.size).toBe(0);
+  it('does not set the Stripe sent flag while an email released as not_configured is still owed', async () => {
+    mocks.sessionsUpdate.mockReset().mockResolvedValue({});
+    mocks.sendNotice.mockResolvedValueOnce({ sent: false, reason: 'not_configured' });
+    const first = await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
 
-    const second = await run();
-    expect(second.customerEmailSent).toBe(true);
-    expect(second.founderEmailSent).toBe(true);
-    expect(sendEmail).toHaveBeenCalledTimes(2);
+    expect(first.customerEmailDelivery).toBe('sent');
+    expect(first.founderEmailDelivery).toBe('not_configured');
+    expect(mocks.sessionsUpdate).not.toHaveBeenCalled();
+
+    const second = await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+    expect(second.founderEmailDelivery).toBe('sent');
+    expect(mocks.sendEmail).toHaveBeenCalledTimes(1);
+    expect(mocks.sendNotice).toHaveBeenCalledTimes(2);
+    expect(mocks.sessionsUpdate).toHaveBeenCalledTimes(1);
   });
 
   it('sends nothing when the delivery record cannot be written', async () => {
-    const dbDown = Object.assign(new Error('db down'), { code: 'P1001' });
-    delegate.create.mockRejectedValueOnce(dbDown).mockRejectedValueOnce(dbDown);
-    const result = await run();
-    expect(sendEmail).not.toHaveBeenCalled();
-    expect(sendFounder).not.toHaveBeenCalled();
-    expect(result.customerEmailDelivery).toBe('unavailable');
-    expect(result.founderEmailDelivery).toBe('unavailable');
-  });
+    const { prisma } = await import('@/lib/prisma');
+    vi.mocked(prisma.stripeWebhookEvent.create).mockRejectedValueOnce(
+      Object.assign(new Error("Can't reach database server"), { code: 'P1001' })
+    );
 
-  it('still honours the Stripe metadata fast path', async () => {
-    const session = paidSession();
-    session.metadata = { ...session.metadata, coaching_monthly_emails_sent: 'true' };
-    const result = await processCarsiCoachingMonthlyCheckoutCompleted(session);
-    expect(result.skipped).toBe('already_emailed');
-    expect(sendEmail).not.toHaveBeenCalled();
-    expect(delegate.create).not.toHaveBeenCalled();
+    await expect(
+      processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS)
+    ).rejects.toThrow();
+    expect(mocks.sendEmail).not.toHaveBeenCalled();
+    expect(mocks.sendNotice).not.toHaveBeenCalled();
   });
 });

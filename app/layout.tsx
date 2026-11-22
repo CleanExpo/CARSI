@@ -2,6 +2,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { AuthProvider } from '@/components/auth/auth-provider';
 import { ServiceWorkerRegistration } from '@/components/lms/ServiceWorkerRegistration';
+import { CookieConsentBanner } from '@/components/privacy/CookieConsentBanner';
 import { OrganizationSchema, WebsiteSchema } from '@/components/seo';
 import { AppToastProvider } from '@/hooks/use-toast';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
@@ -146,6 +147,8 @@ export default function RootLayout({
             <AppToastProvider>{children}</AppToastProvider>
           </ThemeProvider>
         </AuthProvider>
+        {/* Analytics loads only after the visitor accepts in this banner (GP-731). */}
+        <CookieConsentBanner />
         <GoogleAnalytics />
       </body>
     </html>

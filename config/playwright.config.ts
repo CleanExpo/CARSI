@@ -2,6 +2,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, devices } from '@playwright/test';
 
+import { CONSENT_NOTICE_VERSION, CONSENT_STORAGE_KEY } from '../src/lib/analytics/consent';
+
 // This file lives in config/; every path (specs, output, auth state, web server working
 // directory) must resolve from the repo root, where package.json and next.config.ts live.
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -40,6 +42,35 @@ const SURVEY_SPEC = /e2e\/payment-success-survey\.spec\.ts$/;
 // repeat these (the CI build writes a copy of e2e/ under .next/standalone).
 const BUILD_OUTPUT = ['**/.next/**', '**/node_modules/**'];
 
+/**
+ * GP-731: every page shows the analytics consent banner until the visitor chooses, and the banner
+ * covers the foot of the page. Each project therefore starts with a stored "Reject optional"
+ * choice for its own origin, so journeys are not blocked by the banner and no test traffic loads
+ * Google. Specs that check analytics events make an explicit "yes" first
+ * (acceptAnalytics in e2e/membership-analytics.ts). The value is built from the app's own
+ * constants, so a new notice version cannot silently bring the banner back.
+ */
+function rejectedAnalytics(url: string | undefined) {
+  const origins = url
+    ? [
+        {
+          origin: new URL(url).origin,
+          localStorage: [
+            {
+              name: CONSENT_STORAGE_KEY,
+              value: JSON.stringify({
+                version: CONSENT_NOTICE_VERSION,
+                analytics: false,
+                timestamp: '2026-11-21T00:00:00.000Z',
+              }),
+            },
+          ],
+        },
+      ]
+    : [];
+  return { cookies: [], origins };
+}
+
 export default defineConfig({
   testDir: repoRoot,
   outputDir: path.join(repoRoot, 'test-results'),
@@ -64,10 +95,12 @@ export default defineConfig({
       // `test.use({ storageState })`; unauthenticated specs are unaffected.
       name: 'setup',
       testMatch: /e2e\/auth\.setup\.ts$/,
+      // The saved student session carries the stored choice into the authenticated projects.
+      use: { storageState: rejectedAnalytics(baseURL) },
     },
     {
       name: 'desktop-chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'], storageState: rejectedAnalytics(baseURL) },
       grepInvert: /@authenticated|@survey-on/,
       // Flag-on journeys run only in the membership-checkout project below.
       testIgnore: [...BUILD_OUTPUT, MEMBERSHIP_SPEC],
@@ -90,7 +123,11 @@ export default defineConfig({
             name: 'membership-checkout',
             testMatch: MEMBERSHIP_SPEC,
             testIgnore: BUILD_OUTPUT,
-            use: { ...devices['Desktop Chrome'], baseURL: membershipBaseURL },
+            use: {
+              ...devices['Desktop Chrome'],
+              baseURL: membershipBaseURL,
+              storageState: rejectedAnalytics(membershipBaseURL),
+            },
           },
         ]
       : []),
@@ -101,7 +138,11 @@ export default defineConfig({
             testMatch: SURVEY_SPEC,
             testIgnore: BUILD_OUTPUT,
             grep: /@survey-on/,
-            use: { ...devices['Desktop Chrome'], baseURL: surveyBaseURL },
+            use: {
+              ...devices['Desktop Chrome'],
+              baseURL: surveyBaseURL,
+              storageState: rejectedAnalytics(surveyBaseURL),
+            },
           },
         ]
       : []),
