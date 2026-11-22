@@ -55,11 +55,14 @@ describe('free confirm refuses a course that is not published', () => {
     expect(mocks.fulfil).not.toHaveBeenCalled();
   });
 
-  it('a published free course still enrols (positive control)', async () => {
+  // Status is the canonical published state (src/lib/server/public-courses-list.ts): about 20
+  // live catalogue rows are status 'published' with the legacy isPublished flag false.
+  it.each([true, false])('a published free course (flag %s) still enrols', async (isPublished) => {
     mocks.dbCourse.mockResolvedValue({
-      id: 'c1', slug: 'free-course', priceAud: 0, isFree: true, status: 'published', isPublished: true,
+      id: 'c1', slug: 'free-course', priceAud: 0, isFree: true, status: 'published', isPublished,
     });
-    await confirm();
+    const res = await confirm();
+    expect(res.status).not.toBe(404);
     expect(mocks.fulfil).toHaveBeenCalledTimes(1);
   });
 });

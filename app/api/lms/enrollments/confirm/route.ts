@@ -90,9 +90,10 @@ export async function POST(request: NextRequest) {
     } catch {
       return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
     }
-    // GP-776: without a paid Stripe session only a published course may be enrolled in, the
-    // same rule as guest-free. A draft has not passed review, approval and the publish gate.
-    if (dbCourse.status !== 'published' || dbCourse.isPublished !== true) {
+    // GP-776: without a paid Stripe session only a published course may be enrolled in. A draft
+    // has not passed review, approval and the publish gate. Status is the canonical published
+    // state (public-courses-list.ts); live rows with the legacy isPublished flag off stay enrollable.
+    if (dbCourse.status !== 'published') {
       return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
     }
 
