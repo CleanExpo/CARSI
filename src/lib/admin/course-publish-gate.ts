@@ -35,9 +35,9 @@ import {
   isLessonImage,
   lessonUrls,
 } from '../../../scripts/check-course-visuals.mjs';
+import { htmlToText } from '@/lib/course-kit/html-extract';
 import { scanCourseForBannedPhrases, scanCourseForStandardExcerpts } from '@/lib/course-kit/scaffold';
 import type { KitCourse } from '@/lib/course-kit/types';
-import { projectLearnerCourseMeta } from '@/lib/lms/learner-course-meta';
 import { getCurrentCecApproval } from '@/lib/seed/cec-approvals';
 
 export type PublishGateCheck = 'workflow' | 'evidence' | 'visuals' | 'compliance' | 'approval';
@@ -126,9 +126,8 @@ function stable(value: unknown): unknown {
 const OPERATIONAL_META_KEYS = new Set(['optimizeDraft', 'optimizeBefore', 'optimizeAppliedAt']);
 
 function learnerMeta(meta: unknown): Record<string, unknown> | null {
-  const projected = projectLearnerCourseMeta(meta);
-  if (!projected) return null;
-  const kept = Object.entries(projected).filter(([k]) => !OPERATIONAL_META_KEYS.has(k));
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return null;
+  const kept = Object.entries(meta as Record<string, unknown>).filter(([k]) => !OPERATIONAL_META_KEYS.has(k));
   // No learner-visible meta hashes the same as no meta at all.
   return kept.length > 0 ? Object.fromEntries(kept) : null;
 }
@@ -136,13 +135,14 @@ function learnerMeta(meta: unknown): Record<string, unknown> | null {
 /**
  * Everything a learner can see, in one place. The approval hash, the live-course content lock
  * and every compliance scan read this one projection, so a field cannot be approved without
- * being scanned, or scanned without being bound to the approval. `meta` is the learner meta
- * projection (src/lib/lms/learner-course-meta.ts) minus optimiser bookkeeping: unknown keys
- * are included, not ignored. Left out on purpose: price, free flag, CEC hours (register
- * driven) and publication state.
+ * being scanned, or scanned without being bound to the approval. `meta` is all of the course
+ * meta (including the short-course delivery profile served to learners) minus optimiser
+ * bookkeeping: unknown keys are included, not ignored. Left out on purpose: price, free flag,
+ * CEC hours (register driven) and publication state.
  */
-function learnerContent(course: PublishGateCourse) {
+export function learnerContent(course: PublishGateCourse) {
   return {
+    slug: course.slug,
     title: course.title,
     description: course.description,
     shortDescription: course.shortDescription,
@@ -194,52 +194,78 @@ export function courseContentSha256(course: PublishGateCourse): string {
   return createHash('sha256').update(JSON.stringify(stable(learnerContent(course)))).digest('hex');
 }
 
+export type LearnerText = { id: string; where: string; text: string };
+
+const COURSE_FIELD_LABELS: Record<string, string> = {
+  slug: 'course address',
+  title: 'course title',
+  description: 'course description',
+  shortDescription: 'course summary',
+  thumbnailUrl: 'course cover',
+  meta: 'course page details',
+};
+
 /**
- * Every string leaf of a value. Nothing is skipped by shape (links and paths included): a skip
- * rule is a way round the scan, and an over-match only blocks, never publishes.
+ * Push every string leaf of `value`. Nothing is skipped by key or by shape (links, paths and
+ * ids included): a skip rule is a way round the scan, and an over-match only blocks.
  */
-function leafText(value: unknown): string[] {
-  if (typeof value === 'string') return value.trim() ? [value] : [];
-  if (Array.isArray(value)) return value.flatMap(leafText);
-  if (value && typeof value === 'object') return Object.values(value as Record<string, unknown>).flatMap(leafText);
-  return [];
+function walk(value: unknown, id: string, where: string, out: LearnerText[]): void {
+  if (typeof value === 'string') {
+    if (value.trim()) out.push({ id, where, text: value });
+  } else if (Array.isArray(value)) {
+    value.forEach((v, i) => walk(v, `${id}[${i}]`, where, out));
+  } else if (value && typeof value === 'object') {
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) walk(v, `${id}.${k}`, where, out);
+  }
 }
 
-type LearnerText = { id: string; where: string; text: string };
-
 /**
- * The learner-visible wording, labelled for the admin, walked from learnerContent so the
- * compliance scans see exactly what the approval binds. A lesson body stays whole, so the
- * copied-standard-text scan sees the passage, not fragments.
+ * Every string a learner can see, walked generically from learnerContent and labelled for the
+ * admin. The walk covers every key, so a field added to the projection is scanned without a
+ * second list to keep in step. A lesson body is one leaf, so it stays whole for the
+ * copied-standard-text scan.
  */
-function learnerTexts(course: PublishGateCourse): LearnerText[] {
-  const c = learnerContent(course);
+export function learnerTexts(course: PublishGateCourse): LearnerText[] {
   const out: LearnerText[] = [];
-  const add = (id: string, where: string, parts: string[]) => {
-    const text = parts.join('\n\n');
-    if (text.trim()) out.push({ id, where, text });
-  };
-  add('course-title', 'course title', leafText(c.title));
-  add('course-description', 'course description', leafText(c.description));
-  add('course-summary', 'course summary', leafText(c.shortDescription));
-  add('course-details', 'course details (level, category, tags, page details)', [
-    ...leafText(c.level),
-    ...leafText(c.category),
-    ...leafText(c.tags),
-    ...leafText(c.meta),
-  ]);
-  c.modules.forEach((m, mi) => {
-    add(`module-${mi + 1}`, `module "${m.title}"`, leafText(m.title));
-    for (const l of m.lessons) {
-      add(`${l.id}-title`, `lesson "${l.title}" title`, leafText(l.title));
-      add(l.id, `lesson "${l.title}"`, leafText(l.contentBody));
-      add(`${l.id}-resources`, `lesson "${l.title}" flashcards, slides or links`, leafText(l.resources));
+  for (const [key, value] of Object.entries(learnerContent(course))) {
+    if (key === 'modules') {
+      (value as ReturnType<typeof learnerContent>['modules']).forEach((m, mi) => {
+        for (const [mk, mv] of Object.entries(m)) {
+          if (mk !== 'lessons') {
+            walk(mv, `modules[${mi}].${mk}`, `module "${m.title}"`, out);
+            continue;
+          }
+          m.lessons.forEach((l, li) => {
+            for (const [lk, lv] of Object.entries(l)) {
+              const where =
+                lk === 'resources'
+                  ? `lesson "${l.title}" flashcards, slides or links`
+                  : lk === 'title'
+                    ? `lesson "${l.title}" title`
+                    : `lesson "${l.title}"`;
+              walk(lv, `modules[${mi}].lessons[${li}].${lk}`, where, out);
+            }
+          });
+        }
+      });
+    } else if (key === 'quizzes') {
+      (value as ReturnType<typeof learnerContent>['quizzes']).forEach((q, qi) =>
+        walk(q, `quizzes[${qi}]`, `quiz "${q.title}"`, out)
+      );
+    } else {
+      walk(value, key, COURSE_FIELD_LABELS[key] ?? `course ${key}`, out);
     }
-  });
-  for (const q of c.quizzes) {
-    add(`quiz-${q.id}`, `quiz "${q.title}"`, [...leafText(q.title), ...leafText(q.questions)]);
   }
   return out;
+}
+
+/**
+ * The forms of a text the GP-748 rule checks: as stored, as read (tags become spaces, entities
+ * decoded), and with tags removed outright, so wording split by inline markup
+ * (`II<b>CRC</b>`) or written as entities (`&#73;ICRC`) is still seen.
+ */
+function readableForms(text: string): string[] {
+  return [text, htmlToText(text), htmlToText(text.replace(/<[^>]*>/g, ''))];
 }
 
 function sample(items: string[]): string {
@@ -357,7 +383,11 @@ function complianceBlockers(course: PublishGateCourse): PublishBlocker[] {
   }
   // GP-748: the exemption holds only for an approval in force today (status approved, not expired).
   if (!getCurrentCecApproval(course.slug)) {
-    const where = [...new Set(texts.filter((t) => IICRC_OR_CEC_RE.test(t.text)).map((t) => t.where))];
+    const where = [
+      ...new Set(
+        texts.filter((t) => readableForms(t.text).some((f) => IICRC_OR_CEC_RE.test(f))).map((t) => t.where)
+      ),
+    ];
     if (course.iicrcDiscipline?.trim()) where.push('its IICRC discipline field');
     if (where.length > 0) {
       out.push({

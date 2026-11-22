@@ -280,6 +280,47 @@ describe('workflow publish gate', () => {
     expect(new Set(r.body.blockers?.map((b) => b.check))).toEqual(new Set(['compliance']));
   });
 
+  it.each([
+    ['the cover address', (c: Row) => { c.thumbnailUrl = `/courses/${SLUG}/IICRC-cover.png`; }],
+    ['the course address', (c: Row) => { c.slug = 'iicrc-drying-goals'; }],
+    ['the short-course delivery profile', (c: Row) => {
+      c.meta = { shortCourseDelivery: { sessions: [{ title: 'IICRC exam preparation' }] } };
+    }],
+    ['a word split by inline markup', (c: Row) => {
+      (c.modules as Row[])[0].lessons[0].contentBody = `${GOOD_BODY}<p>Meets II<b>CRC</b> goals.</p>`;
+    }],
+    ['a word written with an entity', (c: Row) => {
+      (c.modules as Row[])[0].lessons[0].contentBody = `${GOOD_BODY}<p>Meets &#73;ICRC goals.</p>`;
+    }],
+  ])('refuses publish when a non-approved course mentions IICRC in %s', async (_label, mutate) => {
+    mutate(db.course as Row);
+    approveCurrent();
+    const r = await workflow('publish');
+    expect(r.status).toBe(409);
+    expect(r.body.blockers?.map((b) => b.check)).toContain('compliance');
+  });
+
+  it('scans every string the approval hash covers (completeness)', () => {
+    const rich = course({
+      shortDescription: 'Summary', level: 'Intro', category: 'Water', iicrcDiscipline: 'WRT', tags: ['t1'],
+      meta: { company: 'Co', nested: { deep: ['x1'] }, shortCourseDelivery: { sessions: [{ title: 's1' }] } },
+      quizzes: [{ id: 'q1', title: 'Quiz', passPercentage: 80, attemptsAllowed: 3,
+        questions: [{ questionText: 'Q?', options: ['A', { text: 'B' }], correctIndex: 0, orderIndex: 0, points: 1,
+          explanation: 'Because' }] }],
+    });
+    (rich.modules as Row[])[0].lessons[0].resources = [{ kind: 'slides', slides: [{ title: 'S', bullets: ['b1'] }] }];
+    const leaves: string[] = [];
+    const collect = (v: unknown): void => {
+      if (typeof v === 'string') { if (v.trim()) leaves.push(v); }
+      else if (Array.isArray(v)) v.forEach(collect);
+      else if (v && typeof v === 'object') Object.values(v).forEach(collect);
+    };
+    collect(gate.learnerContent(rich as never));
+    const scanned = new Set(gate.learnerTexts(rich as never).map((t) => t.text));
+    expect(leaves.length).toBeGreaterThan(20);
+    expect(leaves.filter((l) => !scanned.has(l))).toEqual([]);
+  });
+
   it('refuses publish when page wording in meta mentions IICRC', async () => {
     db.course = course({ meta: { eyebrow: 'IICRC approved training' } });
     approveCurrent();
