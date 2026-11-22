@@ -27,6 +27,7 @@ export const PUBLIC_ROUTES: readonly string[] = [
   '/courses',
   '/courses/[slug]',
   '/courses/[slug]/payment-success',
+  '/courses/water-damage-restoration-fundamentals/interactive-pilot',
   '/designations',
   '/designations/[slug]',
   '/events/ccw-roadshow',
