@@ -207,6 +207,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Smoke the live site at desktop and phone size
+        id: smoke
         run: npm run test:smoke:live
         env:
           CI: true
@@ -221,9 +222,16 @@ jobs:
           path: test-results/live-smoke/
           retention-days: 30
 
+      # The site was never checked: setup (checkout, npm ci, Chromium) failed before the smoke ran.
+      - name: Report that the live site was not checked
+        if: failure() && steps.smoke.outcome != 'failure'
+        run: |
+          echo "::error::The live smoke did not run (a setup step failed), so https://carsi.com.au was NOT checked after this deploy. Re-run this job; this is not evidence the site is broken or healthy."
+          exit 1
+
       # Rollback is a human decision (Phill). This step only prints how; it changes nothing.
       - name: Print rollback steps (the live site failed its smoke)
-        if: failure()
+        if: failure() && steps.smoke.outcome == 'failure'
         env:
           SHA: ${{ needs.deploy.outputs.sha }}
           PREV_COMMIT: ${{ needs.deploy.outputs.previous_commit }}
@@ -232,6 +240,9 @@ jobs:
           prev="${PREV_DEPLOYMENT:-<previous deployment id>}"
           echo "::error::The live smoke FAILED on https://carsi.com.au after deploying $SHA. Nothing was rolled back automatically."
           echo "Live before this run: commit ${PREV_COMMIT:-unknown}, DigitalOcean deployment $prev."
+          if [ "$PREV_COMMIT" = "$SHA" ]; then
+            echo "That is this same commit (it was already live), so pick the earlier good deployment from the Activity tab instead."
+          fi
           echo "Screenshots and traces: artifact live-smoke-$SHA on this run."
           echo ""
           echo "To roll back (Phill's decision), use one of:"
@@ -239,6 +250,5 @@ jobs:
           echo "  2. DigitalOcean API (doctl has no rollback subcommand, and"
           echo "     'doctl apps create-deployment' rebuilds the head of main, which is the failing commit):"
           echo "     curl -fsS -X POST -H \"Authorization: Bearer \$DIGITALOCEAN_ACCESS_TOKEN\" -H 'Content-Type: application/json' -d '{\"deployment_id\":\"$prev\"}' https://api.digitalocean.com/v2/apps/$DO_APP_ID/rollback"
-          echo "     The app then stays pinned to that deployment until the rollback is committed (.../rollback/commit) or reverted (.../rollback/revert)."
           echo "  3. Revert the bad commit on main through a PR; this workflow deploys the revert once its checks pass."
           exit 1

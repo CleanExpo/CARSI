@@ -77,6 +77,60 @@ describe('deploy-production workflow', () => {
     expect(text.match(/secrets\.[A-Z_]+/g)?.every((s) => s === 'secrets.DIGITALOCEAN_ACCESS_TOKEN')).toBe(true);
   });
 
+  describe('live-smoke job (Phill, 23/11/2026: Playwright on the live site after every deploy)', () => {
+    const smokeJob = wf.jobs['live-smoke'];
+    type Step = {
+      id?: string;
+      name?: string;
+      if?: string;
+      run?: string;
+      env?: Record<string, string>;
+    };
+    const steps: Step[] = smokeJob?.steps ?? [];
+    const smokeStep = steps.find((s) => s.run?.includes('npm run test:smoke:live'));
+    const rollbackStep = steps.find((s) => s.name?.startsWith('Print rollback steps'));
+
+    it('runs after the deploy job, only when a deploy was chosen', () => {
+      expect(smokeJob.needs).toBe('deploy');
+      expect(smokeJob.if).toContain("needs.deploy.result == 'success'");
+      expect(smokeJob.if).toContain("needs.deploy.outputs.deploy == 'true'");
+      expect(job.outputs).toMatchObject({
+        deploy: '${{ steps.target.outputs.deploy }}',
+        sha: '${{ steps.target.outputs.sha }}',
+      });
+    });
+
+    it('smokes the live site and requires /api/health to report the deployed commit', () => {
+      expect(smokeStep?.id).toBe('smoke');
+      expect(smokeStep?.env).toMatchObject({
+        LIVE_SMOKE_BASE_URL: 'https://carsi.com.au',
+        LIVE_SMOKE_EXPECT_COMMIT: '${{ needs.deploy.outputs.sha }}',
+      });
+    });
+
+    it('holds no secrets and no deploy environment (read-only)', () => {
+      expect(smokeJob.environment).toBeUndefined();
+      expect(JSON.stringify(smokeJob)).not.toContain('secrets.');
+    });
+
+    it('prints rollback steps only when the smoke itself failed, and never rolls back', () => {
+      expect(rollbackStep?.if).toBe("failure() && steps.smoke.outcome == 'failure'");
+      const commands = (rollbackStep?.run ?? '')
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line && !line.startsWith('echo') && !line.startsWith('#'));
+      expect(commands.join('\n')).not.toMatch(/curl|doctl/);
+      for (const step of steps) expect(step.run ?? '').not.toMatch(/^\s*(curl|doctl)\b/m);
+    });
+
+    it('uploads the screenshots whatever the result', () => {
+      const upload = steps.find((s) =>
+        (s as { uses?: string }).uses?.startsWith('actions/upload-artifact')
+      );
+      expect(upload?.if).toBe('always()');
+    });
+  });
+
   it('requires exactly the check names the CI workflow produces', () => {
     const ciNames = Object.values(readYaml('.github/workflows/ci.yml').jobs).map(
       (j) => (j as { name?: string }).name,
