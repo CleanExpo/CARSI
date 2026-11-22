@@ -14,7 +14,11 @@ import {
   LANDING_LEAD_CLASS,
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
-import { COACHING_CTA_EVENT, COURSE_CTA_EVENT } from '@/lib/analytics/carsi-events';
+import {
+  COACHING_CTA_EVENT,
+  COURSE_CTA_EVENT,
+  EMPLOYER_TRUST_CTA_EVENT,
+} from '@/lib/analytics/carsi-events';
 import { catalogueCourseTitle } from '@/lib/marketing/authority-catalogue-titles';
 import type { AuthorityPageEntry } from '@/lib/marketing/authority-pages';
 import {
@@ -169,9 +173,14 @@ export function RoleGuideStartHereSection({
           </div>
 
           <ul className="mt-8 grid gap-4 sm:grid-cols-3">
-            {employer.map((link) => (
+            {employer.map((link, index) => (
               <li key={link.href + link.label}>
-                <Link href={link.href} className={`${CARD_LINK_CLASS} min-h-full p-5`}>
+                <Link
+                  href={link.href}
+                  data-carsi-event={EMPLOYER_TRUST_CTA_EVENT}
+                  data-carsi-context={`role-guide:${entry.slug}:employer-${index + 1}`}
+                  className={`${CARD_LINK_CLASS} min-h-full p-5`}
+                >
                   <ShieldCheck className="h-5 w-5 text-[#146fc2]" aria-hidden />
                   <p className="mt-3 font-semibold text-slate-900">{link.label}</p>
                   <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{link.detail}</p>

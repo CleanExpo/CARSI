@@ -21,6 +21,7 @@
 import {
   COACHING_CTA_EVENT,
   COURSE_CTA_EVENT,
+  EMPLOYER_TRUST_CTA_EVENT,
   MARKETING_PACK_BUILD_EVENT,
   ROLE_GUIDE_START_EVENT,
 } from './carsi-events';
@@ -321,6 +322,7 @@ export const ALLOWED_EVENTS: ReadonlySet<string> = new Set([
   COACHING_CTA_EVENT,
   ROLE_GUIDE_START_EVENT,
   MARKETING_PACK_BUILD_EVENT,
+  EMPLOYER_TRUST_CTA_EVENT,
 ]);
 
 /** Event parameters with text values (`ep.` on the wire). */
@@ -468,8 +470,7 @@ const FIXED_PARAM_VALUES: ReadonlyMap<string, ReadonlySet<string>> = new Map([
 ]);
 const SLUG_VALUE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 /** Product-excellence contexts: hub, coaching-marketing, role-guide:slug, role-guide:slug:start-N. */
-const CARSi_CONTEXT_VALUE =
-  /^(?:hub|coaching-marketing|role-guide:[a-z0-9-]+(?::start-[1-3])?)$/;
+const CARSi_CONTEXT_VALUE = /^(?:hub|coaching-marketing|role-guide:[a-z0-9-]+(?::start-[1-3])?)$/;
 
 /**
  * True when an event parameter may be sent, for Google Analytics and PostHog alike. Fixed

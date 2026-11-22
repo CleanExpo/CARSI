@@ -249,45 +249,61 @@ export function CoachingMarketingPackPage() {
           </ul>
         </section>
 
-        <div
-          className="mt-6 flex flex-wrap items-center gap-3"
+        <section
+          className="mt-6 rounded-2xl border border-sky-400/20 bg-gradient-to-br from-sky-500/[0.1] via-black/20 to-transparent px-4 py-4 ring-1 ring-sky-400/15 sm:px-5 sm:py-5"
           aria-live="polite"
           aria-atomic="true"
+          data-testid="marketing-pack-build-panel"
         >
-          <button
-            type="button"
-            className={coachingPrimaryBtn}
-            disabled={!access.canEdit || building}
-            aria-busy={building}
-            data-testid="marketing-pack-build"
-            data-carsi-event={MARKETING_PACK_BUILD_EVENT}
-            data-carsi-context="coaching-marketing"
-            onClick={() => void build()}
-          >
-            {building ? (
-              <Loader2 className="mr-2 h-4 w-4 motion-safe:animate-spin" aria-hidden />
-            ) : pack ? (
-              <RefreshCw className="mr-2 h-4 w-4" aria-hidden />
-            ) : (
-              <Sparkles className="mr-2 h-4 w-4" aria-hidden />
-            )}
-            {building
-              ? 'Building your pack…'
-              : pack
-                ? 'Rebuild my pack'
-                : 'Build my marketing pack'}
-          </button>
-          {pack ? (
-            <span className="text-xs text-slate-500">
-              Built {new Date(pack.generatedAt).toLocaleString('en-AU')}
-            </span>
-          ) : null}
-          {!access.canEdit ? (
-            <span className={`text-xs ${coachingMuted}`}>
-              Available with an active coaching plan.
-            </span>
-          ) : null}
-        </div>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-xl min-w-0">
+              <p className="text-sm font-semibold text-slate-100">
+                {pack ? 'Refresh your pack' : 'Generate your pack'}
+              </p>
+              <p className={`mt-1 text-xs leading-relaxed ${coachingMuted}`}>
+                {pack
+                  ? 'Re-run the checks when your site or profile changes. Coach-approved fixes still flow to your action board.'
+                  : 'Usually 1–2 minutes. We read your public site once; you keep control of logins and approvals.'}
+              </p>
+              {pack ? (
+                <p className="mt-2 text-[11px] text-slate-500">
+                  Last built {new Date(pack.generatedAt).toLocaleString('en-AU')}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+              <button
+                type="button"
+                className={`${coachingPrimaryBtn} inline-flex min-h-11 min-w-[12rem] items-center justify-center shadow-[0_12px_32px_-16px_rgba(56,189,248,0.45)] transition duration-200 hover:brightness-110 disabled:opacity-60`}
+                disabled={!access.canEdit || building}
+                aria-busy={building}
+                data-testid="marketing-pack-build"
+                data-carsi-event={MARKETING_PACK_BUILD_EVENT}
+                data-carsi-context="coaching-marketing"
+                onClick={() => void build()}
+              >
+                {building ? (
+                  <Loader2 className="mr-2 h-4 w-4 motion-safe:animate-spin" aria-hidden />
+                ) : pack ? (
+                  <RefreshCw className="mr-2 h-4 w-4" aria-hidden />
+                ) : (
+                  <Sparkles className="mr-2 h-4 w-4" aria-hidden />
+                )}
+                {building
+                  ? 'Building your pack…'
+                  : pack
+                    ? 'Rebuild my pack'
+                    : 'Build my marketing pack'}
+              </button>
+              {!access.canEdit ? (
+                <span className={`text-xs ${coachingMuted}`}>
+                  Available with an active coaching plan.
+                </span>
+              ) : null}
+            </div>
+          </div>
+        </section>
 
         <CoachingBuildProgressStrip active={building} steps={MARKETING_PACK_BUILD_STEPS} />
 

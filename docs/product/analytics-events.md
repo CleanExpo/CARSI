@@ -7,6 +7,7 @@ Stable `data-carsi-event` names. Clicks are collected app-wide by `CarsiProductE
 | `course_cta`           | Role guide start-here course card | `role-guide:commercial-cleaning-contractors:start-1` |
 | `coaching_cta`         | Coaching / CCW secondary card     | `role-guide:nsw-builders`                            |
 | `role_guide_start`     | Hub entry (future)                | `hub`                                                |
-| `marketing_pack_build` | Pack build button (future)        | `coaching-marketing`                                 |
+| `marketing_pack_build` | Pack build button                 | `coaching-marketing`                                 |
+| `employer_trust_cta`   | Employer / manager trust card     | `role-guide:nsw-builders:employer-2`                 |
 
 Constants: `src/lib/analytics/carsi-events.ts`.
