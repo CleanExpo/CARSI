@@ -8,6 +8,7 @@ const MATCHING = {
   active: true,
   currency: 'aud',
   unit_amount: 79_500,
+  billing_scheme: 'per_unit',
   recurring: { interval: 'year', interval_count: 1 },
 };
 

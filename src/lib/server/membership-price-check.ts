@@ -19,13 +19,25 @@ export interface StripePriceLike {
   active?: boolean;
   currency?: string | null;
   unit_amount?: number | null;
+  billing_scheme?: string | null;
+  transform_quantity?: unknown;
   recurring?: { interval?: string | null; interval_count?: number | null } | null;
 }
 
-/** True only for an active Price billed at exactly `spec`'s amount, currency and interval. */
-export function stripePriceMatches(price: StripePriceLike | null | undefined, spec: MembershipPrice): boolean {
+/** What a Price must bill per unit: amount, currency and interval. */
+export type PriceSpec = Pick<MembershipPrice, 'amountCents' | 'currency' | 'interval'>;
+
+/**
+ * THE one owner of the Stripe Price shape rules (GP-773). Every checkout and seat change calls
+ * this; nothing re-implements it. True only for an active, per-unit Price with no quantity
+ * transform, billed at exactly `spec`'s amount, currency and interval (interval count 1), so
+ * `quantity x spec.amountCents` is exactly what Stripe charges.
+ */
+export function stripePriceMatches(price: StripePriceLike | null | undefined, spec: PriceSpec): boolean {
   if (!price) return false;
   if (price.active === false) return false;
+  if (price.billing_scheme !== 'per_unit') return false;
+  if (price.transform_quantity != null) return false;
   if ((price.currency ?? '').toLowerCase() !== spec.currency) return false;
   if (price.unit_amount !== spec.amountCents) return false;
   const recurring = price.recurring;

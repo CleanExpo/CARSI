@@ -92,6 +92,8 @@ type StripePriceShape = {
   unit_amount: number;
   type: 'recurring' | 'one_time';
   recurring: { interval: 'day' | 'week' | 'month' | 'year'; interval_count: number } | null;
+  billing_scheme: 'per_unit' | 'tiered';
+  transform_quantity: { divide_by: number; round: 'up' | 'down' } | null;
 };
 
 function price(id: string, cents: number, interval: 'month' | 'year' = 'year', currency = 'aud'): StripePriceShape {
@@ -102,7 +104,17 @@ function price(id: string, cents: number, interval: 'month' | 'year' = 'year', c
     unit_amount: cents,
     type: 'recurring',
     recurring: { interval, interval_count: 1 },
+    billing_scheme: 'per_unit',
+    transform_quantity: null,
   };
+}
+
+/** A Price that bills a different amount than its unit_amount suggests (GP-773 rebind P1). */
+function transformed(p: StripePriceShape): StripePriceShape {
+  return { ...p, transform_quantity: { divide_by: 2, round: 'up' } };
+}
+function tiered(p: StripePriceShape): StripePriceShape {
+  return { ...p, billing_scheme: 'tiered' };
 }
 
 /** Stripe answers `prices.retrieve` from this table. */
@@ -169,6 +181,8 @@ describe('individual membership checkout: A$795 per year', () => {
     ['a different amount', price('price_individual', 49_500)],
     ['a monthly interval', price('price_individual', 79_500, 'month')],
     ['another currency', price('price_individual', 79_500, 'year', 'usd')],
+    ['a quantity transform', transformed(price('price_individual', 79_500))],
+    ['tiered billing', tiered(price('price_individual', 79_500))],
   ] as const) {
     it(`refuses a Price with ${label}, and Stripe Checkout is never opened`, async () => {
       catalogue.price_individual = wrong;
@@ -194,6 +208,18 @@ describe('business owner plan (org checkout): A$1,295 per YEAR', () => {
     expect(res.status).toBe(503);
     expect(mocks.sessionsCreate).not.toHaveBeenCalled();
   });
+
+  for (const [label, wrong] of [
+    ['a quantity transform', transformed(price('price_owner', 129_500))],
+    ['tiered billing', tiered(price('price_owner', 129_500))],
+  ] as const) {
+    it(`refuses an A$1,295 yearly Price with ${label}`, async () => {
+      catalogue.price_owner = wrong;
+      const res = await org(request({ organisation_name: 'Acme Restoration' }));
+      expect(res.status).toBe(503);
+      expect(mocks.sessionsCreate).not.toHaveBeenCalled();
+    });
+  }
 
   it('resolves by the yearly lookup key when no env var is set', async () => {
     vi.stubEnv('STRIPE_PRICE_ORG_ANNUAL', '');
@@ -263,6 +289,8 @@ describe('Teams checkout', () => {
     ['a A$695 unit (5 x 695 = $3,475, not the $299 shown)', price('price_team_starter', 69_500)],
     ['a monthly unit', price('price_team_starter', 5_980, 'month')],
     ['another currency', price('price_team_starter', 5_980, 'year', 'usd')],
+    ['a quantity transform', transformed(price('price_team_starter', 5_980))],
+    ['tiered billing', tiered(price('price_team_starter', 5_980))],
   ] as const) {
     it(`refuses a tier Price with ${label}, and Stripe Checkout is never opened`, async () => {
       catalogue.price_team_starter = wrong;
@@ -302,6 +330,9 @@ describe('extra staff seats: A$695 per year each', () => {
     ['the old $49 seat', price('price_seat', 4_900)],
     ['a tier bundle Price', price('price_seat', 29_900)],
     ['a monthly A$695', price('price_seat', 69_500, 'month')],
+    // 5 -> 7 seats would still bill 4 transformed units: the added seats cost less than A$695 each.
+    ['A$695 yearly with a quantity transform', transformed(price('price_seat', 69_500))],
+    ['A$695 yearly with tiered billing', tiered(price('price_seat', 69_500))],
   ] as const) {
     it(`refuses, and charges nothing, when the seat Price is ${label}`, async () => {
       mocks.subsRetrieve.mockResolvedValue({

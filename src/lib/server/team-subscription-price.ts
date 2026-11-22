@@ -18,7 +18,7 @@
 
 import { getStripeClient } from '@/lib/api/stripe';
 import { teamTierById, type TeamBundleTierId, type TeamTier } from '@/lib/lms/pricing-tiers';
-import type { StripePriceLike } from '@/lib/server/membership-price-check';
+import { stripePriceMatches, type StripePriceLike } from '@/lib/server/membership-price-check';
 
 /** lookup_key + env override the runbook instructs Rana to set, per tier. */
 export const TEAMS_TIER_PRICE_CONFIG: Record<
@@ -40,27 +40,18 @@ export function __resetTeamSubscriptionPriceCache(): void {
   cache.clear();
 }
 
-type TeamStripePrice = StripePriceLike & {
-  billing_scheme?: string | null;
-  transform_quantity?: unknown;
-};
-
 /**
  * True only when `quantity = seatsIncluded` on this Price bills exactly the tier's displayed
- * yearly total in AUD: active, per-unit, no quantity transform, yearly, interval count 1.
+ * yearly total in AUD. The shape rules (per-unit, no transform, currency, interval) belong to
+ * `stripePriceMatches`; this only derives the per-seat unit the tier total implies.
  */
-export function teamTierPriceMatches(price: TeamStripePrice | null | undefined, tier: TeamTier): boolean {
-  if (!price || price.active === false) return false;
-  if ((price.currency ?? '').toLowerCase() !== 'aud') return false;
-  if (price.billing_scheme && price.billing_scheme !== 'per_unit') return false;
-  if (price.transform_quantity) return false;
-  const recurring = price.recurring;
-  if (!recurring || recurring.interval !== 'year' || (recurring.interval_count ?? 1) !== 1) {
-    return false;
-  }
-  const unit = price.unit_amount;
-  if (typeof unit !== 'number' || !Number.isInteger(unit)) return false;
-  return unit * tier.seatsIncluded === tier.priceCents;
+export function teamTierPriceMatches(price: StripePriceLike | null | undefined, tier: TeamTier): boolean {
+  if (tier.seatsIncluded <= 0 || tier.priceCents % tier.seatsIncluded !== 0) return false;
+  return stripePriceMatches(price, {
+    amountCents: tier.priceCents / tier.seatsIncluded,
+    currency: 'aud',
+    interval: 'year',
+  });
 }
 
 /**
@@ -83,16 +74,16 @@ export async function resolveTeamTierPriceId(
   try {
     const stripe = getStripeClient();
     const envPrice = process.env[config.envVar]?.trim();
-    let price: TeamStripePrice | undefined;
+    let price: StripePriceLike | undefined;
     if (envPrice) {
-      price = (await stripe.prices.retrieve(envPrice)) as TeamStripePrice;
+      price = (await stripe.prices.retrieve(envPrice)) as StripePriceLike;
     } else {
       const prices = await stripe.prices.list({
         lookup_keys: [config.lookupKey],
         active: true,
         limit: 1,
       });
-      price = prices.data[0] as TeamStripePrice | undefined;
+      price = prices.data[0] as StripePriceLike | undefined;
     }
     if (!price?.id) return null;
     if (!teamTierPriceMatches(price, tierConfig)) {
