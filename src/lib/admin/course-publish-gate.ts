@@ -37,7 +37,8 @@ import {
 } from '../../../scripts/check-course-visuals.mjs';
 import { scanCourseForBannedPhrases, scanCourseForStandardExcerpts } from '@/lib/course-kit/scaffold';
 import type { KitCourse } from '@/lib/course-kit/types';
-import { getCecApproval } from '@/lib/seed/cec-approvals';
+import { projectLearnerCourseMeta } from '@/lib/lms/learner-course-meta';
+import { getCurrentCecApproval } from '@/lib/seed/cec-approvals';
 
 export type PublishGateCheck = 'workflow' | 'evidence' | 'visuals' | 'compliance' | 'approval';
 
@@ -54,6 +55,7 @@ export type PublishGateCourse = {
   category?: string | null;
   iicrcDiscipline?: string | null;
   durationHours?: number | null;
+  tags?: unknown;
   status: string | null;
   isPublished: boolean | null;
   modules: Array<{
@@ -66,6 +68,7 @@ export type PublishGateCourse = {
       contentBody: string | null;
       orderIndex: number;
       isPreview: boolean;
+      durationMinutes?: number | null;
       resources: unknown;
     }>;
   }>;
@@ -118,30 +121,38 @@ function stable(value: unknown): unknown {
   return value ?? null;
 }
 
-function metaString(meta: unknown, key: string): string | null {
-  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return null;
-  const v = (meta as Record<string, unknown>)[key];
-  return typeof v === 'string' ? v : null;
+// Optimiser bookkeeping kept in meta (src/lib/server/optimize-course-content.ts). Learners never
+// see it; storing or discarding an optimiser draft is not a content change.
+const OPERATIONAL_META_KEYS = new Set(['optimizeDraft', 'optimizeBefore', 'optimizeAppliedAt']);
+
+function learnerMeta(meta: unknown): Record<string, unknown> | null {
+  const projected = projectLearnerCourseMeta(meta);
+  if (!projected) return null;
+  const kept = Object.entries(projected).filter(([k]) => !OPERATIONAL_META_KEYS.has(k));
+  // No learner-visible meta hashes the same as no meta at all.
+  return kept.length > 0 ? Object.fromEntries(kept) : null;
 }
 
 /**
- * sha256 of everything a learner reads: titles, descriptions, cover, intro video, level,
- * category, discipline, duration, lesson bodies and resources, and quiz questions. Price,
- * publication state and the rest of `meta` are left out, so a price change or a stored
- * optimiser draft is not a content change.
+ * Everything a learner can see, in one place. The approval hash, the live-course content lock
+ * and every compliance scan read this one projection, so a field cannot be approved without
+ * being scanned, or scanned without being bound to the approval. `meta` is the learner meta
+ * projection (src/lib/lms/learner-course-meta.ts) minus optimiser bookkeeping: unknown keys
+ * are included, not ignored. Left out on purpose: price, free flag, CEC hours (register
+ * driven) and publication state.
  */
-export function courseContentSha256(course: PublishGateCourse): string {
-  const content = {
-    introVideoUrl: metaString(course.meta, 'introVideoUrl'),
-    introThumbnailUrl: metaString(course.meta, 'introThumbnailUrl'),
+function learnerContent(course: PublishGateCourse) {
+  return {
     title: course.title,
     description: course.description,
     shortDescription: course.shortDescription,
     thumbnailUrl: course.thumbnailUrl,
+    meta: learnerMeta(course.meta),
     level: course.level ?? null,
     category: course.category ?? null,
     iicrcDiscipline: course.iicrcDiscipline ?? null,
     durationHours: course.durationHours ?? null,
+    tags: course.tags ?? null,
     modules: [...course.modules]
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map((m) => ({
@@ -149,10 +160,12 @@ export function courseContentSha256(course: PublishGateCourse): string {
         lessons: [...m.lessons]
           .sort((a, b) => a.orderIndex - b.orderIndex)
           .map((l) => ({
+            id: l.id,
             title: l.title,
             contentType: l.contentType,
             contentBody: l.contentBody,
             isPreview: l.isPreview,
+            durationMinutes: l.durationMinutes ?? null,
             resources: l.resources,
           })),
       })),
@@ -174,7 +187,58 @@ export function courseContentSha256(course: PublishGateCourse): string {
           })),
       })),
   };
-  return createHash('sha256').update(JSON.stringify(stable(content))).digest('hex');
+}
+
+/** sha256 of the learner-visible content (see learnerContent). */
+export function courseContentSha256(course: PublishGateCourse): string {
+  return createHash('sha256').update(JSON.stringify(stable(learnerContent(course)))).digest('hex');
+}
+
+const LINK_RE = /^(?:[a-z][a-z0-9+.-]*:|\/)\S*$/i;
+
+/** Every string leaf of a value except bare links and file paths, which carry no wording. */
+function leafText(value: unknown): string[] {
+  if (typeof value === 'string') return value.trim() && !LINK_RE.test(value.trim()) ? [value] : [];
+  if (Array.isArray(value)) return value.flatMap(leafText);
+  if (value && typeof value === 'object') return Object.values(value as Record<string, unknown>).flatMap(leafText);
+  return [];
+}
+
+type LearnerText = { id: string; where: string; text: string };
+
+/**
+ * The learner-visible wording, labelled for the admin, walked from learnerContent so the
+ * compliance scans see exactly what the approval binds. A lesson body stays whole, so the
+ * copied-standard-text scan sees the passage, not fragments.
+ */
+function learnerTexts(course: PublishGateCourse): LearnerText[] {
+  const c = learnerContent(course);
+  const out: LearnerText[] = [];
+  const add = (id: string, where: string, parts: string[]) => {
+    const text = parts.join('\n\n');
+    if (text.trim()) out.push({ id, where, text });
+  };
+  add('course-title', 'course title', leafText(c.title));
+  add('course-description', 'course description', leafText(c.description));
+  add('course-summary', 'course summary', leafText(c.shortDescription));
+  add('course-details', 'course details (level, category, tags, page details)', [
+    ...leafText(c.level),
+    ...leafText(c.category),
+    ...leafText(c.tags),
+    ...leafText(c.meta),
+  ]);
+  c.modules.forEach((m, mi) => {
+    add(`module-${mi + 1}`, `module "${m.title}"`, leafText(m.title));
+    for (const l of m.lessons) {
+      add(`${l.id}-title`, `lesson "${l.title}" title`, leafText(l.title));
+      add(l.id, `lesson "${l.title}"`, leafText(l.contentBody));
+      add(`${l.id}-resources`, `lesson "${l.title}" flashcards, slides or links`, leafText(l.resources));
+    }
+  });
+  for (const q of c.quizzes) {
+    add(`quiz-${q.id}`, `quiz "${q.title}"`, [...leafText(q.title), ...leafText(q.questions)]);
+  }
+  return out;
 }
 
 function sample(items: string[]): string {
@@ -264,25 +328,15 @@ function visualsBlockers(course: PublishGateCourse, root: string): PublishBlocke
 }
 
 function complianceBlockers(course: PublishGateCourse): PublishBlocker[] {
+  const texts = learnerTexts(course);
   const kit: KitCourse = {
     slug: course.slug,
     title: course.title,
     modules: [
       {
-        title: 'Course details',
-        lessons: [
-          { id: 'course-description', title: 'Course description', contentBody: course.description },
-          { id: 'course-summary', title: 'Course summary', contentBody: course.shortDescription },
-        ],
+        title: 'Learner-visible content',
+        lessons: texts.map((t) => ({ id: t.id, title: t.where, contentBody: t.text })),
       },
-      ...course.modules.map((m) => ({
-        title: m.title,
-        lessons: m.lessons.map((l) => ({
-          id: l.id,
-          title: l.title,
-          contentBody: l.contentType === 'quiz' ? null : l.contentBody,
-        })),
-      })),
     ],
   };
   const out: PublishBlocker[] = [];
@@ -297,30 +351,12 @@ function complianceBlockers(course: PublishGateCourse): PublishBlocker[] {
   if (excerpts.length > 0) {
     out.push({
       check: 'compliance',
-      message: `${excerpts.length} lesson${excerpts.length === 1 ? ' looks' : 's look'} like copied standard text (${sample(excerpts.map((h) => String(h.where ?? 'lesson')))}). Rewrite it in CARSI's own words.`,
+      message: `${excerpts.length} part${excerpts.length === 1 ? ' looks' : 's look'} like copied standard text (${sample(excerpts.map((h) => String(h.where ?? 'lesson')))}). Rewrite it in CARSI's own words.`,
     });
   }
-  if (!getCecApproval(course.slug)) {
-    const texts: Array<[string, string | null]> = [
-      ['course title', course.title],
-      ['course description', course.description],
-      ['course summary', course.shortDescription],
-      ...course.modules.flatMap((m) => [
-        [`module "${m.title}"`, m.title] as [string, string],
-        ...m.lessons.flatMap((l) => [
-          [`lesson "${l.title}"`, l.title] as [string, string],
-          [`lesson "${l.title}"`, l.contentType === 'quiz' ? null : l.contentBody] as [string, string | null],
-        ]),
-      ]),
-      ...course.quizzes.flatMap((q) =>
-        q.questions.flatMap((x) => [
-          [`quiz "${q.title}"`, x.questionText] as [string, string],
-          [`quiz "${q.title}"`, x.explanation] as [string, string | null],
-          [`quiz "${q.title}"`, JSON.stringify(x.options ?? null)] as [string, string],
-        ])
-      ),
-    ];
-    const where = [...new Set(texts.filter(([, t]) => t && IICRC_OR_CEC_RE.test(t)).map(([w]) => w))];
+  // GP-748: the exemption holds only for an approval in force today (status approved, not expired).
+  if (!getCurrentCecApproval(course.slug)) {
+    const where = [...new Set(texts.filter((t) => IICRC_OR_CEC_RE.test(t.text)).map((t) => t.where))];
     if (course.iicrcDiscipline?.trim()) where.push('its IICRC discipline field');
     if (where.length > 0) {
       out.push({

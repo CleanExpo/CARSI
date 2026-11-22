@@ -204,6 +204,15 @@ function CourseEditorFormContent({ courseId }: { courseId?: string }) {
 
   async function runWorkflow(action: 'save_draft' | 'submit_review' | 'approve' | 'publish') {
     if (!courseId) return;
+    if (
+      workflowStatus === 'published' &&
+      (action === 'save_draft' || action === 'submit_review') &&
+      !window.confirm(
+        'This course is live. Moving it to draft or review takes it off sale now, and it returns only after review, a new approval and the publish checks pass. Continue?'
+      )
+    ) {
+      return;
+    }
     setWorkflowBusy(true);
     setWorkflowBlockers([]);
     try {

@@ -235,6 +235,60 @@ describe('workflow publish gate', () => {
     expect(r.body.blockers?.[0].message).toMatch(/IICRC discipline field/);
   });
 
+  // One projection feeds the hash and every scan: each learner-visible surface below must be
+  // both scanned and bound to the approval.
+  it.each([
+    ['a flashcard', { resources: [{ kind: 'flashcards', cards: [{ front: 'Drying goals', back: 'Follow the IICRC S500 drying goals.' }] }] }],
+    ['a slide', { resources: [{ kind: 'slides', slides: [{ title: 'Goals', bullets: ['Earn CECs with this course'], speakerNotes: 'x' }] }] }],
+  ])('refuses publish when a non-approved course mentions IICRC only in %s', async (_label, lessonPatch) => {
+    const c = course();
+    Object.assign((c.modules as Row[])[0].lessons[0], lessonPatch);
+    db.course = c;
+    approveCurrent();
+    const r = await workflow('publish');
+    expect(r.status).toBe(409);
+    expect(r.body.blockers?.map((b) => b.check)).toEqual(['compliance']);
+    expect(r.body.blockers?.[0].message).toMatch(/flashcards, slides or links/);
+  });
+
+  it('refuses publish when a non-approved course mentions IICRC only in a quiz title', async () => {
+    db.course = course({ quizzes: [{ id: 'q1', title: 'Get IICRC certified with CARSI', passPercentage: 80,
+      attemptsAllowed: 3, questions: [] }] });
+    approveCurrent();
+    const r = await workflow('publish');
+    expect(r.status).toBe(409);
+    // Both the banned-phrase scan and the GP-748 rule see the quiz title.
+    expect(new Set(r.body.blockers?.map((b) => b.check))).toEqual(new Set(['compliance']));
+    expect(r.body.blockers?.map((b) => b.message).join(' ')).toMatch(/not on the IICRC CEC approvals register.*quiz "Get IICRC certified with CARSI"/);
+  });
+
+  it('refuses publish when page wording in meta mentions IICRC', async () => {
+    db.course = course({ meta: { eyebrow: 'IICRC approved training' } });
+    approveCurrent();
+    const r = await workflow('publish');
+    expect(r.status).toBe(409);
+    expect(r.body.blockers?.map((b) => b.check)).toEqual(['compliance']);
+  });
+
+  it.each([
+    ['a lesson duration', (c: Row) => { (c.modules as Row[])[0].lessons[0].durationMinutes = 45; }],
+    ['the onboarding company name', (c: Row) => { c.meta = { company: 'Changed Pty Ltd' }; }],
+    ['the course tags', (c: Row) => { c.tags = ['new-tag']; }],
+  ])('refuses publish when %s changed after approval', async (_label, mutate) => {
+    approveCurrent();
+    mutate(db.course as Row);
+    const r = await workflow('publish');
+    expect(r.status).toBe(409);
+    expect(r.body.blockers?.map((b) => b.check)).toEqual(['approval']);
+  });
+
+  it('still publishes when only an optimiser draft was stored after approval', async () => {
+    approveCurrent();
+    (db.course as Row).meta = { optimizeDraft: { title: 'AI rewrite' }, optimizeAppliedAt: '2026-11-22T00:00:00Z' };
+    const r = await workflow('publish');
+    expect(r.status).toBe(200);
+  });
+
   it('refuses approve outside review', async () => {
     db.course = course({ status: 'draft' });
     const r = await workflow('approve');
@@ -286,7 +340,9 @@ describe('other publish paths', () => {
   it('blocks a content edit to a published course and allows a price-only save', async () => {
     db.course = course({ status: 'published', isPublished: true });
     const base = { published: true, isFree: false, priceAud: 120, thumbnailUrl: `/courses/${SLUG}/cover.png`,
-      modules: [{ id: '22222222-2222-4222-8222-222222222222', title: 'Goals', textContent: 'Body' }] };
+      // Unchanged lesson text, so only the price differs. The mock does not rewrite lessons;
+      // the real editor path is proven against PostgreSQL in course-publish-gate.pg.test.ts.
+      modules: [{ id: '22222222-2222-4222-8222-222222222222', title: 'Goals', textContent: GOOD_BODY }] };
     await expect(service.adminUpdateCourse(COURSE_ID, { ...base, title: 'Drying goals, rewritten' } as never))
       .rejects.toThrow('PUBLISHED_COURSE_CONTENT_LOCKED');
     db.course = course({ status: 'published', isPublished: true });
