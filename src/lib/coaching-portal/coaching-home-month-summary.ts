@@ -2,6 +2,8 @@ export type CoachingHomeMonthSummary = {
   headline: string;
   lines: string[];
   tone: 'neutral' | 'good' | 'attention';
+  /** When the member has monthly actions on the board. */
+  progress: { completed: number; total: number; percent: number } | null;
 };
 
 export function buildCoachingHomeMonthSummary(input: {
@@ -20,7 +22,9 @@ export function buildCoachingHomeMonthSummary(input: {
       `${input.completedThisMonth} of ${input.totalThisMonth} monthly actions complete (${pct}%).`
     );
   } else {
-    lines.push('No monthly actions on your board yet — they appear after your growth plan is approved.');
+    lines.push(
+      'No monthly actions on your board yet — they appear after your growth plan is approved.'
+    );
   }
 
   if (input.proposedFixCount > 0) {
@@ -28,7 +32,9 @@ export function buildCoachingHomeMonthSummary(input: {
       `${input.proposedFixCount} marketing fix${input.proposedFixCount === 1 ? '' : 'es'} waiting for coach approval before they become tasks.`
     );
   } else if (input.profileReady && !input.marketingHasPack) {
-    lines.push('Build your marketing pack when you are ready — ranked fixes flow here after coach approval.');
+    lines.push(
+      'Build your marketing pack when you are ready — ranked fixes flow here after coach approval.'
+    );
   } else if (input.marketingHasPack && input.proposedFixCount === 0) {
     lines.push('Marketing pack is up to date — check actions for coach-approved fixes.');
   }
@@ -41,11 +47,23 @@ export function buildCoachingHomeMonthSummary(input: {
     input.proposedFixCount > 0 ||
     (input.totalThisMonth > 0 && input.completedThisMonth < input.totalThisMonth);
   const good =
-    input.totalThisMonth > 0 && input.completedThisMonth === input.totalThisMonth && input.proposedFixCount === 0;
+    input.totalThisMonth > 0 &&
+    input.completedThisMonth === input.totalThisMonth &&
+    input.proposedFixCount === 0;
+
+  const progress =
+    input.totalThisMonth > 0
+      ? {
+          completed: input.completedThisMonth,
+          total: input.totalThisMonth,
+          percent: Math.round((input.completedThisMonth / input.totalThisMonth) * 100),
+        }
+      : null;
 
   return {
     headline: 'This month at a glance',
     lines,
     tone: good ? 'good' : attention ? 'attention' : 'neutral',
+    progress,
   };
 }
