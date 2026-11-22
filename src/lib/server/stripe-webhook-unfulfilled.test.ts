@@ -356,6 +356,35 @@ describe('GP-759 (a): the refund handler records the reversal before any success
     expect(marker()).toBeUndefined();
   });
 
+  it('a full refund takes an unfulfilled session off the admin list (nothing is owed, so no one grants it by hand)', async () => {
+    checkoutCompleted({
+      id: 'cs_test_reversed',
+      customer_email: 'nobody@unfulfilled-test.invalid',
+      metadata: { course_slug: 'paid-course' },
+    });
+    await deliver();
+    expect(record('cs_test_reversed')?.processedAt).toBeNull();
+
+    reversalEvent('charge.refunded', { amount: 14_900, amount_refunded: 14_900 });
+    expect((await deliver()).status).toBe(200);
+
+    expect(record('cs_test_reversed')?.processedAt).toBeInstanceOf(Date);
+  });
+
+  it('control: a partial refund leaves an unfulfilled session on the admin list', async () => {
+    checkoutCompleted({
+      id: 'cs_test_reversed',
+      customer_email: 'nobody@unfulfilled-test.invalid',
+      metadata: { course_slug: 'paid-course' },
+    });
+    await deliver();
+
+    reversalEvent('charge.refunded', { amount: 14_900, amount_refunded: 2_000 });
+    expect((await deliver()).status).toBe(200);
+
+    expect(record('cs_test_reversed')?.processedAt).toBeNull();
+  });
+
   it('a won dispute lifts a dispute marker but never a refund marker', async () => {
     reversalEvent('charge.dispute.created', { id: 'dp_test', amount: 14_900 });
     await deliver();

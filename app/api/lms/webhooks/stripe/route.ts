@@ -203,6 +203,9 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
       // from this session, even when no enrolment row exists yet.
       await recordCheckoutPaymentReversed(ref, reason, eventTimestamp);
       await revokeEnrollmentsByPaymentReference(ref, reason, eventTimestamp);
+      // A full refund means nothing is owed: take the session off the unfulfilled list so no
+      // admin grants a refunded purchase by hand. A dispute stays listed (it may yet be won).
+      if (reason === 'refunded') await resolveUnfulfilledPayment(ref);
     }
   }
 }
