@@ -168,6 +168,11 @@
                   "label": "Hazard-to-PPE selection card",
                   "url": "/courses/water-damage-restoration-fundamentals/field-tools/hazard-ppe-selection-card.md",
                   "kind": "checklist"
+                },
+                {
+                  "kind": "interactive",
+                  "label": "Interactive job-site experience",
+                  "experienceId": "water-damage-module-3-pilot"
                 }
               ]
             },
