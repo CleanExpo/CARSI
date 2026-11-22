@@ -155,7 +155,13 @@ export async function PATCH(request: NextRequest) {
     }
   }
 
-  if (process.env.DATABASE_URL?.trim() && Object.keys(update).length > 0) {
+  // A requested change is acknowledged only after it is stored (GP-775). Every way it can fail to
+  // be stored (no database configured, or a failed write) returns an error, never a 200 that the
+  // profile page would show as "saved" while, for example, a learner who opted out stays ranked.
+  if (Object.keys(update).length > 0) {
+    if (!process.env.DATABASE_URL?.trim()) {
+      return NextResponse.json({ detail: 'Settings cannot be saved right now' }, { status: 503 });
+    }
     try {
       await prisma.lmsUser.update({
         where: { id: claims.sub },

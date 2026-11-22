@@ -64,6 +64,21 @@ describe('opting out of the leaderboard is acknowledged only when stored (GP-775
     expect(stored.leaderboardShowDisplayName).toBe(true); // unchanged, and not acknowledged
   });
 
+  // Review r3 found the same kind on a second path: with no database configured the write was
+  // skipped and the route still answered 200. The rule is now one check for the whole class:
+  // a requested change that was not persisted is never a success, whatever the reason.
+  it.each([
+    ['opt-out', { leaderboard_show_display_name: false, leaderboard_display_name: null }],
+    ['opt-in', { leaderboard_show_display_name: true }],
+    ['label change', { leaderboard_display_name: 'New label' }],
+    ['theme change', { theme_preference: 'light' }],
+  ])('with no database configured, a %s is not acknowledged', async (_label, body) => {
+    vi.stubEnv('DATABASE_URL', '');
+    const res = await patch(body);
+    expect(res.status).toBeGreaterThanOrEqual(500);
+    expect(mocks.update).not.toHaveBeenCalled();
+  });
+
   it('a stored opt-out returns the stored false value', async () => {
     const res = await patch({
       leaderboard_show_display_name: false,
