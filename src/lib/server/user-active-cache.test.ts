@@ -1,53 +1,15 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { generationClaim, isCurrentGeneration } from '@/lib/auth/session-generation';
 
-import {
-  ACTIVE_TTL_MS,
-  __clearActiveCache,
-  resolveSessionState,
-  sessionMatchesState,
-  type UserSessionState,
-} from './user-active-cache';
+import { sessionMatchesState, type UserSessionState } from './user-active-cache';
 
-beforeEach(() => __clearActiveCache());
+// GP-760 review of f512fd90: the per-instance cache and the learner fail-open path are gone; the
+// database is read on every request and a failed read refuses. Those behaviours are now covered
+// end to end in session-freshness-authoritative.test.ts.
 
 const ACTIVE: UserSessionState = { active: true, role: 'student', generation: 0 };
 const INACTIVE: UserSessionState = { active: false, role: 'student', generation: 0 };
-
-describe('resolveSessionState', () => {
-  it('returns the fetched value and caches it', async () => {
-    const fetcher = vi.fn(async () => ACTIVE);
-    expect(await resolveSessionState('u1', 1000, fetcher)).toEqual(ACTIVE);
-    // within TTL → served from cache, fetcher not called again
-    expect(await resolveSessionState('u1', 1000 + ACTIVE_TTL_MS - 1, fetcher)).toEqual(ACTIVE);
-    expect(fetcher).toHaveBeenCalledTimes(1);
-  });
-
-  it('re-fetches after the TTL expires', async () => {
-    const fetcher = vi.fn(async () => ACTIVE);
-    await resolveSessionState('u2', 0, fetcher);
-    await resolveSessionState('u2', ACTIVE_TTL_MS + 1, fetcher);
-    expect(fetcher).toHaveBeenCalledTimes(2);
-  });
-
-  it('returns the state of a deactivated user', async () => {
-    expect(await resolveSessionState('u3', 0, async () => INACTIVE)).toEqual(INACTIVE);
-  });
-
-  it('fails OPEN on DB error (null) and does NOT cache the fallback', async () => {
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const fetcher = vi
-      .fn()
-      .mockRejectedValueOnce(new Error('db down'))
-      .mockResolvedValueOnce(INACTIVE);
-    // first call: error → fail open (null), not cached
-    expect(await resolveSessionState('u4', 0, fetcher)).toBeNull();
-    // second call: fetcher runs again (not cached) → real value
-    expect(await resolveSessionState('u4', 10, fetcher)).toEqual(INACTIVE);
-    expect(fetcher).toHaveBeenCalledTimes(2);
-  });
-});
 
 describe('session generation (GP-760)', () => {
   it('accepts only the current generation', () => {

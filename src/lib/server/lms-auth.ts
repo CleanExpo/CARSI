@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import bcrypt from 'bcryptjs';
 
+import type { Prisma } from '@/generated/prisma/client';
 import { isReservedStaffEmail } from '@/lib/admin/admin-panel-access';
 import { isCurrentGeneration } from '@/lib/auth/session-generation';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
@@ -37,6 +38,33 @@ export async function consumePasswordReset(
        AND "is_active" = true
        AND "session_generation" = ${generation}::integer`;
   return updated === 1;
+}
+
+/** Other lms_users fields a password write may set in the same statement. */
+export type PasswordWriteFields = Omit<
+  Prisma.LmsUserUpdateInput,
+  'hashedPassword' | 'sessionGeneration'
+>;
+
+/**
+ * GP-760: the ONE writer of a new password on an existing lms_users row (consumePasswordReset is
+ * the same rule for the emailed link, which must also spend the link). The same statement adds one
+ * to the session generation, so every session and reset link issued before the change is refused
+ * on its next use (verifyActiveSession reads the generation from the database on every request).
+ * Admin resets, membership credential rotation, claiming a placeholder account and the operator
+ * scripts all call this; none writes hashedPassword on an existing row itself
+ * (password-writes-end-sessions.test.ts holds that). A caller that mints a session afterwards must
+ * read it from the database (sessionClaimsForUserId) so it carries the new generation.
+ */
+export async function setPasswordEndingSessions(
+  userId: string,
+  hashedPassword: string,
+  fields: PasswordWriteFields = {}
+) {
+  return prisma.lmsUser.update({
+    where: { id: userId },
+    data: { ...fields, hashedPassword, sessionGeneration: { increment: 1 } },
+  });
 }
 
 /** Rows created only for JWT sync (e.g. ensureLmsUserFromClaims) are not password-login accounts. */
@@ -273,15 +301,12 @@ export async function registerUserWithPassword(params: {
       return { ok: false, code: 'EMAIL_TAKEN' };
     }
 
-    // JWT-sync placeholder row — let the user finish signup with a real password.
+    // JWT-sync placeholder row — let the user finish signup with a real password. The row was
+    // created from a live session's claims (lms-user-sync.ts), so the write ends those sessions.
     if (isJwtProvisionedPasswordHash(existing.hashedPassword)) {
-      await prisma.lmsUser.update({
-        where: { id: existing.id },
-        data: {
-          hashedPassword,
-          fullName: fullName || existing.fullName,
-          role: 'student',
-        },
+      await setPasswordEndingSessions(existing.id, hashedPassword, {
+        fullName: fullName || existing.fullName,
+        role: 'student',
       });
       await ensureStudentRole(existing.id);
       const claims = await sessionClaimsForUserId(existing.id);

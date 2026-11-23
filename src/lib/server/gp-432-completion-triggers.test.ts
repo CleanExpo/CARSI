@@ -51,6 +51,7 @@ vi.mock('@/lib/prisma', () => ({
       fn({
         $queryRaw: mocks.raw,
         lmsQuizAttempt: { create: mocks.create },
+        lmsEnrollment: { findUnique: async () => ({ id: 'enr-1' }) },
         lmsAssessmentSubmission: { findUnique: mocks.submission, update: mocks.submissionUpdate },
       }),
     ),
@@ -89,6 +90,10 @@ beforeEach(() => {
     const text = sql.join('?');
     if (/COUNT/i.test(text)) return [{ count: 0 }];
     if (text.includes('explanation')) return [];
+    // GP-432: the owner's row lock (withLockedEnrollment) sees an active enrolment for the learner.
+    if (text.includes('FROM lms_enrollments') && text.includes('FOR UPDATE')) {
+      return [{ id: 'enr-1', studentId: STUDENT, courseId: COURSE, status: 'active' }];
+    }
     return [{ id: 'bound-attempt' }];
   });
 });

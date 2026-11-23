@@ -69,7 +69,6 @@ describe.runIf(RUNNABLE)('GP-760 same-second session generation (real PostgreSQL
   let lmsAuth: typeof import('@/lib/server/lms-auth');
   let jwt: typeof import('@/lib/auth/session-jwt');
   let getSessionClaimsFromRequest: typeof import('@/lib/server/auth-from-request').getSessionClaimsFromRequest;
-  let clearCache: () => void;
   let prisma: typeof import('@/lib/prisma').prisma;
 
   beforeAll(async () => {
@@ -87,7 +86,6 @@ describe.runIf(RUNNABLE)('GP-760 same-second session generation (real PostgreSQL
     lmsAuth = await import('@/lib/server/lms-auth');
     jwt = await import('@/lib/auth/session-jwt');
     ({ getSessionClaimsFromRequest } = await import('@/lib/server/auth-from-request'));
-    ({ __clearActiveCache: clearCache } = await import('@/lib/server/user-active-cache'));
     ({ prisma } = await import('@/lib/prisma'));
   });
 
@@ -124,7 +122,6 @@ describe.runIf(RUNNABLE)('GP-760 same-second session generation (real PostgreSQL
   }
 
   async function accepted(token: string): Promise<boolean> {
-    clearCache();
     const req = new NextRequest('https://carsi.example.test/x', {
       headers: { cookie: `auth_token=${token}` },
     });

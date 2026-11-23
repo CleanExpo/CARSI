@@ -5,7 +5,7 @@ import { publishedCourseAccess } from '@/lib/admin/comp-access-grant';
 import { prisma } from '@/lib/prisma';
 import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
 import { generateMemberTempPassword } from '@/lib/server/member-temp-password';
-import { hashPassword } from '@/lib/server/lms-auth';
+import { hashPassword, setPasswordEndingSessions } from '@/lib/server/lms-auth';
 import { sendYearlyMembershipEmail } from '@/lib/server/transactional-email';
 import {
   describeWelcomeEmailDelivery as classifyWelcomeEmailDelivery,
@@ -164,13 +164,10 @@ export async function grantYearlyMembership(params: {
 
   // Safe to rotate credentials now: the only remaining step is the email that carries them.
   if (existing) {
-    user = await prisma.lmsUser.update({
-      where: { id: existing.id },
-      data: {
-        hashedPassword,
-        ...(params.fullName?.trim() ? { fullName: params.fullName.trim() } : {}),
-        isActive: true,
-      },
+    // GP-760: rotating the password ends the member's older sessions (setPasswordEndingSessions).
+    user = await setPasswordEndingSessions(existing.id, hashedPassword, {
+      ...(params.fullName?.trim() ? { fullName: params.fullName.trim() } : {}),
+      isActive: true,
     });
   }
 

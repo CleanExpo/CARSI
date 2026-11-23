@@ -13,7 +13,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
 
-import { verifyActiveSession } from '@/lib/server/user-active-cache';
+import type { SessionClaims } from '@/lib/auth/session-jwt';
+import { resolveCurrentSessionCredential } from '@/lib/server/session-credential';
 import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
 import {
   parsePurchaseMode,
@@ -142,36 +143,29 @@ export async function POST(request: NextRequest) {
     const success_url = getCheckoutReturnUrl(body.success_url, defaults.success_url);
     const cancel_url = getCheckoutReturnUrl(body.cancel_url, defaults.cancel_url);
 
-    const authHeader = request.headers.get('authorization') ?? '';
-    const authTokenCookie = request.cookies.get('auth_token')?.value;
-
+    // GP-760: the buyer is the ONE session credential chosen by the shared rule
+    // (resolveCurrentSessionCredential: Bearer, then auth_token, then carsi_token; the first one the
+    // database confirms as current: active, current session generation, current role). A stale
+    // credential never hides a current one beside it, and the buyer's id and the payer email come
+    // from that same credential, so a session cannot pay as another session's email.
+    // Fail closed: when signed credentials were supplied and none is current (deactivated, deleted,
+    // ended by a password reset, or not confirmable because the database cannot be read), refuse.
+    // Never fall through to the guest path, which would act on that token's identity.
+    const session = await resolveCurrentSessionCredential(request);
+    const buyerClaims: SessionClaims | null = session.kind === 'current' ? session.claims : null;
+    const studentId: string | undefined = buyerClaims?.sub;
+    const refusedSession = session.kind === 'refused';
     const customerEmail = await resolveCheckoutEmail({
-      authTokenCookie,
-      authorizationHeader: authHeader,
+      session: buyerClaims,
       bodyEmail: body.customer_email,
     });
 
-    // The buyer's session comes from the same credentials `resolveCheckoutEmail` accepts:
-    // the `auth_token` cookie first, else a `Bearer` session token. Both are verified by
-    // `verifyActiveSession` (GP-760: signature, then the active, session generation and role
-    // re-check, so a session ended by a password reset is not a buyer); a Bearer-only buyer must
-    // not be treated as a guest (the prerequisite gate would otherwise refuse a learner who has
-    // completed it).
-    const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
-    let studentId: string | undefined;
-    let buyerClaims: Awaited<ReturnType<typeof verifyActiveSession>> = null;
-    for (const token of [authTokenCookie, bearerToken]) {
-      if (!token) continue;
-      const c = await verifyActiveSession(token);
-      if (c?.sub) {
-        studentId = c.sub;
-        buyerClaims = c;
-        break;
-      }
-    }
     // A still-valid token for a deactivated or deleted learner can't be fulfilled by the webhook,
     // so refuse before charging.
-    if (studentId && !(await guardLookup(() => isActiveLearnerId(studentId!)))) {
+    if (
+      refusedSession ||
+      (studentId && !(await guardLookup(() => isActiveLearnerId(studentId!))))
+    ) {
       return NextResponse.json(
         { detail: 'Your session is no longer valid. Please sign in again.', code: 'inactive_account' },
         { status: 401 },
@@ -215,8 +209,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Without a cookie session the webhook resolves the learner by email (a Bearer token or a
-    // typed email). An existing deactivated account there can't be fulfilled, so refuse it too.
+    // Without a current session the webhook resolves the learner by the typed email. An existing
+    // deactivated account there can't be fulfilled, so refuse it too.
     if (!studentId && (await guardLookup(() => isInactiveAccountEmail(customerEmail)))) {
       return NextResponse.json(
         { detail: 'This account is not active. Please contact CARSI support.', code: 'inactive_account' },

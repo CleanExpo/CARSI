@@ -22,8 +22,21 @@ vi.mock('@/lib/server/course-prerequisites', () => ({
   filterCoursesPassingPrerequisites: async (a: { courseIds: string[] }) => new Set(a.courseIds),
 }));
 vi.mock('@/lib/server/db-tx', () => ({
-  runSerializable: (fn: (tx: unknown) => Promise<unknown>) =>
-    fn({ lmsAssessmentSubmission: { findUnique: mock.subFindUnique, update: mock.subUpdate } }),
+  runSerializable: (fn: (tx: unknown) => Promise<unknown>) => {
+    // GP-432: grading runs inside withLockedEnrollment; the learner's enrolment is found, then its
+    // row lock answers with an active row for that learner.
+    let learner = { studentId: '', courseId: '' };
+    return fn({
+      lmsAssessmentSubmission: { findUnique: mock.subFindUnique, update: mock.subUpdate },
+      lmsEnrollment: {
+        findUnique: async (a: { where: { studentId_courseId: { studentId: string; courseId: string } } }) => {
+          learner = a.where.studentId_courseId;
+          return { id: 'enr-1' };
+        },
+      },
+      $queryRaw: async () => [{ id: 'enr-1', ...learner, status: 'active' }],
+    });
+  },
 }));
 
 const { reviewSubmission, listAvailableAssessmentsForStudent, AssessmentError } =

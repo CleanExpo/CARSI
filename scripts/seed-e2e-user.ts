@@ -31,7 +31,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { prisma } from '../src/lib/prisma';
-import { hashPassword } from '../src/lib/server/lms-auth';
+import { hashPassword, setPasswordEndingSessions } from '../src/lib/server/lms-auth';
 import type { CoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
 import { isCoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
 
@@ -109,27 +109,21 @@ async function main() {
 
   const hashedPassword = await hashPassword(E2E_STUDENT.password);
 
-  // Upsert the test user by email (the unique login key). Always reset the
-  // password hash + active flags so a re-run guarantees a working login.
-  const user = await prisma.lmsUser.upsert({
-    where: { email: E2E_STUDENT.email },
-    create: {
-      id: E2E_STUDENT.id,
-      email: E2E_STUDENT.email,
-      fullName: E2E_STUDENT.fullName,
-      hashedPassword,
-      isActive: true,
-      isVerified: true,
-      role: 'student',
-    },
-    update: {
-      fullName: E2E_STUDENT.fullName,
-      hashedPassword,
-      isActive: true,
-      isVerified: true,
-      role: 'student',
-    },
-  });
+  // Create or update the test user by email (the unique login key). Always reset the
+  // password hash + active flags so a re-run guarantees a working login. GP-760: resetting the
+  // password of an existing row goes through setPasswordEndingSessions (it ends older sessions).
+  const profile = {
+    fullName: E2E_STUDENT.fullName,
+    isActive: true,
+    isVerified: true,
+    role: 'student',
+  };
+  const existing = await prisma.lmsUser.findUnique({ where: { email: E2E_STUDENT.email } });
+  const user = existing
+    ? await setPasswordEndingSessions(existing.id, hashedPassword, profile)
+    : await prisma.lmsUser.create({
+        data: { id: E2E_STUDENT.id, email: E2E_STUDENT.email, hashedPassword, ...profile },
+      });
 
   await ensureStudentRole(user.id);
 
