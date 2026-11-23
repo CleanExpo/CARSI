@@ -49,11 +49,19 @@ export const RENEWAL_REMINDER_TYPE = 'renewal_reminder';
 /** A claim whose email has not been confirmed as sent yet (GP-595). */
 export const RENEWAL_REMINDER_PENDING_TYPE = 'renewal_reminder_pending';
 /**
- * How old a pending claim must be before another delivery may take it over. A live
- * attempt finishes well inside this: the year recap is capped at YEAR_RECAP_TIMEOUT_MS
- * (3 s) and the email send at 15 s (sendEmail's own timeout).
+ * How old a pending claim must be before another delivery may take it over. The claim
+ * time is taken before the claim is written, so a slow write could hand this attempt a
+ * claim that is already close to stale; RENEWAL_REMINDER_SEND_DEADLINE_MS stops that
+ * attempt sending.
  */
 export const RENEWAL_REMINDER_STALE_CLAIM_MS = 5 * 60 * 1000;
+/**
+ * The latest point, measured from the claim time, at which this attempt may still start
+ * the email. It leaves two minutes before the claim goes stale, far more than the send
+ * needs (sendEmail aborts after 15 s), so no other delivery can take the claim over while
+ * this attempt is sending. Past it, the attempt releases its claim and throws (retry).
+ */
+export const RENEWAL_REMINDER_SEND_DEADLINE_MS = RENEWAL_REMINDER_STALE_CLAIM_MS - 2 * 60 * 1000;
 
 const SUPPORT_EMAIL = 'support@carsi.com.au';
 const AU_TIME_ZONE = 'Australia/Sydney';
@@ -470,6 +478,15 @@ export async function sendUpcomingRenewalReminder(params: {
     claimedAt
   );
   if (claim === 'already_sent') return skip(subscriptionId, 'already_sent');
+  if (Date.now() - claimedAt.getTime() > RENEWAL_REMINDER_SEND_DEADLINE_MS) {
+    // The claim write was so slow that the claim may soon be taken over: do not send.
+    console.error('[renewal-reminder] claim took too long to write; not sending', {
+      subscriptionId,
+      dedupeKey,
+    });
+    await releaseClaim(subscriptionId, dedupeKey, claimedAt);
+    throw new Error('renewal reminder claim took too long to write; retry later');
+  }
 
   let result: Awaited<ReturnType<typeof sendEmail>>;
   try {

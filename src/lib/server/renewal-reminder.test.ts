@@ -42,6 +42,10 @@ const h = vi.hoisted(() => {
     gate: null as Promise<void> | null,
     /** Resolves once the gated call has read the store and is parked. */
     parked: null as (() => void) | null,
+    /** When set, the NEXT takeover (updateMany with a createdAt cutoff) parks BEFORE it
+     *  evaluates its condition, so another delivery can run in between (GP-595). */
+    takeoverGate: null as Promise<void> | null,
+    takeoverParked: null as (() => void) | null,
   };
   return {
     notifications,
@@ -57,7 +61,9 @@ const h = vi.hoisted(() => {
     prisma: {
       lmsNotification: {
         findUnique: vi.fn(async ({ where }: { where: { dedupeKey: string } }) => {
-          const row = notifications.get(where.dedupeKey) ?? null;
+          // A snapshot, as a database read returns: later writes do not change it.
+          const stored = notifications.get(where.dedupeKey);
+          const row = stored ? { ...stored } : null;
           if (race.gate) {
             const gate = race.gate;
             race.gate = null;
@@ -92,6 +98,13 @@ const h = vi.hoisted(() => {
             where: NotificationWhere;
             data: Partial<Omit<NotificationRow, 'id' | 'dedupeKey'>>;
           }) => {
+            const cutoff = where.createdAt;
+            if (race.takeoverGate && cutoff && !(cutoff instanceof Date) && 'lt' in cutoff) {
+              const gate = race.takeoverGate;
+              race.takeoverGate = null;
+              race.takeoverParked?.();
+              await gate;
+            }
             const row = notifications.get(where.dedupeKey);
             if (!row || !matches(row, where)) return { count: 0 };
             Object.assign(row, data);
@@ -437,10 +450,12 @@ describe('GP-595: a claim left behind by a failed attempt never loses the remind
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
     leftBehindClaim(10 * MINUTE);
     let release!: () => void;
-    h.race.gate = new Promise<void>((r) => (release = r));
-    const parked = new Promise<void>((r) => (h.race.parked = r));
+    h.race.takeoverGate = new Promise<void>((r) => (release = r));
+    const parked = new Promise<void>((r) => (h.race.takeoverParked = r));
 
-    // A reads the stale claim and is parked; B runs to completion meanwhile.
+    // A reaches its takeover of the stale claim and is parked before the takeover's
+    // condition is checked; B takes the claim over, sends and confirms meanwhile. When A
+    // resumes, only the takeover condition (pending AND older than the window) stops it.
     const a = handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_stale_a')).then(
       () => 'done',
       () => 'threw'
@@ -464,6 +479,28 @@ describe('GP-595: a claim left behind by a failed attempt never loses the remind
     expect(h.sendEmail).not.toHaveBeenCalled();
     // The other delivery's claim is left alone.
     expect(h.notifications.get(KEY)?.id).toBe('n-orphan');
+  });
+
+  it('a claim whose write took past the send deadline is released and nothing is sent', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      const realCreate = h.prisma.lmsNotification.create.getMockImplementation()!;
+      // The database is slow: the claim lands six minutes after its claim time, already
+      // stale, so another delivery could take it over while this one sends.
+      h.prisma.lmsNotification.create.mockImplementationOnce(async (args) => {
+        vi.setSystemTime(Date.now() + 6 * MINUTE);
+        return realCreate(args);
+      });
+      await expect(
+        handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_slow_claim')),
+      ).rejects.toThrow(/renewal reminder/i);
+      expect(h.sendEmail).not.toHaveBeenCalled();
+      expect(h.notifications.has(KEY)).toBe(false); // released, so the retry can send
+    } finally {
+      vi.useRealTimers();
+      err.mockRestore();
+    }
   });
 
   it('a sent reminder is never resent, however old its record is', async () => {
