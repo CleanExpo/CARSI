@@ -15,6 +15,7 @@ import { randomUUID } from 'node:crypto';
 import { hash } from 'bcryptjs';
 
 import { prisma } from '../src/lib/prisma';
+import { setPasswordEndingSessions } from '../src/lib/server/lms-auth';
 
 const BCRYPT_COST = 12;
 
@@ -82,13 +83,10 @@ async function main() {
       },
     });
   } else {
-    lmsUser = await prisma.lmsUser.update({
-      where: { id: lmsUser.id },
-      data: {
-        hashedPassword: passwordHash,
-        isActive: true,
-        role: 'admin',
-      },
+    // GP-760: a new password ends the account's older sessions.
+    lmsUser = await setPasswordEndingSessions(lmsUser.id, passwordHash, {
+      isActive: true,
+      role: 'admin',
     });
   }
 

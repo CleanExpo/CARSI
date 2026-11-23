@@ -1,32 +1,22 @@
 import type { CheckoutCourse } from '@/lib/course-list-item';
 import { getStripeClient } from '@/lib/api/stripe';
-import { verifySessionToken } from '@/lib/auth/session-jwt';
+import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { analyticsConsentMetadata } from '@/lib/server/analytics-consent';
 
 /**
- * Resolve payer email: local HS256 session cookie, backend /me when upstream + Bearer cookie,
- * or explicit `customer_email` from the client (e.g. right after register).
+ * The payer email (GP-760): the current session's own email when the buyer is signed in (the
+ * credential chosen by resolveCurrentSessionCredential, so buyer and payer are the same account),
+ * otherwise a well-formed `customer_email` typed by a guest. Null when neither is usable.
  */
 export async function resolveCheckoutEmail(params: {
-  authTokenCookie: string | undefined;
-  authorizationHeader: string | undefined;
+  session: Pick<SessionClaims, 'email'> | null;
   bodyEmail: string | undefined;
 }): Promise<string | null> {
-  const { authTokenCookie, authorizationHeader, bodyEmail } = params;
-
-  if (authTokenCookie) {
-    const claims = await verifySessionToken(authTokenCookie);
-    if (claims?.email) return claims.email;
-  }
+  const { session, bodyEmail } = params;
+  if (session) return session.email.trim() || null;
 
   const trimmed = bodyEmail?.trim();
   if (trimmed && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return trimmed;
-
-  const bearer = authorizationHeader?.startsWith('Bearer ') ? authorizationHeader.slice(7) : null;
-  if (bearer) {
-    const c = await verifySessionToken(bearer);
-    if (c?.email) return c.email;
-  }
 
   return null;
 }

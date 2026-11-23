@@ -7,10 +7,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { ADMIN_COOKIE_NAME } from '@/lib/admin/admin-constants';
-import {
-  getPostLoginRedirectPath,
-  isLmsClaimsAllowedAdminPanel,
-} from '@/lib/admin/admin-panel-access';
+import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { isValidAdminSessionCookie } from '@/lib/admin/admin-session-edge';
 import {
   SESSION_SENTINEL_COOKIE,
@@ -165,24 +162,12 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const authPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
-  const isAuthPath = authPaths.some((path) => request.nextUrl.pathname.startsWith(path));
-
-  if (isAuthPath && user) {
-    const url = request.nextUrl.clone();
-    const claims: SessionClaims = {
-      sub: user.id,
-      email: user.email,
-      full_name: 'User',
-      role: user.roles?.[0] ?? 'student',
-    };
-    const next =
-      request.nextUrl.searchParams.get('next') ?? request.nextUrl.searchParams.get('redirect');
-    url.pathname = getPostLoginRedirectPath(claims, next);
-    url.searchParams.delete('next');
-    url.searchParams.delete('redirect');
-    return NextResponse.redirect(url);
-  }
+  // GP-760: no redirect AWAY from /login, /register, /forgot-password or /reset-password here. The
+  // edge checks only the token signature; the server also checks that the session is still current
+  // (verifyActiveSession: active, session generation, role). A cookie the server has ended (for
+  // example by a password reset) is sent to /login by server layouts; bouncing it off /login on the
+  // signature alone looped the browser between the two, and kept a signed-in user from using a
+  // reset link. The auth pages render for everyone; signing in replaces the cookie.
 
   return response;
 }

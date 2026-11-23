@@ -8,7 +8,6 @@ import { validateNewPassword } from '@/lib/auth/password-policy';
 import { clientIpFrom } from '@/lib/rate-limit';
 import { applyDurableRateLimit, retryAfterSeconds } from '@/lib/server/durable-rate-limit';
 import { consumePasswordReset, hashPassword, sessionClaimsForUserId } from '@/lib/server/lms-auth';
-import { forgetSessionState } from '@/lib/server/user-active-cache';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
@@ -68,7 +67,6 @@ export async function POST(request: NextRequest) {
     if (!consumed) {
       return NextResponse.json({ error: INVALID_LINK }, { status: 400 });
     }
-    forgetSessionState(userId);
 
     const claims = await sessionClaimsForUserId(userId);
     if (!claims) {

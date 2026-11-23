@@ -63,7 +63,11 @@ vi.mock('@/lib/admin/admin-enrollment-mutations', () => ({
 vi.mock('@/lib/server/member-temp-password', () => ({
   generateMemberTempPassword: vi.fn(() => 'temp-pw'),
 }));
-vi.mock('@/lib/server/lms-auth', () => ({ hashPassword: vi.fn(async () => 'hashed') }));
+// The real setPasswordEndingSessions runs (GP-760), so its write lands in the lmsUser.update mock.
+vi.mock('@/lib/server/lms-auth', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/server/lms-auth')>()),
+  hashPassword: vi.fn(async () => 'hashed'),
+}));
 vi.mock('@/lib/server/transactional-email', () => ({
   sendYearlyMembershipEmail: vi.fn(async (p: { to: string; courseCount: number }) => {
     state.sentEmails.push({ to: p.to, courseCount: p.courseCount });
@@ -233,7 +237,12 @@ describe('grantYearlyMembership — an existing member must not be locked out', 
     await grant();
 
     expect(state.userUpdates).toHaveLength(1);
-    expect(state.userUpdates[0]).toMatchObject({ hashedPassword: 'hashed', isActive: true });
+    expect(state.userUpdates[0]).toMatchObject({
+      hashedPassword: 'hashed',
+      isActive: true,
+      // GP-760: rotating the password ends the member's older sessions.
+      sessionGeneration: { increment: 1 },
+    });
     expect(state.sentEmails).toHaveLength(1);
   });
 
