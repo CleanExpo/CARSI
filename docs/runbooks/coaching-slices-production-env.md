@@ -74,6 +74,7 @@ Existing workflows (`notifications-recert.yml`, etc.) use the same secret.
 | 633 | `/admin/coaching-learning-paths` | Prescribed path after coach approval                 |
 | 635 | `/admin/coaching-accountability` | `/dashboard/coaching/progress`                       |
 | 637 | Partner demo seed (script)       | `/ccw-training/partner-demo`                         |
+| 634 | `/admin/coaching-actions`        | `/dashboard/coaching/marketing` — pack build; proposed fixes queue (no extra env flag; needs active coaching sub + DB migration) |
 | 638 | —                                | Live guard only (`live-buy-path-guard.yml` schedule) |
 
 ---
@@ -85,6 +86,8 @@ Existing workflows (`notifications-recert.yml`, etc.) use the same secret.
 3. With **C** on: signed-in coaching subscriber sees Ask my coach; staff preview sees explicit “subscriber feature” copy, not a silent gap.
 4. `gh workflow run live-buy-path-guard.yml` — exit 0 on production (GP-638).
 5. Accountability cron (step 3 above) before enabling **E**.
+6. **GP-634:** Member builds marketing pack; coach approves at `/admin/coaching-actions`; optional `CARSI_COACHING_BOOKING_URL` for session booking CTA.
+7. `npm run verify:product-excellence` — automated subset before founder demos (`docs/runbooks/product-excellence-smoke.md`).
 
 ---
 

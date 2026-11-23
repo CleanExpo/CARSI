@@ -65,11 +65,307 @@ const URL_LIKE_RE =
 const HTML_QUOTE_ENTITY_RE = /&(?:quot|apos|#0*3[49]|#x0*2[27]);$/i;
 const isSpace = (c) => c === ' ' || c === '\t' || c === '\n' || c === '\r' || c === '\f';
 
+/** A srcset width or density descriptor ending just before a comma: `a.png 640w,` `b 1.5x ,`. */
+const SRCSET_DESCRIPTOR_RE = /\s(?:\d+w|\d*\.?\d+x)\s*$/i;
+/**
+ * A serialized srcset value (CodeRabbit on #1192): a JSON key `"srcSet":"…"`, its JS-escaped
+ * form inside an RSC string `\"srcSet\":\"…\"`, or its `&quot;`-encoded form in a data
+ * attribute. Group 1 is the quote that opens the value; the value runs to the same quote.
+ */
+const SERIALIZED_SRCSET_RE =
+  /(?:\\"|"|&quot;)(?:image)?srcset(?:\\"|"|&quot;)\s*:\s*(\\"|"|&quot;)/gi;
+const TAG_OPEN_RE = /<([a-z][^\s/>]*)/iy;
+/** Elements whose content is raw text: no tag or attribute inside them is real HTML. */
+const RAW_TEXT_ELEMENTS = new Set(['script', 'style', 'textarea', 'title', 'xmp', 'noembed']);
+const isJsLineEnd = (c) => c === '\n' || c === '\r' || c === ' ' || c === ' ';
+const isJsSpace = (c) =>
+  c === ' ' || c === '\t' || c === '\v' || c === '\f' || c === ' ' || c === '﻿';
+const isIdentChar = (c) => /[\w$\u0080-￿]/.test(c);
+/** Keywords after which a `/` starts a regular expression, not a division. */
+const REGEX_AFTER_WORD = new Set(
+  'return typeof instanceof in new delete void throw case do else'.split(' ')
+);
+/** Words that are keywords in some positions and identifiers in others. */
+const CONTEXTUAL_WORD = new Set(['of', 'yield', 'await']);
+
+/**
+ * Punctuators after which a `/` starts a regular expression ('' is the start of the script, '='
+ * also stands for a REGEX_AFTER_WORD keyword). `)` and `}` are left out on purpose: either can
+ * end an expression, so a `/` after them stops recording (a false red, never a false green).
+ */
+const REGEX_AFTER_PUNCT = new Set(['', ...'(,=:[!&|?{;~+-*%<>^']);
+
+function precededByEquals(s, i) {
+  let j = i - 1;
+  while (j >= 0 && isSpace(s[j])) j -= 1;
+  return j >= 0 && s[j] === '=';
+}
+
+/**
+ * Read one tag's attributes from `j` (just after its name) to just past its `>`, calling
+ * `onAttr(name, start, end)` with each value's span. Quoted and unquoted values both count.
+ */
+function readAttributes(s, j, onAttr) {
+  const n = s.length;
+  for (;;) {
+    while (j < n && (isSpace(s[j]) || s[j] === '/')) j += 1;
+    if (j >= n) return n;
+    if (s[j] === '>') return j + 1;
+    const nameStart = j;
+    j += 1;
+    while (j < n && !isSpace(s[j]) && s[j] !== '/' && s[j] !== '>' && s[j] !== '=') j += 1;
+    const name = s.slice(nameStart, j).toLowerCase();
+    let k = j;
+    while (k < n && isSpace(s[k])) k += 1;
+    if (s[k] !== '=') continue;
+    k += 1;
+    while (k < n && isSpace(s[k])) k += 1;
+    let start = k;
+    let end;
+    if (s[k] === '"' || s[k] === "'") {
+      start = k + 1;
+      end = s.indexOf(s[k], start);
+      if (end < 0) end = n;
+      j = end + 1;
+    } else {
+      end = k;
+      while (end < n && !isSpace(s[end]) && s[end] !== '>') end += 1;
+      j = end;
+    }
+    onAttr(name, start, end);
+  }
+}
+
+/**
+ * The `//` line comments in one script body, s[a, b), that a JS lexer would confirm (GP-691,
+ * CodeRabbit on #1192). The scan tracks block comments, strings, template literals (with
+ * `${}` nesting) and regular expressions, so `/*\n// *\/ fetch("//h")` is code, not a comment.
+ * Only a comment that is the first token on its line is recorded. The scan stops recording at
+ * the first thing it cannot read with certainty (an unterminated string or regex, an unclosed
+ * block comment, a `/` after `)`, `}`, `++`, `--` or any other context that is not plainly a
+ * regex start): a missed suppression is a false red, never a false
+ * green.
+ */
+function scriptLineComments(s, a, b, out) {
+  const braces = []; // one open-brace count per `${` we are inside
+  let i = a;
+  let lineStart = true;
+  let prev = ''; // last significant code character: '' | 'x' (expression end) | the operator
+  const template = () => {
+    // Read template text from i (just past a backtick or a closing `}`) to its end or `${`.
+    while (i < b) {
+      const c = s[i];
+      if (c === '\\') i += 2;
+      else if (c === '`') {
+        i += 1;
+        prev = 'x';
+        return true;
+      } else if (c === '$' && s[i + 1] === '{') {
+        i += 2;
+        braces.push(0);
+        prev = '{';
+        return true;
+      } else i += 1;
+    }
+    return false;
+  };
+  while (i < b) {
+    const c = s[i];
+    if (isJsLineEnd(c)) {
+      lineStart = true;
+      i += 1;
+      continue;
+    }
+    if (isJsSpace(c)) {
+      i += 1;
+      continue;
+    }
+    const first = lineStart;
+    lineStart = false;
+    if (c === '/' && s[i + 1] === '/') {
+      let e = i + 2;
+      while (e < b && !isJsLineEnd(s[e])) e += 1;
+      if (first) out.push([i, e]);
+      i = e;
+      continue;
+    }
+    if (c === '/' && s[i + 1] === '*') {
+      const e = s.indexOf('*/', i + 2);
+      if (e < 0 || e + 2 > b) return;
+      i = e + 2;
+      continue;
+    }
+    if (c === '"' || c === "'") {
+      let j = i + 1;
+      while (j < b && s[j] !== c) {
+        if (isJsLineEnd(s[j])) return;
+        j += s[j] === '\\' ? 2 : 1;
+      }
+      if (j >= b) return;
+      i = j + 1;
+      prev = 'x';
+      continue;
+    }
+    if (c === '`') {
+      i += 1;
+      if (!template()) return;
+      continue;
+    }
+    if (c === '/') {
+      if (prev === 'x') {
+        i += 1;
+        prev = '/';
+        continue;
+      }
+      // CodeRabbit on #1192: a regex may start only where no expression can end. After `)`,
+      // `}`, a postfix `++`/`--` or anything else not listed, the reading is unclear, so stop.
+      if (!REGEX_AFTER_PUNCT.has(prev)) return;
+      let j = i + 1;
+      let inClass = false;
+      for (;;) {
+        if (j >= b || isJsLineEnd(s[j])) return;
+        const r = s[j];
+        if (r === '\\') j += 1;
+        else if (r === '[') inClass = true;
+        else if (r === ']') inClass = false;
+        else if (r === '/' && !inClass) break;
+        j += 1;
+      }
+      i = j + 1;
+      prev = 'x';
+      continue;
+    }
+    if (isIdentChar(c)) {
+      let j = i + 1;
+      while (j < b && isIdentChar(s[j])) j += 1;
+      // A keyword after `.` / `?.` is a property name (`obj.return / 2`), so it ends an
+      // expression like any identifier (CodeRabbit on #1192).
+      // `of`, `yield` and `await` can also be plain identifiers (`let of = 2; of / 2`), so their
+      // role is unknown: a `/` right after one stops recording (false red, never false green).
+      const word = s.slice(i, j);
+      // After `.`, `?.` or `#` the word is a property or private-field name, not a keyword.
+      if (prev === '.' || prev === '#') prev = 'x';
+      else if (CONTEXTUAL_WORD.has(word)) prev = 'unclear';
+      else prev = REGEX_AFTER_WORD.has(word) ? '=' : 'x';
+      i = j;
+      continue;
+    }
+    if (braces.length && c === '{') braces[braces.length - 1] += 1;
+    if (braces.length && c === '}') {
+      if (braces[braces.length - 1] === 0) {
+        braces.pop();
+        i += 1;
+        if (!template()) return;
+        continue;
+      }
+      braces[braces.length - 1] -= 1;
+    }
+    if ((c === '+' || c === '-') && s[i + 1] === c) {
+      // `++` / `--`: prefix or postfix cannot be told apart here, so a `/` after it is unclear.
+      prev = '++';
+      i += 2;
+      continue;
+    }
+    prev = c === ']' ? 'x' : c;
+    i += 1;
+  }
+}
+
+/**
+ * One pass over the HTML: srcset and imagesrcset attribute values from real tags (never from
+ * script or style text), and the confirmed whole-line comments in each <script>.
+ */
+function scanHtml(s) {
+  const srcset = [];
+  const comments = [];
+  const n = s.length;
+  let i = 0;
+  while (i < n) {
+    const lt = s.indexOf('<', i);
+    if (lt < 0) break;
+    if (s.startsWith('<!--', lt)) {
+      const e = s.indexOf('-->', lt + 4);
+      if (e < 0) break;
+      i = e + 3;
+      continue;
+    }
+    TAG_OPEN_RE.lastIndex = lt;
+    const m = TAG_OPEN_RE.exec(s);
+    if (!m) {
+      i = lt + 1;
+      continue;
+    }
+    const tag = m[1].toLowerCase();
+    i = readAttributes(s, lt + m[0].length, (name, start, end) => {
+      if (name === 'srcset' || name === 'imagesrcset') srcset.push([start, end]);
+    });
+    if (RAW_TEXT_ELEMENTS.has(tag)) {
+      const close = new RegExp(`</${tag}(?=[\\s/>]|$)`, 'gi');
+      close.lastIndex = i;
+      const e = close.exec(s);
+      const end = e ? e.index : n;
+      if (tag === 'script') scriptLineComments(s, i, end, comments);
+      i = end;
+    }
+  }
+  return { srcset, comments };
+}
+
+/** Serialized srcset values (JSON, JS-escaped JSON, `&quot;`-encoded JSON) anywhere in `s`. */
+function serializedSrcsetSpans(s) {
+  const spans = [];
+  SERIALIZED_SRCSET_RE.lastIndex = 0;
+  for (let m; (m = SERIALIZED_SRCSET_RE.exec(s));) {
+    const quote = m[1];
+    const start = m.index + m[0].length;
+    let end = start;
+    if (quote === '"') {
+      while (end < s.length && s[end] !== '"') end += s[end] === '\\' ? 2 : 1;
+    } else {
+      end = s.indexOf(quote, start);
+      if (end < 0) end = s.length;
+    }
+    spans.push([start, Math.min(end, s.length)]);
+    SERIALIZED_SRCSET_RE.lastIndex = Math.max(end, start + 1);
+  }
+  return spans;
+}
+
+/** Srcset values and confirmed whole-line script comments in `s`, each found once on first use. */
+function textSpans(s) {
+  let html = null;
+  let serialized = null;
+  // Spans are sorted and do not overlap: binary search keeps a page of many links linear-ish.
+  const within = (list, i) => {
+    let lo = 0;
+    let hi = list.length - 1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (i < list[mid][0]) hi = mid - 1;
+      else if (i >= list[mid][1]) lo = mid + 1;
+      else return true;
+    }
+    return false;
+  };
+  return {
+    inSrcset(i) {
+      html ??= scanHtml(s);
+      serialized ??= serializedSrcsetSpans(s);
+      return within(html.srcset, i) || within(serialized, i);
+    },
+    inScriptComment(i) {
+      html ??= scanHtml(s);
+      return within(html.comments, i);
+    },
+  };
+}
+
 /**
  * Whether a scheme-relative `//host` starting at `index` sits where a browser or parser reads a
  * URL: the whole text (a Location header), an attribute value (`=` then optional padding, an
  * optional quote, optional padding), a quoted string (JS, JSON, an `&quot;`-encoded data
- * attribute, CSS `@import "..."`), CSS `url(`, or a later srcset candidate after a comma.
+ * attribute, CSS `@import "..."`) unless it sits in a whole-line script comment, CSS `url(`, or
+ * a later srcset candidate after a comma (GP-691).
  * JSON-escaped `\/\/` only ever appears inside a string, so it always counts.
  *
  * Anything else, above all a `//` that opens a script line comment or sits inside a CSS
@@ -77,17 +373,25 @@ const isSpace = (c) => c === ' ' || c === '\t' || c === '\n' || c === '\r' || c 
  * front of this match, so the whole scan stays linear however much padding a page carries
  * (GP-686 item 3: the old look-back was a fixed 16 characters).
  */
-function inUrlPosition(s, index) {
+function inUrlPosition(s, index, spans) {
   if (s.startsWith('\\/', index)) return true;
   let i = index - 1;
   while (i >= 0 && isSpace(s[i])) i -= 1;
   if (i < 0) return true;
   const c = s[i];
-  if (c === '=' || c === ',') return true;
+  if (c === '=') return true;
+  // GP-691: a comma starts a URL only as a later srcset candidate: inside a srcset value, or
+  // after a width or density descriptor (`640w,` `2x,`, as in an RSC srcSet string). The comma
+  // in `/* old, //127.1:8080 dev */` is neither.
+  if (c === ',')
+    return spans.inSrcset(i) || SRCSET_DESCRIPTOR_RE.test(s.slice(Math.max(0, i - 24), i));
   if (c === '(') return /url$/i.test(s.slice(Math.max(0, i - 3), i));
   const entity = c === ';' && HTML_QUOTE_ENTITY_RE.exec(s.slice(Math.max(0, i - 9), i + 1));
   if (c !== '"' && c !== "'" && c !== '`' && !entity) return false;
-  if (i === index - 1) return true;
+  // GP-691: a quote inside a whole-line `//` comment in a <script> opens no string. Only a
+  // comment that starts its line (or directly follows the <script> tag) counts, so no string,
+  // regex or code can sit in front of it; a quote after `=` is still read, as an attribute.
+  if (i === index - 1) return !!entity || precededByEquals(s, i) || !spans.inScriptComment(i);
   // Padding between a quote and the URL counts only inside an attribute value: `href=" //h"`.
   let j = i - (entity ? entity[0].length : 1);
   while (j >= 0 && isSpace(s[j])) j -= 1;
@@ -111,7 +415,8 @@ export function findLocalOrigins(text, { attributeValues = false } = {}) {
   const s = String(text);
   // A scheme makes a string a URL wherever it stands. A scheme-relative `//host` is a URL only
   // where a browser or parser reads one (GP-686): elsewhere it is a script or CSS comment.
-  const isLink = (scheme, index) => scheme || attributeValues || inUrlPosition(s, index);
+  const spans = textSpans(s);
+  const isLink = (scheme, index) => scheme || attributeValues || inUrlPosition(s, index, spans);
   const found = [];
   for (const m of s.matchAll(LOCAL_ORIGIN_RE)) {
     if (isLink(/^https?:/i.test(m[0]), m.index)) {
@@ -522,33 +827,30 @@ export async function audit(faults = []) {
         // The card must still ask for the buyer's email: checkout cannot start without it. The
         // field counts only if a buyer can see it: no hidden or transparent element from the field
         // up to the page, and some of it left after every ancestor that clips its overflow.
-        const hasEmail = await page.evaluate(
-          (sel) => {
-            const usable = (el) => {
-              const r = el.getBoundingClientRect();
-              let box = { l: r.left, t: r.top, r: r.right, b: r.bottom };
-              for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
-                const st = getComputedStyle(n);
-                if (st.display === 'none' || st.visibility === 'hidden' || Number(st.opacity) === 0)
-                  return false;
-                if (n !== el && (st.overflowX !== 'visible' || st.overflowY !== 'visible')) {
-                  const c = n.getBoundingClientRect();
-                  box = {
-                    l: Math.max(box.l, c.left),
-                    t: Math.max(box.t, c.top),
-                    r: Math.min(box.r, c.right),
-                    b: Math.min(box.b, c.bottom),
-                  };
-                }
+        const hasEmail = await page.evaluate((sel) => {
+          const usable = (el) => {
+            const r = el.getBoundingClientRect();
+            let box = { l: r.left, t: r.top, r: r.right, b: r.bottom };
+            for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+              const st = getComputedStyle(n);
+              if (st.display === 'none' || st.visibility === 'hidden' || Number(st.opacity) === 0)
+                return false;
+              if (n !== el && (st.overflowX !== 'visible' || st.overflowY !== 'visible')) {
+                const c = n.getBoundingClientRect();
+                box = {
+                  l: Math.max(box.l, c.left),
+                  t: Math.max(box.t, c.top),
+                  r: Math.min(box.r, c.right),
+                  b: Math.min(box.b, c.bottom),
+                };
               }
-              return box.r - box.l > 0 && box.b - box.t > 0;
-            };
-            return [...document.querySelectorAll(sel)].some((card) =>
-              [...card.querySelectorAll('input[type="email"], input[name*="email" i]')].some(usable)
-            );
-          },
-          QUICK_ENROL_CARD_SELECTOR
-        );
+            }
+            return box.r - box.l > 0 && box.b - box.t > 0;
+          };
+          return [...document.querySelectorAll(sel)].some((card) =>
+            [...card.querySelectorAll('input[type="email"], input[name*="email" i]')].some(usable)
+          );
+        }, QUICK_ENROL_CARD_SELECTOR);
         if (!hasEmail) faults.push(`QUICK-ENROL CARD HAS NO EMAIL FIELD ${path} (${scheme})`);
         const fields = await page.evaluate(readFormColours, QUICK_ENROL_CARD_SELECTOR);
         if (fields.length === 0) faults.push(`QUICK-ENROL CARD HAS NO FIELDS ${path} (${scheme})`);

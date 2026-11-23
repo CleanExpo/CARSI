@@ -1,8 +1,8 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, devices } from '@playwright/test';
-
-import { CONSENT_NOTICE_VERSION, CONSENT_STORAGE_KEY } from '../src/lib/analytics/consent';
+import { rejectedAnalytics } from './e2e-consent';
+import { allocateE2EPorts } from './e2e-ports';
 
 // This file lives in config/; every path (specs, output, auth state, web server working
 // directory) must resolve from the repo root, where package.json and next.config.ts live.
@@ -11,7 +11,14 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 // GitHub never sets E2E_PORT*, so CI listens on 3000, 3100 and 3101. The release gate's local
 // CI mirror sets them to free ports, because on a shared Mac another session's dev server
 // often holds 3000 (UNI-3468).
-const MAIN_PORT = process.env.E2E_PORT || '3000';
+// A developer's own PORT is kept when E2E_PORT is unset (UNI-3472); no workflow sets PORT.
+// All three server ports come from allocateE2EPorts: explicit E2E_PORT_2 / E2E_PORT_3 win, and a
+// default that another server holds is skipped, so two servers never share a port.
+const {
+  main: MAIN_PORT,
+  membership: MEMBERSHIP_CI_PORT,
+  survey: SURVEY_CI_PORT,
+} = allocateE2EPorts(process.env);
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${MAIN_PORT}`;
 
 /**
@@ -21,7 +28,6 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${MAIN_PORT
  * 3100 with the flag on, so the checkout journeys run in the normal gate. Locally, point
  * PLAYWRIGHT_MEMBERSHIP_BASE_URL at a flag-on server; without it the project is not defined.
  */
-const MEMBERSHIP_CI_PORT = process.env.E2E_PORT_2 || '3100';
 const membershipBaseURL =
   process.env.PLAYWRIGHT_MEMBERSHIP_BASE_URL ??
   (process.env.CI ? `http://localhost:${MEMBERSHIP_CI_PORT}` : undefined);
@@ -33,7 +39,6 @@ const MEMBERSHIP_SPEC = /e2e\/membership-checkout\.spec\.ts$/;
  * Flag-on tests carry the @survey-on tag and run only in the `purchase-survey` project; the
  * flag-off test in the same file runs in the default project.
  */
-const SURVEY_CI_PORT = process.env.E2E_PORT_3 || '3101';
 const surveyBaseURL =
   process.env.PLAYWRIGHT_SURVEY_BASE_URL ??
   (process.env.CI ? `http://localhost:${SURVEY_CI_PORT}` : undefined);
@@ -41,35 +46,6 @@ const SURVEY_SPEC = /e2e\/payment-success-survey\.spec\.ts$/;
 // A project-level testIgnore REPLACES the top-level one, so every project that sets its own must
 // repeat these (the CI build writes a copy of e2e/ under .next/standalone).
 const BUILD_OUTPUT = ['**/.next/**', '**/node_modules/**'];
-
-/**
- * GP-731: every page shows the analytics consent banner until the visitor chooses, and the banner
- * covers the foot of the page. Each project therefore starts with a stored "Reject optional"
- * choice for its own origin, so journeys are not blocked by the banner and no test traffic loads
- * Google. Specs that check analytics events make an explicit "yes" first
- * (acceptAnalytics in e2e/membership-analytics.ts). The value is built from the app's own
- * constants, so a new notice version cannot silently bring the banner back.
- */
-function rejectedAnalytics(url: string | undefined) {
-  const origins = url
-    ? [
-        {
-          origin: new URL(url).origin,
-          localStorage: [
-            {
-              name: CONSENT_STORAGE_KEY,
-              value: JSON.stringify({
-                version: CONSENT_NOTICE_VERSION,
-                analytics: false,
-                timestamp: '2026-11-21T00:00:00.000Z',
-              }),
-            },
-          ],
-        },
-      ]
-    : [];
-  return { cookies: [], origins };
-}
 
 export default defineConfig({
   testDir: repoRoot,
