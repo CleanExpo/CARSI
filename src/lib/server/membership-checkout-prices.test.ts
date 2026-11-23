@@ -318,11 +318,13 @@ describe('extra staff seats: A$695 per year each', () => {
     mocks.subsRetrieve.mockResolvedValue({
       items: { data: [{ id: 'si_1', quantity: 5, price: price('price_seat', 69_500) }] },
     });
-    const res = await expandSeats(request({ additional_seats: 2 }));
+    const res = await expandSeats(request({ additional_seats: 2, request_id: 'seat-add-req-0001' }));
     expect(res.status).toBe(200);
     expect(mocks.subsUpdate).toHaveBeenCalledWith(
       'sub_1',
-      expect.objectContaining({ items: [{ id: 'si_1', quantity: 7 }] })
+      expect.objectContaining({ items: [{ id: 'si_1', quantity: 7 }] }),
+      // GP-759: the page's per-click id is the Stripe idempotency key.
+      { idempotencyKey: 'carsi-expand-seats:sub_1:seat-add-req-0001' }
     );
   });
 
@@ -338,7 +340,7 @@ describe('extra staff seats: A$695 per year each', () => {
       mocks.subsRetrieve.mockResolvedValue({
         items: { data: [{ id: 'si_1', quantity: 5, price: seatPrice }] },
       });
-      const res = await expandSeats(request({ additional_seats: 2 }));
+      const res = await expandSeats(request({ additional_seats: 2, request_id: 'seat-add-req-0001' }));
       expect(res.status).toBe(409);
       expect(mocks.subsUpdate).not.toHaveBeenCalled();
       expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
