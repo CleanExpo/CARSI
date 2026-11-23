@@ -4,6 +4,7 @@ import path from 'node:path';
 import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
 
+import { APPROVED_CEC_BY_DISCIPLINE_HEADING, approvedCecHoursLine } from '@/lib/proof-pack-cec-wording';
 import type { ProofPackPayload } from '@/types/proof-pack';
 
 function wrapLines(text: string, maxChars: number): string[] {
@@ -106,7 +107,7 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
     payload.learner_name,
     payload.learner_email,
     payload.issuing_organisation,
-    ...payload.cec_by_discipline.map((d) => d.discipline),
+    ...(payload.cec_by_discipline ?? []).map((d) => d.discipline),
     ...payload.credentials.flatMap((c) => [
       c.course_title,
       c.iicrc_discipline ?? '',
@@ -159,7 +160,9 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
     }
   }
 
-  const title = 'Training & CEC summary';
+  // GP-748: the title, subtitle and footer name no IICRC and no CEC; those appear only in the
+  // approved-course lines below, and only when the learner has an approved course.
+  const title = 'Training summary';
   drawText(page, title, {
     x: MARGIN,
     y,
@@ -169,7 +172,7 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
   });
   y -= 26;
 
-  drawText(page, 'For employer, HR, or insurer evidence — completions on CARSI; IICRC CEC hours only for approved courses.', {
+  drawText(page, 'For employer, HR, or insurer evidence: course completions on CARSI.', {
     x: MARGIN,
     y,
     size: 9,
@@ -228,18 +231,24 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
     color: BLACK,
   });
   y -= 14;
-  drawText(page, `Total IICRC CEC hours (from completed courses): ${payload.summary.total_cec_hours}`, {
-    x: MARGIN,
-    y,
-    size: 10,
-    font: helvetica,
-    color: BLACK,
-  });
-  y -= 28;
+  // GP-748 / GP-704: the payload carries a CEC total only when a completed course is in
+  // data/seed/cec-approvals.json, and the line takes its wording from approved-wording.ts.
+  if (payload.summary.total_cec_hours != null) {
+    drawText(page, approvedCecHoursLine(payload.summary.total_cec_hours), {
+      x: MARGIN,
+      y,
+      size: 10,
+      font: helvetica,
+      color: BLACK,
+    });
+    y -= 14;
+  }
+  y -= 14;
 
-  if (payload.cec_by_discipline.length > 0) {
-    ensureSpace(40 + payload.cec_by_discipline.length * 16);
-    drawText(page, 'CEC hours by discipline', {
+  const cecByDiscipline = payload.cec_by_discipline ?? [];
+  if (cecByDiscipline.length > 0) {
+    ensureSpace(40 + cecByDiscipline.length * 16);
+    drawText(page, APPROVED_CEC_BY_DISCIPLINE_HEADING, {
       x: MARGIN,
       y,
       size: 12,
@@ -247,7 +256,7 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
       color: BLACK,
     });
     y -= 16;
-    for (const row of payload.cec_by_discipline) {
+    for (const row of cecByDiscipline) {
       ensureSpace(20);
       drawText(page, `${row.discipline}`, { x: MARGIN, y, size: 10, font: helvetica, color: BLACK });
       drawText(page, `${row.cec_hours}`, {
@@ -296,7 +305,13 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
 
   for (const c of payload.credentials) {
     const titleLines = wrapLines(c.course_title, 72);
-    const metaLine = `${c.iicrc_discipline ?? '—'} · ${c.cec_hours} CEC · issued ${c.issued_date} · ID ${c.credential_id}`;
+    // GP-748: the hours part exists only for a course in the approvals registry; every other row
+    // shows the issue date and credential ID only.
+    const cecPart =
+      c.cec_hours != null
+        ? [c.iicrc_discipline?.trim() || null, approvedCecHoursLine(c.cec_hours)].filter(Boolean).join(' · ')
+        : null;
+    const metaLine = [cecPart, `issued ${c.issued_date}`, `ID ${c.credential_id}`].filter(Boolean).join(' · ');
     const urlLines = wrapLines(c.verification_url, 92);
     const blockH = titleLines.length * 11 + 14 + 12 + urlLines.length * 10 + 12;
     ensureSpace(blockH);

@@ -52,7 +52,7 @@ export function isActiveLearner(
 
 /**
  * Holds at least one Stripe-bought seat that is active with no lessons done (GP-766).
- * Free, admin, team and membership enrolments never count: see `enrollmentIsStripeBought`.
+ * Free, admin, team and membership enrolments never count: see `enrollmentIsStripePaid`.
  */
 export function isBoughtNotStarted(
   u: Pick<AdminDashboardUserEntry, 'boughtNotStartedCount'>

@@ -1,22 +1,38 @@
 import { type AdminOpsPeriod } from '@/lib/admin/admin-ops-format';
+import { isStripeCheckoutPaymentReference } from '@/lib/lms/course-prerequisites';
 
-export { formatAud } from '@/lib/admin/admin-ops-format';
+export { formatAud, formatRevenueAud, REVENUE_PRICE_UNKNOWN_LABEL } from '@/lib/admin/admin-ops-format';
 export type { AdminOpsPeriod };
 
-function listPriceAudFromCourse(course: { isFree: boolean; priceAud: unknown }): number {
-  if (course.isFree) return 0;
-  const n = Number(course.priceAud);
-  return Number.isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : 0;
-}
-
-function enrollmentLooksPaid(e: { status: string; paymentReference: string | null }): boolean {
+/**
+ * GP-763. The one rule for "this enrolment was paid for": a Stripe Checkout session id
+ * (`cs_...`) that has not been refunded or revoked. Free (`free`), admin (`admin:*`), team
+ * seat (`team:*`, `team-seat:*`), membership, org, discount and attendance grants are not
+ * payments. Allow-list on purpose: a new kind of grant is unpaid until proven otherwise.
+ */
+export function enrollmentIsStripePaid(e: {
+  status: string;
+  paymentReference: string | null;
+}): boolean {
   const status = (e.status ?? '').toLowerCase();
   if (status === 'refunded' || status === 'revoked') return false;
-  return Boolean(e.paymentReference?.trim());
+  return isStripeCheckoutPaymentReference(e.paymentReference);
+}
+
+/**
+ * GP-763. The database stores no amount paid per enrolment, only the Stripe session id, and
+ * a course's price today says nothing about what an earlier learner paid. So revenue is
+ * known only when there is nothing to value: 0 with no paid enrolments, otherwise null
+ * ("price at purchase unknown"). Never derive it from the course's current list price.
+ */
+export function revenueAudForPaidCount(paidEnrollments: number): number | null {
+  return paidEnrollments > 0 ? null : 0;
 }
 
 export type AdminOpsPeriodKpis = {
-  revenueAud: number;
+  /** 0 when the window has no Stripe-paid enrolments; null when it has any (price unknown). */
+  revenueAud: number | null;
+  /** Stripe-paid enrolments (one per Checkout session and learner; a team purchase is one). */
   paidEnrollments: number;
   enrollments: number;
   completions: number;
@@ -30,7 +46,6 @@ type SaleLike = {
   certificateIssuedAt: Date | null;
   status: string;
   paymentReference: string | null;
-  course: { isFree: boolean; priceAud: unknown };
 };
 
 function startOfMonth(d: Date): Date {
@@ -68,7 +83,6 @@ export function summariseOpsPeriod(
   now = new Date()
 ): AdminOpsPeriodKpis {
   const { from, to } = periodBounds(period, now);
-  let revenueAud = 0;
   let paidEnrollments = 0;
   let enrollments = 0;
   let completions = 0;
@@ -77,10 +91,7 @@ export function summariseOpsPeriod(
   for (const row of sales) {
     if (inRange(row.enrolledAt, from, to)) {
       enrollments += 1;
-      if (enrollmentLooksPaid(row)) {
-        paidEnrollments += 1;
-        revenueAud += listPriceAudFromCourse(row.course);
-      }
+      if (enrollmentIsStripePaid(row)) paidEnrollments += 1;
     }
     if (row.completedAt && inRange(row.completedAt, from, to)) {
       completions += 1;
@@ -92,11 +103,60 @@ export function summariseOpsPeriod(
 
   const newUsers = usersCreatedAt.filter((at) => inRange(at, from, to)).length;
   return {
-    revenueAud: Math.round(revenueAud * 100) / 100,
+    revenueAud: revenueAudForPaidCount(paidEnrollments),
     paidEnrollments,
     enrollments,
     completions,
     newUsers,
     certificates,
   };
+}
+
+export type AdminOpsMonth = {
+  month: string;
+  paidEnrollments: number;
+  enrollments: number;
+  completions: number;
+};
+
+/** The last eight calendar months, oldest first. */
+export function summariseOpsMonthly(sales: SaleLike[], now = new Date()): AdminOpsMonth[] {
+  const months: AdminOpsMonth[] = [];
+  for (let i = 7; i >= 0; i -= 1) {
+    const cursor = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const next = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+    const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`;
+    let paidEnrollments = 0;
+    let enrollments = 0;
+    let completions = 0;
+    for (const e of sales) {
+      if (e.enrolledAt >= cursor && e.enrolledAt < next) {
+        enrollments += 1;
+        if (enrollmentIsStripePaid(e)) paidEnrollments += 1;
+      }
+      if (e.completedAt && e.completedAt >= cursor && e.completedAt < next) {
+        completions += 1;
+      }
+    }
+    months.push({ month: key, paidEnrollments, enrollments, completions });
+  }
+  return months;
+}
+
+export type AdminOpsTopCourse = { title: string; paidEnrollments: number };
+
+/** Courses ranked by Stripe-paid enrolments (not by price), top eight. */
+export function topCoursesByPaidEnrollments(
+  sales: (SaleLike & { courseId: string; course: { title: string } })[]
+): AdminOpsTopCourse[] {
+  const byCourse = new Map<string, AdminOpsTopCourse>();
+  for (const e of sales) {
+    if (!enrollmentIsStripePaid(e)) continue;
+    const row = byCourse.get(e.courseId) ?? { title: e.course.title, paidEnrollments: 0 };
+    row.paidEnrollments += 1;
+    byCourse.set(e.courseId, row);
+  }
+  return Array.from(byCourse.values())
+    .sort((a, b) => b.paidEnrollments - a.paidEnrollments)
+    .slice(0, 8);
 }

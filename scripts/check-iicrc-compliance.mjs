@@ -171,7 +171,10 @@ const BANNED = [
     // credentials to your business", "Get your IICRC certification". Denials ("does not / No CARSI
     // course will get you …") and the third-person route through an IICRC-approved school pass.
     re: /(?<!\b(?:not|never|no)\s+(?:\w+\s+){0,3})(?<!n['’]t\s+(?:\w+\s+){0,3})\b(?:earn(?:s|ing)?|add(?:s|ing)?|gain(?:s|ing)?|get(?:s|ting)?|receiv(?:e|es|ing))\s+(?:(?:your|verifiable|recognised|recognized|real|official|full|new|an?|the|more)\s+)*IICRC[\s-]+(?:certifications?|certificates?|certs?|creds?|credentials?|qualifications?)\b/i,
-    allow: /\bthrough\s+(?:an?\s+)?IICRC[\s-]*approved\s+(?:schools?|examinations?|exams?)\b/i,
+    // Anchored to the credential noun (GP-584 per-occurrence matching): the allow must overlap the
+    // ban, so "IICRC certification through an IICRC-approved school" passes but a school phrase
+    // elsewhere on the line does not excuse an unrelated grant claim.
+    allow: /\bIICRC[\s-]+(?:certifications?|certificates?|certs?|creds?|credentials?|qualifications?)\s+(?:only\s+)?through\s+(?:an?\s+)?IICRC[\s-]*approved\s+(?:schools?|examinations?|exams?)\b/i,
     baselined: true,
     message:
       'CARSI does not grant IICRC certification or credentials — do not tell learners to "earn / add / get IICRC credentials" from CARSI. Say "verifiable CARSI credentials".',
@@ -185,12 +188,54 @@ const BANNED = [
     message:
       'Do not sell "IICRC certs/creds" — CARSI does not deliver IICRC certification. Name the skill area or the CARSI credential.',
   },
+  // GAP CLOSED (GP-753 follow-up, 2026-11-21) — the same certification promise WITHOUT the word
+  // "IICRC". On a CARSI course or marketing surface, "certification course", "get certified" or
+  // "earn your certification" reads as CARSI granting certification; the only certification in
+  // this market is the IICRC's. CARSI issues its own *designations* (DECISIONS: CARSI Southern
+  // Hemisphere Restoration Designations), so the approved wording is "CARSI designation" /
+  // "verifiable CARSI credentials". Probed against the rules above before this landed: all of
+  // these passed. Still passing: third-person facts ("FSRT is an IICRC certification covering…",
+  // "IICRC certification is obtained only through IICRC-approved schools"), a learner's own
+  // certification ("renew / maintain your IICRC certification", "recertification", member
+  // number, CEC tracking), denials ("not a certification course", "does not get you certified")
+  // and the route through an IICRC-approved school. Lines already on main are pinned in
+  // CERT_BASELINE_FILE, not approved.
+  {
+    // A course or programme sold as a certification product.
+    re: /\bcertification[\s-]+(?:courses?|training|programs?|programmes?|class(?:es)?|workshops?|bootcamps?)\b/i,
+    allow:
+      // Denials, incl. one paired adjective ("not an accredited or certification course",
+      // data/seed/ccw-truckmount-assessment.json), and the IICRC-approved-school route.
+      /\b(?:not|never|no|isn['’]t|aren['’]t)\s+(?:an?\s+)?(?:[\w-]+\s+or\s+)?(?:IICRC[\s-]+)?certification[\s-]+(?:courses?|training|programs?|programmes?|class(?:es)?|workshops?|bootcamps?)\b|\bIICRC[\s-]*approved\s+(?:schools?|instructors?|examinations?|exams?)\b/i,
+    baselined: true,
+    message:
+      'Do not sell a CARSI course as a "certification course / training / program". CARSI is an IICRC Approved CEC Provider and issues CARSI designations; name the CARSI designation, or say "from an IICRC Approved CEC Provider".',
+  },
+  {
+    // "get certified", "become (a) certified technician", "become fully certified". Denials and
+    // the third-person IICRC-school route pass. "be certified" is not matched (third-person
+    // requirements: "technicians must be certified by the IICRC").
+    re: /(?<!\b(?:not|never|no|cannot|can['’]t)\s+(?:\w+\s+){0,3})(?<!n['’]t\s+(?:\w+\s+){0,3})\b(?:get|gets|getting|become|becomes|becoming)\s+(?:(?:an?|fully|officially|properly|industry|professionally)\s+)*(?:IICRC[\s-]*)?certified\b/i,
+    allow: /\bthrough\s+(?:an?\s+)?IICRC[\s-]*approved\s+(?:schools?|examinations?|exams?)\b/i,
+    baselined: true,
+    message:
+      'CARSI does not certify anyone — do not say "get certified" / "become certified". Say "earn a CARSI designation" or "earn IICRC CECs toward your existing certification".',
+  },
+  {
+    // "earn your certification", "achieve certification", "gain an industry certification".
+    // Holder forms ("maintain / renew / keep your certification") use other verbs and pass.
+    re: /(?<!\b(?:not|never|no|cannot|can['’]t)\s+(?:\w+\s+){0,3})(?<!n['’]t\s+(?:\w+\s+){0,3})\b(?:earn|earns|earning|gain|gains|gaining|achiev(?:e|es|ing)|obtain|obtains|obtaining|receiv(?:e|es|ing)|get|gets|getting)\s+(?:(?:your|a|an|the|full|official|industry|recognised|recognized|professional|accredited)\s+)*certifications?\b/i,
+    allow: /\bthrough\s+(?:an?\s+)?IICRC[\s-]*approved\s+(?:schools?|examinations?|exams?)\b/i,
+    baselined: true,
+    message:
+      'CARSI does not grant certification — do not say "earn / achieve / get your certification". Say "earn your CARSI designation" or "verifiable CARSI credentials".',
+  },
   // GAP CLOSED — "IICRC-approved" as a CARSI offering. Legitimate uses (real IICRC schools /
   // exams / the CE-provider program / board-approval process) are allowed.
   {
     re: /\bIICRC[\s-]*approved\b/i,
     allow:
-      /\bIICRC[\s-]*approved\s+(school|examination|exam|instructor|course\s+of\s+study)|IICRC[\s-]*board[\s-]*approv|(CE|CEC)[\s-]*provider|IICRC[\s-]*approv\w*\s+CE\b/i,
+      /\bIICRC[\s-]*approved\s+(school|examination|exam|instructor|course\s+of\s+study)|IICRC[\s-]*board[\s-]*approv|\bIICRC[\s-]*approved\s+CEC[\s-]+provider|IICRC[\s-]*approv\w*\s+CE\b/i,
     message:
       'Bare "IICRC-approved" implies IICRC approves CARSI\'s courses/certifications — say "IICRC Approved CEC Provider" for CARSI, or "approved for IICRC CECs" for a class in the register.',
   },
@@ -419,6 +464,25 @@ function isExempt(f) {
   return EXEMPT.some((e) => n === e || n.endsWith('/' + e));
 }
 
+/** All [start, end) spans where `re` matches `text` (zero-width matches skipped). */
+function matchSpans(re, text) {
+  const g = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
+  const spans = [];
+  for (const m of text.matchAll(g)) {
+    if (m[0].length > 0) spans.push([m.index, m.index + m[0].length]);
+  }
+  return spans;
+}
+
+/** True when some match of `rule.re` in `content` is not overlapped by a match of `rule.allow`.
+ *  Exported for the self-test (GP-584). */
+export function hasUnexcusedBan(rule, content) {
+  const bans = matchSpans(rule.re, content);
+  if (!rule.allow) return bans.length > 0;
+  const allows = matchSpans(rule.allow, content);
+  return bans.some(([s, e]) => !allows.some(([as, ae]) => as < e && s < ae));
+}
+
 /** GP-753 known-findings baseline for the `baselined` certification-phrase rules. NOT an approval:
  *  it pins, by exact (file, normalised text), the lines that were already on main when the rules
  *  landed and that need the founder's wording decision. They are printed on every run. Anything
@@ -460,8 +524,10 @@ function scanLine(file, lineNo, content, findings, allowlist, certCtx = CERT_CTX
       // -approved in the allowlist. No regex exemption — the human review is the control.
       flagged = !allowlist.has(normaliseLine(content));
     } else {
-      // BANNED rules: line-wide, exempt-if-`allow`.
-      flagged = !(rule.allow && rule.allow.test(content));
+      // BANNED rules: per occurrence (GP-584). Each ban match must be excused by an allow match
+      // that overlaps ITS span. A legitimate phrase elsewhere on the line excuses nothing, so
+      // "Buy our IICRC courses today. We are an IICRC CEC provider." blocks.
+      flagged = hasUnexcusedBan(rule, content);
     }
     // GP-753: a pinned pre-existing line is reported as a known finding instead of blocking.
     if (flagged && rule.baselined && certCtx?.pinned.has(certKey(nf, content))) {

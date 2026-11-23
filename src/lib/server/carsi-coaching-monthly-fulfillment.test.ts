@@ -171,11 +171,57 @@ describe('CARSI coaching monthly fulfillment', () => {
   it('still honours the legacy Stripe sent flag on sessions fulfilled before this change', async () => {
     const session = paidSession();
     session.metadata = { ...session.metadata, coaching_monthly_emails_sent: 'true' };
+    const { prisma } = await import('@/lib/prisma');
+    vi.mocked(prisma.stripeWebhookEvent.create).mockClear();
     const result = await processCarsiCoachingMonthlyCheckoutCompleted(session, OPTS);
 
     expect(result.skipped).toBe('already_emailed');
     expect(mocks.sendEmail).not.toHaveBeenCalled();
     expect(mocks.sendNotice).not.toHaveBeenCalled();
+    expect(prisma.stripeWebhookEvent.create).not.toHaveBeenCalled();
+  });
+
+  it('reports each delivery and marks the records processed after a good send', async () => {
+    const first = await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+    expect(first.customerEmailDelivery).toBe('sent');
+    expect(first.founderEmailDelivery).toBe('sent');
+    expect(first.customerEmailSent).toBe(true);
+
+    const records = [...db.rows.values()];
+    expect(records).toHaveLength(2);
+    expect(records.every((r) => r.type === 'carsi_coaching_monthly_email')).toBe(true);
+    expect(records.every((r) => r.processedAt instanceof Date)).toBe(true);
+
+    const second = await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+    expect(second.customerEmailSent).toBe(false);
+    expect(second.customerEmailDelivery).toBe('already_claimed');
+    expect(second.founderEmailDelivery).toBe('already_claimed');
+  });
+
+  it('keeps the record and reports failed after an uncertain send', async () => {
+    mocks.sendEmail.mockResolvedValueOnce({ sent: false, reason: 'send_failed' });
+    mocks.sendNotice.mockRejectedValueOnce(new Error('timeout'));
+    const first = await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+
+    expect(first.customerEmailDelivery).toBe('failed');
+    expect(first.founderEmailDelivery).toBe('failed');
+    expect([...db.rows.values()].every((r) => r.processedAt === null)).toBe(true);
+  });
+
+  it('does not set the Stripe sent flag while an email released as not_configured is still owed', async () => {
+    mocks.sessionsUpdate.mockReset().mockResolvedValue({});
+    mocks.sendNotice.mockResolvedValueOnce({ sent: false, reason: 'not_configured' });
+    const first = await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+
+    expect(first.customerEmailDelivery).toBe('sent');
+    expect(first.founderEmailDelivery).toBe('not_configured');
+    expect(mocks.sessionsUpdate).not.toHaveBeenCalled();
+
+    const second = await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+    expect(second.founderEmailDelivery).toBe('sent');
+    expect(mocks.sendEmail).toHaveBeenCalledTimes(1);
+    expect(mocks.sendNotice).toHaveBeenCalledTimes(2);
+    expect(mocks.sessionsUpdate).toHaveBeenCalledTimes(1);
   });
 
   it('sends nothing when the delivery record cannot be written', async () => {
