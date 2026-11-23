@@ -9,6 +9,7 @@ import {
 } from '@/lib/admin/admin-courses-service';
 import type { OptimizedCourseDraft, OptimizedModuleDraft } from '@/lib/admin/optimize-course-draft';
 import { hasCurriculumPersistence } from '@/lib/admin/admin-course-curriculum-readback';
+import { AI_REWRITE_DENYLIST_SLUGS, isAiRewriteLocked } from '@/lib/courses/ai-rewrite-lock';
 import {
   CourseBuilderInputError,
   assertNoStandardText,
@@ -391,26 +392,8 @@ function appliedAtNeedsOptimize(updatedAt: Date, meta: unknown): boolean {
   return updatedAt.getTime() > appliedMs + 3_000;
 }
 
-/**
- * Courses the AI optimise cron must never rewrite. Their lessons are cited and fact-checked
- * against primary sources (see each course's source register), so an AI rewrite would break
- * the claim-to-source mapping. Held in code so a reseed or a lost DB marker cannot re-enable
- * the rewrite. A course can also opt out per-row with `meta.noAiRewrite: true`.
- */
-export const AI_REWRITE_DENYLIST_SLUGS: ReadonlySet<string> = new Set([
-  'ozone-and-hydroxyl-generators-what-the-evidence-says',
-]);
-
-export function isAiRewriteLocked(input: { slug?: string | null; meta: unknown }): boolean {
-  if (input.slug && AI_REWRITE_DENYLIST_SLUGS.has(input.slug)) return true;
-  const meta = input.meta;
-  return (
-    !!meta &&
-    typeof meta === 'object' &&
-    !Array.isArray(meta) &&
-    (meta as Record<string, unknown>).noAiRewrite === true
-  );
-}
+// The rewrite lock lives in a pure module so the weekly findings triage can read it too.
+export { AI_REWRITE_DENYLIST_SLUGS, isAiRewriteLocked };
 
 /** Paid courses only. Re-run only when never applied, or the course was edited after apply. */
 export function paidCourseNeedsOptimize(input: {

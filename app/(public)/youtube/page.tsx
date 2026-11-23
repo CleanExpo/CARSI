@@ -13,6 +13,7 @@ import { BreadcrumbSchema, VideoObjectSchema } from '@/components/seo';
 import { getBackendOrigin } from '@/lib/env/public-url';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 import type { Metadata } from 'next';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 export const metadata: Metadata = {
   title: 'YouTube Channel Directory | CARSI Industry Hub',
@@ -29,6 +30,7 @@ export const metadata: Metadata = {
     'pest control training',
   ],
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     images: OG_IMAGES,
     title: 'YouTube Channel Directory | CARSI Industry Hub',
     description:

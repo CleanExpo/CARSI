@@ -7,6 +7,7 @@ import {
   getCcwRoadshowEvent,
   getCcwRoadshowPricing,
 } from '@/lib/marketing/ccw-roadshow';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 const siteUrl = getPublicSiteUrl();
 const canonical = `${siteUrl}${ccwRoadshowPath}`;
@@ -40,6 +41,7 @@ const baseMetadata: Metadata = {
     'CARSI CCW training',
   ],
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     title: 'Grow Your Cleaning Business with the CARSI Roadshow',
     description:
       'Two practical business-growth days with Phill McGurk inside CCW Melbourne, Sydney and Brisbane locations.',

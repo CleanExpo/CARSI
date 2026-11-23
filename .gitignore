@@ -1,7 +1,7 @@
 # Migration pipeline generated output (local SQL dump extracts)
 
 # Dependencies
-node_modules/
+node_modules
 .pnpm-store/
 
 # Build outputs

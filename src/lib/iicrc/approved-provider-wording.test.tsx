@@ -125,10 +125,6 @@ const PENDING: Record<string, string> = {
   'data/courses/': 'GP-748 (PR #1205): course research and drafts',
   'data/course-content/': 'GP-749: lesson content',
   'data/CARSI_Specialty_Courses_Collection.txt': 'GP-749: legacy course text',
-  'src/components/seo/JsonLd.tsx':
-    'GP-748 (PR #1205) rewrites this file; fix the credential line after it merges',
-  'src/components/lms/CoursePublicDetail.tsx':
-    'GP-748 (PR #1205) rewrites this file; fix the provider line after it merges',
   'src/lib/certificate/CertificateArt.tsx':
     'certificate wording builder (fix/certificate-cec-wording)',
   'src/components/lms/diagrams/CertificatePreview.tsx':
