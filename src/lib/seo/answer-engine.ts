@@ -118,7 +118,7 @@ export function pricingFaqs(f: {
     {
       question: 'Do I have to buy anything to start?',
       answer:
-        'No. Every learner gets the Free Library at no cost and no card required. When you are ready, buy any individual course outright; yearly membership is optional.',
+        'No. Courses marked Free in the catalogue need only a free account, with no card required, and the Free Resources page of government guides needs no account. When you are ready, buy any individual course outright; yearly membership is optional.',
     },
     priceFaq(f),
     {
