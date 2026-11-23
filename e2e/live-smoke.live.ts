@@ -16,8 +16,10 @@ import path from 'node:path';
 
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
 
-/** The approved CARSI wordmark, served by src/components/landing/PublicLogo.tsx. */
-const APPROVED_LOGO_PATH = '/logo/logo1.png';
+// The approved CARSI wordmarks are owned by the component that renders them. Never copy a
+// logo path into this file: a second copy went stale when /login switched to the reversed
+// wordmark (#1288) and failed live smoke run 45109317306 on a correct page.
+import { isApprovedCarsiLogoSrc } from '../src/components/landing/carsi-logo';
 
 interface PageExpectation {
   /** Short name used for the screenshot file. */
@@ -82,22 +84,24 @@ async function brokenImages(page: Page): Promise<string[]> {
   );
 }
 
-async function approvedLogoShown(page: Page, logoPath: string): Promise<boolean> {
-  return page.evaluate((wanted) => {
-    return Array.from(document.images).some((img) => {
-      const src = decodeURIComponent(img.currentSrc || img.src || '');
-      const box = img.getBoundingClientRect();
-      const style = window.getComputedStyle(img);
-      return (
-        src.includes(wanted) &&
-        img.naturalWidth > 0 &&
-        box.width > 0 &&
-        box.height > 0 &&
-        style.visibility !== 'hidden' &&
-        style.display !== 'none'
-      );
-    });
-  }, logoPath);
+/** True when at least one visible, loaded image on the page is an approved CARSI wordmark. */
+async function approvedLogoShown(page: Page): Promise<boolean> {
+  const visibleSources = await page.evaluate(() =>
+    Array.from(document.images)
+      .filter((img) => {
+        const box = img.getBoundingClientRect();
+        const style = window.getComputedStyle(img);
+        return (
+          img.naturalWidth > 0 &&
+          box.width > 0 &&
+          box.height > 0 &&
+          style.visibility !== 'hidden' &&
+          style.display !== 'none'
+        );
+      })
+      .map((img) => img.currentSrc || img.src || '')
+  );
+  return visibleSources.some((src) => isApprovedCarsiLogoSrc(src));
 }
 
 async function checkPublicPage(
@@ -120,7 +124,7 @@ async function checkPublicPage(
   expect.soft(broken, `${url}: broken images`).toEqual([]);
 
   expect
-    .soft(await approvedLogoShown(page, APPROVED_LOGO_PATH), `${url}: approved CARSI logo visible`)
+    .soft(await approvedLogoShown(page), `${url}: approved CARSI logo visible`)
     .toBe(true);
 
   if (testInfo.project.name.startsWith('phone')) {
