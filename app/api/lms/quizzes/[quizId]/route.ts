@@ -6,6 +6,7 @@ import { ensureStaffEnrollmentForQuiz } from '@/lib/server/enrollment-service';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { findEnrolledCoursePrerequisiteBlock, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
+import { countCountedQuizAttempts } from '@/lib/server/quiz-attempt-count';
 type Ctx = { params: Promise<{ quizId: string }> };
 
 function parseQuizOptions(raw: unknown): { text: string }[] {
@@ -70,9 +71,7 @@ export async function GET(request: NextRequest, ctx: Ctx) {
       return NextResponse.json(prerequisiteBlockBody(prereqBlock), { status: 403 });
     }
 
-    const attempts = await prisma.lmsQuizAttempt.count({
-      where: { quizId, studentId: claims.sub },
-    });
+    const attempts = await countCountedQuizAttempts(prisma, quizId, claims.sub);
 
     return NextResponse.json({
       id: quiz.id,

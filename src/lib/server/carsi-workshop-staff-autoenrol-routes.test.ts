@@ -42,6 +42,8 @@ vi.mock('@/lib/prisma', () => ({
     lmsQuiz: { findUnique: mocks.quizFindUnique },
     lmsEnrollment: { findFirst: mocks.enrolFindFirst },
     lmsQuizAttempt: { count: mocks.attemptCount },
+    // countCountedQuizAttempts (GP-432) reads the non-voided count with one raw query.
+    $queryRaw: vi.fn(async () => [{ count: 0 }]),
   },
 }));
 

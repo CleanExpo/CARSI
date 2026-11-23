@@ -101,6 +101,15 @@ vi.mock('@/lib/prisma', () => {
           if (!row) throw new Error('row not found');
           return Object.assign(row, data);
         }),
+        // The GP-737 reactivation is one updateMany guarded on the status it read (GP-432).
+        updateMany: vi.fn(
+          async ({ where, data }: { where: { id: string; status: string }; data: Partial<Row> }) => {
+            const row = db.rows.find((r) => r.id === where.id && r.status === where.status);
+            if (!row) return { count: 0 };
+            Object.assign(row, data);
+            return { count: 1 };
+          }
+        ),
       },
     },
   };

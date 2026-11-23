@@ -77,13 +77,24 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
     return NextResponse.json(prerequisiteBlockBody(prereqBlock), { status: 403 });
   }
 
-  await patchLessonProgress({
-    studentId: claims.sub,
-    lessonId: ctxRow.lesson.id,
-    enrollmentId: ctxRow.enrollmentId,
-    courseId: ctxRow.lesson.module.courseId,
-    completed: json.completed,
-  });
+  try {
+    await patchLessonProgress({
+      studentId: claims.sub,
+      lessonId: ctxRow.lesson.id,
+      enrollmentId: ctxRow.enrollmentId,
+      courseId: ctxRow.lesson.module.courseId,
+      completed: json.completed,
+    });
+  } catch (e) {
+    // GP-432: the server holds no evidence for this lesson (a quiz not yet passed).
+    if (e instanceof Error && e.name === 'LessonCompletionEvidenceError') {
+      return NextResponse.json(
+        { detail: e.message, code: 'quiz_not_passed' },
+        { status: 409, headers: { 'Cache-Control': 'no-store' } },
+      );
+    }
+    throw e;
+  }
 
   return NextResponse.json({ ok: true });
 }

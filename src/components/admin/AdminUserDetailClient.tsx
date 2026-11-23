@@ -15,6 +15,7 @@ import {
   KeyRound,
   Loader2,
   Mail,
+  RotateCcw,
   Shield,
   Trash2,
   UserRound,
@@ -107,6 +108,7 @@ function CourseEnrollmentCard({
   onToggleSelect,
   onAskRevoke,
   onMarkComplete,
+  onResetQuizAttempts,
   onSendIicrc,
   onDownloadCertificate,
 }: {
@@ -123,6 +125,7 @@ function CourseEnrollmentCard({
   onToggleSelect: () => void;
   onAskRevoke: () => void;
   onMarkComplete: (id: string) => void;
+  onResetQuizAttempts: (id: string) => void;
   onSendIicrc: (id: string) => void;
   onDownloadCertificate: (id: string, slug: string) => void;
 }) {
@@ -161,7 +164,8 @@ function CourseEnrollmentCard({
               />
             </label>
           ) : null}
-          <div className="min-w-0 flex-1 space-y-2">
+          {/* min-w keeps the course text readable on a phone: the actions wrap below it. */}
+          <div className="min-w-[14rem] flex-1 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge label={statusLabel} tone={enrollmentStatusTone(enrollment.status)} />
               {stuck ? <StatusBadge label="Not started" tone="warning" /> : null}
@@ -239,6 +243,18 @@ function CourseEnrollmentCard({
                   )}
                 </Button>
               )}
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-9 w-9 text-white/35 hover:bg-white/10 hover:text-white/80"
+                disabled={pendingRevoke || pendingComplete}
+                onClick={() => onResetQuizAttempts(enrollment.enrollmentId)}
+                title="Reset failed quiz attempts"
+                aria-label={`Reset failed quiz attempts for ${enrollment.courseTitle}`}
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
               <Button
                 type="button"
                 size="icon"
@@ -577,18 +593,28 @@ export function AdminUserDetailClient({
     setSelectedEnrollmentIds(new Set());
   }
 
+  // GP-432: marking complete records every lesson as done; the course completes only when its
+  // required assessments are passed. A reason is required and kept in the audit log.
   async function markEnrollmentsComplete(enrollmentIds: string[]) {
     if (enrollmentIds.length === 0) return;
+    const reason = window
+      .prompt(
+        'Reason for marking these lessons complete (kept in the audit log). Assessments are still required before the course completes.'
+      )
+      ?.trim();
+    if (!reason) return;
     setActionError(null);
+    setActionSuccess(null);
     setPendingCompleteIds(new Set(enrollmentIds));
     try {
       const res = await fetch('/api/admin/enrollments/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ studentId: user.userId, enrollmentIds }),
+        body: JSON.stringify({ studentId: user.userId, enrollmentIds, reason }),
       });
       const payload = (await res.json().catch(() => ({}))) as {
         detail?: string;
+        results?: { completed?: boolean }[];
         partial?: boolean;
       };
       if (!res.ok) {
@@ -600,6 +626,12 @@ export function AdminUserDetailClient({
         }
         return;
       }
+      const notCompleted = (payload.results ?? []).filter((r) => r.completed !== true).length;
+      if (notCompleted > 0) {
+        setActionSuccess(
+          `Lessons marked complete. ${notCompleted} course${notCompleted === 1 ? '' : 's'} still need${notCompleted === 1 ? 's' : ''} the learner to pass the required assessment before a certificate is issued.`
+        );
+      }
       setSelectedEnrollmentIds(new Set());
       router.refresh();
     } catch {
@@ -608,6 +640,41 @@ export function AdminUserDetailClient({
       );
     } finally {
       setPendingCompleteIds(new Set());
+    }
+  }
+
+  // GP-432: give the learner fresh attempts on this course's quizzes. Failed attempts are voided
+  // (kept on record), passed attempts are untouched, and the reason goes in the audit log.
+  async function resetQuizAttempts(enrollmentId: string) {
+    const reason = window
+      .prompt('Reason for resetting this learner’s failed quiz attempts (kept in the audit log).')
+      ?.trim();
+    if (!reason) return;
+    setActionError(null);
+    setActionSuccess(null);
+    try {
+      const res = await fetch(
+        `/api/admin/enrollments/${encodeURIComponent(enrollmentId)}/quiz-attempts/reset`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason }),
+        }
+      );
+      const payload = (await res.json().catch(() => ({}))) as { detail?: string; voided?: number };
+      if (!res.ok) {
+        setActionError(payload.detail ?? 'Could not reset quiz attempts');
+        return;
+      }
+      const voided = payload.voided ?? 0;
+      setActionSuccess(
+        voided > 0
+          ? `Reset ${voided} failed quiz attempt${voided === 1 ? '' : 's'}. The learner can try again.`
+          : 'This learner has no failed quiz attempts to reset on this course.'
+      );
+      router.refresh();
+    } catch {
+      setActionError('Could not reset quiz attempts. Please check your connection and try again.');
     }
   }
 
@@ -1096,6 +1163,7 @@ export function AdminUserDetailClient({
                     onMarkComplete={
                       bulkCompletePending ? () => {} : (id) => void markEnrollmentsComplete([id])
                     }
+                    onResetQuizAttempts={(id) => void resetQuizAttempts(id)}
                     onSendIicrc={(id) => void sendIicrcRenewalEmail(id)}
                     onDownloadCertificate={(id, slug) => void downloadCertificate(id, slug)}
                   />
