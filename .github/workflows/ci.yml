@@ -134,6 +134,12 @@ jobs:
       - name: Script entry-point helper self-test
         run: npm run test:entry-point
 
+      # GP-780 main rewrite detector (.github/workflows/main-rewrite-guard.yml). Plants a
+      # force-push rewrite in a throwaway repo and needs exit 1 with the lost PRs listed, and
+      # needs exit 0 for a plain fast-forward.
+      - name: Main rewrite detector self-test
+        run: npm run test:main-rewrite
+
       - name: Source-citation scorecard self-test
         run: npm run test:sources
 
