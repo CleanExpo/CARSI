@@ -31,6 +31,7 @@ try {
 }
 
 const steps = [
+  ['Agent skill system', 'npm', ['run', 'verify:agent-skills']],
   ['Legacy skill references', 'npm', ['run', 'audit:skill-references']],
   ['Dependency governance', 'npm', ['run', 'check:approved-dependencies']],
   ['Premium visuals scanner', 'node', ['scripts/premium-visuals/check-visuals.mjs', '--root', '.']],

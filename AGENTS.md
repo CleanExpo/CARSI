@@ -13,6 +13,9 @@ Premium Visual & Motion Standard, verification gate and compound loop:
 Product engineering skills (specialised workflows — not always-on):
 @.agents/skills/README.md
 
+Skill system completion receipt:
+@.agents/SKILLS-COMPLETE.md
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know

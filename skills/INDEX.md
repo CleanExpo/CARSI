@@ -6,7 +6,8 @@ Legacy `skills/**/*.skill.md` files were removed in favour of the **CARSI Produc
 
 | Location                                                  | Purpose                                              |
 | --------------------------------------------------------- | ---------------------------------------------------- |
-| [`.agents/skills/README.md`](../.agents/skills/README.md) | Skill catalogue (42 workflows)                       |
+| [`.agents/skills/README.md`](../.agents/skills/README.md) | Skill catalogue (44 workflows)                       |
+| [`.agents/SKILLS-COMPLETE.md`](../.agents/SKILLS-COMPLETE.md) | Completion receipt — `npm run verify:agent-skills` |
 | [`.agents/references/`](../.agents/references/)           | Shared standards (libraries, quality gates, visuals) |
 | `AGENTS.md`                                               | Always-on entry + link to skills                     |
 | `docs/agents/`                                            | Licence, premium visuals, IICRC rules                |

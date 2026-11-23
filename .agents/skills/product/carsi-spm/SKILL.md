@@ -31,6 +31,7 @@ See `../../references/engineering-principle.md`.
 
 - `docs/specs/`
 - `docs/runbooks/spm-carsi-first-run-walk.md`
+- `.agents/skills/product/carsi-spm/references/spec-checklist.md`
 ## Acceptance criteria
 
 - Outcome stated for restoration professionals and business metrics.

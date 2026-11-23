@@ -15,9 +15,13 @@
   "scripts": {
     "postinstall": "prisma generate",
     "build": "prisma generate && next build",
+    "verify:agent-skills": "node scripts/audit/verify-agent-skills.mjs",
+    "test:agent-skills": "node scripts/audit/verify-agent-skills.test.mjs",
+    "sync:cursor-skills": "node scripts/sync-cursor-agent-skills.mjs",
     "audit:skill-references": "node scripts/audit/legacy-skill-references.mjs",
     "check:approved-dependencies": "node scripts/audit/check-approved-dependencies.mjs",
     "quality:sda-gate": "node scripts/quality/sda-evidence-gate.mjs",
+    "quality:sda-capture": "node scripts/quality/capture-sda-evidence.mjs",
     "media:manifest:sync": "node scripts/quality/sync-media-manifest.mjs",
     "test:media-manifest-sync": "node scripts/quality/sync-media-manifest.test.mjs",
     "check:secrets": "node scripts/check-secrets.mjs",

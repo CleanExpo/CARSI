@@ -47,7 +47,11 @@ const MANIFEST = [
       'Include media plan, dependencies, risks, and verification plan per `quality-gates.md`.',
       'Customer pages: align with `docs/agents/AGENTS.md` and `visual-surfaces.md` surface A.',
     ],
-    refs: ['docs/specs/', 'docs/runbooks/spm-carsi-first-run-walk.md'],
+    refs: [
+      'docs/specs/',
+      'docs/runbooks/spm-carsi-first-run-walk.md',
+      '.agents/skills/product/carsi-spm/references/spec-checklist.md',
+    ],
   },
   {
     id: 'carsi-architecture',
@@ -178,6 +182,31 @@ const MANIFEST = [
     focus: [
       'Verify 390 / 768 / 1440 for customer-facing work (visual QA skill).',
       'Mobile-first lesson reading on surface B.',
+    ],
+  },
+  {
+    id: 'carsi-tailwind-engineering',
+    category: 'frontend',
+    title: 'CARSI Tailwind Engineering',
+    description:
+      'Applies Tailwind CSS v4 utilities and CARSI campus tokens for responsive layout. Use when styling with Tailwind, custom variants, or migrating legacy CSS.',
+    when: ['tailwind', 'tailwind v4', 'utility', 'responsive', 'globals.css'],
+    focus: [
+      'docs/internal/frontend/tailwind-v4.md',
+      'app/globals.css — no decorative gradient art on marketing surfaces',
+    ],
+  },
+  {
+    id: 'carsi-ui-components',
+    category: 'frontend',
+    title: 'CARSI UI Components',
+    description:
+      'Extends Radix and shadcn-style components in src/components/ui for LMS and admin surfaces. Use when adding buttons, forms, dialogs, or tables.',
+    when: ['component', 'shadcn', 'radix', 'src/components/ui', 'form', 'dialog'],
+    focus: [
+      'src/components/ui/',
+      'docs/internal/frontend/shadcn-ui.md',
+      'components.json',
     ],
   },
   {
@@ -361,6 +390,7 @@ const MANIFEST = [
       '../../references/premium-visuals-triage.md',
       'npm run media:manifest:sync',
       'npm run quality:sda-gate',
+      'npm run quality:sda-capture (with dev server)',
       'Playwright at 390/768/1440; reduced-motion check.',
       'Owner review still required; scanner is heuristic.',
     ],

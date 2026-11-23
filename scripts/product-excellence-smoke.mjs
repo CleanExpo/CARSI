@@ -11,6 +11,11 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 const STEPS = [
   {
+    label: 'agent skill system',
+    cmd: 'npm',
+    args: ['run', 'verify:agent-skills'],
+  },
+  {
     label: 'carsi product analytics',
     cmd: 'npx',
     args: [

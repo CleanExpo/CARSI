@@ -8,3 +8,6 @@ Licence, course production and IICRC terminology rules:
 
 Premium Visual & Motion Standard, verification gate and compound loop:
 @../docs/agents/AGENTS.md
+
+Product engineering skills (specialised workflows — not always-on):
+@../.agents/skills/README.md

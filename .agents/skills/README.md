@@ -1,6 +1,8 @@
 # CARSI Product Engineering Skills
 
-Portable Agent Skills for Cursor (`.agents/skills/`). **Persistent rules** remain in `AGENTS.md` and `docs/agents/`. Skills activate for specialised workflows — they are not always-on instructions.
+Portable Agent Skills for Cursor (`.agents/skills/`; mirror via `npm run sync:cursor-skills` → `.cursor/skills/`). **Persistent rules** remain in `AGENTS.md` and `docs/agents/`. Skills activate for specialised workflows — they are not always-on instructions.
+
+**Receipt:** `.agents/SKILLS-COMPLETE.md` · **Verify:** `npm run verify:agent-skills`
 
 **Principle:** Every feature should make CARSI easier to use, more valuable to restoration professionals, and more commercially successful.
 
@@ -23,7 +25,7 @@ Portable Agent Skills for Cursor (`.agents/skills/`). **Persistent rules** remai
 
 ### Frontend (`frontend/`)
 
-- `carsi-nextjs-engineering`, `carsi-design-system`, `carsi-premium-ui`, `carsi-visual-storytelling`, `carsi-motion-design`, `carsi-responsive-design`, `carsi-interaction-design`
+- `carsi-nextjs-engineering`, `carsi-design-system`, `carsi-premium-ui`, `carsi-visual-storytelling`, `carsi-motion-design`, `carsi-responsive-design`, `carsi-interaction-design`, `carsi-tailwind-engineering`, `carsi-ui-components`
 
 ### Learning (`learning/`)
 

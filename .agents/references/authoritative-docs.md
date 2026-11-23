@@ -4,7 +4,9 @@ Do not duplicate these in skills — link to them.
 
 | Topic | Path |
 |-------|------|
-| Agent entry (Codex/Cursor) | `AGENTS.md` |
+| Agent entry (Codex/Cursor) | `AGENTS.md`, `.claude/CLAUDE.md` |
+| Skill system receipt | `.agents/SKILLS-COMPLETE.md` |
+| Skill catalogue | `.agents/skills/README.md` |
 | Premium visuals, motion, media | `docs/agents/AGENTS.md` |
 | Licence, courses, IICRC terminology | `docs/agents/CLAUDE.md` |
 | Verification gate | `docs/agent-framework/CARSI_VERIFICATION_GATE.md` |
