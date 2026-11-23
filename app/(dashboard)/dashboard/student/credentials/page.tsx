@@ -8,6 +8,7 @@ import { apiClient } from '@/lib/api/client';
 import { markDashboardPageReady } from '@/lib/onboarding/page-ready';
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
 import { certificateCecWording } from '@/lib/certificate/certificate-cec-wording';
+import { APPROVED_FOR_IICRC_CECS } from '@/lib/iicrc/approved-wording';
 import { CecRenewalFigure, CecRenewalStatus } from '@/components/lms/CecRenewalStatus';
 import { useRenewalSummary } from '@/hooks/use-renewal-summary';
 import { renewalProgress } from '@/lib/renewal-progress';
@@ -184,7 +185,7 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
   );
 }
 
-function ProofPackCard() {
+function ProofPackCard({ showCec }: { showCec: boolean }) {
   const { toast } = useToast();
   const [minting, setMinting] = useState(false);
 
@@ -223,8 +224,9 @@ function ProofPackCard() {
             <p className={kicker}>Share with an employer</p>
             <h2 className={`mt-2 text-[1.35rem] ${heading}`}>Employer proof pack</h2>
             <p className={`mt-2 text-[15px] leading-6 ${muted}`}>
-              One PDF or share link with completed courses, dates, approved IICRC CEC totals, and
-              public verification URLs.
+              One PDF or share link with completed courses, dates,{' '}
+              {showCec ? `CEC totals for courses ${APPROVED_FOR_IICRC_CECS}, ` : ''}and public
+              verification URLs.
             </p>
           </div>
         </div>
@@ -301,6 +303,8 @@ export default function StudentCredentialsPage() {
   const cecLabel = formatCecHoursForDisplay(cecProgress.earned);
   // The record shows every approved CEC; only the renewal card is limited to the period (GP-655).
   const lifetimeCecLabel = formatCecHoursForDisplay(approvedCec);
+  // GP-748: a learner with no approved course sees no IICRC name anywhere on this page.
+  const hasApprovedCec = lifetimeCecLabel != null;
 
   return (
     <div className="learner-home -mx-4 w-[calc(100%+2rem)] min-w-0 space-y-10 px-4 pb-16 sm:-mx-6 sm:w-[calc(100%+3rem)] sm:px-6 lg:-mx-10 lg:w-[calc(100%+5rem)] lg:px-10">
@@ -310,16 +314,19 @@ export default function StudentCredentialsPage() {
           Certificates
         </h1>
         <p className="mt-3 max-w-xl text-[15px] leading-6 text-slate-500">
-          CARSI designations, downloads, and approved IICRC CEC hours — only where the IICRC has
-          confirmed them.
+          {hasApprovedCec
+            ? `CARSI designations, downloads, and CEC hours for courses ${APPROVED_FOR_IICRC_CECS}.`
+            : 'CARSI designations and certificate downloads.'}
         </p>
       </header>
 
       {user && !loading && !error && credentials.length > 0 ? (
-        <section className="grid w-full items-stretch gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+        <section
+          className={`grid w-full items-stretch gap-5 ${hasApprovedCec ? 'lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]' : ''}`}
+        >
           <div className={`${surface} px-7 py-7`}>
             <p className={kicker}>Your record</p>
-            <dl className="mt-7 grid grid-cols-2 gap-4">
+            <dl className={`mt-7 grid gap-4 ${hasApprovedCec ? 'grid-cols-2' : 'grid-cols-1'}`}>
               <div className={`${inset} rounded-xl px-4 py-5`}>
                 <dt className={`text-[11px] ${muted}`}>
                   {credentials.length === 1 ? 'Certificate' : 'Certificates'}
@@ -328,27 +335,31 @@ export default function StudentCredentialsPage() {
                   {credentials.length}
                 </dd>
               </div>
-              <div className={`${inset} rounded-xl px-4 py-5`}>
-                <dt className={`text-[11px] ${muted}`}>Approved IICRC CEC hours</dt>
-                <dd className={`mt-2 text-[2.2rem] leading-none tabular-nums ${heading}`}>
-                  {lifetimeCecLabel ?? '0'}
-                </dd>
-              </div>
+              {hasApprovedCec ? (
+                <div className={`${inset} rounded-xl px-4 py-5`}>
+                  <dt className={`text-[11px] ${muted}`}>Approved IICRC CEC hours</dt>
+                  <dd className={`mt-2 text-[2.2rem] leading-none tabular-nums ${heading}`}>
+                    {lifetimeCecLabel}
+                  </dd>
+                </div>
+              ) : null}
             </dl>
           </div>
-          <div className={`${surface} flex flex-col px-7 py-7`}>
-            <p className={kicker}>IICRC CEC progress</p>
-            <div className="mt-6 flex items-center gap-5">
-              <BrandRing percent={cecProgress.percent} size={84} stroke={7} id="cred-cec-ring" />
-              <p className={`text-[2.1rem] leading-none tabular-nums ${heading}`}>
-                <CecRenewalFigure progress={cecProgress} earnedLabel={cecLabel ?? '0'} />
-              </p>
+          {hasApprovedCec ? (
+            <div className={`${surface} flex flex-col px-7 py-7`}>
+              <p className={kicker}>IICRC CEC progress</p>
+              <div className="mt-6 flex items-center gap-5">
+                <BrandRing percent={cecProgress.percent} size={84} stroke={7} id="cred-cec-ring" />
+                <p className={`text-[2.1rem] leading-none tabular-nums ${heading}`}>
+                  <CecRenewalFigure progress={cecProgress} earnedLabel={cecLabel ?? '0'} />
+                </p>
+              </div>
+              <div className="mt-6">
+                <ProgressTrack percent={cecProgress.percent} />
+              </div>
+              <CecRenewalStatus progress={cecProgress} textClassName={muted} />
             </div>
-            <div className="mt-6">
-              <ProgressTrack percent={cecProgress.percent} />
-            </div>
-            <CecRenewalStatus progress={cecProgress} textClassName={muted} />
-          </div>
+          ) : null}
         </section>
       ) : null}
 
@@ -363,7 +374,7 @@ export default function StudentCredentialsPage() {
         </section>
       ) : null}
 
-      {user ? <ProofPackCard /> : null}
+      {user ? <ProofPackCard showCec={hasApprovedCec} /> : null}
 
       {loading ? (
         <div
@@ -388,8 +399,7 @@ export default function StudentCredentialsPage() {
           </span>
           <h2 className={`mt-5 text-[1.4rem] ${heading}`}>No certificates yet</h2>
           <p className={`mx-auto mt-2 max-w-md text-[15px] leading-6 ${muted}`}>
-            Complete your first course to earn a CARSI certificate. Approved IICRC CEC hours appear
-            here only after IICRC confirmation.
+            Complete your first course to earn a CARSI certificate.
           </p>
           <Link href="/dashboard/courses" className={`${btn} mt-8`}>
             View courses

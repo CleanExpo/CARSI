@@ -88,6 +88,28 @@ async function settleEmailDelivery(
   }
 }
 
+/**
+ * What happened to one email on this run.
+ * - `sent`: sent on this run; record marked processed.
+ * - `already_claimed`: a delivery record already existed (sent, in flight, or an uncertain
+ *   failure). The email is NOT owed; never resend.
+ * - `not_configured`: mail was not configured, nothing went out, record released.
+ * - `failed`: the send failed in a way that may still have delivered (timeout, provider error,
+ *   throw). Record kept, not retried (founder rule 21/11/2026: at most once).
+ * A record that cannot be written at all throws (see `claimEmailDelivery`), so nothing is sent.
+ */
+export type CoachingMonthlyEmailDelivery = 'sent' | 'already_claimed' | 'not_configured' | 'failed';
+
+function deliveryStatus(
+  claimed: boolean,
+  outcome: { sent: boolean; reason?: string } | 'threw'
+): CoachingMonthlyEmailDelivery {
+  if (!claimed) return 'already_claimed';
+  if (outcome === 'threw') return 'failed';
+  if (outcome.sent) return 'sent';
+  return outcome.reason === 'not_configured' ? 'not_configured' : 'failed';
+}
+
 export function isCarsiCoachingMonthlyCheckoutSession(session: Stripe.Checkout.Session): boolean {
   return session.metadata?.source === CARSI_COACHING_MONTHLY_CHECKOUT_SOURCE;
 }
@@ -95,8 +117,11 @@ export function isCarsiCoachingMonthlyCheckoutSession(session: Stripe.Checkout.S
 export type CarsiCoachingMonthlyFulfillmentResult = {
   fulfilled: boolean;
   skipped?: string;
+  /** Sent on this run (not "sent at some point"); see the `*Delivery` fields for why not. */
   customerEmailSent?: boolean;
   founderEmailSent?: boolean;
+  customerEmailDelivery?: CoachingMonthlyEmailDelivery;
+  founderEmailDelivery?: CoachingMonthlyEmailDelivery;
 };
 
 function resolveAmountLabel(session: Stripe.Checkout.Session): string {
@@ -213,27 +238,27 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
     coachingPageUrl,
   });
 
-  let customerResult: { sent: boolean } = { sent: false };
-  if (await claimEmailDelivery(session.id, 'welcome')) {
-    let welcomeOutcome: { sent: boolean; reason?: string } | 'threw' = 'threw';
+  const welcomeClaimed = await claimEmailDelivery(session.id, 'welcome');
+  let welcomeOutcome: { sent: boolean; reason?: string } | 'threw' = 'threw';
+  if (welcomeClaimed) {
     try {
-      customerResult = await sendEmail({
+      welcomeOutcome = await sendEmail({
         to: email,
         subject: `Welcome to ${carsiCoachingProductName}`,
         html,
         text,
       });
-      welcomeOutcome = customerResult;
     } finally {
       await settleEmailDelivery(session.id, 'welcome', welcomeOutcome);
     }
   }
+  const customerEmailDelivery = deliveryStatus(welcomeClaimed, welcomeOutcome);
 
-  let founderResult: { sent: boolean } = { sent: false };
-  if (await claimEmailDelivery(session.id, 'coach_notice')) {
-    let noticeOutcome: { sent: boolean; reason?: string } | 'threw' = 'threw';
+  const noticeClaimed = await claimEmailDelivery(session.id, 'coach_notice');
+  let noticeOutcome: { sent: boolean; reason?: string } | 'threw' = 'threw';
+  if (noticeClaimed) {
     try {
-      founderResult = await sendCarsiCoachingMonthlyFounderNotificationEmail({
+      noticeOutcome = await sendCarsiCoachingMonthlyFounderNotificationEmail({
         appOrigin,
         contactName,
         contactEmail: email,
@@ -243,14 +268,19 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
         stripeCheckoutSessionId: session.id,
         stripeSubscriptionId: subscriptionId,
       });
-      noticeOutcome = founderResult;
     } catch (err) {
       console.error('[coaching-monthly] founder notification failed:', err);
     }
     await settleEmailDelivery(session.id, 'coach_notice', noticeOutcome);
   }
+  const founderEmailDelivery = deliveryStatus(noticeClaimed, noticeOutcome);
 
-  if (customerResult.sent || founderResult.sent) {
+  // Fast-path flag only when neither email is still owed. If one was released as
+  // `not_configured`, setting the flag would skip it on every later run.
+  const neitherOwed = [customerEmailDelivery, founderEmailDelivery].every(
+    (d) => d === 'sent' || d === 'already_claimed'
+  );
+  if (neitherOwed) {
     try {
       const stripe = getStripeClient();
       await stripe.checkout.sessions.update(session.id, {
@@ -266,7 +296,9 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
 
   return {
     fulfilled: true,
-    customerEmailSent: customerResult.sent,
-    founderEmailSent: founderResult.sent,
+    customerEmailSent: customerEmailDelivery === 'sent',
+    founderEmailSent: founderEmailDelivery === 'sent',
+    customerEmailDelivery,
+    founderEmailDelivery,
   };
 }

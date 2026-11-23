@@ -1,6 +1,7 @@
 import { formatCecHoursForCertificate } from '@/lib/cec-display';
 import {
   APPROVED_FOR_IICRC_CECS,
+  APPROVED_FOR_IICRC_CECS_LABEL,
   CARSI_PROVIDER_STATUS,
   IICRC_APPROVED_CEC_PROVIDER,
 } from '@/lib/iicrc/approved-wording';
@@ -61,7 +62,7 @@ export function certificateCecWording(
     approved: true,
     cecCreditsValue,
     recordLine: `${COURSE_APPROVED_FOR_IICRC_CECS}. Retain this certificate with your renewal records.`,
-    cardLabel: COURSE_APPROVED_FOR_IICRC_CECS,
+    cardLabel: APPROVED_FOR_IICRC_CECS_LABEL,
     scopeStatement:
       `A CARSI-issued credential, not an IICRC certification. ${CARSI_PROVIDER_STATUS} ` +
       `${COURSE_APPROVED_FOR_IICRC_CECS}. ` +
