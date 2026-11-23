@@ -25,6 +25,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
 
 import { getStripeClient } from '@/lib/api/stripe';
+import {
+  analyticsConsentFromBody,
+  analyticsConsentMetadata,
+} from '@/lib/server/analytics-consent';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { membershipCheckoutDecisionFor } from '@/lib/server/membership-checkout-guard';
 import {
@@ -56,7 +60,11 @@ export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => ({}))) as {
     success_url?: string;
     cancel_url?: string;
+    analytics_consent?: unknown;
   };
+  // GP-732: the visitor's analytics choice, recorded on the session and the subscription so the
+  // webhook's GA4 subscription events are sent only after a yes.
+  const consentMetadata = analyticsConsentMetadata(analyticsConsentFromBody(body.analytics_consent));
 
   if (!subscriptionsEnabled()) {
     return NextResponse.json({ detail: UNAVAILABLE }, { status: 503 });
@@ -133,6 +141,7 @@ export async function POST(request: NextRequest) {
           plan: 'pro_annual',
           source: 'carsi-pro-annual',
           ...(attributionJourneyId ? { attribution_journey_id: attributionJourneyId } : {}),
+          ...consentMetadata,
         },
         subscription_data: {
           trial_period_days: 7,
@@ -140,6 +149,7 @@ export async function POST(request: NextRequest) {
             carsi_user_id: claims.sub,
             plan: 'pro_annual',
             ...(attributionJourneyId ? { attribution_journey_id: attributionJourneyId } : {}),
+            ...consentMetadata,
           },
         },
         // GP-773: no promotion codes on a membership (founder ruling: "no further discounts").

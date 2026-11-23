@@ -14,6 +14,11 @@ import { courseAssetDecision } from './course-asset-access';
 
 const mocks = vi.hoisted(() => ({ updateSession: vi.fn(), renamed: vi.fn(), lookup: vi.fn() }));
 vi.mock('@/lib/api/middleware', () => ({ updateSession: mocks.updateSession }));
+// GP-760: an admin token is staff only while the database agrees (isLmsSessionAdminNow, tested in
+// auth-current-role-readers.test.ts). Here the database agrees with the token's role.
+vi.mock('@/lib/server/lms-admin-now', () => ({
+  isLmsSessionAdminNow: async (claims: { role?: string } | null) => claims?.role === 'admin',
+}));
 vi.mock('@/lib/seo/renamed-course-slugs', () => ({
   renamedCourseRedirect: mocks.renamed,
   lookupCourseSlugInDatabase: mocks.lookup,

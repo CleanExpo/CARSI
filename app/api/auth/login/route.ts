@@ -9,7 +9,8 @@ import {
   loginFailureKindForEmail,
   NEEDS_PASSWORD_SETUP_MESSAGE,
 } from '@/lib/server/lms-auth';
-import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
+import { clientIpFrom } from '@/lib/rate-limit';
+import { applyDurableRateLimit } from '@/lib/server/durable-rate-limit';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 const AUTH_LIMIT = 10;
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
       request.headers.get('x-forwarded-for'),
       request.headers.get('x-real-ip'),
     );
-    const rl = applyRateLimit(`auth-login:${ip}`, AUTH_LIMIT, AUTH_WINDOW_MS);
+    const rl = await applyDurableRateLimit(`auth-login:${ip}`, AUTH_LIMIT, AUTH_WINDOW_MS);
     if (!rl.ok) {
       return NextResponse.json(
         { error: 'Too many attempts. Please try again later.' },

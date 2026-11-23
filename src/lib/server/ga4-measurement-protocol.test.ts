@@ -53,7 +53,7 @@ describe('sendGa4MeasurementProtocolEvent', () => {
     setEnv(undefined, undefined);
     const fetchImpl = vi.fn();
     const result = await sendGa4MeasurementProtocolEvent(
-      { name: 'purchase', clientId: 'abc', params: {} },
+      { name: 'purchase', clientId: 'abc', analyticsConsent: true, params: {} },
       { fetchImpl },
     );
     expect(result).toEqual({ sent: false });
@@ -68,7 +68,7 @@ describe('sendGa4MeasurementProtocolEvent', () => {
       {
         name: 'purchase',
         clientId: 'client-1',
-        userId: 'user-1',
+        analyticsConsent: true,
         params: { currency: 'AUD', value: 199 },
       },
       { fetchImpl },
@@ -81,7 +81,7 @@ describe('sendGa4MeasurementProtocolEvent', () => {
     expect(url).toContain('api_secret=secret-abc');
     const body = JSON.parse(init.body);
     expect(body.client_id).toBe('client-1');
-    expect(body.user_id).toBe('user-1');
+    expect(body).not.toHaveProperty('user_id');
     expect(body.events).toEqual([{ name: 'purchase', params: { currency: 'AUD', value: 199 } }]);
   });
 
@@ -90,7 +90,7 @@ describe('sendGa4MeasurementProtocolEvent', () => {
     const fetchImpl = vi.fn().mockRejectedValue(new Error('network down'));
 
     const result = await sendGa4MeasurementProtocolEvent(
-      { name: 'purchase', clientId: 'client-1', params: {} },
+      { name: 'purchase', clientId: 'client-1', analyticsConsent: true, params: {} },
       { fetchImpl },
     );
 
@@ -102,11 +102,77 @@ describe('sendGa4MeasurementProtocolEvent', () => {
     const fetchImpl = vi.fn().mockResolvedValue({ ok: false, status: 400 });
 
     const result = await sendGa4MeasurementProtocolEvent(
-      { name: 'purchase', clientId: 'client-1', params: {} },
+      { name: 'purchase', clientId: 'client-1', analyticsConsent: true, params: {} },
       { fetchImpl },
     );
 
     expect(result).toEqual({ sent: false, status: 400 });
+  });
+});
+
+// GP-732: the server sends nothing to Google unless the visitor said yes at checkout. On main
+// these sent the event whatever the visitor chose, with the learner's account id as user_id.
+describe('the visitor analytics choice (GP-732)', () => {
+  it.each([
+    ['no choice recorded', undefined],
+    ['a no', false],
+    ['a value that is not a plain yes', 'granted'],
+  ])('sends nothing on %s', async (_label, analyticsConsent) => {
+    setEnv('G-TEST123', 'secret-abc');
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: true, status: 204 });
+
+    const result = await sendGa4MeasurementProtocolEvent(
+      {
+        name: 'purchase',
+        clientId: 'cs_test_123',
+        params: { currency: 'AUD', value: 199 },
+        ...(analyticsConsent === undefined ? {} : { analyticsConsent }),
+      } as unknown as Parameters<typeof sendGa4MeasurementProtocolEvent>[0],
+      { fetchImpl },
+    );
+
+    expect(result).toEqual({ sent: false });
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it('never sends a user_id, even when a caller passes one', async () => {
+    setEnv('G-TEST123', 'secret-abc');
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: true, status: 204 });
+
+    await sendGa4MeasurementProtocolEvent(
+      {
+        name: 'purchase',
+        clientId: 'cs_test_123',
+        analyticsConsent: true,
+        userId: 'learner-account-id',
+        params: {},
+      } as unknown as Parameters<typeof sendGa4MeasurementProtocolEvent>[0],
+      { fetchImpl },
+    );
+
+    const body = JSON.parse(fetchImpl.mock.calls[0][1].body);
+    expect(body).not.toHaveProperty('user_id');
+    expect(JSON.stringify(body)).not.toContain('learner-account-id');
+  });
+
+  it('sends no purchase event without a yes', async () => {
+    setEnv('G-TEST123', 'secret-abc');
+    const originalFetch = global.fetch;
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: true, status: 204 });
+    global.fetch = fetchImpl as unknown as typeof fetch;
+    try {
+      const result = await sendGa4PurchaseEvent({
+        clientId: 'cs_test_123',
+        analyticsConsent: false,
+        courseSlug: 'water-damage-101',
+        valueAud: 199,
+        transactionId: 'cs_test_123',
+      });
+      expect(result).toEqual({ sent: false });
+      expect(fetchImpl).not.toHaveBeenCalled();
+    } finally {
+      global.fetch = originalFetch;
+    }
   });
 });
 
@@ -116,6 +182,7 @@ describe('sendGa4PurchaseEvent', () => {
     const fetchImpl = vi.fn();
     const result = await sendGa4PurchaseEvent({
       clientId: 'client-1',
+      analyticsConsent: true,
       courseSlug: 'water-damage-101',
       valueAud: 199,
       transactionId: 'cs_test_123',
@@ -133,7 +200,7 @@ describe('sendGa4PurchaseEvent', () => {
     try {
       const result = await sendGa4PurchaseEvent({
         clientId: 'client-1',
-        userId: 'user-1',
+        analyticsConsent: true,
         courseSlug: 'water-damage-101',
         valueAud: 199,
         transactionId: 'cs_test_123',

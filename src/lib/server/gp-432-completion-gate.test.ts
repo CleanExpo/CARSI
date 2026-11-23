@@ -486,6 +486,8 @@ const STATUS_WRITER_ALLOW = new Map<string, StatusWriterHow>([
   [`${join('src', 'lib', 'server', 'enrollment-service.ts')}#enrollStudentInCourse`, 'limit'],
   [`${join('src', 'lib', 'server', 'enrollment-service.ts')}#ensureAdminEnrollmentForCourse`, 'new-row'],
   [`${join('src', 'lib', 'server', 'enrollment-service.ts')}#reactivateStaffEnrollment`, 'guarded'],
+  // GP-759 (#1258): a team-seat refund revokes the seats it sold, filtered on their status.
+  [`${join('src', 'lib', 'server', 'team-seat-refund.ts')}#revokeTeamSeatBlocksForRefund`, 'guarded'],
   [`${join('src', 'lib', 'admin', 'admin-enrollment-mutations.ts')}#adminGrantEnrollment`, 'new-row'],
 ]);
 

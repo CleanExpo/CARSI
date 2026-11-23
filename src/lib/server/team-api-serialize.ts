@@ -6,6 +6,7 @@ import {
 import { decideTeamSeatSubscription } from '@/lib/server/entitlements';
 import { getTeamCoursePurchases, getTeamCourseSeatPools } from '@/lib/server/team-course-seats';
 import { countTeamSeatsUsed, repairAndGetTeamForUser } from '@/lib/server/teams';
+import { countTeamPaidSeatsUsed } from '@/lib/server/team-seat-refund';
 
 type TeamRecord = NonNullable<Awaited<ReturnType<typeof repairAndGetTeamForUser>>>;
 
@@ -98,7 +99,8 @@ export async function serializeTeamForClient(team: TeamRecord, claimsSub: string
     course_slug: team.courseSlug,
     // For a Teams subscription team the PAID seat count is authoritative.
     seat_limit: teamSub ? teamSub.seatLimit : team.seatLimit,
-    seats_used: seatsUsed,
+    // GP-759: a course-purchase team shows only seats it paid for (same rule as the invite check).
+    seats_used: teamSub ? seatsUsed : ((await countTeamPaidSeatsUsed(prisma, team.id)) ?? seatsUsed),
     owner_id: team.ownerId,
     is_owner: true,
     team_subscription: teamSubscription,

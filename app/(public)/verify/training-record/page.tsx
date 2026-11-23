@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { AlertCircle, Download, ExternalLink, Loader2 } from 'lucide-react';
 
+import { APPROVED_FOR_IICRC_CECS_LABEL } from '@/lib/iicrc/approved-wording';
+import { APPROVED_CEC_BY_DISCIPLINE_HEADING, approvedCecHoursLine } from '@/lib/proof-pack-cec-wording';
 import type { ProofPackPayload } from '@/types/proof-pack';
 
 function formatGenerated(iso: string) {
@@ -63,7 +65,7 @@ function TrainingRecordContent() {
         CARSI verification
       </p>
       <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white md:text-3xl">
-        Training &amp; CEC summary
+        Training summary
       </h1>
       <p className="mt-2 text-sm text-slate-600 dark:text-white/55">
         For employer, HR, or insurer evidence. Each course links to a public credential check.
@@ -127,14 +129,17 @@ function TrainingRecordContent() {
                 </p>
                 <p className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">{data.summary.completed_courses}</p>
               </div>
-              <div>
-                <p className="text-[10px] font-semibold tracking-widest text-slate-600 dark:text-white/55 uppercase">
-                  Total CEC hours
-                </p>
-                <p className="mt-1 text-xl font-semibold text-[#146fc2] dark:text-[#7ec5ff]">
-                  {data.summary.total_cec_hours}
-                </p>
-              </div>
+              {/* GP-748: present only when a completed course is in the CEC approvals registry. */}
+              {data.summary.total_cec_hours != null && (
+                <div>
+                  <p className="text-[10px] font-semibold tracking-widest text-slate-600 dark:text-white/55 uppercase">
+                    {APPROVED_FOR_IICRC_CECS_LABEL}
+                  </p>
+                  <p className="mt-1 text-xl font-semibold text-[#146fc2] dark:text-[#7ec5ff]">
+                    {data.summary.total_cec_hours} {data.summary.total_cec_hours === 1 ? 'hour' : 'hours'}
+                  </p>
+                </div>
+              )}
             </div>
             <a
               href={pdfHref}
@@ -145,10 +150,10 @@ function TrainingRecordContent() {
             </a>
           </div>
 
-          {data.cec_by_discipline.length > 0 && (
+          {data.cec_by_discipline && data.cec_by_discipline.length > 0 && (
             <section aria-labelledby="cec-heading">
               <h2 id="cec-heading" className="text-sm font-semibold text-slate-900 dark:text-white">
-                CEC by discipline
+                {APPROVED_CEC_BY_DISCIPLINE_HEADING}
               </h2>
               <ul className="mt-3 divide-y divide-white/10 rounded-xl border border-white/10">
                 {data.cec_by_discipline.map((row) => (
@@ -176,7 +181,10 @@ function TrainingRecordContent() {
                 >
                   <p className="font-medium text-slate-900 dark:text-white">{c.course_title}</p>
                   <p className="mt-1 text-xs text-slate-600 dark:text-white/55">
-                    {c.iicrc_discipline ?? '—'} · {c.cec_hours} CEC · issued {c.issued_date}
+                    {c.cec_hours != null
+                      ? `${[c.iicrc_discipline?.trim() || null, approvedCecHoursLine(c.cec_hours)].filter(Boolean).join(' · ')} · `
+                      : ''}
+                    issued {c.issued_date}
                   </p>
                   <p className="mt-1 font-mono text-[11px] text-slate-600 dark:text-white/55">ID {c.credential_id}</p>
                   <a

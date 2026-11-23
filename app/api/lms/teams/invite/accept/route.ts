@@ -5,6 +5,7 @@ import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { runSerializable } from '@/lib/server/db-tx';
 import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import { enrollTeamMemberInPurchasedCourse } from '@/lib/server/team-course-purchase';
+import { countTeamPaidSeatsUsed } from '@/lib/server/team-seat-refund';
 
 /** POST /api/lms/teams/invite/accept — accept invite token. */
 export async function POST(request: NextRequest) {
@@ -82,7 +83,11 @@ export async function POST(request: NextRequest) {
         select: { userId: true },
       });
       if (!existing) {
-        const seatsUsed = await tx.lmsTeamMember.count({ where: { teamId: invite.teamId } });
+        // GP-759: a course-purchase team counts only seats it paid for (one owner,
+        // teamPaidSeatHolders); other teams count members as before.
+        const paidSeatsUsed = teamSub ? null : await countTeamPaidSeatsUsed(tx, invite.teamId);
+        const seatsUsed =
+          paidSeatsUsed ?? (await tx.lmsTeamMember.count({ where: { teamId: invite.teamId } }));
         if (seatsUsed >= effectiveSeatLimit) {
           return { seatFull: true as const };
         }

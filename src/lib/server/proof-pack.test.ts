@@ -42,9 +42,11 @@ describe('getProofPackPayloadForStudent — course references (BACKLOG #26)', ()
     expect(withRefs.references.map((r) => r.label)).toEqual(source.map((r) => r.label));
     expect(withoutRefs.references).toEqual([]);
 
-    // References change nothing about CEC: neither course is in the approvals registry.
-    expect(withRefs.cec_hours).toBe(0);
-    expect(withoutRefs.cec_hours).toBe(0);
-    expect(p!.summary.total_cec_hours).toBe(0);
+    // References change nothing about CEC: neither course is in the approvals registry, so
+    // neither row nor the summary carries a CEC key at all (GP-748).
+    expect(withRefs).not.toHaveProperty('cec_hours');
+    expect(withoutRefs).not.toHaveProperty('cec_hours');
+    expect(p!.summary).not.toHaveProperty('total_cec_hours');
+    expect(p).not.toHaveProperty('cec_by_discipline');
   });
 });
