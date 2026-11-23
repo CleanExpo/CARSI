@@ -48,6 +48,16 @@ export function isBoughtNotStarted(
   return u.enrollmentCount > 0 && progressPct(u) === 0;
 }
 
+const sydneyYearMonthFormat = new Intl.DateTimeFormat('en-AU', {
+  year: 'numeric',
+  month: '2-digit',
+  timeZone: 'Australia/Sydney',
+});
+
+function sydneyYearMonth(date: Date): string {
+  return sydneyYearMonthFormat.format(date);
+}
+
 export function matchesAdminUserSegment(
   u: AdminDashboardUserEntry,
   segment: AdminUserSegment,
@@ -61,8 +71,9 @@ export function matchesAdminUserSegment(
   if (segment === 'in_progress' || segment === 'active') return isActiveLearner(u);
   if (segment === 'completed') return u.enrollmentCount > 0 && pct === 100;
   if (segment === 'new') {
-    const created = new Date(u.createdAt);
-    return created.getFullYear() === now.getFullYear() && created.getMonth() === now.getMonth();
+    // Compare calendar months in Sydney, not the runtime's zone: the server (UTC) and the
+    // browser must agree, or the filtered row count differs on hydration (GP-768).
+    return sydneyYearMonth(new Date(u.createdAt)) === sydneyYearMonth(now);
   }
   return true;
 }

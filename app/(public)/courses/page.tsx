@@ -32,6 +32,7 @@ import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-cou
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import { ArrowRight, Compass } from 'lucide-react';
 
+import { APPROVED_FOR_IICRC_CECS_LABEL } from '@/lib/iicrc/approved-wording';
 export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -238,7 +239,7 @@ export default async function CoursesPage({
                 href="/courses?discipline=iicrc-cec#catalogue"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#146fc2]/30 bg-white px-7 text-sm font-semibold text-[#146fc2] transition hover:border-[#146fc2]/60 focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
               >
-                IICRC CEC Accredited courses ({cecApprovedCount})
+                {APPROVED_FOR_IICRC_CECS_LABEL} ({cecApprovedCount})
               </Link>
             ) : null}
             <Link

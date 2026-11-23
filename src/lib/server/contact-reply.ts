@@ -18,6 +18,7 @@
  */
 
 import { ASSISTANT_DISCLAIMER } from '@/lib/assistant-disclaimer';
+import { scanTextForStandardExcerpt, type StandardExcerptHit } from '@/lib/course-kit/standards-excerpt';
 import { assertNoVerbatimSource, type NoVerbatimResult } from '@/lib/server/no-verbatim-guard';
 
 /** A standard passage the reply was grounded in, used both for citation and the n-gram check. */
@@ -122,6 +123,36 @@ export function validateReplyNoVerbatim(
     .map((s) => s?.passage?.trim())
     .filter((p): p is string => Boolean(p));
   return assertNoVerbatimSource(replyText, passages, n);
+}
+
+/**
+ * The citation line `buildContactReplyText` writes, e.g.
+ * "This guidance is grounded in IICRC S500 §12.2.3 and IICRC S520." It is
+ * generated, not authored, so it is left out of the wording check: two cited
+ * sections would otherwise look like clause-numbered standard text.
+ */
+const GENERATED_CITATION_LINE = /^This guidance is grounded in [^\n]{1,300}\.$/gm;
+
+/** The 422 detail every reply route returns when free text reads like standard text. */
+export const STANDARD_WORDING_REJECTION =
+  'Reply rejected: it reads like pasted standard text. Name the standard and section, and answer in your own words.';
+
+/**
+ * GP-706 item 1: check text an authorised admin (or the drafting agent) typed
+ * for the shape of pasted standard text. Uses the course-kit cite-density
+ * heuristic, which needs no standard text: a standard named alongside clustered
+ * clause numbers or repeated normative "shall". Returns the hit, or null.
+ *
+ * Covers every free-text path: draft answer paragraphs, the admin's edit when
+ * approving a draft, and the inline reply. The generated citation line and the
+ * disclaimer footer are removed first. It is a filter, not proof of absence.
+ */
+export function findStandardWordingInFreeText(text: string): StandardExcerptHit | null {
+  const authored = (text ?? '')
+    .replace(GENERATED_CITATION_LINE, '')
+    .split(CONTACT_REPLY_DISCLAIMER)
+    .join('');
+  return scanTextForStandardExcerpt(authored, 'contact-reply');
 }
 
 /**

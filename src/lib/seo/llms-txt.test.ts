@@ -15,6 +15,7 @@ import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
 import type { CourseListItem } from '@/lib/course-list-item';
+import * as approvedWording from '@/lib/iicrc/approved-wording';
 import { FLOOR_CARE_ONBOARDING_SLUG } from '@/lib/onboarding/enterprise';
 import { INDIVIDUAL_TIERS } from '@/lib/lms/pricing-tiers';
 import { getCecApprovalEntries, selectCurrentCecCourses } from '@/lib/seed/cec-approvals';
@@ -490,6 +491,15 @@ const HAS_NUMBER = (t: string) => /\d/.test(t) || NUMBER_WORD.test(t);
 const VALUE_FORMATTERS = new Set(['formatAud', 'isoDate', 'makeSourcer']);
 /** Locals that hold an already-sourced value. */
 const SOURCED_LOCALS = new Set(['yearly', 'generated', 'email']);
+/**
+ * The GP-704 provider wording constants. They are fixed copy, not values, and carry no number
+ * (asserted below), so inserting one cannot smuggle an unsourced figure into llms.txt.
+ */
+const WORDING_CONSTANTS = new Set(
+  Object.entries(approvedWording)
+    .filter(([, v]) => typeof v === 'string' && !HAS_NUMBER(v))
+    .map(([k]) => k)
+);
 
 function enclosingFunction(node: ts.Node): string | null {
   for (let a: ts.Node | undefined = node.parent; a; a = a.parent) {
@@ -528,6 +538,7 @@ export function templateFindings(source: string): { staticNumbers: string[]; uns
       const ok =
         isSourcedCall(ex) ||
         (ts.isIdentifier(ex) && SOURCED_LOCALS.has(ex.text)) ||
+        (ts.isIdentifier(ex) && WORDING_CONSTANTS.has(ex.text)) ||
         (ts.isConditionalExpression(ex) &&
           ts.isStringLiteral(ex.whenTrue) &&
           ts.isStringLiteral(ex.whenFalse));

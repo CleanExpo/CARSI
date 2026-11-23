@@ -10,11 +10,12 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 
+import { CARSI_PROVIDER_STATUS } from '@/lib/iicrc/approved-wording';
 const ITEMS = [
   {
     n: '01',
     title: 'IICRC CEC provider',
-    body: 'CARSI is an IICRC CEC Accredited provider. Where the IICRC has approved a course, its CEC hours are shown on the course and recorded in your learner dashboard when you pass.',
+    body: `${CARSI_PROVIDER_STATUS} Where the IICRC has approved a course, its CEC hours are shown on the course and recorded in your learner dashboard when you pass.`,
   },
   {
     n: '02',

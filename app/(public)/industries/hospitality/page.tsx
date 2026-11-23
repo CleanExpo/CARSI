@@ -20,6 +20,7 @@ import {
 } from '@/lib/marketing/industry-track1-topics';
 import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
@@ -88,8 +89,7 @@ const faqs = [
   },
   {
     question: 'Can hospitality crews complete this training online?',
-    answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, suited to rotating hotel rosters. Staff can complete modules between shifts. Certificates and CEC records sit in the learner dashboard when you pass an approved course.',
+    answer: `Yes. CARSI, an ${IICRC_APPROVED_CEC_PROVIDER}, offers courses online and self-paced, suited to rotating hotel rosters. Staff can complete modules between shifts. Certificates and CEC records sit in the learner dashboard when you pass an approved course.`,
   },
 ];
 
