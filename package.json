@@ -184,6 +184,8 @@
     "build:course-references": "tsx scripts/build-course-references.ts",
     "check:course-visibility": "node scripts/check-course-visibility-predicate.mjs",
     "test:course-visibility": "node scripts/check-course-visibility-predicate.test.mjs",
+    "check:app-origin": "node scripts/check-app-origin.mjs",
+    "test:app-origin": "node scripts/check-app-origin.test.mjs",
     "test:iicrc-terminology": "node scripts/check-iicrc-terminology.test.mjs",
     "test:built-site": "node scripts/check-built-site.test.mjs",
     "test:entry-point": "node scripts/lib/is-entry-point.test.mjs",
