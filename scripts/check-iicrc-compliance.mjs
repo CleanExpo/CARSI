@@ -130,7 +130,7 @@ const BANNED = [
   {
     re: /\bIICRC[\s-]*approved\b/i,
     allow:
-      /\bIICRC[\s-]*approved\s+(school|examination|exam|instructor|course\s+of\s+study)|IICRC[\s-]*board[\s-]*approv|(CE|CEC)[\s-]*provider|IICRC[\s-]*approv\w*\s+CE\b/i,
+      /\bIICRC[\s-]*approved\s+(school|examination|exam|instructor|course\s+of\s+study)|IICRC[\s-]*board[\s-]*approv|\bIICRC[\s-]*approved\s+CEC[\s-]+provider|IICRC[\s-]*approv\w*\s+CE\b/i,
     message:
       'Bare "IICRC-approved" implies IICRC approves CARSI\'s courses/certifications — say "IICRC Approved CEC Provider" for CARSI, or "approved for IICRC CECs" for a class in the register.',
   },
@@ -357,6 +357,25 @@ function isExempt(f) {
   return EXEMPT.some((e) => n === e || n.endsWith('/' + e));
 }
 
+/** All [start, end) spans where `re` matches `text` (zero-width matches skipped). */
+function matchSpans(re, text) {
+  const g = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
+  const spans = [];
+  for (const m of text.matchAll(g)) {
+    if (m[0].length > 0) spans.push([m.index, m.index + m[0].length]);
+  }
+  return spans;
+}
+
+/** True when some match of `rule.re` in `content` is not overlapped by a match of `rule.allow`.
+ *  Exported for the self-test (GP-584). */
+export function hasUnexcusedBan(rule, content) {
+  const bans = matchSpans(rule.re, content);
+  if (!rule.allow) return bans.length > 0;
+  const allows = matchSpans(rule.allow, content);
+  return bans.some(([s, e]) => !allows.some(([as, ae]) => as < e && s < ae));
+}
+
 function scanLine(file, lineNo, content, findings, allowlist) {
   // A specific CEC-hour claim is exempt ONLY when the file belongs to a founder-approved
   // course — i.e. its path contains a slug listed in CEC_APPROVED_SLUGS (empty = none approved).
@@ -371,8 +390,10 @@ function scanLine(file, lineNo, content, findings, allowlist) {
       // -approved in the allowlist. No regex exemption — the human review is the control.
       flagged = !allowlist.has(normaliseLine(content));
     } else {
-      // BANNED rules: line-wide, exempt-if-`allow`.
-      flagged = !(rule.allow && rule.allow.test(content));
+      // BANNED rules: per occurrence (GP-584). Each ban match must be excused by an allow match
+      // that overlaps ITS span. A legitimate phrase elsewhere on the line excuses nothing, so
+      // "Buy our IICRC courses today. We are an IICRC CEC provider." blocks.
+      flagged = hasUnexcusedBan(rule, content);
     }
     if (flagged) {
       findings.push(`  ${file}:${lineNo}: ${rule.message}\n    → ${content.trim().slice(0, 150)}`);
