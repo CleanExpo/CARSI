@@ -241,6 +241,9 @@ const { POST: acceptPost } = await import('../../../app/api/lms/teams/invite/acc
 const { POST: webhookPost } = await import('../../../app/api/lms/webhooks/stripe/route');
 const { addCourseTeamMemberByEmail } = await import('./team-member-provision');
 const { fulfillCourseCheckoutForUser } = await import('./team-course-purchase');
+const { findCoursePrerequisiteBlock } = await import('@/lib/server/course-prerequisites');
+const { getOrCreateCourseBySlug } = await import('@/lib/server/course-catalog-sync');
+const { sendTeamMemberAddedEmail } = await import('@/lib/server/transactional-email');
 
 function accept(userId: string, token: string) {
   return acceptPost(
@@ -421,5 +424,32 @@ describe.each(['pending', 'on_hold_unrecognised'])('GP-759 follow-up: an own enr
       expect(rows[0]).toMatchObject({ id: 'e-ua', status: 'active', paymentReference: 'team:team-1' });
       expect(paidHolders()).toHaveLength(2);
     });
+  });
+});
+
+/**
+ * Codex round 2 (Kind C): at a full pool the direct invite defers its refusal to the seat step.
+ * If a seat cannot be prepared (an error, or the course not found), that step has nothing to
+ * refuse with, so the deferred refusal must not be lost: the invite is refused, no member row is
+ * written and no email is sent.
+ */
+describe('GP-759 follow-up: a seat that cannot be prepared at a full pool refuses the direct invite', () => {
+  beforeEach(() => {
+    db.tables.lmsEnrollment.push(
+      { id: 'e-x', studentId: 'ux', courseId: COURSE.id, status: 'active', paymentReference: 'team:team-1', enrolledAt: new Date(Date.UTC(2026, 10, 2)), revokedReason: null, statusEventAt: null },
+    );
+    db.tables.lmsTeamMember.push({ teamId: 'team-1', userId: 'ux', role: 'member' });
+    vi.mocked(sendTeamMemberAddedEmail).mockClear();
+  });
+
+  it.each([
+    ['the preparation throws', () => vi.mocked(findCoursePrerequisiteBlock).mockRejectedValueOnce(new Error('prerequisite read failed'))],
+    ['the course is not found', () => vi.mocked(getOrCreateCourseBySlug).mockRejectedValueOnce(new Error('COURSE_NOT_FOUND'))],
+  ])('%s: existing account without the course is refused, not added, not emailed', async (_label, plant) => {
+    plant();
+    expect(await direct('ub@seat-race-test.invalid')).toBe(409);
+    expect(db.tables.lmsTeamMember.map((m) => m.userId)).not.toContain('ub');
+    expect(paidHolders()).toHaveLength(2);
+    expect(vi.mocked(sendTeamMemberAddedEmail)).not.toHaveBeenCalled();
   });
 });
