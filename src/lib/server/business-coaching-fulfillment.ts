@@ -1,6 +1,7 @@
 import type Stripe from 'stripe';
 
 import { getStripeClient } from '@/lib/api/stripe';
+import { taxInvoiceBuyerFromCheckout } from '@/lib/billing/tax-invoice';
 import {
     formatAudFromCents,
     getBusinessCoachingPackage
@@ -95,6 +96,11 @@ export async function processBusinessCoachingCheckoutCompleted(
       seatCount: result.seatCount,
       amountLabel,
       amountTotalCents: session.amount_total,
+      buyer: {
+        name: attendees[0] || session.customer_details?.name,
+        businessName: session.metadata?.company_name || session.customer_details?.business_name,
+        abn: taxInvoiceBuyerFromCheckout(session.customer_details).abn,
+      },
       registrationStatus: result.status,
       businessName: session.metadata?.company_name?.trim() || undefined,
       phone: session.metadata?.contact_phone?.trim() || undefined,

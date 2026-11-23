@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { signSessionToken } from '@/lib/auth/session-jwt';
 import { getStripeClient } from '@/lib/api/stripe';
+import { taxInvoiceBuyerFromCheckout } from '@/lib/billing/tax-invoice';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
@@ -127,6 +128,7 @@ export async function POST(request: NextRequest) {
         payment: {
           amountTotalCents: session.amount_total,
           seatCount: fulfilled.kind === 'team' ? teamSeatCount : undefined,
+          buyer: taxInvoiceBuyerFromCheckout(session.customer_details),
         },
       }).catch((e) => console.error('[guest-complete] email', e));
 

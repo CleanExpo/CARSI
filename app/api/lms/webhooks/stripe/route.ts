@@ -15,6 +15,7 @@ import {
   resolveStripeWebhookSecret,
   webhookLivemodeMatchesApiKey,
 } from '@/lib/api/stripe';
+import { taxInvoiceBuyerFromCheckout } from '@/lib/billing/tax-invoice';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { processBusinessCoachingCheckoutCompleted } from '@/lib/server/business-coaching-fulfillment';
@@ -544,6 +545,7 @@ export async function POST(request: NextRequest) {
           payment: {
             amountTotalCents: session.amount_total,
             seatCount: purchaseMode === 'team' ? teamSeatCount : undefined,
+            buyer: taxInvoiceBuyerFromCheckout(session.customer_details),
           },
         }).catch((e) => console.error('[stripe webhook] email', e));
         notifyCrmEnrollmentCreated({

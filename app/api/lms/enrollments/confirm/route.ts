@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getStripeClient } from '@/lib/api/stripe';
+import { taxInvoiceBuyerFromCheckout, type TaxInvoiceBuyer } from '@/lib/billing/tax-invoice';
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { confirmEmailOwnershipOk, resolveAccountEmail } from '@/lib/server/enrollment-confirm-guard';
@@ -45,6 +46,8 @@ export async function POST(request: NextRequest) {
   let teamSeatCount: number | undefined;
   /** GST-inclusive amount Stripe charged; set only for a paid Stripe session (GP-761). */
   let paidAmountTotalCents: number | null = null;
+  /** The payer as Checkout recorded them, for the tax invoice buyer row (GP-761). */
+  let paidBuyer: TaxInvoiceBuyer = { name: null, businessName: null, abn: null };
 
   if (sessionId) {
     if (!process.env.STRIPE_SECRET_KEY?.trim()) {
@@ -82,6 +85,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ detail: 'Session email does not match account' }, { status: 403 });
       }
       paidAmountTotalCents = session.amount_total ?? null;
+      paidBuyer = taxInvoiceBuyerFromCheckout(session.customer_details);
     } catch (e) {
       console.error('[enrollments/confirm] stripe', e);
       void captureServerError(e, { route: '/api/lms/enrollments/confirm' });
@@ -160,6 +164,7 @@ export async function POST(request: NextRequest) {
           ? {
               amountTotalCents: paidAmountTotalCents,
               seatCount: purchaseMode === 'team' ? teamSeatCount : undefined,
+              buyer: paidBuyer,
             }
           : undefined,
       }).catch((e) => console.error('[enrollments/confirm] email', e));
