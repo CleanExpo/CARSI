@@ -13,6 +13,7 @@ import {
   type IndustryAddonVariant,
 } from '@/lib/marketing/industry-page-data';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 interface ContractorAddOnsProps {
   accentColor?: string;
   variant?: IndustryAddonVariant;
@@ -58,7 +59,7 @@ export function ContractorAddOns({ variant = 'default' }: ContractorAddOnsProps)
             </h2>
             <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
               ISSA-aligned cleaning businesses can add CARSI restoration courses to build
-              restoration skills. CARSI is an IICRC CEC Accredited provider; it does not deliver
+              restoration skills. CARSI is an {IICRC_APPROVED_CEC_PROVIDER}; it does not deliver
               IICRC certification, and CEC hours apply only to courses the IICRC has approved.
             </p>
 

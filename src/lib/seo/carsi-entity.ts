@@ -1,5 +1,6 @@
 import { CARSI_SOCIAL_PROFILES } from '@/lib/brand/social-profiles';
 
+import { CARSI_PROVIDER_STATUS } from '@/lib/iicrc/approved-wording';
 /**
  * The single CARSI entity record read by the Organization JSON-LD, the public footer and
  * /llms.txt (see carsi-entity.test.tsx). Change a contact detail here, nowhere else.
@@ -29,8 +30,7 @@ export const CARSI_ENTITY = {
   serviceCountries: ['AU', 'NZ'],
   sameAs: CARSI_SOCIAL_PROFILES.map((p) => ({ label: p.label, url: p.url })),
   /** Factual, no superlatives: answer engines quote this sentence. */
-  description:
-    'Australian online training for cleaning and restoration professionals, covering water, fire, mould and carpet cleaning. CARSI is an IICRC CEC Accredited provider.',
+  description: `Australian online training for cleaning and restoration professionals, covering water, fire, mould and carpet cleaning. ${CARSI_PROVIDER_STATUS}`,
 } as const;
 
 /** "PO Box 4309, Forest Lake QLD 4078" — the form the footer and llms.txt print. */

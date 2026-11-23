@@ -13,6 +13,7 @@ import { CARSI_ENTITY, postalAddressLine } from '@/lib/seo/carsi-entity';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { CARSI_SOCIAL_PROFILES } from '@/lib/brand/social-profiles';
 
+import { CARSI_PROVIDER_STATUS } from '@/lib/iicrc/approved-wording';
 /**
  * Shared public footer. Design-led site closure with full platform navigation.
  * Used in the (public) layout so every public page gets consistent footer content.
@@ -153,8 +154,7 @@ export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } 
             <p className="mt-5 max-w-md text-sm leading-relaxed text-white/58">
               Cleaning and restoration training for Australian technicians.
               <br />
-              24/7 online. <AcronymTooltip term="IICRC" />
-              <span> CEC Accredited courses.</span>
+              24/7 online. {CARSI_PROVIDER_STATUS}
             </p>
           </div>
 
@@ -426,8 +426,7 @@ function LightFooter() {
             <p className="mt-5 max-w-md text-sm leading-relaxed text-slate-500">
               Cleaning and restoration training for Australian technicians.
               <br />
-              24/7 online. <AcronymTooltip term="IICRC" />
-              <span> CEC Accredited courses.</span>
+              24/7 online. {CARSI_PROVIDER_STATUS}
             </p>
           </div>
 

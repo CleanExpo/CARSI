@@ -90,10 +90,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ detail: 'slug or session_id required' }, { status: 400 });
     }
 
-    let dbCourse: { id: string; priceAud: unknown; isFree: boolean };
+    let dbCourse: { id: string; priceAud: unknown; isFree: boolean; status: string | null; isPublished: boolean | null };
     try {
       dbCourse = await getOrCreateCourseBySlug(slug);
     } catch {
+      return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
+    }
+    // GP-776: without a paid Stripe session only a published course may be enrolled in. A draft
+    // has not passed review, approval and the publish gate. Status is the canonical published
+    // state (public-courses-list.ts); live rows with the legacy isPublished flag off stay enrollable.
+    if (dbCourse.status !== 'published') {
       return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
     }
 

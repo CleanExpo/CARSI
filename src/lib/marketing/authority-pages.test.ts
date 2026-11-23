@@ -607,7 +607,8 @@ const NEVER = [
   /satisf(y|ies) disclosure law/i,
   /CARSI (offers|delivers|provides|sells|runs) IICRC (courses|training|certification)/i,
   /IICRC[- ]accredited/i,
-  /IICRC[- ]approved/i,
+  // GP-704: the IICRC provider term from the approved-wording module is the one permitted form.
+  /IICRC[- ]approved(?! CEC Provider\b)/i,
   /IICRC[- ]certified/i,
   // Built from fragments so the repo-wide terminology guards do not flag this list itself.
   new RegExp(['IICRC', 'certification', 'course'].join('\\s+'), 'i'),

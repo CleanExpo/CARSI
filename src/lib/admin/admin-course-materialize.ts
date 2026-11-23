@@ -47,8 +47,8 @@ export async function getOrCreateLmsCourseFromWorkbookCatalog(slug: string): Pro
   await ensureCatalogInstructor();
 
   const courseId = randomUUID();
-  const statusRaw = (course.status ?? 'draft').toLowerCase();
-  const isPublished = statusRaw === 'published';
+  // GP-776: a course created here is always a draft, whatever the workbook says. It reaches
+  // learners only through review, a recorded approval and the publish gate.
   const priceAud = new Prisma.Decimal(Number.isFinite(course.priceAud) ? course.priceAud : 0);
 
   const sortedModules = [...course.modules].sort((a, b) => a.moduleNo - b.moduleNo);
@@ -63,13 +63,13 @@ export async function getOrCreateLmsCourseFromWorkbookCatalog(slug: string): Pro
         shortDescription: null,
         thumbnailUrl: null,
         instructorId: DEFAULT_INSTRUCTOR_ID,
-        status: isPublished ? 'published' : 'draft',
+        status: 'draft',
         priceAud,
         isFree: course.isFree,
         level: null,
         category: course.categories[0] ?? null,
         iicrcDiscipline: course.iicrcDiscipline,
-        isPublished,
+        isPublished: false,
       },
     });
 
