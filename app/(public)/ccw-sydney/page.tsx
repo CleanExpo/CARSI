@@ -8,6 +8,7 @@ import {
   getCcwRoadshowEvent,
   hasCcwRoadshowSessionEnded,
 } from '@/lib/marketing/ccw-roadshow';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 const siteUrl = getPublicSiteUrl();
 
@@ -23,7 +24,7 @@ export const dynamic = 'force-dynamic';
 export function generateMetadata(): Metadata {
   const page = {
     alternates: { canonical: `${siteUrl}/ccw-sydney` },
-    openGraph: { url: `${siteUrl}/ccw-sydney`, type: 'website' as const, images: ['/og-image.png'] },
+    openGraph: { ...OG_LOCALE_FIELDS, url: `${siteUrl}/ccw-sydney`, type: 'website' as const, images: ['/og-image.png'] },
   };
   // A sitting that has ended is never advertised: announce the next dates at the CCW store.
   if (!sydney || hasCcwRoadshowSessionEnded(sydney, new Date())) {

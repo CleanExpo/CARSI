@@ -9,6 +9,7 @@ import {
   getCcwRoadshowEvent,
   hasCcwRoadshowSessionEnded,
 } from '@/lib/marketing/ccw-roadshow';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 const siteUrl = getPublicSiteUrl();
 
@@ -25,7 +26,7 @@ export const dynamic = 'force-dynamic';
 export function generateMetadata(): Metadata {
   const page = {
     alternates: { canonical: `${siteUrl}/ccw-brisbane` },
-    openGraph: { url: `${siteUrl}/ccw-brisbane`, type: 'website' as const, images: ['/og-image.png'] },
+    openGraph: { ...OG_LOCALE_FIELDS, url: `${siteUrl}/ccw-brisbane`, type: 'website' as const, images: ['/og-image.png'] },
   };
   // A sitting that has ended is never advertised: no past dates or price, next dates TBA.
   if (!brisbane || hasCcwRoadshowSessionEnded(brisbane, new Date())) {

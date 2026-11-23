@@ -1,6 +1,6 @@
 /**
  * POST /api/lms/subscription/checkout — start the individual annual membership
- * (`pro_annual`, A$795/yr) Stripe Checkout in `mode: 'subscription'`.
+ * (`pro_annual`, price in `src/lib/lms/membership-prices.ts`) Stripe Checkout in `mode: 'subscription'`.
  *
  * There is ONE membership price. The CCW roadshow attendee special — A$295 for
  * the first year via a `duration: once` Stripe coupon — was removed by the
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
             ...(attributionJourneyId ? { attribution_journey_id: attributionJourneyId } : {}),
           },
         },
-        allow_promotion_codes: true,
+        // GP-773: no promotion codes on a membership (founder ruling: "no further discounts").
       },
       {
         idempotencyKey: checkoutSessionIdempotencyKey('individual', claims.sub, reservedAt),

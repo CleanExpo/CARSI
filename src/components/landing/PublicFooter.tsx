@@ -149,7 +149,7 @@ export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } 
               Australian restoration training
             </p>
             <Link href="/" aria-label="CARSI home" className="inline-block">
-              <PublicLogo variant="footer" />
+              <PublicLogo variant="footer" surface="chrome" />
             </Link>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-white/58">
               Cleaning and restoration training for Australian technicians.

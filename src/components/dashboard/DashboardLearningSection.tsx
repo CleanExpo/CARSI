@@ -1,13 +1,16 @@
 import { ArrowRight, Award, Flame } from 'lucide-react';
 import Link from 'next/link';
 
+import { DashboardPageReady } from '@/components/dashboard/DashboardPageReady';
 import type { ContinueLearningSnapshot } from '@/components/lms/ContinueLearningBanner';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
+import { resolveNextLessonPosition } from '@/lib/lms/next-lesson-position';
 import { resolveHomeContinueState } from '@/lib/learner-home-state';
 import type { EnrollmentDto, LearnerDashboardSummary } from '@/lib/server/learner-dashboard-data';
 import type { OnboardingProgramRow } from '@/lib/server/onboarding-programs';
 import { CecRenewalFigure, CecRenewalStatus } from '@/components/lms/CecRenewalStatus';
 import { renewalProgress } from '@/lib/renewal-progress';
+import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
 import type { RenewalCourseSuggestion, RenewalSummaryPayload } from '@/types/renewal';
 
 function greetingForHour(hour: number): string {
@@ -156,8 +159,7 @@ function ContinueHero({
   title,
   description,
   percent,
-  lessonIndex,
-  lessonTotal,
+  position,
   nextLesson,
   href,
   ctaLabel,
@@ -165,8 +167,8 @@ function ContinueHero({
   title: string;
   description: string | null;
   percent: number | null;
-  lessonIndex: number | null;
-  lessonTotal: number | null;
+  /** GP-627: the position of `nextLesson`, not the count of completed lessons. */
+  position: { index: number; total: number } | null;
   nextLesson: string | null;
   href: string;
   ctaLabel: string;
@@ -201,9 +203,9 @@ function ContinueHero({
               className={`mb-2 flex items-center justify-between text-[13px] tabular-nums ${muted}`}
             >
               <span>{pct}% complete</span>
-              {lessonIndex != null && lessonTotal != null && lessonTotal > 0 ? (
+              {position ? (
                 <span>
-                  Lesson {lessonIndex} of {lessonTotal}
+                  Lesson {position.index} of {position.total}
                 </span>
               ) : null}
             </div>
@@ -272,12 +274,8 @@ export function DashboardLearningSection({
 }) {
   const firstName = claims?.full_name?.trim().split(/\s+/)[0] || 'Learner';
   const enrollments = summary?.enrollments ?? [];
-  const completed = enrollments.filter(
-    (e) => e.all_lessons_complete === true || e.status === 'completed'
-  );
-  const inProgress = enrollments.filter(
-    (e) => e.status !== 'completed' && e.all_lessons_complete !== true
-  );
+  const completed = enrollments.filter((e) => isEnrollmentCompleted(e.status));
+  const inProgress = enrollments.filter((e) => !isEnrollmentCompleted(e.status));
   const certificates = completed.filter((e) => e.certificate_issued_at);
   // Lifetime CECs for the "CECs earned" stat; the renewal card uses the renewal period (GP-655).
   const cec = summary?.cecHoursFromCompleted ?? 0;
@@ -297,6 +295,7 @@ export function DashboardLearningSection({
 
   return (
     <div className="learner-home -mx-4 w-[calc(100%+2rem)] min-w-0 space-y-12 px-4 pb-8 sm:-mx-6 sm:w-[calc(100%+3rem)] sm:px-6 lg:-mx-10 lg:w-[calc(100%+5rem)] lg:px-10">
+      <DashboardPageReady />
       <header className="relative flex w-full flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
           <p className={`text-[13px] ${muted}`}>{formatHomeDate()}</p>
@@ -338,8 +337,12 @@ export function DashboardLearningSection({
             title={resume.course_title}
             description={resume.course_description ?? resumeEnrollment?.description ?? null}
             percent={resumeEnrollment?.completion_percentage ?? null}
-            lessonIndex={resume.lesson_index ?? resumeEnrollment?.lessons_completed ?? null}
-            lessonTotal={resume.lesson_total ?? resumeEnrollment?.lessons_total ?? null}
+            position={resolveNextLessonPosition({
+              resumeIndex: resume.lesson_index,
+              resumeTotal: resume.lesson_total,
+              lessonsCompleted: resumeEnrollment?.lessons_completed,
+              lessonsTotal: resumeEnrollment?.lessons_total,
+            })}
             nextLesson={resume.lesson_title}
             href={resume.resume_href}
             ctaLabel="Continue learning"
@@ -350,8 +353,10 @@ export function DashboardLearningSection({
             title={inProgress[0].course_title}
             description={inProgress[0].description ?? null}
             percent={inProgress[0].completion_percentage}
-            lessonIndex={1}
-            lessonTotal={inProgress[0].lessons_total ?? null}
+            position={resolveNextLessonPosition({
+              lessonsCompleted: inProgress[0].lessons_completed,
+              lessonsTotal: inProgress[0].lessons_total,
+            })}
             nextLesson={inProgress[0].last_lesson_title ?? inProgress[0].course_title}
             href={learnHref(inProgress[0])}
             ctaLabel="Start course"
@@ -362,8 +367,7 @@ export function DashboardLearningSection({
             title="Start a course"
             description="Browse the catalogue and pick up a restoration course."
             percent={0}
-            lessonIndex={null}
-            lessonTotal={null}
+            position={null}
             nextLesson="Browse the catalogue"
             href="/dashboard/courses"
             ctaLabel="Browse courses"
@@ -374,8 +378,7 @@ export function DashboardLearningSection({
             title="Courses complete"
             description="You have completed your current courses. Open a recommended course next."
             percent={100}
-            lessonIndex={null}
-            lessonTotal={null}
+            position={null}
             nextLesson="Explore recommended courses"
             href="/dashboard/courses"
             ctaLabel="Explore courses"
@@ -394,7 +397,7 @@ export function DashboardLearningSection({
           <ul className="grid w-full items-stretch gap-5 md:grid-cols-2">
             {previewCourses.map((enr) => {
               const started = enr.completion_percentage > 0;
-              const done = enr.all_lessons_complete === true || enr.status === 'completed';
+              const done = isEnrollmentCompleted(enr.status);
               const cecHours = enr.cec_hours != null && enr.cec_hours > 0 ? enr.cec_hours : null;
               const pct = done ? 100 : enr.completion_percentage;
               return (

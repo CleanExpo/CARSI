@@ -14,6 +14,8 @@ import {
   MembershipLibrary,
   MembershipSteps,
 } from '@/components/membership/MembershipLanding';
+import { INDIVIDUAL_MEMBERSHIP, membershipAmountAud } from '@/lib/lms/membership-prices';
+
 import { SubscribeCta } from './SubscribeCta';
 
 import { APPROVED_FOR_IICRC_CECS } from '@/lib/iicrc/approved-wording';
@@ -32,9 +34,9 @@ export const metadata: Metadata = {
 
 const PLAN = {
   name: 'Yearly membership',
-  price: 795,
+  price: membershipAmountAud(INDIVIDUAL_MEMBERSHIP),
   suffix: 'AUD / year',
-  helper: 'That is about $66/month · GST included',
+  helper: `That is about $${Math.round(membershipAmountAud(INDIVIDUAL_MEMBERSHIP) / 12)}/month · GST included`,
 };
 
 export const PRO_FEATURES = [
@@ -50,7 +52,7 @@ export const PRO_FEATURES = [
   'Odour control courses',
   'PDF certificates for every course',
   'CEC tracking dashboard',
-  'Monthly activity recognition (anonymous by default) & streak tracker',
+  'Optional monthly activity recognition (off unless you opt in) & streak tracker',
   'Priority email support',
 ];
 

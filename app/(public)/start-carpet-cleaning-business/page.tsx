@@ -9,6 +9,7 @@ import {
   startSmartPages,
   startSmartReadinessLoop,
 } from '@/lib/marketing/start-smart';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 const siteUrl = getPublicSiteUrl();
 const canonical = `${siteUrl}${startSmartBasePath}`;
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
   },
   keywords: startSmartHubKeywords,
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     title: 'Start a Carpet Cleaning Business | CARSI Start Smart Pathway',
     description:
       'A practical CARSI pathway for carpet cleaning startup research, existing cleaners, business buyers and equipment decisions.',
