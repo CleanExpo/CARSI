@@ -9,6 +9,7 @@ import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
+import { APPROVED_FOR_IICRC_CECS_LABEL } from '@/lib/iicrc/approved-wording';
 const surface = 'learner-home-surface learner-home-card overflow-hidden rounded-[1.25rem]';
 const inset = 'learner-home-inset';
 const kicker =
@@ -100,7 +101,7 @@ export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
                 <div>
                   <p className={kicker}>
                     {cecLabel
-                      ? 'IICRC CEC Accredited'
+                      ? APPROVED_FOR_IICRC_CECS_LABEL
                       : onboarding
                         ? 'Organisation program'
                         : 'Professional development'}

@@ -20,6 +20,7 @@ import {
 } from '@/lib/marketing/industry-track1-topics';
 import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
+import { CARSI_PROVIDER_STATUS, IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
@@ -80,8 +81,7 @@ const faqs = [
   },
   {
     question: 'Does CARSI deliver IICRC certification for hospital work?',
-    answer:
-      'No. CARSI is an IICRC CEC Accredited provider. Where the IICRC has approved a course, its CEC hours are shown on the course page and recorded in your learner dashboard when you pass. IICRC certification itself is obtained only through schools and examinations approved by the IICRC.',
+    answer: `No. ${CARSI_PROVIDER_STATUS} Where the IICRC has approved a course, its CEC hours are shown on the course page and recorded in your learner dashboard when you pass. IICRC certification itself is obtained only through schools and examinations approved by the IICRC.`,
   },
   {
     question: 'What mould training applies to healthcare facilities in Australia?',
@@ -95,8 +95,7 @@ const faqs = [
   },
   {
     question: 'Can hospital and contractor crews complete training around shift work?',
-    answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, designed to fit around 24/7 hospital shift patterns and after-hours call-outs. Certificates and CEC records sit in the learner dashboard when you pass an approved course.',
+    answer: `Yes. CARSI, an ${IICRC_APPROVED_CEC_PROVIDER}, offers courses online and self-paced, designed to fit around 24/7 hospital shift patterns and after-hours call-outs. Certificates and CEC records sit in the learner dashboard when you pass an approved course.`,
   },
   {
     question: 'Which courses should a crew open first for a hospital water loss?',

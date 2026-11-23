@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 
 import {
   catalogueMetaDescription,
@@ -99,7 +100,7 @@ describe('coursesIndexMetaDescription', () => {
   it('states provider standing rather than promising a learner will earn CECs', () => {
     const out = coursesIndexMetaDescription(facts());
     expect(out).not.toContain(LIVE_CREDIT_PROMISE);
-    expect(out).toContain('IICRC CEC Accredited provider');
+    expect(out).toContain(IICRC_APPROVED_CEC_PROVIDER);
   });
 
   it('keeps the real published count', () => {
@@ -111,7 +112,7 @@ describe('coursesIndexMetaDescription', () => {
       facts({ publishedCourseCount: 0, disciplineCodes: [] })
     );
     expect(out).not.toMatch(ACRONYM_RE);
-    expect(out).toContain('IICRC CEC Accredited provider');
+    expect(out).toContain(IICRC_APPROVED_CEC_PROVIDER);
   });
 });
 
@@ -123,7 +124,7 @@ describe('catalogueMetaDescription', () => {
   it('states provider standing rather than promising CECs', () => {
     const out = catalogueMetaDescription(facts());
     expect(out).not.toContain(LIVE_CREDIT_PROMISE);
-    expect(out).toContain('IICRC CEC Accredited provider');
+    expect(out).toContain(IICRC_APPROVED_CEC_PROVIDER);
   });
 
   it('is acronym-free with a zero count', () => {
@@ -146,9 +147,9 @@ describe('CEC accreditation is claimed for the PROVIDER, never for the catalogue
     const prefix = 'Browse 37 ' + 'IICRC CEC Accredited' + ' restoration and cleaning courses';
     expect(CATALOGUE_CLAIM.test(prefix)).toBe(true);
     // ...and does NOT fire on the permitted provider-standing form.
-    expect(CATALOGUE_CLAIM.test('Study online with CARSI, an IICRC CEC Accredited provider.')).toBe(
-      false
-    );
+    expect(
+      CATALOGUE_CLAIM.test(`Study online with CARSI, an ${IICRC_APPROVED_CEC_PROVIDER}.`)
+    ).toBe(false);
   });
 
   for (const [name, fn] of [
@@ -160,7 +161,7 @@ describe('CEC accreditation is claimed for the PROVIDER, never for the catalogue
         const out = fn(facts({ publishedCourseCount }));
         expect(out).not.toMatch(CATALOGUE_CLAIM);
         // The provider-standing sentence must survive — this is not a blanket ban on the phrase.
-        expect(out).toContain('IICRC CEC Accredited provider');
+        expect(out).toContain(IICRC_APPROVED_CEC_PROVIDER);
       }
     });
   }

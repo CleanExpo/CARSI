@@ -12,7 +12,7 @@
       "attemptsAllowed": 3,
       "questions": [
         {
-          "questionText": "Under ANSI/IICRC S520:2024, what is the goal of mould remediation?",
+          "questionText": "What is the goal of mould remediation?",
           "options": [
             "To achieve a completely spore-free indoor environment",
             "To return the affected environment to Condition 1 (normal fungal ecology)",
@@ -36,7 +36,7 @@
           "sourceRef": "Course module 2; S520:2024 §3"
         },
         {
-          "questionText": "Which S520:2024 Condition describes actual mould growth that may be active, dormant, dead, visible or hidden?",
+          "questionText": "Which Condition describes actual mould growth that may be active, dormant, dead, visible or hidden?",
           "options": [
             "Condition 1",
             "Condition 2",
@@ -108,7 +108,7 @@
           "sourceRef": "Course module 3; S520:2024 susceptible occupants"
         },
         {
-          "questionText": "During the S520:2024 §7 inspection process, which activity comes first in building the picture of a mould problem?",
+          "questionText": "During an inspection, which activity comes first in building the picture of a mould problem?",
           "options": [
             "Removing plasterboard to expose the wall cavity",
             "Gathering the building history and occupant information, then inspecting systematically",

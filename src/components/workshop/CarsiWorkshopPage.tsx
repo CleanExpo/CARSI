@@ -29,6 +29,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { FROM_IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 /** Pillar topics — hero. */
 const PILLAR_LINE =
   'Fibre · Chemistry · Methods · Upholstery · Hard Floors · Business · Maintenance';
@@ -78,7 +79,7 @@ const included = [
 
 const trainerMeta = [
   { term: 'Standards', text: 'ANSI/IICRC S100 · S300 · S220, applied in the Australian context' },
-  { term: 'CARSI', text: 'Online courses from an IICRC CEC Accredited provider' },
+  { term: 'CARSI', text: `Online courses ${FROM_IICRC_APPROVED_CEC_PROVIDER}` },
   { term: 'Focus', text: 'Carpet · Stain Removal · Upholstery · Hard Floors · Business · Machinery' },
   { term: 'Method', text: 'Three tiers — Newby, Intermediate, Pro — layered into every module' },
 ] as const;

@@ -12,12 +12,12 @@
       "attemptsAllowed": 3,
       "questions": [
         {
-          "questionText": "S520:2024 §8 is titled Limitations, Complexities, Complications and Conflicts. What is its relevance to a Level 3 job?",
+          "questionText": "Which factors move a mould job up to Level 3?",
           "options": [
-            "It lists the chemicals approved for large jobs",
-            "It frames the factors — large or hidden contamination, susceptible occupants, disputes, Category 3 water — that escalate a job beyond a standard remediation",
-            "It sets the maximum price a remediator may charge",
-            "It is only relevant to residential jobs"
+            "The colour of the mould and the time of year",
+            "Large or hidden growth, sensitive occupants and Category 3 water",
+            "The price of the job and the number of quotes",
+            "Whether the building is a home or an office"
           ],
           "correctIndex": 1,
           "points": 1,
@@ -60,16 +60,16 @@
           "sourceRef": "Course module 3; S520:2024 §9.3.7, §8.6"
         },
         {
-          "questionText": "Under S520:2024 §11, what is the correct first step when handling contents in affected areas?",
+          "questionText": "What must happen before a contaminated air-conditioning system is switched back on?",
           "options": [
-            "Dispose of everything immediately",
-            "Inspect and evaluate each item for restorability, then inventory and pack items removed from affected areas",
-            "Clean everything with bleach on site",
-            "Return all items to the occupant untouched"
+            "It is switched on to air the place out",
+            "A qualified person signs off after cleaning or replacement",
+            "The building manager decides alone",
+            "It is left running for a day as a test"
           ],
           "correctIndex": 1,
           "points": 1,
-          "sourceRef": "Course module 4; S520:2024 §11.1, §11.2"
+          "sourceRef": "Course module 3, lesson 3.3 (HVAC isolation and restart sign-off)"
         },
         {
           "questionText": "How should high-value and irreplaceable items (artworks, documents, heirlooms) be handled?",
@@ -108,7 +108,7 @@
           "sourceRef": "Course module 6; S520:2024 §7.1, §12"
         },
         {
-          "questionText": "You uncover material likely to contain asbestos in a pre-2004 building during mould works. Under S520:2024 §8.5 and §8.9, what must you do?",
+          "questionText": "You uncover material likely to contain asbestos in a pre-2004 building during mould works. What must you do?",
           "options": [
             "Continue the mould works and remove the asbestos yourself",
             "Stop the mould work and engage licensed removalists under the relevant WHS asbestos regulations before continuing",

@@ -3,7 +3,8 @@
  * check-course-visuals.mjs: Course Standard v1, section 4.1 items 1 to 3 (Linear GP-752).
  *
  * Every course with meta.standard "v1" must have:
- *   cover    a thumbnailUrl (a local file under public/ must exist; an https URL is accepted);
+ *   cover    a thumbnailUrl (a local file under public/ must exist; an https or protocol-relative
+ *            //host URL is accepted as remote);
  *   and every teaching lesson (contentType is not "quiz", COURSE_STANDARD.md section 3.3) must
  *   carry both
  *   image    a raster lesson image (.png .jpg .jpeg .webp .avif), as an <img src> in the body or a
@@ -11,6 +12,10 @@
  *   diagram  a hand-written SVG at /courses/<folder>/diagrams/<name>.svg, as an <img src> in the
  *            body or a resource url, and the file must exist under public/. Only files in a
  *            diagrams folder count, because only those are checked by check:course-diagrams.
+ *
+ * Body images are read from the src attribute only (quoted or unquoted; data-src is ignored), and
+ * HTML comments are skipped. The diagram suffix is a lower-case ".svg", as check:course-diagrams
+ * reads it (GP-754).
  *
  * Scanned: data/seed/courses-catalog.json and every data/courses/<slug>/v1-draft/ and v1/
  * courses-catalog.json. Floor 5.10 of audit-course-depth.mjs only asks for "some visual"; this
@@ -37,8 +42,13 @@ import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 export const KINDS = ['cover', 'image', 'diagram'];
 const RASTER = /\.(png|jpe?g|webp|avif)$/i;
-const DIAGRAM = /^\/courses\/[^/]+\/diagrams\/[^/]+\.svg$/i;
-const IMG_SRC = /<img\b[^>]*?\bsrc\s*=\s*(["'])(.*?)\1/gi;
+// Case-sensitive on purpose: check:course-diagrams only reads files ending in lower-case ".svg".
+const DIAGRAM = /^\/courses\/[^/]+\/diagrams\/[^/]+\.svg$/;
+// The src attribute only (whitespace before it, so data-src is not read), quoted or unquoted.
+const IMG_SRC = /<img\b[^>]*?\ssrc\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))/gi;
+const HTML_COMMENT = /<!--[\s\S]*?(?:-->|$)/g;
+// https://host/... or protocol-relative //host/..., which loads over the page's https scheme.
+const REMOTE = /^(?:https:)?\/\//i;
 
 function bare(url) {
   return String(url || '')
@@ -46,7 +56,7 @@ function bare(url) {
     .replace(/[?#].*$/, '');
 }
 function localFileExists(root, url) {
-  if (!url.startsWith('/') || url.includes('..')) return false;
+  if (!url.startsWith('/') || url.startsWith('//') || url.includes('..')) return false;
   const p = join(root, 'public', url);
   return existsSync(p) && statSync(p).isFile();
 }
@@ -54,7 +64,7 @@ function localFileExists(root, url) {
 export function isLessonImage(root, url) {
   const u = bare(url);
   if (!RASTER.test(u)) return false;
-  if (/^https:\/\//i.test(u)) return true;
+  if (REMOTE.test(u)) return true;
   return localFileExists(root, u);
 }
 /** A course diagram: /courses/<folder>/diagrams/<name>.svg that exists under public/. */
@@ -65,14 +75,15 @@ export function isDiagram(root, url) {
 export function isCover(root, url) {
   const u = bare(url);
   if (!u) return false;
-  if (/^https:\/\//i.test(u)) return true;
+  if (REMOTE.test(u)) return true;
   return localFileExists(root, u);
 }
 
 /** Every visual URL a lesson references: body <img src> values plus resource urls. */
 export function lessonUrls(lesson) {
   const out = [];
-  for (const m of String(lesson.contentBody || '').matchAll(IMG_SRC)) out.push(m[2]);
+  const body = String(lesson.contentBody || '').replace(HTML_COMMENT, '');
+  for (const m of body.matchAll(IMG_SRC)) out.push(m[1] ?? m[2] ?? m[3]);
   for (const r of Array.isArray(lesson.resources) ? lesson.resources : []) {
     if (r && typeof r.url === 'string') out.push(r.url);
   }

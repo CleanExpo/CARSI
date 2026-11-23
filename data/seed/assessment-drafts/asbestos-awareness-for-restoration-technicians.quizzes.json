@@ -2,7 +2,7 @@
   "version": 1,
   "status": "draft",
   "courseSlug": "asbestos-awareness-for-restoration-technicians",
-  "disclaimer": "Educational assessment. CARSI is an IICRC CEC Accredited provider; this is CARSI-original Australian training, not IICRC certification.",
+  "disclaimer": "Educational assessment. This is a CARSI course and a CARSI credential, written as original Australian training.",
   "note": "Australian-produced. Grounded in the course's own modules. Founder to review before wiring live.",
   "quizzes": [
     {
@@ -66,7 +66,7 @@
             "Nothing",
             "Work Health and Safety law and Safe Work Australia guidance",
             "The client's rules",
-            "IICRC certification"
+            "A restoration trade certificate"
           ],
           "correctIndex": 1,
           "points": 1,

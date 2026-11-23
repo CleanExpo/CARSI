@@ -12,6 +12,7 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
@@ -64,7 +65,7 @@ const faqs = [
   {
     question: 'Can food processing staff complete this training while maintaining shift patterns?',
     answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced. Staff can complete modules around production schedules and shift rotations. Courses issue verifiable digital credentials on completion.',
+      `Yes. CARSI, an ${IICRC_APPROVED_CEC_PROVIDER}, offers courses online and self-paced. Staff can complete modules around production schedules and shift rotations. Courses issue verifiable digital credentials on completion.`,
   },
 ];
 
