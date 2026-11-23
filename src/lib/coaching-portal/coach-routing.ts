@@ -1,16 +1,27 @@
 /**
  * GP-632 (Coaching advantage A5) — multi-coach chapters and routing.
- * Schema + UI land in follow-up PRs; this module is the shared vocabulary.
  */
+import {
+  DEFAULT_COACHING_CHAPTER_SLUG,
+  formatChapterPriceLabel,
+  getCoachingChapter,
+  getCoachingChapterByCoachId,
+  type CoachingChapterCurrency,
+} from '@/lib/coaching-portal/coaching-chapters';
+
 export type CoachingChapterSlug = string;
 
 export type CoachingCoachProfile = {
   id: string;
   displayName: string;
   chapterSlug: CoachingChapterSlug;
+  chapterTitle: string;
+  currency: CoachingChapterCurrency;
+  priceLabel: string;
   /** Public-facing specialty line for chapter branding (AU English). */
   headline: string;
   bookingUrl?: string;
+  isDemoChapter?: boolean;
 };
 
 export type CoachingMemberCoachAssignment = {
@@ -20,14 +31,18 @@ export type CoachingMemberCoachAssignment = {
   assignedAtIso: string;
 };
 
-/** Default chapter until multi-coach data exists — Phill-led CARSI Business Coaching. */
-export const DEFAULT_COACHING_CHAPTER_SLUG = 'carsi-business-coaching';
+export { DEFAULT_COACHING_CHAPTER_SLUG };
+
+const _defaultChapter = getCoachingChapter(DEFAULT_COACHING_CHAPTER_SLUG)!;
 
 export const DEFAULT_COACHING_COACH: CoachingCoachProfile = {
-  id: 'coach-phill-mcgurk',
-  displayName: 'Phill McGurk',
-  chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
-  headline: 'Business growth coaching for Australian cleaning and restoration owners',
+  id: _defaultChapter.coachUserId,
+  displayName: _defaultChapter.coachDisplayName,
+  chapterSlug: _defaultChapter.slug,
+  chapterTitle: _defaultChapter.title,
+  currency: _defaultChapter.currency,
+  priceLabel: formatChapterPriceLabel(_defaultChapter),
+  headline: _defaultChapter.headline,
 };
 
 /**
@@ -39,14 +54,27 @@ export function resolveCoachingMemberCoach(input?: {
   chapterSlug?: string | null;
   coachUserId?: string | null;
 }): CoachingCoachProfile {
-  const chapterSlug = input?.chapterSlug?.trim() || DEFAULT_COACHING_CHAPTER_SLUG;
+  let chapter =
+    getCoachingChapter(input?.chapterSlug) ??
+    getCoachingChapterByCoachId(input?.coachUserId) ??
+    getCoachingChapter(DEFAULT_COACHING_CHAPTER_SLUG)!;
+
+  if (input?.coachUserId?.trim()) {
+    const byCoach = getCoachingChapterByCoachId(input.coachUserId);
+    if (byCoach) chapter = byCoach;
+  }
+
   const name = input?.sessionCoachName?.trim();
-  const base = { ...DEFAULT_COACHING_COACH, chapterSlug };
-  if (input?.coachUserId) {
-    return { ...base, id: input.coachUserId };
-  }
-  if (name && name !== DEFAULT_COACHING_COACH.displayName) {
-    return { ...base, displayName: name };
-  }
-  return base;
+  const coachId = input?.coachUserId?.trim() || chapter.coachUserId;
+
+  return {
+    id: coachId,
+    displayName: name && name !== chapter.coachDisplayName ? name : chapter.coachDisplayName,
+    chapterSlug: chapter.slug,
+    chapterTitle: chapter.title,
+    currency: chapter.currency,
+    priceLabel: formatChapterPriceLabel(chapter),
+    headline: chapter.headline,
+    isDemoChapter: chapter.isDemo,
+  };
 }

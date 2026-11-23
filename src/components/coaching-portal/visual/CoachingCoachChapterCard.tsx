@@ -28,8 +28,11 @@ export function CoachingCoachChapterCard({ className = '' }: { className?: strin
             <h2 className={`mt-1 ${coachingCardTitle}`}>{coach.displayName}</h2>
             <p className={`mt-1 ${coachingMuted}`}>{coach.headline}</p>
             <p className="mt-2 text-xs text-slate-500">
-              Chapter:{' '}
+              {coach.chapterTitle}
+              <span className="text-slate-600"> · </span>
               <span className="font-mono text-slate-400">{coach.chapterSlug}</span>
+              <span className="text-slate-600"> · </span>
+              {coach.priceLabel}
             </p>
           </div>
         </div>
