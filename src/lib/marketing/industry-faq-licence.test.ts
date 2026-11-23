@@ -168,7 +168,8 @@ describe('industry FAQ licence sweep', () => {
     expect(
       licenceProblems({
         question: 'How do CECs work?',
-        answer: `CARSI is an IICRC CEC Accredited provider. Where the IICRC has approved a course, its CEC hours are shown on the course page. ${currentApprovedTitles[0]} is IICRC CEC Accredited.`,
+        // GP-704 retired "IICRC CEC Accredited"; the compliant forms are the approved wording.
+        answer: `CARSI is an IICRC Approved CEC Provider. Where the IICRC has approved a course, its CEC hours are shown on the course page. ${currentApprovedTitles[0]} is approved for IICRC CECs.`,
       })
     ).toEqual([]);
   });

@@ -160,6 +160,9 @@ function runGuardIn(files) {
       mkdirSync(join(dir, 'scripts', 'lib'), { recursive: true });
       writeFileSync(join(dir, 'scripts', 'check-iicrc-compliance.mjs'), readFileSync(GUARD));
       writeFileSync(join(dir, 'scripts', 'lib', 'is-entry-point.mjs'), readFileSync(join(HERE, 'lib', 'is-entry-point.mjs')));
+      // The guard's shared claim rules (GP-599): present, so the only thing missing is the stripper.
+      mkdirSync(join(dir, 'src', 'lib', 'iicrc'), { recursive: true });
+      writeFileSync(join(dir, 'src', 'lib', 'iicrc', 'claim-rules.mjs'), readFileSync(join(HERE, '..', 'src', 'lib', 'iicrc', 'claim-rules.mjs')));
       for (const [rel, body] of Object.entries({
         'src/lib/reviews/review-policy.ts': 'export const reviewPolicy = "How was your course?";\n',
         'src/components/lms/ReviewPolicy.tsx': 'export function ReviewPolicy() { return null; }\n',

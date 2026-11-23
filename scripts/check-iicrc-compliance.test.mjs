@@ -26,6 +26,7 @@ import {
   IICRC_FREE_FILES,
   inScope,
   loadBareBaseline,
+  newCertificationContext,
   normaliseLine,
 } from './check-iicrc-compliance.mjs';
 
@@ -118,7 +119,8 @@ const MUST_PASS_ALWAYS = [
   ['CEC calculator requirement math (not a course claim)', '21 CECs as a Master'],
   ['ticket ref that abuts CEC', 'GP-498 CEC licence gate — production display path'],
   ['code comment about absence of CEC', 'No registry approval → 0 CEC, never a derived one.'],
-  ['sanctioned provider wording', 'CARSI provides IICRC CEC Accredited training for aged care teams.'],
+  // GP-599: 'IICRC CEC Accredited' was the sanctioned provider wording until GP-704 retired it; it
+  // now blocks (see section 9).
   ['negated disclaimer', 'It is <strong>not</strong> IICRC CEC accredited and it does not award CECs.'],
 ];
 
@@ -452,7 +454,6 @@ const SPAN_MUST_PASS = [
   ['third-person schools and exams', 'IICRC certification comes only from IICRC-approved schools and IICRC-approved examinations.'],
   ['board approval process', 'Each class goes through the IICRC board approval process.'],
   ['negated CEC-accredited denial', 'It is not CEC accredited training.'],
-  ['sanctioned CEC Accredited training', 'CARSI provides IICRC CEC Accredited training for aged care teams.'],
 ];
 for (const [name, line] of SPAN_MUST_BLOCK) {
   if (evaluateContent(NON_APPROVED, line, EMPTY).length === 0) fail(`GP-584 span: MUST BLOCK but passed: ${name}\n    ${line}`);
@@ -460,6 +461,77 @@ for (const [name, line] of SPAN_MUST_BLOCK) {
 for (const [name, line] of SPAN_MUST_PASS) {
   const f = evaluateContent(NON_APPROVED, line, EMPTY);
   if (f.length > 0) fail(`GP-584 span: MUST PASS but blocked: ${name}\n    ${line}\n    ${f.join('\n    ')}`);
+}
+
+// (9) GP-586 / GP-599 / GP-600 — one owner for the shared claim shapes (src/lib/iicrc/claim-rules.mjs).
+{
+  const PAGE = 'app/(public)/courses/page.tsx';
+  const runAt = (file, line) => evaluateContent(file, line, EMPTY, newCertificationContext([]));
+  // GP-586: CARSI or its training makes the learner certified, in any word order.
+  const GRANT_MUST_BLOCK = [
+    ['GP-586 card payload', 'CARSI courses get you certified.'],
+    ['make + team', 'CARSI makes your whole team IICRC certified.'],
+    ['get + staff', 'Our online modules get your cleaning staff certified fast.'],
+    ['CARSI certifies you', 'CARSI certifies you in water damage restoration.'],
+    ['this course certifies technicians', 'This course certifies technicians for insurance work.'],
+    ['our training will certify', 'Our online training will certify your crew.'],
+    ['future: you will be certified', 'You will be certified after this course.'],
+    ["future: you'll be fully certified", "Finish the modules and you'll be fully certified."],
+    ["present: you're now certified", "Pass the quiz and you're now certified."],
+    ['statement ending in a question mark is not a question', 'CARSI courses get you certified?'],
+    ['claim after an honest question on the same line', 'Will a CARSI course make me IICRC certified? Yes, CARSI courses get you certified.'],
+  ];
+  const GRANT_MUST_PASS = [
+    ['GP-586 card: holder earns CECs', 'CARSI courses earn CECs toward maintaining an existing IICRC certification.'],
+    ['GP-586 card: denial', 'CARSI does not deliver IICRC certification.'],
+    ['FAQ question (live copy)', "question: 'Does a CARSI course make me IICRC certified?',"],
+    ['FAQ question, JSON string', '"question": "Will a CARSI course make me IICRC certified?",'],
+    ['denial: no course will get you', 'No CARSI course will get you certified.'],
+    ["denial: won't make you", "CARSI courses won't make you certified."],
+    ['route through an approved school', 'Get your team certified through an IICRC-approved school.'],
+    ['third-person requirement', 'Technicians must be certified by the IICRC.'],
+    ['third-party sign-off', 'A licensed gasfitter installs and certifies the gas installation.'],
+    ['competency sign-off unit', 'This unit certifies that an operator can run the specific machine safely.'],
+    ['holder framing', 'If you are already IICRC certified, CARSI courses help you keep learning.'],
+    ['certificate template', 'This is to certify that'],
+  ];
+  for (const [name, line] of GRANT_MUST_BLOCK) {
+    if (runAt(PAGE, line).length === 0) fail(`GP-586 MUST BLOCK but passed: ${name}\n    ${line}`);
+  }
+  for (const [name, line] of GRANT_MUST_PASS) {
+    const f = runAt(PAGE, line);
+    if (f.length > 0) fail(`GP-586 MUST PASS but blocked: ${name}\n    ${line}\n    ${f.join('\n    ')}`);
+  }
+
+  // GP-599: the provider wording GP-704 retired, on the pricing-tiers surface the card names.
+  const PRICING = 'src/lib/lms/pricing-tiers.ts';
+  const RETIRED_MUST_BLOCK = [
+    ['GP-599 card payload', "      'Pay once per IICRC CEC Accredited course.',"],
+    ['old sanctioned wording', 'CARSI provides IICRC CEC Accredited training for aged care teams.'],
+    ['accredited provider', 'CARSI is an accredited provider of restoration training.'],
+    ['accredited by the IICRC', 'CARSI courses are accredited by the IICRC.'],
+    ['GP-771 unqualified', 'CARSI is fully accredited.'],
+  ];
+  for (const [name, line] of RETIRED_MUST_BLOCK) {
+    if (runAt(PRICING, line).length === 0) fail(`GP-599 MUST BLOCK but passed: ${name}\n    ${line}`);
+  }
+  for (const line of ['CARSI is an IICRC Approved CEC Provider.', 'CARSI courses are not accredited by the IICRC.', 'Is CARSI accredited?']) {
+    const f = runAt(PRICING, line);
+    if (f.length > 0) fail(`GP-599 MUST PASS but blocked:\n    ${line}\n    ${f.join('\n    ')}`);
+  }
+  // The exemption lists come from the same owner as the vitest guard: a detector file and a dated
+  // record pass, the same line on a served surface blocks.
+  const retired = 'CARSI is IICRC CEC Accredited.';
+  if (runAt('src/lib/iicrc/approved-provider-wording.test.tsx', retired).length > 0) fail('GP-599: a detector file listed by the owner should be exempt');
+  if (runAt('docs/audit/2026-01-01-example.md', retired).length > 0) fail('GP-599: a dated record listed by the owner should be exempt');
+  if (runAt('src/components/pricing/PricingTiers.tsx', retired).length === 0) fail('GP-599: the served pricing component must not be exempt');
+
+  // GP-600: no record or file window decides what is judged. A claim in a JSON parent key beside a
+  // nested CARSI question blocks, and so does the same claim with no CARSI question anywhere.
+  const nested = JSON.stringify({ claim: 'You will be certified.', items: [{ q: 'Is CARSI useful?', a: 'Yes online.' }] }, null, 2);
+  if (runAt('data/seed/faq.json', nested).length === 0) fail('GP-600: parent-key claim beside a nested CARSI question passed');
+  if (runAt('data/seed/faq.json', JSON.stringify({ claim: 'You will be certified.' })).length === 0) fail('GP-600: claim with no CARSI question passed');
+  console.log(`  GP-586/599/600 cases: ${GRANT_MUST_BLOCK.length + RETIRED_MUST_BLOCK.length} block, ${GRANT_MUST_PASS.length + 3} pass, exemption and window controls.`);
 }
 
 if (failed > 0) {
