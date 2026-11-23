@@ -1,7 +1,13 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { verifyEmailVerificationToken } from '@/lib/auth/session-jwt';
+import { clientIpFrom } from '@/lib/rate-limit';
+import { applyDurableRateLimit } from '@/lib/server/durable-rate-limit';
 import { markEmailVerified } from '@/lib/server/lms-auth';
+
+// GP-760: confirmations per IP. A real person presses the button once or twice.
+const IP_LIMIT = 20;
+const IP_WINDOW_MS = 15 * 60 * 1000;
 
 /**
  * GP-699 — the write behind the "Confirm my email" button.
@@ -47,6 +53,12 @@ async function tokenFromForm(request: NextRequest): Promise<string> {
 }
 
 export async function POST(request: NextRequest) {
+  const ip = clientIpFrom(request.headers.get('x-forwarded-for'), request.headers.get('x-real-ip'));
+  // Over the limit: the same "not confirmed" redirect as any other failure (never a success).
+  if (!(await applyDurableRateLimit(`auth-verify-email-ip:${ip}`, IP_LIMIT, IP_WINDOW_MS)).ok) {
+    return done(false);
+  }
+
   const token = await tokenFromForm(request);
   if (!token) return done(false);
 

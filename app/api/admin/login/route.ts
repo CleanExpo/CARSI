@@ -12,7 +12,8 @@ import {
   recordAdminLogin,
   verifyAdminByEmail,
 } from '@/lib/admin/admin-store';
-import { applyRateLimit, UNKNOWN_IP } from '@/lib/rate-limit';
+import { UNKNOWN_IP } from '@/lib/rate-limit';
+import { applyDurableRateLimit } from '@/lib/server/durable-rate-limit';
 
 // RA-3027 — rate-limit admin login (defense-in-depth) + DB-backed lookup.
 //
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
 
   // 1. Rate limit BEFORE body parse so brute-force attempts cost less.
-  const rl = applyRateLimit(`admin:${ip}`, LOGIN_LIMIT, LOGIN_WINDOW_MS);
+  const rl = await applyDurableRateLimit(`admin:${ip}`, LOGIN_LIMIT, LOGIN_WINDOW_MS);
   if (!rl.ok) {
     await logAdminEvent({ outcome: 'failure', email: '', ip, reason: 'rate_limited' });
     return NextResponse.json(

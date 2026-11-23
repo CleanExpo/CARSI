@@ -14,9 +14,14 @@ const mocks = vi.hoisted(() => ({
   verifySession: vi.fn(),
   completed: vi.fn(),
   dbCourse: vi.fn(),
+  adminNow: vi.fn(),
+  // GP-760: the buyer's role in the database now, read by the session reader (verifyActiveSession).
+  dbRole: 'student',
 }));
 
 vi.mock('@/lib/auth/session-jwt', () => ({ verifySessionToken: mocks.verifySession }));
+// GP-760: the admin exemption asks the database (isLmsSessionAdminNow), never the token role.
+vi.mock('@/lib/server/lms-admin-now', () => ({ isLmsSessionAdminNow: mocks.adminNow }));
 vi.mock('@/lib/server/local-course-checkout', () => ({
   resolveCheckoutEmail: vi.fn(async () => 'learner@example.com.au'),
   createStripeCheckoutForCourse: mocks.createStripe,
@@ -60,6 +65,18 @@ vi.mock('@/lib/prisma', () => ({
       findMany: vi.fn(async () => [{ id: 'crs-l2', slug: L2, title: 'Level 2 — Mould Remediation' }]),
     },
     lmsEnrollment: { findMany: mocks.completed },
+    // The session reader's one-statement user read (readLmsUserNow).
+    $queryRaw: vi.fn(async (_s: TemplateStringsArray, userId: string) => [
+      {
+        id: userId,
+        email: 'buyer@example.com.au',
+        full_name: 'B',
+        is_active: true,
+        role: null,
+        session_generation: 0,
+        role_names: [mocks.dbRole],
+      },
+    ]),
   },
 }));
 
@@ -87,6 +104,8 @@ beforeEach(() => {
   mocks.createStripe.mockResolvedValue({ checkout_url: 'https://checkout.stripe.test/cs_new', checkout_session_id: 'cs_new' });
   mocks.verifySession.mockResolvedValue({ sub: 'stu', email: 'learner@example.com.au', full_name: 'L', role: 'student' });
   mocks.completed.mockResolvedValue([]);
+  mocks.adminNow.mockResolvedValue(false);
+  mocks.dbRole = 'student';
   mocks.dbCourse.mockResolvedValue({
     id: 'crs-mould',
     slug: SLUG,
@@ -124,9 +143,28 @@ describe('checkout — prerequisite gate', () => {
 
   it('an admin reaches Stripe without the prerequisite', async () => {
     mocks.verifySession.mockResolvedValue({ sub: 'adm', email: 'a@carsi.com.au', full_name: 'A', role: 'admin' });
+    mocks.dbRole = 'admin';
+    mocks.adminNow.mockResolvedValue(true);
     const res = await POST(request(true));
     expect(res.status).toBe(200);
     expect(mocks.createStripe).toHaveBeenCalledTimes(1);
+  });
+
+  it('an admin the exemption check refuses needs the prerequisite (GP-760)', async () => {
+    mocks.verifySession.mockResolvedValue({ sub: 'adm', email: 'a@carsi.com.au', full_name: 'A', role: 'admin' });
+    mocks.dbRole = 'admin';
+    mocks.adminNow.mockResolvedValue(false);
+    const res = await POST(request(true));
+    expect(res.status).toBe(403);
+    expect(mocks.createStripe).not.toHaveBeenCalled();
+  });
+
+  it('a demoted admin (token still says admin) is not a signed-in buyer at all (GP-760)', async () => {
+    mocks.verifySession.mockResolvedValue({ sub: 'adm', email: 'a@carsi.com.au', full_name: 'A', role: 'admin' });
+    mocks.dbRole = 'student';
+    const res = await POST(request(true));
+    expect(res.status).toBe(401);
+    expect(mocks.createStripe).not.toHaveBeenCalled();
   });
 
   it('a course with no prerequisites is unaffected (no prerequisite lookups)', async () => {

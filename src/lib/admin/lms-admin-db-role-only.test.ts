@@ -19,7 +19,15 @@ vi.mock('next/headers', () => ({
     get: (name: string) => (jar.has(name) ? { name, value: jar.get(name) } : undefined),
   }),
 }));
-vi.mock('@/lib/prisma', () => ({ prisma: {} }));
+// GP-760: the admin gate re-reads the user's role from the database on every request. This
+// stand-in database agrees with the token's role, so these cases test the email lists only.
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    $queryRaw: async () => [
+      { is_active: true, role: null, session_generation: 0, role_names: ['admin'] },
+    ],
+  },
+}));
 
 const { getDefaultAppPathForClaims, getPostLoginRedirectPath, isLmsClaimsAllowedAdminPanel } =
   await import('./admin-panel-access');

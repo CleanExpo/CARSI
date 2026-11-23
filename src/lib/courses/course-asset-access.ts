@@ -148,8 +148,9 @@ export function cachedCourseSlugLookup(
 }
 
 /**
- * Staff session check for the proxy: a valid admin cookie, or a verified `auth_token` whose
- * role opens the admin panel (the same two checks the /admin gate in `updateSession` uses).
+ * Staff session check for the proxy: a valid admin cookie, or a verified `auth_token` whose user is
+ * an admin in the database now (GP-760: isLmsSessionAdminNow, fails closed), so a demoted or
+ * deactivated admin's 7-day token stops opening draft course files on the next request.
  */
 export async function hasStaffSession(cookies: {
   get(name: string): { value: string } | undefined;
@@ -158,5 +159,8 @@ export async function hasStaffSession(cookies: {
   const token = cookies.get('auth_token')?.value;
   if (!token) return false;
   const claims = await verifySessionToken(token);
-  return claims ? isLmsClaimsAllowedAdminPanel(claims) : false;
+  if (!claims || !isLmsClaimsAllowedAdminPanel(claims)) return false;
+  // Loaded only for a token that claims admin, so public file requests never load the database client.
+  const { isLmsSessionAdminNow } = await import('@/lib/server/lms-admin-now');
+  return isLmsSessionAdminNow(claims);
 }

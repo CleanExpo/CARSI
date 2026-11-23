@@ -22,7 +22,7 @@ Dear CEC Committee,
 I am writing to submit nine online courses for IICRC CEC approval.
 
 CARSI is an Australian online continuing education provider for the cleaning and restoration
-trade. We are an IICRC CEC Accredited provider. Our courses are self-paced and delivered online at
+trade. We are an IICRC Approved CEC Provider. Our courses are self-paced and delivered online at
 https://www.carsi.com.au, which is how Australian technicians keep their certifications current
 without the flights, hotels and lost days that classroom delivery costs them here.
 
