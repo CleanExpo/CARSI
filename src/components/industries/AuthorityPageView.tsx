@@ -22,6 +22,7 @@ import {
 import { AuthorityForCrossLinks } from '@/components/industries/AuthorityForCrossLinks';
 import { RoleGuideHero } from '@/components/industries/role-guide/RoleGuideHero';
 import { RoleGuideScopeSection } from '@/components/industries/role-guide/RoleGuideScopeSection';
+import { RoleGuideStartHereSection } from '@/components/industries/role-guide/RoleGuideStartHereSection';
 import { RoleGuideWhySection } from '@/components/industries/role-guide/RoleGuideWhySection';
 import {
   LANDING_DISPLAY_H2_CLASS,
@@ -90,6 +91,7 @@ export function AuthorityPageView({
   const publishable = isAuthorityPagePublishable(entry, new Set(courses.map((c) => c.slug)));
   const sourcesUpdated = authorityPageLatestVerified(entry);
   const featuredCourse = courses[0];
+  const liveSlugs = new Set(courses.map((c) => c.slug));
   const awaitingSlugs = entry.bundle.awaitingCatalogueSlugs;
   const evidence = entry.claims.map((claim) => ({
     title: claim.sourceTitle,
@@ -181,6 +183,8 @@ export function AuthorityPageView({
         livePageLabel={entry.livePageLabel}
         heroImage={entry.heroImage}
       />
+
+      <RoleGuideStartHereSection entry={entry} liveSlugs={liveSlugs} />
 
       <IndustryCourseSection
         industryName={entry.shortAudience}

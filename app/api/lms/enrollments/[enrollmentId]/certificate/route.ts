@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getAppOrigin } from '@/lib/server/app-url';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import {
   buildCompletionCertificatePdf,
   completionCertificateDataFromEnrollment,
 } from '@/lib/server/certificate-pdf';
-import { getAppOrigin } from '@/lib/server/app-url';
 import { canIssueCertificate } from '@/lib/server/certificate-name';
 import { getEnrollmentForCertificate, markCertificateIssued } from '@/lib/server/enrollment-service';
 import { captureServerError } from '@/lib/server/sentry';

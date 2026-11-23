@@ -1,16 +1,10 @@
-import { headers } from 'next/headers';
-
 import { getAppOrigin } from '@/lib/server/app-url';
 
 /**
- * Origin for absolute URLs (verification links, etc.) in a server component.
- *
- * The configured app URL wins, as for every other site address (GP-756). The request's own
- * host is only a fallback when no app URL is configured, and never a local one in production.
+ * Origin for absolute URLs on server-rendered pages (verification links, etc.).
+ * GP-700: decided by `getAppOrigin`, never by the request's host headers.
+ * Kept async so existing callers need no change.
  */
 export async function getServerOrigin(): Promise<string> {
-  const h = await headers();
-  const host = h.get('x-forwarded-host') ?? h.get('host');
-  const proto = h.get('x-forwarded-proto') ?? 'http';
-  return getAppOrigin(host ? { nextUrl: { origin: `${proto}://${host}` } } : null);
+  return getAppOrigin();
 }

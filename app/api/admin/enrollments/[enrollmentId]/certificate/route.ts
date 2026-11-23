@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
+import { getAppOrigin } from '@/lib/server/app-url';
 import {
   buildCompletionCertificatePdf,
   completionCertificateDataFromEnrollment,
 } from '@/lib/server/certificate-pdf';
-import { getAppOrigin } from '@/lib/server/app-url';
 import { canIssueCertificate } from '@/lib/server/certificate-name';
 import { getEnrollmentForCertificate, markCertificateIssued } from '@/lib/server/enrollment-service';
 import { captureServerError } from '@/lib/server/sentry';

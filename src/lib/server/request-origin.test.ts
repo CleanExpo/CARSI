@@ -1,46 +1,35 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const headerMap = new Map<string, string>();
+const headerStore = vi.hoisted(() => ({ value: new Headers() }));
+
 vi.mock('next/headers', () => ({
-  headers: async () => ({ get: (name: string) => headerMap.get(name.toLowerCase()) ?? null }),
+  headers: async () => headerStore.value,
 }));
 
-import { getServerOrigin } from './request-origin';
+const { getServerOrigin } = await import('./request-origin');
 
 beforeEach(() => {
-  headerMap.clear();
   vi.stubEnv('NODE_ENV', 'production');
   vi.stubEnv('NEXT_PUBLIC_APP_URL', '');
   vi.stubEnv('NEXT_PUBLIC_FRONTEND_URL', '');
+  vi.stubEnv('VERCEL_ENV', 'production');
+  vi.stubEnv('VERCEL_URL', '');
+  vi.stubEnv('VERCEL_BRANCH_URL', '');
+  headerStore.value = new Headers({
+    host: 'evil.example',
+    'x-forwarded-host': 'evil.example',
+    'x-forwarded-proto': 'https',
+  });
 });
 afterEach(() => vi.unstubAllEnvs());
 
-describe('getServerOrigin (GP-756)', () => {
-  it('uses the configured app URL, not a forged Host header', async () => {
+describe('GP-700 getServerOrigin (credential pages)', () => {
+  it('ignores a forged Host / X-Forwarded-Host and uses the canonical origin', async () => {
+    expect(await getServerOrigin()).toBe('https://carsi.com.au');
+  });
+
+  it('uses the configured address over a forged host', async () => {
     vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://carsi.com.au/');
-    headerMap.set('host', 'evil.example');
-    headerMap.set('x-forwarded-proto', 'https');
-    expect(await getServerOrigin()).toBe('https://carsi.com.au');
-  });
-
-  it('uses the configured app URL over x-forwarded-host', async () => {
-    vi.stubEnv('NEXT_PUBLIC_FRONTEND_URL', 'https://carsi.com.au');
-    headerMap.set('x-forwarded-host', 'evil.example');
-    expect(await getServerOrigin()).toBe('https://carsi.com.au');
-  });
-
-  it('falls back to the request host when no app URL is configured', async () => {
-    headerMap.set('x-forwarded-host', 'www.carsi.com.au');
-    headerMap.set('x-forwarded-proto', 'https');
-    expect(await getServerOrigin()).toBe('https://www.carsi.com.au');
-  });
-
-  it('never returns a local host in production', async () => {
-    headerMap.set('host', 'localhost:3000');
-    expect(await getServerOrigin()).toBe('https://carsi.com.au');
-  });
-
-  it('defaults to the canonical site with no host and no env', async () => {
     expect(await getServerOrigin()).toBe('https://carsi.com.au');
   });
 });

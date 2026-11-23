@@ -8,6 +8,7 @@ This sheet holds every stop rule the course teaches (section 6). All of them app
 
 | Check | Answer |
 | --- | --- |
+| Country of the job (Australia / New Zealand) | |
 | Year the floor was laid (or built or renovated) | |
 | Floor and any adhesive tested? Report sighted? (Y / N) | |
 | Register or assessment report sighted? (Y / N) | |
@@ -24,7 +25,7 @@ Person told: ______________  Date and time: ______________
 
 - SDS on site for every product? Y / N
 - Hazards, protective equipment, first aid, mixing and surface warnings read? Y / N
-- Australia: Poisons Information Centre 13 11 26. Emergency 000.
+- Australia: Poisons Information Centre 13 11 26. Emergency Triple Zero (000).
 - New Zealand: National Poisons Centre 0800 764 766. Emergency 111.
 
 ## 3. Controls and protective equipment
@@ -44,6 +45,7 @@ Person told: ______________  Date and time: ______________
 - Other loads already on this circuit: ______ A
 - Machine currents from the data plates, added up: ______ A
 - Total of other loads plus machine currents: ______ A. Within the circuit rating? Y / N
+- Lowest rating of any power board, extension lead or outlet in the supply path: ______ A. Machine currents plus anything else plugged into it within that rating? Y / N
 
 ## 6. Stop rules (all apply before and during the job)
 
@@ -51,10 +53,10 @@ If any rule applies, stop. Record it in the Decision box and tell the person nam
 
 | No. | Stop rule | Taught in |
 | --- | --- | --- |
-| S1 | Asbestos cannot be ruled out (no test result or register sighted, a floor laid before the ban date, or any doubt): stop and refer the proposed work for competent, jurisdiction-specific assessment. Do not strip, abrade, machine-treat or remove. This gate also comes before any strip and recoat. Do not resume until a competent person confirms in writing what is permitted. | Asbestos: identify, presume, stop and refer; Resilient floors: strip, rinse, dry and recoat; Quoting: residential and commercial programs; Handover, records and the supervised practical day |
+| S1 | Asbestos cannot be ruled out (no test result or register sighted, a floor laid before the trigger date for the country, or any doubt): stop and refer the proposed work for competent, jurisdiction-specific assessment. Do not strip, abrade, machine-treat or remove. This gate also comes before any strip and recoat. Do not resume until a competent person confirms in writing what is permitted. Trigger date: Australia, a floor laid before the 31 December 2003 ban; New Zealand, a building built before 1 January 2000, which WorkSafe NZ says is likely to contain asbestos. The 1 October 2016 New Zealand import ban is not a building date. A later date lowers the risk but never rules asbestos out. | Asbestos: identify, presume, stop and refer; Resilient floors: strip, rinse, dry and recoat; Quoting: residential and commercial programs; Handover, records and the supervised practical day |
 | S2 | Broken, lifting or crumbling tiles: stop, keep people out and report it. | Asbestos: identify, presume, stop and refer |
 | S3 | A safety data sheet (SDS) is missing for any product: stop until it is on site and read. | SDS, protective equipment, slip risk and power; Chemistry: soil, surface, label and SDS |
-| S4 | Power is unsafe: damaged lead or plug, no RCD, test tag out of date, circuit rating not confirmed, or other loads plus machine currents over the circuit rating. Stop and fix it. | SDS, protective equipment, slip risk and power; Which machine for which job, and the pre-start check |
+| S4 | Power is unsafe: damaged lead or plug, no RCD, test tag out of date, circuit rating not confirmed, other loads plus machine currents over the circuit rating, or the load on any power board, extension lead or outlet over its own rating. Stop and fix it. | SDS, protective equipment, slip risk and power; Which machine for which job, and the pre-start check |
 | S5 | No signs out, no dry walkway, or no barrier where the public can reach: stop and set them up before the first pass. | SDS, protective equipment, slip risk and power; Which machine for which job, and the pre-start check; Handover, records and the supervised practical day |
 | S6 | The floor or its coating cannot be identified (including a coating recorded as unknown): stop and ask the maker or an expert. An unknown coating ends the job until advice is obtained. | The floor identification routine; The approved setup record; Coatings on tile and stone, sealers and slip |
 | S7 | The maker's limits or the compatibility cannot be established: stop and obtain technical advice. Do not substitute a generic pressure, pH band, pad colour or speed. | Chemistry: soil, surface, label and SDS; The approved setup record; Tile and grout restorative clean |

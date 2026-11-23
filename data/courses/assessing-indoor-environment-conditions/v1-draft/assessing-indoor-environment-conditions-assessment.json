@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "courseSlug": "assessing-indoor-environment-conditions",
+  "status": "draft",
+  "note": "DRAFT v1 practical task for the CARSI Indoor Environment Assessment Practitioner course. Instructor-graded against the rubric. Original CARSI task for Australian and New Zealand conditions; no IICRC standard text reproduced. SME review and sign-off required before it is published.",
+  "assessment": {
+    "id": "c04070ff-535b-48ad-8b4b-ecdfc124afea",
+    "title": "CARSI Indoor Environment Assessment Practitioner — Practical task: plan, carry out and report an indoor environment assessment",
+    "passThreshold": 80,
+    "isPublished": false,
+    "instructions": "## Practical task\n\nPlan, carry out and report an indoor environment assessment of a real building you have permission to assess, or use the supplied case. **Supplied case:** a 1968 brick-veneer house in Ballarat, Victoria (NCC climate zone 7), rented to a family with a 2-year-old. In July the tenant reports a musty smell and black spotting on the main bedroom ceiling corner (bedroom 3.4 m x 3.0 m, ceiling 2.4 m). An unflued gas heater is used in the living room. The bathroom fan discharges into the roof space. The property manager commissioned the assessment; the tenant asks whether the air is safe for her child. On your visit the bedroom reads 18 degrees C and 70 %RH, the ceiling corner 12 degrees C, the living room 21 degrees C and 55 %RH, and outdoors 9 degrees C and 90 %RH. *New Zealand learners may relocate the case to a Christchurch rental and apply the NZ positions taught in the course.*\n\nSubmit one PDF, or a set of documents and photos, containing:\n\n1. **Scope and framing.** The written question, who commissioned it, the decision it supports and exclusions; at least two source-pathway-receptor hypotheses, each with the reading that would support it and the reading that would rule it out. Say how you answer the tenant's health question.\n2. **Measurements you can defend.** A reading log with value, unit or scale, instrument and mode, location, time and reference for each reading; g/kg and dew point for each room and outdoors, with your working; surface temperatures compared with dew point; equipment state recorded.\n3. **Sampling decision.** Whether sampling is justified, and why. If it is, the written question, method, locations, comparison samples, sample volumes, the laboratory's accreditation (NATA or IANZ) and scope check, and a completed chain-of-custody form. If it is not, explain why that is the better decision.\n4. **Interpretation and stop rules.** Your interpretation against references and outdoors; which hypotheses are supported or ruled out. Identify every stop-and-escalate trigger in the case (including the gas heater and any building-age hazard), the action you take and who you refer to. Any regulatory figure you quote is source-tagged (jurisdiction, date, units, averaging time) and marked as not a residential threshold.\n5. **The report.** A report in the CARSI ten-part structure with a one-paragraph plain-English summary for the tenant, limitations, recommendations tied to findings, and your fee in AUD with GST. No health verdicts; no \"safe\" or \"clear\" without a basis.\n\nUse Australian English and metric units throughout. Reference any standard by name only; do not copy text from any standard.",
+    "criteria": [
+      {
+        "label": "Scope and source-pathway-receptor framing",
+        "description": "Written question, commissioning party, decision supported and exclusions stated; at least two hypotheses with supporting and ruling-out readings; the health question handled by describing the building and referring to a doctor.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Defensible measurements and psychrometry",
+        "description": "Every reading carries value, unit or scale, instrument and mode, location, time and a reference; g/kg and dew point correct with working shown; surface temperatures compared with dew point; equipment state recorded.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Sampling decision and chain of custody",
+        "description": "Sampling justified (or declined) against a written question in line with enHealth guidance; where sampling is used, method, comparisons, volumes, accredited laboratory scope check and a complete chain-of-custody record.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Interpretation in context and stop-and-escalate",
+        "description": "Readings interpreted by comparison, not against a \"safe\" number; no workplace limit presented as a residential threshold and every figure source-tagged; CO, asbestos and other triggers identified with the right action and referral.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Report quality and Australian/New Zealand production",
+        "description": "Ten-part structure with facts kept apart from interpretation; plain-English summary; limitations and recommendations tied to findings; fee in AUD with GST; Australian English, metric units; standards named only, no copied standard text; no health verdicts.",
+        "maxPoints": 20
+      }
+    ]
+  }
+}
