@@ -14,6 +14,8 @@ import { PER_COURSE_PRICE_FALLBACK_LABEL, perCoursePriceLabel } from '@/lib/lms/
 import { OG_IMAGES } from '@/lib/seo/og-image';
 import { getPublicCatalogueFacts } from '@/lib/server/public-catalogue-facts';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 /**
  * AU price-anchoring page (BACKLOG row 14).
  *
@@ -64,8 +66,7 @@ function buildFaqItems(perCourseLabel: string | null) {
   return [
     {
       question: 'Does a CARSI course make me IICRC certified?',
-      answer:
-        'No, and any provider telling you otherwise is misleading you. IICRC certification is earned through a school approved by the IICRC and its examination. CARSI is accredited as an IICRC CEC provider, which is a different standing: CARSI courses carry CARSI Southern Hemisphere Restoration Designations in their own right, and where an individual course has been approved by the IICRC, the credits it carries are shown on that course and tracked in your dashboard.',
+      answer: `No, and any provider telling you otherwise is misleading you. IICRC certification is earned through a school approved by the IICRC and its examination. CARSI is an ${IICRC_APPROVED_CEC_PROVIDER}, which is a different standing: CARSI courses carry CARSI Southern Hemisphere Restoration Designations in their own right, and where an individual course has been approved by the IICRC, the credits it carries are shown on that course and tracked in your dashboard.`,
     },
     {
       question: 'So what am I actually comparing?',
@@ -102,6 +103,7 @@ export const metadata: Metadata = {
     'continuing education credits restoration',
   ],
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     images: OG_IMAGES,
     title: 'What restoration training actually costs in Australia | CARSI',
     description:
@@ -155,7 +157,7 @@ export default async function RestorationTrainingCostPage() {
           A certification course and a continuing education course are not competing products. You
           buy an IICRC certification once per discipline, from a school approved by the IICRC and
           its examination. Keeping that certification current is a separate, recurring cost for the
-          rest of your career. CARSI is an accredited IICRC CEC provider and sits on the recurring
+          rest of your career. CARSI is an {IICRC_APPROVED_CEC_PROVIDER} and sits on the recurring
           side. CARSI does not deliver IICRC certification, and no CARSI course will make you IICRC
           certified.
         </p>

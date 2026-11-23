@@ -15,9 +15,17 @@
  *     lower-case words. Every other query key is stripped. The title sent is the route form,
  *     never document.title. These are allow-lists: nothing is sent because it "looks safe".
  *  4. The same rules are applied again to each request at the moment the browser sends it
- *     (`screenCollect`), because the Google library adds data of its own.
+ *     (`screenCollect`), because the Google library adds data of its own. A field the wire check
+ *     does not know drops the event (GP-750).
  */
 
+import {
+  COACHING_CTA_EVENT,
+  COURSE_CTA_EVENT,
+  EMPLOYER_TRUST_CTA_EVENT,
+  MARKETING_PACK_BUILD_EVENT,
+  ROLE_GUIDE_START_EVENT,
+} from './carsi-events';
 import { PUBLIC_ROUTES } from './public-routes';
 
 // ---------------------------------------------------------------------------
@@ -128,12 +136,12 @@ export const PRIVATE_FIRST_SEGMENTS: ReadonlySet<string> = new Set([
 export const PRIVATE_PATH_PREFIXES: readonly string[] = ['/events/ccw-roadshow/checkin'];
 
 /**
- * Public pages whose next segment is a record identifier (app/(public)/jobs/[id] and
- * calendar/[id]). The list page itself is counted; a page below it is not, whatever the
+ * Public pages whose next segment is a record identifier (app/(public)/jobs/[id],
+ * calendar/[id] and interactive-learning/[experienceId]). The list page itself is counted; a page below it is not, whatever the
  * identifier looks like, because a short id is still an id. consent.test.ts walks app/ and fails
  * when a new identifier route is not covered here or by PRIVATE_FIRST_SEGMENTS.
  */
-export const IDENTIFIER_ROUTES: readonly string[] = ['/calendar', '/jobs'];
+export const IDENTIFIER_ROUTES: readonly string[] = ['/calendar', '/interactive-learning', '/jobs'];
 
 const MAX_PATH = 200;
 const PATH_SHAPE = /^\/[a-z0-9\-_/]*$/;
@@ -311,6 +319,11 @@ export const ALLOWED_EVENTS: ReadonlySet<string> = new Set([
   'checkout_started',
   'membership_view',
   'membership_checkout_started',
+  COURSE_CTA_EVENT,
+  COACHING_CTA_EVENT,
+  ROLE_GUIDE_START_EVENT,
+  MARKETING_PACK_BUILD_EVENT,
+  EMPLOYER_TRUST_CTA_EVENT,
 ]);
 
 /** Event parameters with text values (`ep.` on the wire). */
@@ -321,6 +334,9 @@ export const ALLOWED_TEXT_PARAMS: ReadonlySet<string> = new Set([
   'is_free',
   'checkout_enabled',
   'currency',
+  /** Phase 5 product CTAs — set only via data-carsi-context / counted paths. */
+  'carsi_context',
+  'link_path',
 ]);
 
 /** Event parameters with number values (`epn.` on the wire). */
@@ -406,7 +422,82 @@ export interface ScreenedRequest {
 }
 
 const NUMBER_VALUE = /^-?\d{1,15}(\.\d{1,10})?$/;
-const RULED_FIELDS: ReadonlySet<string> = new Set(['tid', 'en', 'dl', 'dr', 'dt', 'dp']);
+const RULED_FIELDS: ReadonlySet<string> = new Set(['tid', 'en', 'dl', 'dr', 'dt', 'dp', 'cu']);
+
+/**
+ * The Google library's own fields that may appear in a request, outside the event parameters
+ * (`ep.` and `epn.`) and the ruled fields above. This is an allow-list (GP-750): a field not
+ * named here, or in RULED_FIELDS, drops the event, whatever its value looks like, because a
+ * plain user id or member number has no shape to catch. Values are still refused when they
+ * carry an email or a web address.
+ *
+ * When Google adds a field, the hits that carry it stop leaving until it is named here: rerun
+ * scripts/analytics-proof/consent-proof.mjs, read the fields of the hits it records, and add only
+ * fields that are the library's bookkeeping, never one that can carry who the visitor is.
+ */
+export const LIBRARY_FIELDS: ReadonlySet<string> = new Set([
+  // Protocol, property and tag
+  'v',
+  'gtm',
+  '_p',
+  '_gaz',
+  'tag_exp',
+  'ptag_exp',
+  'pscdl',
+  // Consent state and advertising signals (all denied by public/ga-init.js and the config call)
+  'gcs',
+  'gcd',
+  'gcu',
+  'gcut',
+  'npa',
+  'dma',
+  'dma_cps',
+  // The pseudonymous browser and session the library keeps in the _ga cookies
+  'cid',
+  'sid',
+  'sct',
+  'seg',
+  '_s',
+  '_fv',
+  '_ss',
+  '_nsi',
+  '_c',
+  '_ee',
+  '_et',
+  'tfd',
+  // Browser language, screen size and user-agent client hints
+  'ul',
+  'sr',
+  'uaa',
+  'uab',
+  'uafvl',
+  'uamb',
+  'uam',
+  'uap',
+  'uapv',
+  'uaw',
+  // Library feature and transport flags
+  'are',
+  'frm',
+  'pae',
+  '_eu',
+  '_tu',
+  '_z',
+  '_r',
+  '_dbg',
+  'ir',
+  'ngs',
+  'richsstsse',
+  // `rcb`: a small integer gtag.js puts on its own page_view (value 7 in the headless-Chromium
+  // consent proof on PR #1232, comment 7089443744; 4, 7 and 17 in public captures of other
+  // sites). Google does not document it. Public notes on gtag's `_&` escape name `_&rcb` among
+  // the library's internal fields, and the site never sets it, so it is library bookkeeping, not
+  // anything about the visitor. Its value is still screened for an email or a web address.
+  'rcb',
+]);
+
+/** The only currency this site sends (`cu` on the wire, from the `currency` event parameter). */
+const SENT_CURRENCY = 'AUD';
 const PERCENT_ESCAPES = /%[0-9A-Fa-f]{2}/g;
 
 /** Every reading of a value: as given, then with percent escapes undone, up to four rounds. */
@@ -454,6 +545,14 @@ const FIXED_PARAM_VALUES: ReadonlyMap<string, ReadonlySet<string>> = new Map([
   ['checkout_enabled', new Set(['true', 'false', '1', '0'])],
 ]);
 const SLUG_VALUE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+/** Product-excellence contexts: hub, coaching-marketing, role-guide:slug, role-guide:slug:start-N. */
+const CARSi_CONTEXT_VALUE =
+  /^(?:hub(?::[a-z0-9-]+){0,2}|coaching-marketing|role-guide:[a-z0-9-]+(?::(?:start-[1-3]|employer-[1-9]|catalogue-fallback))?)$/;
+
+/** Rejects forged or mistyped `data-carsi-context` before anything is sent (GP-731). */
+export function isValidCarsiContext(value: string): boolean {
+  return value.length <= 120 && CARSi_CONTEXT_VALUE.test(value);
+}
 
 /**
  * True when an event parameter may be sent, for Google Analytics and PostHog alike. Fixed
@@ -469,6 +568,11 @@ export function isAllowedTextParam(name: string, value: unknown): boolean {
   const fixed = FIXED_PARAM_VALUES.get(name);
   if (fixed !== undefined) return fixed.has(value);
   if (value.length > 200 || looksPersonal(value) || DIGIT_RUN.test(value)) return false;
+  if (name === 'carsi_context') return CARSi_CONTEXT_VALUE.test(value);
+  if (name === 'link_path') {
+    const path = safePathname(value);
+    return path !== '' && path === value;
+  }
   return name !== 'course_slug' || SLUG_VALUE.test(value);
 }
 
@@ -504,6 +608,9 @@ function eventAllowed(
   if (pagePath !== undefined && (address === undefined || pagePath !== new URL(address).pathname))
     return false;
 
+  const currency = fields.get('cu');
+  if (currency !== undefined && currency !== SENT_CURRENCY) return false;
+
   for (const [key, value] of fields) {
     if (RULED_FIELDS.has(key)) continue;
     // A user id or user property is never sent.
@@ -525,8 +632,10 @@ function eventAllowed(
       if (!ALLOWED_NUMBER_PARAMS.has(key.slice(4)) || !NUMBER_VALUE.test(value)) return false;
       continue;
     }
-    // Any other field is the library's own bookkeeping. It never needs an address or an email.
-    if (looksPersonal(value)) return false;
+    // Any other field must be one of the library's own, listed fields (GP-750): an unknown field
+    // can carry a plain user id that no value shape would catch. Listed fields never need an
+    // address or an email either.
+    if (!LIBRARY_FIELDS.has(key) || looksPersonal(value)) return false;
   }
   return true;
 }

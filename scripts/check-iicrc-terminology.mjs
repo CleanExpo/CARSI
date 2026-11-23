@@ -517,21 +517,22 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
       re: /\bIICRC[\s-]*Accredited\b/i,
       allow: null,
       message:
-        'Say "IICRC CEC Accredited", never bare "IICRC Accredited" — CARSI is accredited as a CEC provider, not accredited by IICRC generally.',
+        'Say "IICRC Approved CEC Provider" (GP-704); never call CARSI or a course accredited.',
     },
     {
       // "IICRC-accredited course(s)" / "IICRC accredited course(s)" (no CEC) —
       // implies IICRC accredits the course/certification itself.
       re: /\bIICRC[\s-]*accredited[\s-]+courses?\b/i,
       allow: null,
-      message: 'CARSI courses are not "IICRC-accredited" — say "IICRC CEC Accredited course(s)".',
+      message:
+        'CARSI courses are not accredited — a single approved class is "approved for IICRC CECs".',
     },
     {
       // "IICRC course(s) accredited/accreditation" (reversed word order).
       re: /\bIICRC[\s-]+courses?[\s-]+accredit\w*\b/i,
       allow: null,
       message:
-        'Do not imply IICRC accredits CARSI\'s courses — say "IICRC CEC Accredited course(s)".',
+        'Do not imply the IICRC accredits CARSI\'s courses — a single approved class is "approved for IICRC CECs".',
     },
     {
       // "IICRC Approved School" / "IICRC Approved Instructor" as a positive claim about
@@ -1192,7 +1193,9 @@ const isCli = isEntryPoint(import.meta.url);
 const staged = process.argv.includes('--staged');
 const findings = [];
 
-if (staged) {
+// The scan itself is CLI-only too (GP-711): it ran at import time, so every importer (the
+// self-test, check-built-site) paid a full repository scan (~65s) before doing its own work.
+if (isCli && staged) {
   // Pre-commit: scan STAGED additions only, no context lines (matches check-secrets).
   let diff = '';
   try {
@@ -1222,7 +1225,7 @@ if (staged) {
     scanLine(currentFile, lineNo, line.slice(1), findings);
     lineNo++;
   }
-} else {
+} else if (isCli) {
   // CI / manual: scan all tracked source-copy files.
   let list = '';
   try {

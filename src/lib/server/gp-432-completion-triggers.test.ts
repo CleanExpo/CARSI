@@ -29,7 +29,10 @@ const mocks = vi.hoisted(() => ({
   submissionUpdate: vi.fn(),
 }));
 
-vi.mock('@/lib/server/enrollment-service', () => ({ syncCompletionAfterAssessmentPassed: mocks.sync }));
+vi.mock('@/lib/server/enrollment-service', () => ({
+  syncCompletionAfterAssessmentPassed: mocks.sync,
+  ensureStaffEnrollmentForQuiz: vi.fn(async () => {}),
+}));
 vi.mock('@/lib/server/auth-from-request', () => ({ getSessionClaimsFromRequest: mocks.claims }));
 vi.mock('@/lib/server/upstream-api', () => ({ getUpstreamBaseUrl: () => null }));
 vi.mock('@/lib/server/course-prerequisites', async (original) => ({

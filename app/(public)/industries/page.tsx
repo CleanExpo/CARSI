@@ -4,9 +4,13 @@ import { ArrowRight } from 'lucide-react';
 
 import { industryHubCards } from '@/lib/marketing/industry-hub';
 
+import {
+  FROM_IICRC_APPROVED_CEC_PROVIDER,
+  IICRC_APPROVED_CEC_PROVIDER,
+} from '@/lib/iicrc/approved-wording';
 export const metadata: Metadata = {
   title: 'Industry Training Solutions',
-  description: `Restoration training for ${industryHubCards.length} industries across Australia, from an IICRC CEC Accredited provider. Sector-specific restoration courses with verifiable credentials for healthcare, hospitality, mining, plumbing, NDIS, real estate, and more.`,
+  description: `Restoration training for ${industryHubCards.length} industries across Australia, ${FROM_IICRC_APPROVED_CEC_PROVIDER}. Sector-specific restoration courses with verifiable credentials for healthcare, hospitality, mining, plumbing, NDIS, real estate, and more.`,
   alternates: { canonical: '/industries' },
 };
 
@@ -37,7 +41,7 @@ export default function IndustriesPage() {
             style={{ color: 'rgba(255,255,255,0.5)' }}
           >
             Restoration training for {industryHubCards.length} industries across Australia, from an
-            IICRC CEC Accredited provider. Each pathway uses CARSI course areas, verifiable
+            {IICRC_APPROVED_CEC_PROVIDER}. Each pathway uses CARSI course areas, verifiable
             credentials, and CEC hours only where the IICRC has approved the course.
           </p>
         </section>

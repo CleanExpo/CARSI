@@ -22,7 +22,7 @@ vi.mock('./anthropic-client', () => ({
   AnthropicAPIError: class extends Error {},
 }));
 
-import { applyOptimizedCourseDraft, generateOptimizedCourseDraft, optimizeAndApplyCourse } from './optimize-course-content';
+import { applyOptimizedCourseDraft, draftCourseOptimizationForReview, generateOptimizedCourseDraft } from './optimize-course-content';
 
 const draft = {
   token: 'reviewed-draft',
@@ -45,7 +45,7 @@ describe('applying an optimised draft preserves CEC ownership', () => {
     mocks.adminGetCourse.mockResolvedValue({ meta: { optimizeDraft: draft, curriculumPersistence: null }, modules: [] });
     const operation = mode === 'generate' ? generateOptimizedCourseDraft('course-id')
       : mode === 'apply' ? applyOptimizedCourseDraft('course-id', draft.token)
-      : optimizeAndApplyCourse('course-id');
+      : draftCourseOptimizationForReview('course-id');
     await expect(operation).rejects.toMatchObject({ status: 409 });
     expect(mocks.complete).not.toHaveBeenCalled();
     expect(mocks.adminUpdateCourse).not.toHaveBeenCalled();

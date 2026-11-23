@@ -89,7 +89,9 @@ export async function adminGrantEnrollments(params: {
   alreadyEnrolled: number;
   enrollmentIds: string[];
 }> {
-  const unique = [...new Set(params.courseSlugs.map((s) => s.trim().toLowerCase()).filter(Boolean))];
+  const unique = [
+    ...new Set(params.courseSlugs.map((s) => s.trim().toLowerCase()).filter(Boolean)),
+  ];
   if (unique.length === 0) throw new Error('NO_COURSES');
 
   let created = 0;
@@ -159,19 +161,55 @@ export async function adminRevokeEnrollment(enrollmentId: string) {
   });
 }
 
-type MarkCompleteResult = { enrollmentId: string; lessonsMarked: number; completed: boolean };
+export type AdminBulkCompleteRow = {
+  enrollmentId: string;
+  lessonsMarked: number;
+  completed: boolean;
+};
+
+/**
+ * Thrown when a bulk force-complete fails part-way through (GP-769). Rows before the failure are
+ * already committed and audited; this error names them, the row that failed and the rows that
+ * were never attempted, so the admin screen can say exactly what happened. `cause` is the error
+ * the failed row threw (for example NotCurrentAdminError when the admin's access was removed).
+ */
+export class AdminBulkCompletePartialError extends Error {
+  readonly completed: AdminBulkCompleteRow[];
+  readonly failed: { enrollmentId: string; error: string };
+  readonly notAttempted: string[];
+  override readonly cause: unknown;
+
+  constructor(params: {
+    completed: AdminBulkCompleteRow[];
+    failed: { enrollmentId: string; error: string };
+    notAttempted: string[];
+    cause?: unknown;
+  }) {
+    super('BULK_COMPLETE_PARTIAL');
+    this.name = 'AdminBulkCompletePartialError';
+    this.completed = params.completed;
+    this.failed = params.failed;
+    this.notAttempted = params.notAttempted;
+    this.cause = params.cause;
+  }
+}
 
 /**
  * Mark every lesson of one or more enrollments complete (GP-432). Each enrolment then completes
  * only if its required assessments are passed; `completed` in each result says which did. A
  * reason is required and each enrolment gets its own audit row (forceCompleteEnrollment).
+ *
+ * Rows are processed one at a time, in order, and the batch stops at the first failure. It is not
+ * one database transaction: each completion can start the IICRC CEC auto-submit, which cannot be
+ * rolled back. A part-way failure throws AdminBulkCompletePartialError with a per-row account
+ * instead (GP-769).
  */
 export async function adminMarkEnrollmentsComplete(params: {
   studentId: string;
   enrollmentIds: string[];
   session: AdminSessionProvenance | null;
   reason: string;
-}): Promise<{ updated: number; results: MarkCompleteResult[] }> {
+}): Promise<{ updated: number; results: AdminBulkCompleteRow[] }> {
   const student = await prisma.lmsUser.findUnique({ where: { id: params.studentId } });
   if (!student) throw new Error('USER_NOT_FOUND');
 
@@ -190,15 +228,22 @@ export async function adminMarkEnrollmentsComplete(params: {
     throw new Error('ENROLLMENT_REVOKED');
   }
 
-  // Each enrolment commits on its own; a failure part-way through (for example the admin's
-  // access removed between rows) leaves earlier rows done and audited. `results` lists them.
-  const results: MarkCompleteResult[] = [];
-  for (const enrollmentId of uniqueIds) {
-    const r = await forceCompleteEnrollment(enrollmentId, params.studentId, {
-      session: params.session,
-      reason: params.reason,
-    });
-    results.push({ enrollmentId, lessonsMarked: r.lessonsMarked, completed: r.completed });
+  const results: AdminBulkCompleteRow[] = [];
+  for (const [index, enrollmentId] of uniqueIds.entries()) {
+    try {
+      const r = await forceCompleteEnrollment(enrollmentId, params.studentId, {
+        session: params.session,
+        reason: params.reason,
+      });
+      results.push({ enrollmentId, lessonsMarked: r.lessonsMarked, completed: r.completed });
+    } catch (e) {
+      throw new AdminBulkCompletePartialError({
+        completed: results,
+        failed: { enrollmentId, error: e instanceof Error ? e.message : String(e) },
+        notAttempted: uniqueIds.slice(index + 1),
+        cause: e,
+      });
+    }
   }
 
   return { updated: results.length, results };

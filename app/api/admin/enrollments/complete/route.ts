@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { adminMarkEnrollmentsComplete } from '@/lib/admin/admin-enrollment-mutations';
+import {
+  AdminBulkCompletePartialError,
+  adminMarkEnrollmentsComplete,
+} from '@/lib/admin/admin-enrollment-mutations';
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import { NotCurrentAdminError } from '@/lib/server/current-admin';
 import { readReviewAdminSession } from '@/lib/server/review-admin-session';
@@ -33,13 +36,13 @@ export async function POST(request: NextRequest) {
   if (!studentId || enrollmentIds.length === 0) {
     return NextResponse.json(
       { detail: 'studentId and at least one enrollmentId are required' },
-      { status: 400 },
+      { status: 400 }
     );
   }
   if (!reason || reason.length > 1000) {
     return NextResponse.json(
       { detail: 'A reason (1 to 1000 characters) is required; it is kept in the audit log.' },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -51,9 +54,33 @@ export async function POST(request: NextRequest) {
       reason,
     });
     return NextResponse.json({ ok: true, ...result });
-  } catch (e) {
+  } catch (caught) {
+    // Nothing was written when the first row failed, so answer as that row's own error does.
+    const e =
+      caught instanceof AdminBulkCompletePartialError && caught.completed.length === 0
+        ? caught.cause
+        : caught;
     if (e instanceof NotCurrentAdminError) {
       return NextResponse.json({ detail: 'Forbidden' }, { status: 403 });
+    }
+    if (e instanceof AdminBulkCompletePartialError) {
+      // Part-way failure (GP-769): earlier rows are already committed and audited. Say which.
+      console.error('[admin/enrollments/complete] partial', e.failed.enrollmentId, e.failed.error);
+      const done = e.completed.length;
+      const forbidden = e.cause instanceof NotCurrentAdminError;
+      return NextResponse.json(
+        {
+          detail:
+            (forbidden ? 'Forbidden part-way. ' : '') +
+            `Processed ${done} course${done === 1 ? '' : 's'}, then one failed. ` +
+            `${e.notAttempted.length} not attempted.`,
+          partial: true,
+          completed: e.completed,
+          failed: { enrollmentId: e.failed.enrollmentId },
+          notAttempted: e.notAttempted,
+        },
+        { status: forbidden ? 403 : 500 }
+      );
     }
     const msg = e instanceof Error ? e.message : String(e);
     if (msg === 'USER_NOT_FOUND') {
@@ -65,13 +92,13 @@ export async function POST(request: NextRequest) {
     if (msg === 'ENROLLMENT_NOT_FOUND') {
       return NextResponse.json(
         { detail: 'One or more enrollments were not found for this learner' },
-        { status: 404 },
+        { status: 404 }
       );
     }
     if (msg === 'ENROLLMENT_REVOKED') {
       return NextResponse.json(
         { detail: 'A revoked or refunded enrolment cannot be marked complete.' },
-        { status: 409 },
+        { status: 409 }
       );
     }
     return NextResponse.json({ detail: 'Failed to mark courses complete' }, { status: 500 });

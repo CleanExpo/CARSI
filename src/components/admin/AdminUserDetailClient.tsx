@@ -27,6 +27,7 @@ import { useMemo, useState } from 'react';
 import { AdminPagination } from '@/components/admin/AdminPagination';
 import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
 import { formatAud } from '@/lib/admin/admin-ops-format';
+import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
 import type {
   AdminCatalogCourseOption,
   AdminCourseProgressForUser,
@@ -66,8 +67,17 @@ function isCecEligibleEnrollment(enrollment: AdminCourseProgressForUser): boolea
   return enrollment.resolvedCecHours != null && enrollment.resolvedCecHours > 0;
 }
 
+/**
+ * Completed means the server marked the enrolment completed: lessons AND required assessments
+ * (GP-432), or an admin force-complete. 100% of lessons alone is not complete, and must not show
+ * a Certificate button or IICRC CEC readiness the certificate and IICRC routes would refuse (GP-769).
+ */
+function isCompletedEnrollment(enrollment: AdminCourseProgressForUser): boolean {
+  return isEnrollmentCompleted(enrollment.status);
+}
+
 function isNotStarted(enrollment: AdminCourseProgressForUser): boolean {
-  return enrollment.completionPct < 100 && enrollment.completedLessons === 0;
+  return !isCompletedEnrollment(enrollment) && enrollment.completedLessons === 0;
 }
 
 function nextLesson(enrollment: AdminCourseProgressForUser): string | null {
@@ -77,7 +87,7 @@ function nextLesson(enrollment: AdminCourseProgressForUser): string | null {
 
 function enrollmentUrgency(enrollment: AdminCourseProgressForUser): number {
   if (isNotStarted(enrollment)) return 0;
-  if (enrollment.completionPct < 100) return 1;
+  if (!isCompletedEnrollment(enrollment)) return 1;
   if (isCecEligibleEnrollment(enrollment) && enrollment.renewalStatus !== 'sent') return 2;
   return 3;
 }
@@ -120,7 +130,7 @@ function CourseEnrollmentCard({
   onDownloadCertificate: (id: string, slug: string) => void;
 }) {
   const statusLabel = enrollment.status.replace(/_/g, ' ');
-  const isComplete = enrollment.completionPct >= 100;
+  const isComplete = isCompletedEnrollment(enrollment);
   const stuck = isNotStarted(enrollment);
   const cecEligible = isCecEligibleEnrollment(enrollment);
   const renewalAlreadySent =
@@ -178,6 +188,11 @@ function CourseEnrollmentCard({
             </p>
             {upcoming && !isComplete ? (
               <p className="text-sm text-[#7ec5ff]/90">Next: {upcoming}</p>
+            ) : null}
+            {!isComplete && enrollment.remainingLessons === 0 && enrollment.totalLessons > 0 ? (
+              <p className="text-sm text-amber-200/80">
+                All lessons done · required assessments not yet passed
+              </p>
             ) : null}
             <p className="text-xs text-white/40">
               Enrolled {formatAdminDate(enrollment.enrolledAt)}
@@ -416,7 +431,7 @@ export function AdminUserDetailClient({
   const [grantOpen, setGrantOpen] = useState(user.enrollments.length === 0);
 
   const incompleteEnrollments = useMemo(
-    () => user.enrollments.filter((e) => e.completionPct < 100),
+    () => user.enrollments.filter((e) => !isCompletedEnrollment(e)),
     [user.enrollments]
   );
 
@@ -429,12 +444,12 @@ export function AdminUserDetailClient({
     [catalogCourses, enrolledSlugs]
   );
 
-  const completedCourses = user.enrollments.filter((e) => e.completionPct >= 100).length;
+  const completedCourses = user.enrollments.filter(isCompletedEnrollment).length;
   const totalLessonsDone = user.enrollments.reduce((a, e) => a + e.completedLessons, 0);
   const totalLessons = user.enrollments.reduce((a, e) => a + e.totalLessons, 0);
 
   const cecEligibleCompleted = useMemo(
-    () => user.enrollments.filter((e) => e.completionPct >= 100 && isCecEligibleEnrollment(e)),
+    () => user.enrollments.filter((e) => isCompletedEnrollment(e) && isCecEligibleEnrollment(e)),
     [user.enrollments]
   );
 
@@ -455,8 +470,8 @@ export function AdminUserDetailClient({
   const visibleEnrollments = useMemo(() => {
     const filtered = user.enrollments.filter((e) => {
       if (courseFilter === 'stuck') return isNotStarted(e);
-      if (courseFilter === 'progress') return e.completionPct > 0 && e.completionPct < 100;
-      if (courseFilter === 'done') return e.completionPct >= 100;
+      if (courseFilter === 'progress') return e.completionPct > 0 && !isCompletedEnrollment(e);
+      if (courseFilter === 'done') return isCompletedEnrollment(e);
       if (courseFilter === 'cec') return isCecEligibleEnrollment(e);
       return true;
     });
@@ -605,9 +620,15 @@ export function AdminUserDetailClient({
       const payload = (await res.json().catch(() => ({}))) as {
         detail?: string;
         results?: { completed?: boolean }[];
+        partial?: boolean;
       };
       if (!res.ok) {
         setActionError(payload.detail ?? 'Could not mark courses complete');
+        // Part-way failure (GP-769): earlier rows were completed, so reload to show them.
+        if (payload.partial) {
+          setSelectedEnrollmentIds(new Set());
+          router.refresh();
+        }
         return;
       }
       const notCompleted = (payload.results ?? []).filter((r) => r.completed !== true).length;
@@ -853,7 +874,8 @@ export function AdminUserDetailClient({
     {
       id: 'progress',
       label: 'In progress',
-      count: user.enrollments.filter((e) => e.completionPct > 0 && e.completionPct < 100).length,
+      count: user.enrollments.filter((e) => e.completionPct > 0 && !isCompletedEnrollment(e))
+        .length,
     },
     { id: 'done', label: 'Complete', count: completedCourses },
     {
@@ -1117,7 +1139,7 @@ export function AdminUserDetailClient({
           {visibleEnrollments.length > 0 ? (
             <div className="space-y-4">
               {pagedEnrollments.map((e) => {
-                const isIncomplete = e.completionPct < 100;
+                const isIncomplete = !isCompletedEnrollment(e);
                 return (
                   <CourseEnrollmentCard
                     key={e.enrollmentId}

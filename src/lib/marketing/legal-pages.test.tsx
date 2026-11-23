@@ -3,6 +3,7 @@
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 
 import { PublicFooter } from '@/components/landing/PublicFooter';
 
@@ -39,7 +40,7 @@ describe('refund policy and support pages', () => {
     expect(html).toContain('Support');
     expect(html).toContain('/refund-policy');
     expect(html).toContain('Australian Consumer Law');
-    expect(html).toContain('IICRC CEC Accredited');
+    expect(html).toContain(IICRC_APPROVED_CEC_PROVIDER);
   });
 
   // PublicFooter renders one of two independent markup trees and defaults to

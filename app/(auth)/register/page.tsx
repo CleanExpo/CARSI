@@ -1,7 +1,18 @@
+import type { Metadata } from 'next';
 import { RegisterForm } from '@/components/auth/register-form';
 import Link from 'next/link';
 
 import { loginPathWithNext } from '@/lib/membership-signup-path';
+
+import { FROM_IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
+
+/** Its own title and description, not the home page's. robots.txt already disallows this page. */
+export const metadata: Metadata = {
+  title: 'Create your account',
+  description:
+    'Create a CARSI account to enrol in restoration and cleaning courses for Australian and New Zealand professionals.',
+  robots: { index: false, follow: true },
+};
 
 export default async function RegisterPage({
   searchParams,
@@ -25,7 +36,7 @@ export default async function RegisterPage({
           Enter your details to create your account
         </p>
         <p className="text-xs font-semibold tracking-wide text-[#146fc2]">
-          Restoration training from an IICRC CEC Accredited provider
+          Restoration training {FROM_IICRC_APPROVED_CEC_PROVIDER}
         </p>
       </div>
 

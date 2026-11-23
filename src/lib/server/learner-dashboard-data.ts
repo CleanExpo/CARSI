@@ -3,6 +3,7 @@ import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import { getCecSubmissionsByEnrollmentIds } from '@/lib/server/iicrc-cec-submission';
 import { ACCESS_GRANTING_STATUS_LIST, isEnrolmentAccessAllowed } from '@/lib/server/enrollment-access';
+import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
 
 /** Client / API shape for `EnrolledCourseList` and enrollments/me. */
 export interface EnrollmentDto {
@@ -130,7 +131,9 @@ function mapEnrollmentRow(
     course_id: e.courseId,
     course_title: e.course.title,
     course_slug: e.course.slug,
-    status: allLessonsComplete ? 'completed' : e.status,
+    // The server decides completion (lessons AND required assessments, GP-432). Never promote an
+    // enrolment to "completed" here because its lessons are done (GP-769).
+    status: e.status,
     enrolled_at: e.enrolledAt.toISOString(),
     completion_percentage: allLessonsComplete ? 100 : completionPercentage,
     thumbnail_url: normalizePublicAssetUrl(e.course.thumbnailUrl),
@@ -220,7 +223,7 @@ export async function getLearnerDashboardSummary(
     for (let i = 0; i < rows.length; i += 1) {
       const r = rows[i];
       const dto = enrollments[i];
-      if (dto.all_lessons_complete || normalizeEnrollmentStatus(dto.status) === 'completed') {
+      if (isEnrollmentCompleted(dto.status)) {
         completed += 1;
         // REGISTRY-ONLY, FAIL-CLOSED (GP-498). This CEC total is shown on the learner
         // dashboard — it must never sum the stale WP-import `cecHours`. Registry approval only

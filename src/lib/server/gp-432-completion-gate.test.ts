@@ -411,7 +411,8 @@ function completedWriteOffsets(text: string): number[] {
   for (const m of text.matchAll(ENROLMENT_WRITE)) {
     const call = withoutFilters(callText(text, m.index ?? 0));
     const mentionsCompleted = /['"`]completed['"`]/.test(call);
-    const dynamicStatus = /\bstatus\s*:\s*(?!['"`])[A-Za-z_$]/.test(call);
+    // `status: true` is a Prisma select flag, not a value written.
+    const dynamicStatus = /\bstatus\s*:\s*(?!['"`]|true\b|false\b)[A-Za-z_$]/.test(call);
     const sqlSetsStatus = /\bstatus\s*=\s*(?!'(active|revoked|refunded|pending)')/i.test(call) && /lms_enrollments/i.test(call);
     if (mentionsCompleted || dynamicStatus || sqlSetsStatus) out.push(m.index ?? 0);
   }
@@ -484,6 +485,7 @@ const STATUS_WRITER_ALLOW = new Map<string, StatusWriterHow>([
   // the intended result whatever the row held; unchanged by GP-432.
   [`${join('src', 'lib', 'server', 'enrollment-service.ts')}#enrollStudentInCourse`, 'limit'],
   [`${join('src', 'lib', 'server', 'enrollment-service.ts')}#ensureAdminEnrollmentForCourse`, 'new-row'],
+  [`${join('src', 'lib', 'server', 'enrollment-service.ts')}#reactivateStaffEnrollment`, 'guarded'],
   [`${join('src', 'lib', 'admin', 'admin-enrollment-mutations.ts')}#adminGrantEnrollment`, 'new-row'],
 ]);
 

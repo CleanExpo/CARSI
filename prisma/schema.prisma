@@ -172,6 +172,26 @@ model LmsCourse {
   @@map("lms_courses")
 }
 
+/// Append-only course approval and publish record (GP-776). An `approve` row is a named admin's
+/// approval of exactly the content whose sha256 it stores; a `publish` row records who published,
+/// which approval it relied on and the content it published. Application code only INSERTs.
+/// No FK to lms_courses on purpose: the record must outlive the course.
+model LmsCourseApproval {
+  id            String   @id @default(uuid()) @db.Uuid
+  courseRef     String   @map("course_ref") @db.Uuid
+  courseSlug    String   @map("course_slug")
+  /// approve | publish (DB CHECK)
+  action        String   @db.VarChar(16)
+  actorEmail    String   @map("actor_email")
+  contentSha256 String   @map("content_sha256") @db.VarChar(64)
+  /// For a publish row: the approve row it relied on.
+  approvalRef   String?  @map("approval_ref") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([courseRef, action, createdAt(sort: Desc)], map: "ix_lms_course_approvals_course_action_created")
+  @@map("lms_course_approvals")
+}
+
 /// Student course reviews / star ratings (1–5). One review per student per course
 /// (`uq_lms_course_review`), gated on an existing enrolment. `isPublished` lets an
 /// admin hide a review without deleting it; public listings filter on it.
@@ -894,6 +914,69 @@ model EventAttributionReversal {
   @@index([transactionId, eventAt, stripeEventId], map: "ix_attribution_reversals_transaction_event")
   @@index([status, createdAt])
   @@map("event_attribution_reversals")
+}
+
+/// GP-767: a referral partner (CCW is the first row). The partner link is `?ref=<id>`.
+model ReferralPartner {
+  id        String   @id @db.VarChar(32)
+  name      String   @db.VarChar(200)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  terms ReferralPartnerTerms[]
+  sales PartnerReferralSale[]
+
+  @@map("referral_partners")
+}
+
+/// GP-767: a partner's reward terms, versioned. Option A = 10% commission, no customer discount;
+/// option B = 5% customer discount + 5% commission. Rates in basis points (1000 = 10%). A new
+/// agreement is a new version; old versions stay, because each sale copies the version it was
+/// paid under. Nothing here calculates or pays commission.
+model ReferralPartnerTerms {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  partnerId         String    @map("partner_id") @db.VarChar(32)
+  version           Int
+  rewardOption      String    @map("reward_option") @db.VarChar(1)
+  commissionRateBps Int       @map("commission_rate_bps")
+  discountRateBps   Int       @map("discount_rate_bps")
+  effectiveFrom     DateTime  @map("effective_from") @db.Timestamptz(6)
+  effectiveTo       DateTime? @map("effective_to") @db.Timestamptz(6)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  partner ReferralPartner       @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  sales   PartnerReferralSale[]
+
+  @@unique([partnerId, version])
+  @@index([partnerId, effectiveFrom])
+  @@map("referral_partner_terms")
+}
+
+/// GP-767: one row per paid course checkout that came through a referral partner link
+/// (`?ref=<partner>`). Keyed by the Stripe Checkout Session id, the same key the reversal ledger
+/// uses, so the settlement report reads refunds from `event_attribution_reversals`. The terms in
+/// force when the sale was paid are copied onto the row (null when the partner had none, which
+/// is alerted). Holds no learner identity. Not pruned: it is the settlement record.
+model PartnerReferralSale {
+  id                String   @id @default(uuid()) @db.Uuid
+  partnerId         String   @map("partner_id") @db.VarChar(32)
+  transactionId     String   @unique @map("transaction_id") @db.VarChar(255)
+  courseSlug        String   @map("course_slug") @db.VarChar(200)
+  amountPaidCents   Int      @map("amount_paid_cents")
+  currency          String   @db.VarChar(3)
+  paidAt            DateTime @map("paid_at") @db.Timestamptz(6)
+  termsId           String?  @map("terms_id") @db.Uuid
+  termsVersion      Int?     @map("terms_version")
+  rewardOption      String?  @map("reward_option") @db.VarChar(1)
+  commissionRateBps Int?     @map("commission_rate_bps")
+  discountRateBps   Int?     @map("discount_rate_bps")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  partner ReferralPartner       @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  terms   ReferralPartnerTerms? @relation(fields: [termsId], references: [id], onDelete: Restrict)
+
+  @@index([partnerId, paidAt])
+  @@map("partner_referral_sales")
 }
 
 /// One row per learner; mirrors the Stripe subscription lifecycle. The

@@ -1,14 +1,25 @@
+import type { Metadata } from 'next';
 import { LoginForm } from '@/components/auth/login-form';
 import Link from 'next/link';
 
 import { registerPathWithNext } from '@/lib/membership-signup-path';
 
+import { FROM_IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
+
+/** Its own title and description, not the home page's. robots.txt already disallows this page. */
+export const metadata: Metadata = {
+  title: 'Sign in',
+  description:
+    'Sign in to your CARSI account to pick up your restoration and cleaning courses where you left off and see your progress.',
+  robots: { index: false, follow: true },
+};
+
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string | string[]; email_confirmed?: string | string[] }>;
+  searchParams: Promise<{ next?: string | string[] }>;
 }) {
-  const { next, email_confirmed: emailConfirmed } = await searchParams;
+  const { next } = await searchParams;
   const registerHref = registerPathWithNext(typeof next === 'string' ? next : null);
   return (
     <div
@@ -23,26 +34,9 @@ export default async function LoginPage({
           Enter your email and password to access your account
         </p>
         <p className="text-xs font-semibold tracking-wide text-[#146fc2]">
-          Restoration training from an IICRC CEC Accredited provider
+          Restoration training {FROM_IICRC_APPROVED_CEC_PROVIDER}
         </p>
       </div>
-
-      {/* GP-699: outcome of the confirm link in the welcome email. */}
-      {emailConfirmed === '1' ? (
-        <p
-          role="status"
-          className="mb-4 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"
-        >
-          Your email address is confirmed. Sign in to continue.
-        </p>
-      ) : emailConfirmed === '0' ? (
-        <p
-          role="status"
-          className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900"
-        >
-          That confirmation link is invalid or has expired. You can still sign in.
-        </p>
-      ) : null}
 
       <LoginForm />
 

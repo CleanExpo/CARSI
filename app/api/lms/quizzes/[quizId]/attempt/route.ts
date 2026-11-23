@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { ensureStaffEnrollmentForQuiz } from '@/lib/server/enrollment-service';
 import { runSerializable } from '@/lib/server/db-tx';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
@@ -112,6 +113,10 @@ export async function POST(request: NextRequest, ctx: Ctx) {
 
   const bindingPresent = parsed !== null && typeof parsed === 'object' &&
     (Object.hasOwn(parsed, 'lessonId') || Object.hasOwn(parsed, 'contentVersion'));
+  // Staff access (GP-737), before either submission path checks the enrolment:
+  // admins (any course), instructors (allow-listed workshop courses only).
+  await ensureStaffEnrollmentForQuiz(claims, quizId);
+
   // Prerequisite gate (DECISIONS #41) for both submission paths. Grandfathered and
   // admin-created enrolments pass; see src/lib/server/course-prerequisites.ts.
   const prereqBlock = await findQuizPrerequisiteBlock({
