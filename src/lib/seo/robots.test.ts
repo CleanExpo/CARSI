@@ -6,7 +6,11 @@ import { describe, expect, it } from 'vitest';
 
 import robots from '../../../app/robots';
 
-type Rule = { userAgent?: string | string[]; allow?: string | string[]; disallow?: string | string[] };
+type Rule = {
+  userAgent?: string | string[];
+  allow?: string | string[];
+  disallow?: string | string[];
+};
 
 const AI_CRAWLERS = [
   'OAI-SearchBot',
@@ -44,10 +48,13 @@ describe('robots.ts private paths', () => {
     expect(named.map((r) => r.userAgent).sort()).toEqual([...AI_CRAWLERS].sort());
   });
 
-  it.each(AI_CRAWLERS)('%s group disallows the same private paths as the default group', (agent) => {
-    const group = named.find((r) => r.userAgent === agent);
-    expect(group).toBeDefined();
-    expect(list(group?.disallow)).toEqual(list(defaultGroup?.disallow));
-    expect(list(group?.allow)).toEqual(['/']);
-  });
+  it.each(AI_CRAWLERS)(
+    '%s group disallows the same private paths as the default group',
+    (agent) => {
+      const group = named.find((r) => r.userAgent === agent);
+      expect(group).toBeDefined();
+      expect(list(group?.disallow)).toEqual(list(defaultGroup?.disallow));
+      expect(list(group?.allow)).toEqual(['/']);
+    }
+  );
 });
