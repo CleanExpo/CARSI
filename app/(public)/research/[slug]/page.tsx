@@ -20,6 +20,7 @@ import {
   marketingTextSubtle,
   marketingTopicPill,
 } from '@/lib/marketing/marketing-ui';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 const BACKEND_URL = getBackendOrigin();
 const SITE_URL = getPublicSiteUrl();
@@ -94,6 +95,7 @@ export async function generateMetadata(
     keywords: article.tags.length > 0 ? article.tags : undefined,
     authors: article.author_name ? [{ name: article.author_name }] : undefined,
     openGraph: {
+      ...OG_LOCALE_FIELDS,
       title,
       description,
       type: 'article',

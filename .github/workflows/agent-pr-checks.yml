@@ -14,8 +14,10 @@ jobs:
     steps:
       - name: Check if agent PR
         id: check
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
-          if [[ "${{ github.head_ref }}" == feature/agent-* ]]; then
+          if [[ "$HEAD_REF" == feature/agent-* ]]; then
             echo "is_agent=true" >> $GITHUB_OUTPUT
           else
             echo "is_agent=false" >> $GITHUB_OUTPUT
@@ -147,7 +149,7 @@ jobs:
           echo "Debug code check complete"
 
   update-pr-status:
-    needs: [validate-agent-metadata, run-quality-checks, security-scan]
+    needs: [detect-agent-pr, validate-agent-metadata, run-quality-checks, security-scan]
     if: needs.detect-agent-pr.outputs.is_agent_pr == 'true' && always()
     runs-on: ubuntu-latest
     steps:

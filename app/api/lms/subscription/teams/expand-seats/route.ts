@@ -3,7 +3,7 @@
  * active Teams seat subscription (WS1-E2, GP-442) by increasing the Stripe
  * subscription `quantity` with proration.
  *
- * Body: { additional_seats: number }  (1..50)
+ * Body: { additional_seats: number (1..50), request_id: string (one per click, GP-759) }
  *
  * Seat-billing decision (see the checkout route + PR body): seats are the
  * subscription `quantity`. Expansion updates the single subscription item's
@@ -23,6 +23,8 @@ import { getStripeClient } from '@/lib/api/stripe';
 import { SEAT_ADD_IN_PROGRESS, SEATS_ALREADY_ADDED } from '@/lib/lms/seat-expansion-request';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { decideTeamSeatSubscription } from '@/lib/server/entitlements';
+import { EXTRA_STAFF_SEAT } from '@/lib/lms/membership-prices';
+import { stripePriceMatches, type StripePriceLike } from '@/lib/server/membership-price-check';
 import { getTeamForUser } from '@/lib/server/teams';
 import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
@@ -115,6 +117,20 @@ export async function POST(request: NextRequest) {
     const item = stripeSub.items?.data?.[0];
     if (!item) {
       return NextResponse.json({ detail: 'Subscription item not found.' }, { status: 500 });
+    }
+
+    // GP-773: an extra staff seat is A$695 per year (founder ruling). A seat is billed at the
+    // subscription item's Price, so refuse, before any charge, unless that Price is exactly the
+    // extra-seat price. A tier bundle Price ($299, $799 or $2,499) would bill the wrong amount.
+    if (!stripePriceMatches(item.price as StripePriceLike, EXTRA_STAFF_SEAT)) {
+      return NextResponse.json(
+        {
+          detail:
+            'Extra seats cannot be added to this subscription online yet. Contact CARSI support to add staff.',
+          reason: 'seat_price_mismatch',
+        },
+        { status: 409 },
+      );
     }
 
     await stripe.subscriptions.update(

@@ -11,7 +11,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /**
- * Manual only. Free courses. Returns immediately so Cloudflare cannot 524.
+ * Manual only. Stores review drafts (meta.optimizeDraft); never changes live course
+ * content (GP-758). Free courses. Returns immediately so Cloudflare cannot 524.
  * Paid courses are never touched. One email at the end.
  */
 export async function GET(request: Request) {
@@ -44,7 +45,7 @@ export async function GET(request: Request) {
       started: true,
       scope: 'free',
       detail:
-        'Optimising free courses in the background. Paid courses are skipped. You will get one email when it finishes.',
+        'Drafting free-course rewrites in the background. Paid courses are skipped. Live courses are not changed: each draft waits for an admin to review and apply it at /admin/courses/[id]/optimize. You will get one email when it finishes.',
       timestamp: new Date().toISOString(),
     },
     { status: 202 }

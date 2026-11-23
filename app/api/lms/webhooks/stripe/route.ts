@@ -30,6 +30,7 @@ import { sendGa4PurchaseEvent } from '@/lib/server/ga4-measurement-protocol';
 import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { markOrgSubscriptionStatusBySubscriptionId } from '@/lib/server/org-subscription-store';
+import { recordPartnerReferralSale } from '@/lib/server/partner-referral-sales';
 import { captureServerError } from '@/lib/server/sentry';
 import { resolveStripePaymentReference } from '@/lib/server/stripe-payment-reference';
 import {
@@ -427,6 +428,15 @@ export async function POST(request: NextRequest) {
     const slug = session.metadata?.course_slug?.trim().toLowerCase();
     if (!slug) {
       return await acknowledge();
+    }
+
+    // GP-767: a paid sale through a partner link (?ref=ccw) is stored for settlement from the
+    // verified session, before learner resolution and fulfilment. An unresolved learner cannot
+    // drop it, and a failed write returns 500 before any enrolment side effect has run, so
+    // Stripe's retry repeats the whole event. Idempotent upsert on the checkout session id.
+    const partnerSaleRef = resolveStripePaymentReference(session.id);
+    if (partnerSaleRef) {
+      await recordPartnerReferralSale(session, partnerSaleRef, slug, new Date(event.created * 1000));
     }
 
     const studentIdMeta = session.metadata?.student_id?.trim();

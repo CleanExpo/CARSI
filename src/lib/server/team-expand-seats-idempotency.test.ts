@@ -41,7 +41,25 @@ vi.mock('@/lib/prisma', () => ({
 vi.mock('@/lib/api/stripe', () => ({
   getStripeClient: () => ({
     subscriptions: {
-      retrieve: vi.fn(async () => ({ items: { data: [{ id: 'si_test', quantity: h.stripeQuantity }] } })),
+      // GP-773 (main): the route refuses unless the item's Price is the A$695/year extra-seat Price.
+      retrieve: vi.fn(async () => ({
+        items: {
+          data: [
+            {
+              id: 'si_test',
+              quantity: h.stripeQuantity,
+              price: {
+                id: 'price_extra_seat',
+                active: true,
+                billing_scheme: 'per_unit',
+                currency: 'aud',
+                unit_amount: 69_500,
+                recurring: { interval: 'year', interval_count: 1 },
+              },
+            },
+          ],
+        },
+      })),
       update: vi.fn(
         async (
           _id: string,

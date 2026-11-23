@@ -222,8 +222,11 @@ const REVIEWED_SOURCE_SHA256: Record<string, string> = {
     'e254162212a4d11a365c5900c1e93019c71260af33852ca730b8790412acd35c',
   // GP-696 re-pin after GP-661 b3613864 (embedded preset: layout only; every IICRC, CEC,
   // certification, accreditation and approval line is byte-identical to the GP-639 review).
+  // Accessibility re-pin: the result count gains role="status", the search and filter icons
+  // gain aria-hidden, and one code comment is added. No visible text changed, and no IICRC, CEC,
+  // certification, accreditation or approval sentence was added or edited.
   'src/components/lms/CourseGrid.tsx':
-    '5e2ce9b348771667120c6ce2f6376bca3f48253b7676d1e7270c4f12500d77cc',
+    '97da1c0feb9581c663e52675996e21bbec1699e2ba9d72d0c76821761454e4ce',
   'src/components/lms/CourseSearchBar.tsx':
     'f6e00b2daabe277f1d7c887b1f5357b01ec994cf7d870f489a810b51e16f8e52',
   'src/lib/catalogue/discipline-param.ts':

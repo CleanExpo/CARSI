@@ -22,6 +22,7 @@ import { filterExcludedEvents } from '@/lib/calendar/event-exclusions';
 import { getBackendOrigin } from '@/lib/env/public-url';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 export const metadata: Metadata = {
   title: 'Industry Calendar — Australian Restoration Courses & Events',
@@ -37,6 +38,7 @@ export const metadata: Metadata = {
     'industry networking Australia',
   ],
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     images: OG_IMAGES,
     title: 'Industry Calendar | CARSI Hub',
     description:
