@@ -100,9 +100,9 @@ export const carsiCoachingMonthlyInclusions: CoachingInclusion[] = [
     category: 'Platform',
     items: [
       {
-        title: 'Business Coaching Portal (launching soon)',
+        title: 'Business Coaching Portal',
         detail:
-          'Subscriber dashboard for your plan, monthly actions, progress, and session prep — rolling out shortly after the core program is live.',
+          'Live subscriber workspace at /dashboard/coaching — plan, monthly actions, session receipts, marketing pack, and Ask my coach (when enabled for your chapter).',
       },
       {
         title: 'Email onboarding & session scheduling',

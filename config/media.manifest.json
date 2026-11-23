@@ -2,18 +2,1012 @@
   "version": 1,
   "entries": [
     {
-      "src": "/images/for/nsw-builders.webp",
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/cover.webp",
       "kind": "image",
-      "source": "generated",
-      "credit": "CARSI marketing asset (self-hosted WebP); derived from hero-tile library",
-      "alt": "Technician checks moisture in timber framing before reinstatement work"
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "cover"
     },
     {
-      "src": "/images/for/insurance-claims-staff.webp",
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/eps-exercise-photo-a.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "eps exercise photo a"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/eps-exercise-photo-b.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "eps exercise photo b"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m1-mission.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m1 mission"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m1-safety.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m1 safety"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m1-source-map.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m1 source map"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m2-helpers.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m2 helpers"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m2-oven-dry.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m2 oven dry"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m2-pin-meter.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m2 pin meter"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m2-pinless.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m2 pinless"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m2-ref-card.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m2 ref card"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m3-emc.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m3 emc"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m3-percent-points.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m3 percent points"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m3-ref-corrections.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m3 ref corrections"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m3-ref-scales.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m3 ref scales"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m3-reliable-range.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m3 reliable range"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m3-run-high.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m3 run high"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m3-species-correction.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m3 species correction"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m3-temp-correction.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m3 temp correction"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m4-false-highs.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m4 false highs"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m4-plasterboard.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m4 plasterboard"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m4-ref-materials.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m4 ref materials"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m4-slab-rh.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m4 slab rh"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m4-timber.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m4 timber"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m5-calibration.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m5 calibration"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m5-hygrometer.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m5 hygrometer"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m5-ref-calibration.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m5 ref calibration"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m5-six-mistakes.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m5 six mistakes"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m6-case-study.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m6 case study"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m6-dry-standard.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m6 dry standard"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m6-field-checklist.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m6 field checklist"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m6-moisture-map.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m6 moisture map"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/m6-relining.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "m6 relining"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/photos/protimeter-mini-pin.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "protimeter mini pin"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/photos/remote-thermo-hygrometer.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "remote thermo hygrometer"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/photos/trotec-t3000-electrodes.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "trotec t3000 electrodes"
+    },
+    {
+      "src": "/courses/moisture-meters-readings-and-dry-standards/images/photos/wagner-orion-950-pinless.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI course media — verify rights and alt text",
+      "alt": "wagner orion 950 pinless"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "apple touch icon"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "icon 192"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "icon 512"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "icon maskable 512"
+    },
+    {
+      "src": "/images/badges/cec-10.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "cec 10"
+    },
+    {
+      "src": "/images/badges/cec-100.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "cec 100"
+    },
+    {
+      "src": "/images/badges/cec-25.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "cec 25"
+    },
+    {
+      "src": "/images/badges/cec-50.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "cec 50"
+    },
+    {
+      "src": "/images/badges/discipline-amrt.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "discipline amrt"
+    },
+    {
+      "src": "/images/badges/discipline-asd.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "discipline asd"
+    },
+    {
+      "src": "/images/badges/discipline-cct.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "discipline cct"
+    },
+    {
+      "src": "/images/badges/discipline-crt.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "discipline crt"
+    },
+    {
+      "src": "/images/badges/discipline-fsrt.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "discipline fsrt"
+    },
+    {
+      "src": "/images/badges/discipline-oct.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "discipline oct"
+    },
+    {
+      "src": "/images/badges/discipline-wrt.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "discipline wrt"
+    },
+    {
+      "src": "/images/badges/streak-30day.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "streak 30day"
+    },
+    {
+      "src": "/images/badges/streak-7day.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "streak 7day"
+    },
+    {
+      "src": "/images/badges/streak-90day.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI brand asset",
+      "alt": "streak 90day"
+    },
+    {
+      "src": "/images/campaigns/avian-influenza/course/assessment-screen-ui-concept.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "assessment screen ui concept"
+    },
+    {
+      "src": "/images/campaigns/avian-influenza/course/assessment-screen-ui-concept.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "assessment screen ui concept"
+    },
+    {
+      "src": "/images/campaigns/avian-influenza/course/australian-coastal-seabird-editorial-hero.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "australian coastal seabird editorial hero"
+    },
+    {
+      "src": "/images/campaigns/avian-influenza/course/australian-coastal-seabird-editorial-hero.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "australian coastal seabird editorial hero"
+    },
+    {
+      "src": "/images/campaigns/avian-influenza/course/course-landing-page-ui-concept.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "course landing page ui concept"
+    },
+    {
+      "src": "/images/campaigns/avian-influenza/course/course-landing-page-ui-concept.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "course landing page ui concept"
+    },
+    {
+      "src": "/images/campaigns/avian-influenza/course/facility-inspection-exclusion-zone.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "facility inspection exclusion zone"
+    },
+    {
+      "src": "/images/campaigns/avian-influenza/course/facility-inspection-exclusion-zone.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "facility inspection exclusion zone"
+    },
+    {
+      "src": "/images/campaigns/avian-influenza/course/lesson-dashboard-ui-concept.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "lesson dashboard ui concept"
+    },
+    {
+      "src": "/images/campaigns/avian-influenza/course/lesson-dashboard-ui-concept.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "lesson dashboard ui concept"
+    },
+    {
+      "src": "/images/campaigns/avian-influenza/course/public-reporting-process-infographic.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "public reporting process infographic"
+    },
+    {
+      "src": "/images/campaigns/avian-influenza/course/public-reporting-process-infographic.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "public reporting process infographic"
+    },
+    {
+      "src": "/images/campaigns/avian-influenza/course/restoreassist-field-documentation-workflow.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "restoreassist field documentation workflow"
+    },
+    {
+      "src": "/images/campaigns/avian-influenza/course/restoreassist-field-documentation-workflow.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "restoreassist field documentation workflow"
+    },
+    {
+      "src": "/images/courses/administration-course.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "administration course"
+    },
+    {
+      "src": "/images/courses/air-filtration-equipment.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "air filtration equipment"
+    },
+    {
+      "src": "/images/courses/biohazard-remediation.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "biohazard remediation"
+    },
+    {
+      "src": "/images/courses/building-materials.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "building materials"
+    },
+    {
+      "src": "/images/courses/carpet-cleaning-basics.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "carpet cleaning basics"
+    },
+    {
+      "src": "/images/courses/commercial-kitchen-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "commercial kitchen cleaning"
+    },
+    {
+      "src": "/images/courses/communication-skills.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "communication skills"
+    },
+    {
+      "src": "/images/courses/concrete-moisture-testing.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "concrete moisture testing"
+    },
+    {
+      "src": "/images/courses/containment-barriers.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "containment barriers"
+    },
+    {
+      "src": "/images/courses/contents-restoration.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "contents restoration"
+    },
+    {
+      "src": "/images/courses/customer-service.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "customer service"
+    },
+    {
+      "src": "/images/courses/dehumidification.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "dehumidification"
+    },
+    {
+      "src": "/images/courses/document-drying.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "document drying"
+    },
+    {
+      "src": "/images/courses/donning-doffing-ppe.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "donning doffing ppe"
+    },
+    {
+      "src": "/images/courses/emergency-response.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "emergency response"
+    },
+    {
+      "src": "/images/courses/fire-damage-assessment.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "fire damage assessment"
+    },
+    {
+      "src": "/images/courses/flood-restoration.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "flood restoration"
+    },
+    {
+      "src": "/images/courses/glass-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "glass cleaning"
+    },
+    {
+      "src": "/images/courses/gym-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "gym cleaning"
+    },
+    {
+      "src": "/images/courses/hard-floor-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "hard floor cleaning"
+    },
+    {
+      "src": "/images/courses/healthcare-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "healthcare cleaning"
+    },
+    {
+      "src": "/images/courses/hoarding-cleanup.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "hoarding cleanup"
+    },
+    {
+      "src": "/images/courses/infection-control-childcare.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "infection control childcare"
+    },
+    {
+      "src": "/images/courses/insurance-documentation.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "insurance documentation"
+    },
+    {
+      "src": "/images/courses/intro-advanced-structural-drying.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro advanced structural drying"
+    },
+    {
+      "src": "/images/courses/intro-applied-microbial-remediation.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro applied microbial remediation"
+    },
+    {
+      "src": "/images/courses/intro-applied-structural-drying.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro applied structural drying"
+    },
+    {
+      "src": "/images/courses/intro-asbestos-awareness.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro asbestos awareness"
+    },
+    {
+      "src": "/images/courses/intro-biological-contaminants.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro biological contaminants"
+    },
+    {
+      "src": "/images/courses/intro-carpet-cleaning-drying.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro carpet cleaning drying"
+    },
+    {
+      "src": "/images/courses/intro-digital-moisture-mapping.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro digital moisture mapping"
+    },
+    {
+      "src": "/images/courses/intro-drying-techniques.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro drying techniques"
+    },
+    {
+      "src": "/images/courses/intro-hvac-drying.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro hvac drying"
+    },
+    {
+      "src": "/images/courses/intro-infrared-thermography.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro infrared thermography"
+    },
+    {
+      "src": "/images/courses/intro-large-loss-drying.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro large loss drying"
+    },
+    {
+      "src": "/images/courses/intro-odour-control.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro odour control"
+    },
+    {
+      "src": "/images/courses/intro-ppe-equipment.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro ppe equipment"
+    },
+    {
+      "src": "/images/courses/intro-project-management.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro project management"
+    },
+    {
+      "src": "/images/courses/intro-psychrometry-drying.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro psychrometry drying"
+    },
+    {
+      "src": "/images/courses/intro-safety-procedures.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro safety procedures"
+    },
+    {
+      "src": "/images/courses/intro-smoke-soot-restoration.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro smoke soot restoration"
+    },
+    {
+      "src": "/images/courses/intro-structural-drying-concepts.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro structural drying concepts"
+    },
+    {
+      "src": "/images/courses/intro-water-damage-restoration.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro water damage restoration"
+    },
+    {
+      "src": "/images/courses/intro-water-extraction.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "intro water extraction"
+    },
+    {
+      "src": "/images/courses/leather-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "leather cleaning"
+    },
+    {
+      "src": "/images/courses/marketing-course.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "marketing course"
+    },
+    {
+      "src": "/images/courses/moisture-meter-training.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "moisture meter training"
+    },
+    {
+      "src": "/images/courses/mould-remediation-level-1.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "mould remediation level 1"
+    },
+    {
+      "src": "/images/courses/mould-remediation-level-2.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "mould remediation level 2"
+    },
+    {
+      "src": "/images/courses/mould-remediation-level-3.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "mould remediation level 3"
+    },
+    {
+      "src": "/images/courses/office-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "office cleaning"
+    },
+    {
+      "src": "/images/courses/ozone-treatment.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "ozone treatment"
+    },
+    {
+      "src": "/images/courses/pest-contamination.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "pest contamination"
+    },
+    {
+      "src": "/images/courses/pressure-washing.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "pressure washing"
+    },
+    {
+      "src": "/images/courses/pricing-quoting.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "pricing quoting"
+    },
+    {
+      "src": "/images/courses/retail-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "retail cleaning"
+    },
+    {
+      "src": "/images/courses/risk-assessment.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "risk assessment"
+    },
+    {
+      "src": "/images/courses/rug-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "rug cleaning"
+    },
+    {
+      "src": "/images/courses/school-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "school cleaning"
+    },
+    {
+      "src": "/images/courses/soot-removal.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "soot removal"
+    },
+    {
+      "src": "/images/courses/stain-removal.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "stain removal"
+    },
+    {
+      "src": "/images/courses/starting-a-business.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "starting a business"
+    },
+    {
+      "src": "/images/courses/stone-tile-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "stone tile cleaning"
+    },
+    {
+      "src": "/images/courses/subfloor-drying.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "subfloor drying"
+    },
+    {
+      "src": "/images/courses/team-leadership.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "team leadership"
+    },
+    {
+      "src": "/images/courses/thermal-fogging.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "thermal fogging"
+    },
+    {
+      "src": "/images/courses/timber-floor-restoration.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "timber floor restoration"
+    },
+    {
+      "src": "/images/courses/upholstery-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "upholstery cleaning"
+    },
+    {
+      "src": "/images/courses/vehicle-detailing.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "vehicle detailing"
+    },
+    {
+      "src": "/images/courses/ventilation-equipment.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "ventilation equipment"
+    },
+    {
+      "src": "/images/courses/wall-cavity-drying.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "wall cavity drying"
+    },
+    {
+      "src": "/images/courses/warehouse-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "warehouse cleaning"
+    },
+    {
+      "src": "/images/courses/whs-awareness.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "whs awareness"
+    },
+    {
+      "src": "/images/courses/window-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "window cleaning"
+    },
+    {
+      "src": "/images/for/commercial-cleaning-contractors.webp",
       "kind": "image",
       "source": "generated",
-      "credit": "CARSI marketing asset (self-hosted WebP); course cover library",
-      "alt": "Restoration drying setup documented after a commercial water loss"
+      "credit": "CARSI marketing asset (self-hosted WebP); hero-tile library",
+      "alt": "Technician using carpet extraction equipment on a commercial cleaning job"
     },
     {
       "src": "/images/for/facility-managers.webp",
@@ -30,6 +1024,20 @@
       "alt": "Healthcare facility cleaning crew working in a clinical corridor"
     },
     {
+      "src": "/images/for/insurance-claims-staff.webp",
+      "kind": "image",
+      "source": "generated",
+      "credit": "CARSI marketing asset (self-hosted WebP); course cover library",
+      "alt": "Restoration drying setup documented after a commercial water loss"
+    },
+    {
+      "src": "/images/for/nsw-builders.webp",
+      "kind": "image",
+      "source": "generated",
+      "credit": "CARSI marketing asset (self-hosted WebP); derived from hero-tile library",
+      "alt": "Technician checks moisture in timber framing before reinstatement work"
+    },
+    {
       "src": "/images/for/property-and-strata-managers.webp",
       "kind": "image",
       "source": "generated",
@@ -37,18 +1045,291 @@
       "alt": "Building materials staged for reinstatement after water damage"
     },
     {
-      "src": "/images/for/commercial-cleaning-contractors.webp",
-      "kind": "image",
-      "source": "generated",
-      "credit": "CARSI marketing asset (self-hosted WebP); hero-tile library",
-      "alt": "Technician using carpet extraction equipment on a commercial cleaning job"
-    },
-    {
       "src": "/images/for/test-hero.webp",
       "kind": "image",
       "source": "generated",
       "credit": "CARSI test fixture for authority page approval tests",
       "alt": "A technician reads a moisture meter"
+    },
+    {
+      "src": "/images/hero-tiles/carpet-extraction.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "carpet extraction"
+    },
+    {
+      "src": "/images/hero-tiles/soot-ceiling-cleaning.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "soot ceiling cleaning"
+    },
+    {
+      "src": "/images/hero-tiles/structural-drying-airflow.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "structural drying airflow"
+    },
+    {
+      "src": "/images/hero-tiles/water-moisture-check.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "water moisture check"
+    },
+    {
+      "src": "/images/og/amrt-og.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "amrt og"
+    },
+    {
+      "src": "/images/og/asd-og.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "asd og"
+    },
+    {
+      "src": "/images/og/cct-og.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "cct og"
+    },
+    {
+      "src": "/images/og/course-og.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "course og"
+    },
+    {
+      "src": "/images/og/credential-og.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "credential og"
+    },
+    {
+      "src": "/images/og/crt-og.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "crt og"
+    },
+    {
+      "src": "/images/og/default-og.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "default og"
+    },
+    {
+      "src": "/images/og/fsrt-og.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "fsrt og"
+    },
+    {
+      "src": "/images/og/oct-og.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "oct og"
+    },
+    {
+      "src": "/images/og/pathway-og.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "pathway og"
+    },
+    {
+      "src": "/images/og/wrt-og.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "wrt og"
+    },
+    {
+      "src": "/images/pathways/amrt-pathway.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "amrt pathway"
+    },
+    {
+      "src": "/images/pathways/asd-pathway.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "asd pathway"
+    },
+    {
+      "src": "/images/pathways/cct-pathway.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "cct pathway"
+    },
+    {
+      "src": "/images/pathways/crt-pathway.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "crt pathway"
+    },
+    {
+      "src": "/images/pathways/fsrt-pathway.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "fsrt pathway"
+    },
+    {
+      "src": "/images/pathways/oct-pathway.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "oct pathway"
+    },
+    {
+      "src": "/images/pathways/wrt-pathway.webp",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "wrt pathway"
+    },
+    {
+      "src": "/logo.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "logo"
+    },
+    {
+      "src": "/logo/dark-logo.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "dark logo"
+    },
+    {
+      "src": "/logo/favicon.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "favicon"
+    },
+    {
+      "src": "/logo/logo1.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "logo1"
+    },
+    {
+      "src": "/margot/avatar-192.webp",
+      "kind": "image",
+      "source": "generated",
+      "credit": "CARSI Margot guide avatar",
+      "alt": "Margot, CARSI professional learning guide"
+    },
+    {
+      "src": "/margot/avatar.png",
+      "kind": "image",
+      "source": "generated",
+      "credit": "CARSI Margot guide avatar",
+      "alt": "avatar"
+    },
+    {
+      "src": "/marketing/ccw-roadshow/proofs/ccw-roadshow-email-header-proof.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "ccw roadshow email header proof"
+    },
+    {
+      "src": "/marketing/ccw-roadshow/proofs/ccw-roadshow-linkedin-proof.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "ccw roadshow linkedin proof"
+    },
+    {
+      "src": "/marketing/ccw-roadshow/proofs/ccw-roadshow-social-portrait-proof.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "ccw roadshow social portrait proof"
+    },
+    {
+      "src": "/marketing/ccw-roadshow/proofs/ccw-roadshow-social-square-proof.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "ccw roadshow social square proof"
+    },
+    {
+      "src": "/marketing/ccw-roadshow/proofs/ccw-roadshow-story-proof.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "ccw roadshow story proof"
+    },
+    {
+      "src": "/marketing/ccw-roadshow/proofs/print-melbourne-a4-proof.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "print melbourne a4 proof"
+    },
+    {
+      "src": "/marketing/ccw-roadshow/proofs/print-melbourne-a5-proof.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "print melbourne a5 proof"
+    },
+    {
+      "src": "/marketing/ccw-roadshow/proofs/print-sydney-a4-proof.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "print sydney a4 proof"
+    },
+    {
+      "src": "/marketing/ccw-roadshow/proofs/print-sydney-a5-proof.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "print sydney a5 proof"
+    },
+    {
+      "src": "/marketing/ccw-roadshow/proofs/website-desktop-proof.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "website desktop proof"
+    },
+    {
+      "src": "/marketing/ccw-roadshow/proofs/website-mobile-proof.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "website mobile proof"
+    },
+    {
+      "src": "/og-image.png",
+      "kind": "image",
+      "source": "client",
+      "credit": "CARSI self-hosted asset — verify rights",
+      "alt": "og image"
     }
   ]
 }
