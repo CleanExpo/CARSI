@@ -3,6 +3,8 @@
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
+import { resolveNextLessonPosition } from '@/lib/lms/next-lesson-position';
+
 /** Mirrors `ResumeSnapshot` from learner dashboard API — kept client-local to avoid server imports. */
 export type ContinueLearningSnapshot = {
   course_slug: string;
@@ -11,6 +13,9 @@ export type ContinueLearningSnapshot = {
   lesson_title: string;
   resume_href: string;
   last_accessed_at: string;
+  /** 1-based position of the resume lesson in the course, when the API sends it. */
+  lesson_index?: number | null;
+  lesson_total?: number | null;
 };
 
 const surface =
@@ -26,16 +31,25 @@ export function ContinueLearningBanner({
   snapshot,
   progressPercent,
   description,
-  lessonIndex,
+  lessonsCompleted,
   lessonTotal,
 }: {
   snapshot: ContinueLearningSnapshot | null;
   progressPercent?: number | null;
   description?: string | null;
-  lessonIndex?: number | null;
+  /** Lessons already completed; used only when the snapshot has no lesson position. */
+  lessonsCompleted?: number | null;
   lessonTotal?: number | null;
 }) {
   if (!snapshot) return null;
+
+  // GP-627: the number names the next lesson shown below, not the count already completed.
+  const position = resolveNextLessonPosition({
+    resumeIndex: snapshot.lesson_index,
+    resumeTotal: snapshot.lesson_total,
+    lessonsCompleted,
+    lessonsTotal: lessonTotal,
+  });
 
   const pct =
     typeof progressPercent === 'number' && Number.isFinite(progressPercent)
@@ -62,9 +76,9 @@ export function ContinueLearningBanner({
             className={`mt-5 flex items-center justify-between gap-3 text-sm tabular-nums ${muted}`}
           >
             <span>{pct}% complete</span>
-            {lessonIndex != null && lessonTotal != null && lessonTotal > 0 ? (
+            {position ? (
               <span>
-                Lesson {lessonIndex} of {lessonTotal}
+                Lesson {position.index} of {position.total}
               </span>
             ) : null}
           </div>

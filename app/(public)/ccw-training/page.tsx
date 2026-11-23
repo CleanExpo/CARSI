@@ -14,6 +14,7 @@ import { getPublicSiteUrl } from '@/lib/env/public-url';
 import { getBusinessOffers } from '@/lib/marketing/business-offers';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 import { isCarsiCoachingMonthlyEnabled } from '@/lib/server/carsi-coaching-monthly-flag';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 // The business-offers comparison shows a date-dependent Growth Days price (free, paid or TBA by
 // sitting), so refresh hourly rather than freezing it at build time.
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
   description: carsiCoachingMonthlyTagline,
   alternates: { canonical: `${siteUrl}${carsiCoachingMonthlyPath}` },
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     images: OG_IMAGES,
     title: `${carsiCoachingProductName} | CARSI`,
     description: carsiCoachingMonthlyTagline,

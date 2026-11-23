@@ -42,6 +42,7 @@ import {
 } from '@/components/landing/public-shell-width';
 
 import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 const siteUrl = getPublicSiteUrl();
 
 const AUTHORITY_HERO_IMAGE = {
@@ -185,6 +186,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: `${siteUrl}${authorityPath}` },
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     images: OG_IMAGES,
     title: 'CARSI Authority Hub',
     description:

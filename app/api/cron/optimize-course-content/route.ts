@@ -11,7 +11,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /**
- * Manual only. Returns immediately so Cloudflare cannot 524.
+ * Manual only. Stores review drafts (meta.optimizeDraft); never changes live course
+ * content (GP-758). Returns immediately so Cloudflare cannot 524.
  * Work continues on the web service. One email at the end.
  */
 export async function GET(request: Request) {
@@ -41,7 +42,8 @@ export async function GET(request: Request) {
     {
       ok: true,
       started: true,
-      detail: 'Optimising paid courses in the background. You will get one email when it finishes.',
+      detail:
+        'Drafting paid-course rewrites in the background. Live courses are not changed: each draft waits for an admin to review and apply it at /admin/courses/[id]/optimize. You will get one email when it finishes.',
       timestamp: new Date().toISOString(),
     },
     { status: 202 }

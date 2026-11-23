@@ -7,7 +7,8 @@
  * This test runs the TypeScript parser over each file and fails on any syntax error, so
  * the unit suite reports the file and line in seconds, without a full build.
  */
-import { readdirSync, readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
@@ -19,7 +20,9 @@ const SOURCE_DIRS = ['app', 'src'];
 // client into src/generated/prisma/. It is gitignored, machine-written, and about 5 MB:
 // roughly 40% of the bytes this guard used to parse. No one edits it, so it cannot carry
 // the hand-edit breakage this guard exists for. Skip it; everything committed is parsed.
-const SKIP_DIRS = [join('src', 'generated') + sep];
+// GP-755: skip exactly src/generated/prisma/ (the .gitignore entry), not all of
+// src/generated/. Any other file there is not the Prisma client and is still parsed.
+const SKIP_DIRS = [join('src', 'generated', 'prisma') + sep];
 
 // GP-738: this one test reads and parses every source file, so its work grows with the
 // repository, unlike the rest of the suite. It runs in a few seconds, but inside the full
@@ -55,15 +58,15 @@ function syntaxErrors(fileName: string, text: string): string[] {
   });
 }
 
-function sourceFiles(): string[] {
+function sourceFiles(root: string = ROOT): string[] {
   const files: string[] = [];
   for (const dir of SOURCE_DIRS) {
-    for (const entry of readdirSync(join(ROOT, dir), { recursive: true, withFileTypes: true })) {
+    for (const entry of readdirSync(join(root, dir), { recursive: true, withFileTypes: true })) {
       if (!entry.isFile()) continue;
       if (!/\.tsx?$/.test(entry.name) || entry.name.endsWith('.d.ts')) continue;
       const full = join(entry.parentPath, entry.name);
       if (full.includes(`${sep}node_modules${sep}`)) continue;
-      if (SKIP_DIRS.some((d) => relative(ROOT, full).startsWith(d))) continue;
+      if (SKIP_DIRS.some((d) => relative(root, full).startsWith(d))) continue;
       files.push(full);
     }
   }
@@ -114,9 +117,44 @@ describe('TSX syntax guard (GP-696)', () => {
 
   it('skips only the generated Prisma client, never committed source', () => {
     const files = sourceFiles().map((f) => relative(ROOT, f));
-    expect(files.some((f) => f.startsWith(join('src', 'generated') + sep))).toBe(false);
+    expect(files.some((f) => f.startsWith(join('src', 'generated', 'prisma') + sep))).toBe(false);
     // The skip must not swallow neighbouring committed code.
     expect(files).toContain(join('src', 'lib', 'ci', 'tsx-syntax.test.ts'));
     expect(files.some((f) => f.startsWith(`app${sep}`))).toBe(true);
+  });
+
+  // GP-755: the skip used to be all of src/generated/, so a malformed hand-written file
+  // there passed. Plant broken files in a scratch tree and watch the sweep report them.
+  it('still parses non-Prisma files under src/generated/ (GP-755)', () => {
+    const root = mkdtempSync(join(tmpdir(), 'tsx-guard-gp755-'));
+    const broken = 'export const x = (;\n';
+    const plant = (rel: string, text: string) => {
+      const full = join(root, rel);
+      mkdirSync(join(full, '..'), { recursive: true });
+      writeFileSync(full, text);
+    };
+    try {
+      plant(join('app', 'ok.tsx'), 'export const A = () => <ul><li /></ul>;\n');
+      plant(join('src', 'generated', 'other.ts'), broken);
+      plant(join('src', 'generated', 'prisma-extras', 'x.ts'), broken);
+      plant(join('src', 'generated', 'prisma', 'client.ts'), broken);
+      plant(join('src', 'generated', 'prisma', 'models', 'User.ts'), broken);
+
+      const files = sourceFiles(root).map((f) => relative(root, f));
+      expect(files).toContain(join('src', 'generated', 'other.ts'));
+      // A sibling whose name merely starts with "prisma" is not the Prisma client.
+      expect(files).toContain(join('src', 'generated', 'prisma-extras', 'x.ts'));
+      expect(files.some((f) => f.startsWith(join('src', 'generated', 'prisma') + sep))).toBe(false);
+
+      const errors = sourceFiles(root).flatMap((f) =>
+        syntaxErrors(relative(root, f), readFileSync(f, 'utf8'))
+      );
+      expect(errors.some((e) => e.startsWith(join('src', 'generated', 'other.ts') + ':'))).toBe(
+        true
+      );
+      expect(errors.some((e) => e.includes(join('generated', 'prisma') + sep))).toBe(false);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 });
