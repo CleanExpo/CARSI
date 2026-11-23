@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img" aria-labelledby="t d" font-family="Arial, Helvetica, sans-serif">
+<title id="t">Air mover: pull-apart view</title>
+<desc id="d">Pull-apart view of a generic centrifugal air mover along its shaft: 1 inlet grille, 2 fan wheel, 3 230 V motor, 4 housing that collects and turns the air, 5 outlet that sends a low, wide jet across the wet surface. It speeds evaporation and must be paired with dehumidification. Lesson example draw 1.2 A each at 230 V, illustrative; keep each 10 A circuit under its limit. Mould rule: if visible mould is present, do not run air movers.</desc>
+<rect width="800" height="600" fill="#ffffff"/>
+<text x="24" y="36" font-size="20" font-weight="700" fill="#1f2933">Air mover: pull-apart view</text>
+<image x="656" y="14" width="120" height="31" href="data:image/png;base64,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"/>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52606d"/></marker>
+<marker id="arrowB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f5f8b"/></marker>
+<marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0b6e4f"/></marker>
+<linearGradient id="gCard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9eef3"/></linearGradient>
+<linearGradient id="gWarn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf3"/><stop offset="1" stop-color="#fde6c8"/></linearGradient>
+<linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3fbf7"/><stop offset="1" stop-color="#d3eee2"/></linearGradient>
+<linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f8fc"/><stop offset="1" stop-color="#d6e5f2"/></linearGradient>
+<linearGradient id="gRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6f5"/><stop offset="1" stop-color="#f9d7d3"/></linearGradient>
+<linearGradient id="gWood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3e3c8"/><stop offset="1" stop-color="#dcc29a"/></linearGradient>
+<linearGradient id="gMetal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4e7eb"/><stop offset="1" stop-color="#9aa5b1"/></linearGradient>
+<radialGradient id="gDot" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#2fa77c"/><stop offset="1" stop-color="#0a5c42"/></radialGradient>
+<radialGradient id="gDotW" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#e07a2c"/><stop offset="1" stop-color="#8f3806"/></radialGradient>
+<radialGradient id="gDotB" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#4b8cc0"/><stop offset="1" stop-color="#174a6e"/></radialGradient>
+<filter id="sh" x="-10%" y="-10%" width="125%" height="135%"><feGaussianBlur in="SourceAlpha" stdDeviation="2.5"/><feOffset dx="0" dy="3" result="o"/><feComponentTransfer><feFuncA type="linear" slope="0.22"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<text x="24" y="62" font-size="12" fill="#52606d">A generic centrifugal air mover with its parts pulled apart along the shaft. Not a specific brand.</text>
+<line x1="60" y1="165.0" x2="740" y2="165.0" stroke="#9aa5b1" stroke-width="1.5" stroke-dasharray="6 4"/>
+<circle cx="95" cy="165.0" r="58" fill="url(#gCard)" stroke="#52606d" stroke-width="2"/>
+<circle cx="95" cy="165.0" r="44" fill="none" stroke="#9aa5b1" stroke-width="1.5"/>
+<circle cx="95" cy="165.0" r="30" fill="none" stroke="#9aa5b1" stroke-width="1.5"/>
+<circle cx="95" cy="165.0" r="16" fill="none" stroke="#9aa5b1" stroke-width="1.5"/>
+<circle cx="245" cy="165.0" r="56" fill="url(#gBlue)" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="271.0" y1="165.0" x2="290.1" y2="181.5" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="269.0" y1="174.9" x2="280.4" y2="197.5" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="263.4" y1="183.4" x2="265.2" y2="208.5" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="254.9" y1="189.0" x2="247.0" y2="213.0" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="245.0" y1="191.0" x2="228.5" y2="210.1" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="235.1" y1="189.0" x2="212.5" y2="200.4" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="226.6" y1="183.4" x2="201.5" y2="185.2" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="221.0" y1="174.9" x2="197.0" y2="167.0" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="219.0" y1="165.0" x2="199.9" y2="148.5" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="221.0" y1="155.1" x2="209.6" y2="132.5" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="226.6" y1="146.6" x2="224.8" y2="121.5" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="235.1" y1="141.0" x2="243.0" y2="117.0" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="245.0" y1="139.0" x2="261.5" y2="119.9" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="254.9" y1="141.0" x2="277.5" y2="129.6" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="263.4" y1="146.6" x2="288.5" y2="144.8" stroke="#1f5f8b" stroke-width="2"/>
+<line x1="269.0" y1="155.1" x2="293.0" y2="163.0" stroke="#1f5f8b" stroke-width="2"/>
+<circle cx="245" cy="165.0" r="12" fill="#1f5f8b"/>
+<rect x="355" y="115.0" width="80" height="100" rx="14" fill="url(#gMetal)" stroke="#52606d" stroke-width="2"/>
+<line x1="367" y1="127" x2="423" y2="127" stroke="#7b8794" stroke-width="1.5"/>
+<line x1="367" y1="139" x2="423" y2="139" stroke="#7b8794" stroke-width="1.5"/>
+<line x1="367" y1="151" x2="423" y2="151" stroke="#7b8794" stroke-width="1.5"/>
+<line x1="367" y1="163" x2="423" y2="163" stroke="#7b8794" stroke-width="1.5"/>
+<line x1="367" y1="175" x2="423" y2="175" stroke="#7b8794" stroke-width="1.5"/>
+<line x1="367" y1="187" x2="423" y2="187" stroke="#7b8794" stroke-width="1.5"/>
+<line x1="367" y1="199" x2="423" y2="199" stroke="#7b8794" stroke-width="1.5"/>
+<path d="M545,103.0 A62,62 0 1 1 483,165.0 L483,103.0 Z" fill="url(#gCard)" stroke="#52606d" stroke-width="2"/>
+<circle cx="545" cy="165.0" r="22" fill="#ffffff" stroke="#9aa5b1" stroke-width="1.5"/>
+<polygon points="660,120.0 730,143.0 730,187.0 660,210.0" fill="url(#gGreen)" stroke="#0b6e4f" stroke-width="2"/>
+<text x="95" y="266" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2933">1 Inlet grille</text>
+<text x="95" y="284" font-size="12" text-anchor="middle" fill="#52606d">Room air drawn in</text>
+<text x="95" y="300" font-size="12" text-anchor="middle" fill="#52606d">at the centre</text>
+<text x="245" y="266" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2933">2 Fan wheel</text>
+<text x="245" y="284" font-size="12" text-anchor="middle" fill="#52606d">Spins and flings</text>
+<text x="245" y="300" font-size="12" text-anchor="middle" fill="#52606d">air outwards</text>
+<text x="395" y="266" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2933">3 Motor</text>
+<text x="395" y="284" font-size="12" text-anchor="middle" fill="#52606d">Runs on 230 V,</text>
+<text x="395" y="300" font-size="12" text-anchor="middle" fill="#52606d">50 Hz</text>
+<text x="545" y="266" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2933">4 Housing</text>
+<text x="545" y="284" font-size="12" text-anchor="middle" fill="#52606d">Collects the air</text>
+<text x="545" y="300" font-size="12" text-anchor="middle" fill="#52606d">and turns it</text>
+<text x="695" y="266" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2933">5 Outlet</text>
+<text x="695" y="284" font-size="12" text-anchor="middle" fill="#52606d">Low, wide jet</text>
+<text x="695" y="300" font-size="12" text-anchor="middle" fill="#52606d">across the surface</text>
+<rect x="24" y="336" width="368" height="132" rx="10" fill="url(#gBlue)" stroke="#1f5f8b" stroke-width="2" filter="url(#sh)"/>
+<text x="40" y="360" font-size="14" font-weight="700" fill="#1f2933">What it does</text>
+<text x="40" y="382" font-size="12" fill="#1f2933">Moves air across the wet surface to speed</text>
+<text x="40" y="400" font-size="12" fill="#1f2933">evaporation. Pair it with dehumidification:</text>
+<text x="40" y="418" font-size="12" fill="#1f2933">airflow alone lifts moisture into the room air</text>
+<text x="40" y="436" font-size="12" fill="#1f2933">and stalls drying.</text>
+<rect x="408" y="336" width="368" height="132" rx="10" fill="url(#gGreen)" stroke="#0b6e4f" stroke-width="2" filter="url(#sh)"/>
+<text x="424" y="360" font-size="14" font-weight="700" fill="#1f2933">Power at 230 V</text>
+<text x="424" y="382" font-size="12" fill="#1f2933">1.2 A each in the lesson example (illustrative;</text>
+<text x="424" y="400" font-size="12" fill="#1f2933">read the rating plate). Add every machine on</text>
+<text x="424" y="418" font-size="12" fill="#1f2933">a circuit; keep the total under 10 A with</text>
+<text x="424" y="436" font-size="12" fill="#1f2933">headroom. Tested and tagged, through an RCD.</text>
+<rect x="24" y="484" width="752" height="76" rx="10" fill="url(#gWarn)" stroke="#b54708" stroke-width="2" filter="url(#sh)"/>
+<text x="40" y="508" font-size="14" font-weight="700" fill="#1f2933">The mould rule</text>
+<text x="40" y="530" font-size="12" fill="#1f2933">Visible mould present? Do not run air movers: airflow spreads spores. Use air filtration and dehumidifiers</text>
+<text x="40" y="548" font-size="12" fill="#1f2933">only, under containment, until remediation and a clearance confirm the mould has been dealt with.</text>
+<text x="776" y="588" font-size="12" text-anchor="end" fill="#52606d">CARSI · Water Restoration Practitioner · schematic, not to scale</text>
+</svg>

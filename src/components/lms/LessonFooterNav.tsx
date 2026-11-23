@@ -19,6 +19,8 @@ export interface LessonFooterNavProps {
   onComplete: () => void;
   onShare: () => void;
   error: string | null;
+  /** Draw attention to Mark complete after interactive practice is finished. */
+  emphasizeComplete?: boolean;
 }
 
 export const LESSON_FOOTER_ROW_CLASS =
@@ -41,6 +43,7 @@ export function LessonFooterNav({
   onComplete,
   onShare,
   error,
+  emphasizeComplete,
 }: LessonFooterNavProps) {
   return (
     <div className={LESSON_FOOTER_ROW_CLASS} data-testid="lesson-footer">
@@ -90,7 +93,8 @@ export function LessonFooterNav({
                 'h-11 gap-1.5 rounded-full px-6 text-sm font-semibold shadow-none disabled:opacity-50',
                 completed
                   ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100'
-                  : 'bg-[#146fc2] text-white hover:bg-[#0f5fa8]'
+                  : 'bg-[#146fc2] text-white hover:bg-[#0f5fa8]',
+                emphasizeComplete && !completed && 'ring-2 ring-emerald-400 ring-offset-2'
               )}
               onClick={onComplete}
             >

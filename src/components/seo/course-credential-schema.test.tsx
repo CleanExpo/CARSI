@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
-import { CourseSchema, CREDENTIAL_DISCLAIMER } from './JsonLd';
+import { CARSI_CREDENTIAL_STATEMENT, CourseSchema, CREDENTIAL_DISCLAIMER } from './JsonLd';
 
 /**
  * Two independent blind critics judged this page's credential standing and both landed on the
@@ -51,10 +51,25 @@ describe('CourseSchema credential', () => {
     expect(schema.educationalCredentialAwarded).toBeUndefined();
   });
 
-  it('carries the not-a-certification disclaimer INTO the machine-readable payload', () => {
+  it('a course that is not CEC-approved names no IICRC in its credential (GP-748), fail closed', () => {
+    for (const cecApproved of [false, undefined]) {
+      const markup = renderToStaticMarkup(
+        <CourseSchema
+          {...base}
+          credentialAwarded="CARSI Water Restoration Practitioner"
+          cecApproved={cecApproved}
+        />
+      );
+      const cred = parseSchema(markup).educationalCredentialAwarded as Record<string, unknown>;
+      expect(cred.description).toBe(CARSI_CREDENTIAL_STATEMENT);
+      expect(markup).not.toMatch(/iicrc/i);
+    }
+  });
+
+  it('a CEC-approved course carries the not-a-certification disclaimer INTO the machine-readable payload', () => {
     const schema = parseSchema(
       renderToStaticMarkup(
-        <CourseSchema {...base} credentialAwarded="CARSI Water Restoration Practitioner" />
+        <CourseSchema {...base} credentialAwarded="CARSI Water Restoration Practitioner" cecApproved />
       )
     );
     const cred = schema.educationalCredentialAwarded as Record<string, unknown>;

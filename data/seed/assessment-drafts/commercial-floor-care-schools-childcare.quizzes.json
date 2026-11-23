@@ -2,7 +2,7 @@
   "version": 1,
   "status": "draft",
   "courseSlug": "commercial-floor-care-schools-childcare",
-  "disclaimer": "Educational assessment. CARSI is an IICRC CEC Accredited provider; this is CARSI-original Australian training, not IICRC certification.",
+  "disclaimer": "Educational assessment. This is a CARSI course and a CARSI credential, written as original Australian training.",
   "note": "Australian-produced. Grounded in the course's own modules. Answer keys independently verified against the course text. Founder to review before wiring live.",
   "quizzes": [
     {
@@ -61,12 +61,12 @@
           "sourceRef": "Module 1 - Choosing child-safe, low-tox products and ventilating occupied rooms"
         },
         {
-          "questionText": "What best describes the status of ANSI/IICRC S100 for carpet cleaning?",
+          "questionText": "Why does a pre-inspection matter before you clean an occupied school or childcare carpet?",
           "options": [
-            "A government regulation that legally mandates how carpet must be cleaned",
-            "A recognised industry standard of care, not law, that supports your judgement",
-            "A SafeWork Australia code of practice",
-            "A state-based licensing requirement for cleaners"
+            "It removes the need to vacuum before any wet process",
+            "It records existing damage and the soil load so you can choose a method and set realistic outcomes",
+            "It lets you skip reading the SDS for the products you plan to use",
+            "It replaces the need to identify the fibre and construction"
           ],
           "correctIndex": 1,
           "points": 1,
