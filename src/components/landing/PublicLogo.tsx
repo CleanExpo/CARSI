@@ -2,9 +2,20 @@ import Image from 'next/image';
 
 type PublicLogoProps = {
   variant: 'nav' | 'footer' | 'auth';
-  /** Kept for callers; both surfaces use the official wordmark. */
+  /**
+   * Background the wordmark sits on. `light` (default) uses the navy-lettered
+   * `/logo/logo1.png`; `chrome` is for the dark navy bands (auth card, dark nav and
+   * footer) and uses the reversed white-lettered `/logo/dark-logo.png`, the same
+   * official asset the transactional emails use. Navy lettering on navy measured
+   * 1.03:1 contrast (GP-779 live smoke).
+   */
   surface?: 'chrome' | 'light';
 };
+
+const LOGO_SRC = {
+  light: '/logo/logo1.png',
+  chrome: '/logo/dark-logo.png',
+} as const;
 
 const logoConfig = {
   nav: {
@@ -31,18 +42,19 @@ const logoConfig = {
 } as const;
 
 /** Official CARSI wordmark — 3D mark + CARSI logotype. */
-export function PublicLogo({ variant }: PublicLogoProps) {
+export function PublicLogo({ variant, surface = 'light' }: PublicLogoProps) {
   const config = logoConfig[variant];
 
   return (
     <Image
-      src="/logo/logo1.png"
+      src={LOGO_SRC[surface]}
       alt="CARSI"
       width={config.width}
       height={config.height}
       className={config.className}
       sizes={config.sizes}
       priority={config.priority}
+      data-pv-allow="logo"
     />
   );
 }
