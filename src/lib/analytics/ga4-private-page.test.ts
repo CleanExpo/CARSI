@@ -80,6 +80,30 @@ describe('GA4 refuses events on a private page (P1-5)', () => {
     expect(events()).toHaveLength(0);
   });
 
+  it('GA4 and PostHog agree on every page: GA4 sends exactly when the PostHog scrub keeps the event', async () => {
+    const { scrubPostHogEvent } = await import('./posthog-client');
+    const outcomes: Record<string, boolean> = {};
+    for (const page of ['/subscribe', '/courses', '/', '/register', '/login', PRIVATE_PAGE]) {
+      vi.resetModules();
+      calls = [];
+      const ga4 = await import('./ga4-client');
+      installGtag();
+      ga4.markGa4Configured();
+      goTo(page);
+      ga4.trackMembershipCheckoutStarted({ value_aud: 795 });
+      const posthogKeeps =
+        scrubPostHogEvent({
+          uuid: 'u',
+          event: 'membership_checkout_started',
+          properties: { value: 795 },
+        } as never) !== null;
+      expect(events().length === 1, page).toBe(posthogKeeps);
+      outcomes[page] = posthogKeeps;
+    }
+    // Both answers occur, so the agreement is not two vendors that both always say no.
+    expect(outcomes).toMatchObject({ '/subscribe': true, '/register': false, [PRIVATE_PAGE]: false });
+  });
+
   it('an event queued on a public page is not flushed while a private page is showing', async () => {
     const ga4 = await import('./ga4-client');
     ga4.trackCarsiProductEvent({ name: 'role_guide_start', context: 'hub' });

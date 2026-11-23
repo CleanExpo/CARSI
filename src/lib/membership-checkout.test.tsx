@@ -61,6 +61,7 @@ beforeEach(() => {
     gtagCalls.push(a);
   };
   nav.href = '';
+  nav.pathname = '/subscribe';
   Object.defineProperty(window, 'location', { configurable: true, value: nav });
   container = document.createElement('div');
   document.body.appendChild(container);
@@ -92,6 +93,8 @@ function setValue(name: string, value: string) {
 }
 
 async function registerFromSubscribe() {
+  // The resumed checkout runs on the register page itself.
+  nav.pathname = '/register';
   mocks.params = new URLSearchParams('next=%2Fsubscribe');
   act(() => root.render(createElement(RegisterForm)));
   act(() => {
@@ -150,8 +153,12 @@ describe('membership_checkout_started — the shared checkout boundary', () => {
     expect(checkoutEvents()).toHaveLength(0);
   });
 
-  // Review r1 P1-V6-GUEST-CHECKOUT-UNTRACKED
-  it('a guest: the 401 click fires nothing; the checkout resumed after registering fires once', async () => {
+  // Review r1 P1-V6-GUEST-CHECKOUT-UNTRACKED asked for the resumed checkout to reach GA4.
+  // Reversed by P1-5 (force-push review, 23/11/2026): the resume runs on /register, which
+  // consent.isCountedPath treats as private, so GA4 now drops it exactly as PostHog's
+  // scrubPostHogEvent already did. Counting it again is an owner decision in consent.ts,
+  // for both vendors at once, not an exception in one of them.
+  it('a guest: the 401 click fires nothing; the checkout resumed on /register still goes to Stripe but sends no GA4 event', async () => {
     mocks.post.mockRejectedValueOnce(new ApiClientError('Unauthorized', 401));
     await clickStart();
     expect(nav.href).toBe('/register?next=%2Fsubscribe');
@@ -164,8 +171,7 @@ describe('membership_checkout_started — the shared checkout boundary', () => {
     expect(mocks.register).toHaveBeenCalledTimes(1);
     expect(mocks.post).toHaveBeenLastCalledWith('/api/lms/subscription/checkout', {});
     expect(nav.href).toBe(STRIPE_URL);
-    expect(checkoutEvents()).toHaveLength(1);
-    expect(checkoutEvents()[0][2]).toEqual({ value: 795, currency: 'AUD' });
+    expect(checkoutEvents()).toHaveLength(0);
   });
 
   it('a guest whose resumed checkout fails fires nothing and lands on /subscribe', async () => {
