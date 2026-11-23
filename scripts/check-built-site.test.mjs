@@ -107,7 +107,7 @@ function buildFixture(root) {
   );
   put(
     'server/app/about.html',
-    '<html><body><p>CARSI is an IICRC CEC Accredited provider.</p></body></html>'
+    '<html><body><p>CARSI is an IICRC Approved CEC Provider.</p></body></html>'
   );
   put(
     'server/app/index.rsc',
@@ -203,7 +203,7 @@ try {
   ok(!/about\.html/.test(text), 'compliant provider wording is not flagged');
   ok(!/\.map|standalone|cache|nft\.json/.test(text), 'nothing is reported from an unserved file');
   ok(
-    scanBuiltFile('x.html', '<p>IICRC <em>CEC</em> Accredited</p>').length === 0,
+    scanBuiltFile('x.html', '<p>IICRC <em>Approved CEC</em> Provider</p>').length === 0,
     'tag-stripped HTML view does not invent a finding from compliant wording'
   );
 
@@ -224,7 +224,7 @@ try {
   mkdirSync(join(clean, 'server/app'), { recursive: true });
   writeFileSync(
     join(clean, 'server/app/index.html'),
-    '<p>CARSI is an IICRC CEC Accredited provider.</p>'
+    '<p>CARSI is an IICRC Approved CEC Provider.</p>'
   );
   ok(run('--dir', clean).status === 0, 'exits 0 on a clean build');
 
