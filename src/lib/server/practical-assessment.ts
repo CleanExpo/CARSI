@@ -14,6 +14,7 @@ import {
 } from '@/lib/server/course-prerequisites';
 import { gradeRubric } from '@/lib/practical-assessment-grading';
 import { runSerializable } from '@/lib/server/db-tx';
+import { syncCompletionAfterAssessmentPassed } from '@/lib/server/enrollment-service';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 
 /** Roles permitted to review practical-assessment submissions (mirrors course-review roles). */
@@ -220,7 +221,8 @@ export async function reviewSubmission(input: {
   /** Plain-English reason a critical criterion failed the submission, else null. */
   reason: string | null;
 }> {
-  return runSerializable(async (tx) => {
+  let learner: { studentId: string; courseId: string } | null = null;
+  const result = await runSerializable(async (tx) => {
     const sub = await tx.lmsAssessmentSubmission.findUnique({
       where: { id: input.submissionId },
       include: { assessment: { include: { criteria: true } } },
@@ -230,6 +232,7 @@ export async function reviewSubmission(input: {
       throw new AssessmentError(409, 'Submission has already been reviewed');
     }
 
+    learner = { studentId: sub.studentId, courseId: sub.assessment.courseId };
     const criteria = sub.assessment.criteria;
     const byId = new Map(criteria.map((c) => [c.id, c]));
     // The submitted ids must equal the rubric ids exactly: each rubric criterion once,
@@ -290,6 +293,13 @@ export async function reviewSubmission(input: {
       reason,
     };
   });
+  // GP-432: a passed practical may be the enrolment's last requirement; re-run the gated
+  // completion sync after the review commits.
+  if (result.passed && learner) {
+    const { studentId, courseId } = learner;
+    await syncCompletionAfterAssessmentPassed(studentId, courseId);
+  }
+  return result;
 }
 
 /** A student's own practical-assessment submissions. */

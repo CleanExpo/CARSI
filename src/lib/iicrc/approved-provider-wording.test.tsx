@@ -167,10 +167,6 @@ const PENDING: Record<string, string> = {
   'data/courses/': 'GP-748 (PR #1205): course research and drafts',
   'data/course-content/': 'GP-749: lesson content',
   'data/CARSI_Specialty_Courses_Collection.txt': 'GP-749: legacy course text',
-  'src/lib/certificate/CertificateArt.tsx':
-    'certificate wording builder (fix/certificate-cec-wording)',
-  'src/components/lms/diagrams/CertificatePreview.tsx':
-    'certificate wording builder (fix/certificate-cec-wording)',
   'docs/course-content/': 'GP-749: workshop course content',
 };
 

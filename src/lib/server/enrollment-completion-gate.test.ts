@@ -7,14 +7,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
  * (see enrollment-service.ts:372, "status !== 'completed' ... return null").
  * Its quiz gate (`allCourseQuizzesPassed`) was previously untested end-to-end.
  *
- * IMPORTANT — this pins CURRENT, DELIBERATE behaviour, not a fix: a course
- * with ZERO quizzes has its quiz gate satisfied VACUOUSLY (enrollment-service.ts
- * comment: "A course with no quizzes is trivially satisfied"), so completing all
- * lessons is enough to issue a certificate even though no assessment ever
- * happened. GP-446 is the tracked future policy change to close this gate for
- * zero-assessment courses. This test exists so that when GP-446 lands, this
- * exact assertion is the one that must flip — making the policy change
- * deliberate and reviewable rather than an accidental behaviour drift.
+ * GP-432 flipped the deliberate baseline this file pinned: a course with ZERO
+ * assessments used to complete on lessons alone. Now a course approved for IICRC
+ * CECs needs at least one assessment, and every required assessment passed, before
+ * it completes; a course with no CEC approval and no assessment still completes on
+ * lessons (it claims no CEC). The full GP-432 matrix is in gp-432-completion-gate.test.ts.
  */
 
 type EnrollmentRow = {
@@ -32,12 +29,14 @@ const state = vi.hoisted(() => ({
   completedLessonCount: 0,
   quizzes: [] as { id: string }[],
   passedQuizIds: [] as string[],
+  courseSlug: 'non-cec-course',
 }));
 
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     lmsCourse: {
       findUnique: vi.fn(async () => ({
+        slug: state.courseSlug,
         modules: [{ lessons: state.lessonIds.map((id) => ({ id })) }],
       })),
     },
@@ -67,7 +66,11 @@ vi.mock('@/lib/prisma', () => ({
         state.passedQuizIds.map((quizId) => ({ quizId })),
       ),
     },
+    lmsPracticalAssessment: { findMany: vi.fn(async () => []) },
+    lmsAssessmentSubmission: { findMany: vi.fn(async () => []) },
     // Runs the callback on this client; a throw restores the row, as a rollback would.
+    // Row lock (enrollment-row-lock.ts): the sync reads the prior status after it, via findUnique.
+    $queryRaw: async () => [{ id: "locked-row" }],
     async $transaction(fn: (tx: unknown) => Promise<unknown>) {
       const before = state.enrollment && { ...state.enrollment };
       try {
@@ -83,6 +86,12 @@ vi.mock('@/lib/prisma', () => ({
 // Mock the IICRC auto-submit side effect so it never fires a real submission
 // during these unit tests (enrollment-service.ts dynamically imports it only
 // on a newly-gated completion).
+// The CEC approvals registry decides which courses are CEC courses (GP-498).
+vi.mock('@/lib/server/course-cec-hours', () => ({
+  resolveLmsCourseCecHours: (course: { slug: string }) =>
+    course.slug === 'cec-course' ? 4 : null,
+}));
+
 vi.mock('@/lib/server/iicrc-cec-submission', () => ({
   processIicrcCecSubmissionForEnrollment: vi.fn(async () => {}),
 }));
@@ -97,6 +106,7 @@ function resetState(overrides: Partial<typeof state> = {}) {
   state.completedLessonCount = 0;
   state.quizzes = [];
   state.passedQuizIds = [];
+  state.courseSlug = 'non-cec-course';
   Object.assign(state, overrides);
 }
 
@@ -105,7 +115,7 @@ describe('syncEnrollmentCompletion — zero-quiz course cert gate (GP-446 baseli
     vi.clearAllMocks();
   });
 
-  it('DOCUMENTS CURRENT BEHAVIOUR: a course with NO quizzes completes (and can issue a cert) on lessons alone', async () => {
+  it('a course with no CEC approval and NO assessment completes on lessons alone (claims no CEC)', async () => {
     resetState({
       enrollment: {
         id: 'enr-1',
@@ -223,27 +233,25 @@ describe('syncEnrollmentCompletion — zero-quiz course cert gate (GP-446 baseli
     expect(state.enrollment?.completedAt).toEqual(priorCompletedAt);
   });
 
-  it('an admin force-complete (bypassQuizGate) completes even with unpassed quizzes outstanding', async () => {
+  it('GP-432: a CEC course with NO assessment does not complete on lessons alone', async () => {
     resetState({
       enrollment: {
         id: 'enr-5',
         studentId: 'student-1',
-        courseId: 'course-with-quiz',
+        courseId: 'course-cec',
         status: 'active',
         completedAt: null,
         certificateIssuedAt: null,
       },
+      courseSlug: 'cec-course',
       lessonIds: ['l1'],
       completedLessonCount: 1,
-      quizzes: [{ id: 'q1' }],
-      passedQuizIds: [],
+      quizzes: [],
     });
 
-    await syncEnrollmentCompletion('enr-5', 'student-1', 'course-with-quiz', {
-      bypassQuizGate: true,
-    });
+    await syncEnrollmentCompletion('enr-5', 'student-1', 'course-cec');
 
-    expect(state.enrollment?.status).toBe('completed');
+    expect(state.enrollment?.status).toBe('active');
   });
 
   it('a course with zero lessons resets to active (never "completed" on nothing)', async () => {

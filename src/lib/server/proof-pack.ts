@@ -66,7 +66,9 @@ export async function getProofPackPayloadForStudent(
     byDisc.set(d, (byDisc.get(d) ?? 0) + (c.cec_hours ?? 0));
   }
 
+  // Drop zero-hour rows: a course off the approvals register must not get a credit row (GP-757).
   const cec_by_discipline = [...byDisc.entries()]
+    .filter(([, cec_hours]) => cec_hours > 0)
     .map(([discipline, cec_hours]) => ({ discipline, cec_hours: roundCec(cec_hours) }))
     .sort((a, b) => a.discipline.localeCompare(b.discipline));
 

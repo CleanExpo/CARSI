@@ -54,7 +54,10 @@ export async function GET(request: NextRequest, ctx: Ctx) {
     const row = await getEnrollmentForCertificate(claims.sub, enrollmentId);
     if (!row) {
       return NextResponse.json(
-        { detail: 'Certificate available only after all lessons are complete.' },
+        {
+          detail:
+            'Certificate available only after all lessons are complete and every required assessment is passed.',
+        },
         { status: 403 }
       );
     }

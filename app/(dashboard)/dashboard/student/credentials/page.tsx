@@ -6,11 +6,9 @@ import { LinkedInShareButton } from '@/components/lms/LinkedInShareButton';
 import { useToast } from '@/hooks/use-toast';
 import { apiClient } from '@/lib/api/client';
 import { markDashboardPageReady } from '@/lib/onboarding/page-ready';
-import { formatCecHoursForCertificate, formatCecHoursForDisplay } from '@/lib/cec-display';
-import {
-  APPROVED_FOR_IICRC_CECS,
-  APPROVED_FOR_IICRC_CECS_LABEL,
-} from '@/lib/iicrc/approved-wording';
+import { formatCecHoursForDisplay } from '@/lib/cec-display';
+import { certificateCecWording } from '@/lib/certificate/certificate-cec-wording';
+import { APPROVED_FOR_IICRC_CECS } from '@/lib/iicrc/approved-wording';
 import { CecRenewalFigure, CecRenewalStatus } from '@/components/lms/CecRenewalStatus';
 import { useRenewalSummary } from '@/hooks/use-renewal-summary';
 import { renewalProgress } from '@/lib/renewal-progress';
@@ -129,9 +127,9 @@ function BrandRing({
 function CredentialCard({ credential }: { credential: CredentialOut }) {
   const pdfUrl = `/api/lms/credentials/${encodeURIComponent(credential.credential_id)}?pdf=1`;
   const issuedDate = new Date(credential.issued_date);
-  // cec_hours comes from the CEC approvals register. A course without an approval shows no
-  // IICRC line at all (GP-748); an approved one uses the approved wording (GP-704).
-  const cecLabel = formatCecHoursForCertificate(credential.cec_hours);
+  // cec_hours is the approvals-register value (/api/lms/credentials/me); the words come from the
+  // certificate wording owner, so a non-approved course shows no IICRC line (GP-757).
+  const cecWording = certificateCecWording(credential.cec_hours);
 
   return (
     <article className={`${surface} flex h-full flex-col`}>
@@ -144,16 +142,16 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
             <Award className="h-5 w-5" aria-hidden />
           </span>
           <div className="min-w-0">
-            <p className={kicker}>
-              {cecLabel ? APPROVED_FOR_IICRC_CECS_LABEL : 'CARSI certificate'}
-            </p>
+            <p className={kicker}>{cecWording.cardLabel}</p>
             <h3 className={`mt-2 text-[1.15rem] leading-snug ${heading}`}>
               {credential.course_title}
             </h3>
             <p className={`mt-2 text-[13px] ${muted}`}>
               Issued {formatIssued(credential.issued_date)}
             </p>
-            {cecLabel ? <p className={`mt-1 text-[13px] ${muted}`}>{cecLabel}</p> : null}
+            {cecWording.cecCreditsValue ? (
+              <p className={`mt-1 text-[13px] ${muted}`}>{cecWording.cecCreditsValue}</p>
+            ) : null}
             <p className="mt-3 text-[11px] tracking-wide text-slate-400 uppercase">
               Certificate {credential.credential_id}
             </p>
