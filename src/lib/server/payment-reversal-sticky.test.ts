@@ -80,6 +80,11 @@ vi.mock('@/lib/prisma', () => {
       ),
       updateMany: vi.fn(async () => ({ count: 0 })),
     },
+    // GP-764: a paid fulfilment records the session's amount once.
+    lmsCheckoutPayment: {
+      findUnique: vi.fn(async () => null),
+      create: vi.fn(async (args: { data: Record<string, unknown> }) => args.data),
+    },
   };
   return { prisma: client };
 });

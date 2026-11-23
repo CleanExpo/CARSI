@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { serializeTeamForClient } from '@/lib/server/team-api-serialize';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
+import { checkoutAmountPaid } from '@/lib/server/checkout-payment';
 import { PAYMENT_REVERSED, PAYMENT_REVERSED_BODY } from '@/lib/server/payment-integrity-ledger';
 import { repairAndGetTeamForUser } from '@/lib/server/teams';
 
@@ -117,6 +118,7 @@ export async function POST(request: NextRequest) {
           paymentReference: sessionId,
           purchaseMode: 'team',
           teamSeatCount,
+          amountPaid: checkoutAmountPaid(session),
         });
       }
     }

@@ -63,6 +63,7 @@ import {
   refreshSubscriptionFromStripe,
 } from '@/lib/server/subscription-webhook';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
+import { checkoutAmountPaid } from '@/lib/server/checkout-payment';
 import {
   applyCheckoutPaymentReversal,
   applyDisputeWon,
@@ -607,6 +608,7 @@ export async function POST(request: NextRequest) {
         paymentReference: ref,
         purchaseMode,
         teamSeatCount: Number.isFinite(teamSeatCount) ? teamSeatCount : undefined,
+        amountPaid: checkoutAmountPaid(session),
       });
       await resolveUnfulfilledPayment(ref);
 
