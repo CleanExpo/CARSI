@@ -16,6 +16,7 @@ import { gradeRubric } from '@/lib/practical-assessment-grading';
 import { runSerializable } from '@/lib/server/db-tx';
 import { syncCompletionAfterAssessmentPassed } from '@/lib/server/enrollment-service';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
+import { EnrollmentLockRefusal, withLockedEnrollment } from '@/lib/server/enrollment-row-lock';
 
 /** Roles permitted to review practical-assessment submissions (mirrors course-review roles). */
 export function canReviewAssessments(role: string | null | undefined): boolean {
@@ -187,16 +188,34 @@ export async function submitPracticalAssessment(input: {
     throw new AssessmentError(400, 'Evidence description is too short');
   }
 
-  const created = await prisma.lmsAssessmentSubmission.create({
-    data: {
-      assessmentId: input.assessmentId,
-      studentId: input.studentId,
-      evidenceText: text,
-      evidenceUrls: asStringArray(input.evidenceUrls),
-      status: 'pending',
-    },
-    select: { id: true, status: true, createdAt: true },
-  });
+  // GP-432: the submission is a learner-record write, so it runs inside the one owner
+  // (enrollment-row-lock.ts): the enrolment found above is locked and re-checked, and a
+  // revocation that committed since is refused with nothing written.
+  let created: { id: string; status: string; createdAt: Date };
+  try {
+    created = await prisma.$transaction((tx) =>
+      withLockedEnrollment(
+        tx,
+        { enrollmentId: enrolment.id, studentId: input.studentId, require: 'access' },
+        () =>
+          tx.lmsAssessmentSubmission.create({
+            data: {
+              assessmentId: input.assessmentId,
+              studentId: input.studentId,
+              evidenceText: text,
+              evidenceUrls: asStringArray(input.evidenceUrls),
+              status: 'pending',
+            },
+            select: { id: true, status: true, createdAt: true },
+          }),
+      ),
+    );
+  } catch (e) {
+    if (e instanceof EnrollmentLockRefusal) {
+      throw new AssessmentError(403, 'You must be enrolled in this course to submit');
+    }
+    throw e;
+  }
   return { id: created.id, status: created.status, createdAt: created.createdAt.toISOString() };
 }
 
@@ -233,65 +252,84 @@ export async function reviewSubmission(input: {
     }
 
     learner = { studentId: sub.studentId, courseId: sub.assessment.courseId };
-    const criteria = sub.assessment.criteria;
-    const byId = new Map(criteria.map((c) => [c.id, c]));
-    // The submitted ids must equal the rubric ids exactly: each rubric criterion once,
-    // no unknown ids, no repeats. A count check alone lets a repeated id hide an
-    // unscored (possibly critical) criterion.
-    const scoreById: Record<string, number> = {};
-    for (const s of input.scores) {
-      const c = byId.get(s.criterionId);
-      if (!c) throw new AssessmentError(400, `Unknown criterion ${s.criterionId}`);
-      if (Object.prototype.hasOwnProperty.call(scoreById, s.criterionId)) {
-        throw new AssessmentError(400, `Criterion "${c.label}" is scored more than once`);
-      }
-      if (
-        typeof s.points !== 'number' ||
-        !Number.isFinite(s.points) ||
-        s.points < 0 ||
-        s.points > c.maxPoints
-      ) {
-        throw new AssessmentError(400, `Score for "${c.label}" must be between 0 and ${c.maxPoints}`);
-      }
-      scoreById[s.criterionId] = s.points;
-    }
-    if (Object.keys(scoreById).length !== criteria.length) {
-      throw new AssessmentError(400, 'Every rubric criterion must be scored');
-    }
-
-    const { total, maxScore, failedCriticalCriteria, passed } = gradeRubric({
-      criteria,
-      scores: scoreById,
-      passThreshold: sub.assessment.passThreshold,
+    // GP-432: grading writes the learner's record, so it runs inside the one owner
+    // (enrollment-row-lock.ts) with the admin rule: a revoked or refunded enrolment is refused
+    // (409) and nothing is written.
+    const en = await tx.lmsEnrollment.findUnique({
+      where: { studentId_courseId: { studentId: sub.studentId, courseId: sub.assessment.courseId } },
+      select: { id: true },
     });
-    const reason =
-      failedCriticalCriteria.length > 0
-        ? `Not passed: every critical criterion must be met in full, whatever the total. Not met: ${failedCriticalCriteria.join('; ')}.`
-        : null;
-    const assessorNotes = input.notes?.trim() || '';
-    const reviewerNotes = [assessorNotes, reason].filter(Boolean).join('\n\n') || null;
+    if (!en) throw new AssessmentError(409, 'The learner is not enrolled in this course');
+    return withLockedEnrollment(
+      tx,
+      { enrollmentId: en.id, studentId: sub.studentId, require: 'admin-change' },
+      async () => {
+        const criteria = sub.assessment.criteria;
+        const byId = new Map(criteria.map((c) => [c.id, c]));
+        // The submitted ids must equal the rubric ids exactly: each rubric criterion once,
+        // no unknown ids, no repeats. A count check alone lets a repeated id hide an
+        // unscored (possibly critical) criterion.
+        const scoreById: Record<string, number> = {};
+        for (const s of input.scores) {
+          const c = byId.get(s.criterionId);
+          if (!c) throw new AssessmentError(400, `Unknown criterion ${s.criterionId}`);
+          if (Object.prototype.hasOwnProperty.call(scoreById, s.criterionId)) {
+            throw new AssessmentError(400, `Criterion "${c.label}" is scored more than once`);
+          }
+          if (
+            typeof s.points !== 'number' ||
+            !Number.isFinite(s.points) ||
+            s.points < 0 ||
+            s.points > c.maxPoints
+          ) {
+            throw new AssessmentError(400, `Score for "${c.label}" must be between 0 and ${c.maxPoints}`);
+          }
+          scoreById[s.criterionId] = s.points;
+        }
+        if (Object.keys(scoreById).length !== criteria.length) {
+          throw new AssessmentError(400, 'Every rubric criterion must be scored');
+        }
 
-    const updated = await tx.lmsAssessmentSubmission.update({
-      where: { id: input.submissionId },
-      data: {
-        status: passed ? 'passed' : 'failed',
-        criterionScores: input.scores,
-        totalScore: total,
-        reviewerId: input.reviewerId ?? null,
-        reviewerNotes,
-        reviewedAt: new Date(),
+        const { total, maxScore, failedCriticalCriteria, passed } = gradeRubric({
+          criteria,
+          scores: scoreById,
+          passThreshold: sub.assessment.passThreshold,
+        });
+        const reason =
+          failedCriticalCriteria.length > 0
+            ? `Not passed: every critical criterion must be met in full, whatever the total. Not met: ${failedCriticalCriteria.join('; ')}.`
+            : null;
+        const assessorNotes = input.notes?.trim() || '';
+        const reviewerNotes = [assessorNotes, reason].filter(Boolean).join('\n\n') || null;
+
+        const updated = await tx.lmsAssessmentSubmission.update({
+          where: { id: input.submissionId },
+          data: {
+            status: passed ? 'passed' : 'failed',
+            criterionScores: input.scores,
+            totalScore: total,
+            reviewerId: input.reviewerId ?? null,
+            reviewerNotes,
+            reviewedAt: new Date(),
+          },
+          select: { id: true, status: true },
+        });
+        return {
+          id: updated.id,
+          status: updated.status,
+          totalScore: total,
+          maxScore,
+          passed,
+          failedCriticalCriteria,
+          reason,
+        };
       },
-      select: { id: true, status: true },
+    ).catch((e: unknown) => {
+      if (e instanceof EnrollmentLockRefusal) {
+        throw new AssessmentError(409, 'This learner\'s enrolment is revoked or refunded; the submission cannot be graded.');
+      }
+      throw e;
     });
-    return {
-      id: updated.id,
-      status: updated.status,
-      totalScore: total,
-      maxScore,
-      passed,
-      failedCriticalCriteria,
-      reason,
-    };
   });
   // GP-432: a passed practical may be the enrolment's last requirement; re-run the gated
   // completion sync after the review commits.

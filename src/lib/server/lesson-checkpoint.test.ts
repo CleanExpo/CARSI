@@ -24,6 +24,8 @@ let foreignQuiz: boolean;
 let writes: string[];
 let attemptVersion: string | null;
 let durationMinutes: number | null;
+// The enrolment status the owner's row lock sees (a revocation can commit after the graph read).
+let lockStatus: string;
 
 const client = {
   $transaction: vi.fn(async (fn, options) => {
@@ -44,6 +46,10 @@ const client = {
           title: 'Quiz', passPercentage: 80, timeLimitMinutes: null, attemptsAllowed: 2 }];
         if (query.includes('FROM lms_quiz_questions')) return [{ id: questionId, questionText: 'Original question?',
           options: [{ text: 'A' }, { text: 'B' }], correctIndex, orderIndex: 0, points: 1 }];
+        // GP-432: the owner (withLockedEnrollment) locks the enrolment row before the progress row.
+        if (query.includes('FROM lms_enrollments') && query.includes('FOR UPDATE')) {
+          return [{ id: '10000000-0000-4000-8000-000000000005', studentId, courseId: '10000000-0000-4000-8000-000000000006', status: lockStatus }];
+        }
         if (query.includes('FROM lms_lesson_progress')) return stored === null ? [] : [{ checkpoint: stored }];
         if (query.includes('COUNT(*)')) return [{ count: 1 }];
         if (query.includes('FROM lms_quiz_attempts')) {
@@ -76,6 +82,7 @@ async function input(): Promise<CheckpointInput> {
 }
 
 beforeEach(() => {
+  lockStatus = 'active';
   vi.stubEnv('JWT_SECRET', 'synthetic-secret-with-more-than-32-characters');
   stored = null; pointer = null; granted = true; failPointer = false; serializeOnce = false;
   executions = 0; contentType = 'quiz'; contentBody = undefined; resources = []; correctIndex = 1; foreignQuiz = false; writes = []; attemptVersion = null;
@@ -170,6 +177,14 @@ describe('durable checkpoint service', () => {
     const draft = await input();
     failPointer = true;
     await expect(saveLessonCheckpoint(studentId, lessonId, draft, client)).rejects.toThrow('Synthetic pointer failure');
+    expect(stored).toBeNull(); expect(pointer).toBeNull();
+  });
+  it('GP-432: an enrolment revoked by the time of the lock refuses the save and writes nothing', async () => {
+    const draft = await input();
+    lockStatus = 'revoked';
+    writes.length = 0;
+    await expect(saveLessonCheckpoint(studentId, lessonId, draft, client)).rejects.toMatchObject({ status: 404 });
+    expect(writes).toEqual([]);
     expect(stored).toBeNull(); expect(pointer).toBeNull();
   });
   it('uses bounded serialization retry', async () => {

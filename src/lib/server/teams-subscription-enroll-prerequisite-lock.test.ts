@@ -65,8 +65,19 @@ vi.mock('@/lib/prisma', () => {
     COURSES.find((c) =>
       'id' in where ? c.id === where.id : 'slug' in where ? c.slug === where.slug : false
     ) ?? null;
+  const tx = {
+    // GP-432: touchLessonProgress runs inside withLockedEnrollment; the row lock answers with the
+    // enrolment row by id, as the database would.
+    $queryRaw: vi.fn(async (_sql: TemplateStringsArray, id: string) => {
+      const e = db.enrolments.find((row) => row.id === id);
+      return e ? [{ id: e.id, studentId: e.studentId, courseId: e.courseId, status: e.status }] : [];
+    }),
+    lmsLessonProgress: { upsert: vi.fn(async () => ({})) },
+    lmsEnrollment: { update: vi.fn(async () => ({})) },
+  };
   return {
     prisma: {
+      $transaction: vi.fn(async (fn: (t: typeof tx) => unknown) => fn(tx)),
       lmsCourse: {
         findUnique: vi.fn(async ({ where }: { where: Where }) => matchCourse(where)),
         findMany: vi.fn(async ({ where }: { where: { slug: { in: string[] } } }) =>
