@@ -12,6 +12,7 @@ import {
   StatusBadge,
   adminGlassCard,
   completionColor,
+  formatAdminCount,
   formatAdminDate,
   formatAdminDateTime,
 } from '@/components/admin/admin-learner-ui';
@@ -103,7 +104,7 @@ export function AdminUsersClient({ users }: { users: AdminDashboardUserEntry[] }
             <div>
               <CardTitle className="text-base font-semibold text-white/88">Directory</CardTitle>
               <CardDescription className="text-white/45">
-                {filtered.length.toLocaleString()} match · {users.length.toLocaleString()} total ·
+                {formatAdminCount(filtered.length)} match · {formatAdminCount(users.length)} total ·
                 page {safePage} of {pageCount}
               </CardDescription>
             </div>

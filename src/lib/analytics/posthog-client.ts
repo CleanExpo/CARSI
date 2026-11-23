@@ -19,6 +19,7 @@ import {
 } from './consent';
 import { getAnalyticsChoice, onAnalyticsWithdrawn } from './consent-client';
 
+import type { CarsiProductEventPayload } from './carsi-product-events';
 import type {
   CheckoutStartedPayload,
   CourseViewPayload,
@@ -191,5 +192,12 @@ export function trackMembershipView(payload: MembershipViewPayload): void {
 export function trackMembershipCheckoutStarted(payload: MembershipCheckoutStartedPayload): void {
   capture('membership_checkout_started', {
     ...(typeof payload.value_aud === 'number' ? { value: payload.value_aud, currency: 'AUD' } : {}),
+  });
+}
+
+export function trackCarsiProductEvent(payload: CarsiProductEventPayload): void {
+  capture(payload.name, {
+    ...(payload.context ? { carsi_context: payload.context } : {}),
+    ...(payload.link_path ? { link_path: payload.link_path } : {}),
   });
 }

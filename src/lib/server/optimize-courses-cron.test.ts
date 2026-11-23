@@ -56,7 +56,7 @@ describe('optimize courses cron helpers', () => {
   it('builds a summary email for the founder inbox', () => {
     const mail = buildOptimizeCronEmail({
       processed: 1,
-      updated: 1,
+      drafted: 1,
       skipped: 4,
       failed: 0,
       remaining: 2,
@@ -67,12 +67,15 @@ describe('optimize courses cron helpers', () => {
           title: 'Water',
           previousModuleCount: 5,
           moduleCount: 8,
-          summary: 'Rewrote 5 modules and added 3.',
+          reviewPath: '/admin/courses/1/optimize',
         },
       ],
     });
-    expect(mail.subject).toMatch(/1 updated/);
+    expect(mail.subject).toMatch(/1 drafts to review/);
     expect(mail.text).toMatch(/5 modules -> 8/);
+    expect(mail.text).toMatch(/Live courses were not changed/);
+    expect(mail.text).toMatch(/Review at \/admin\/courses\/1\/optimize/);
+    expect(mail.text).not.toMatch(/UPDATED/);
     expect(mail.text).toMatch(/ranamuzamil|Paid course/i);
   });
 
@@ -132,6 +135,18 @@ describe('AI rewrite exclusion (cited, fact-checked courses)', () => {
     const courses = [row('flagged', true, { noAiRewrite: true }), row('unflagged', true)];
     const { pending } = selectOptimizeBatch(courses, 'free');
     expect(pending.map((c) => c.slug)).toEqual(['unflagged']);
+  });
+
+  it('never selects a course whose draft is still waiting for review', () => {
+    const waiting = {
+      token: 't',
+      generatedAt: '2026-11-01T00:00:00.000Z',
+      title: 'waiting',
+      modules: [{ title: 'Module', textContent: 'Draft text.' }],
+    };
+    const courses = [row('waiting', true, { optimizeDraft: waiting }), row('ready', true)];
+    const { pending } = selectOptimizeBatch(courses, 'free');
+    expect(pending.map((c) => c.slug)).toEqual(['ready']);
   });
 
   it('applies the limit after the exclusion', () => {

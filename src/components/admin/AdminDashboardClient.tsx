@@ -124,8 +124,10 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
   const funnel = [
     {
       label: 'Not started',
+      // Counts every active enrolment at 0, paid or not, so it opens the matching filter.
+      // "Bought, not started" (never_started) is Stripe-bought seats only (GP-766).
       value: data.kpis.neverStartedEnrollments,
-      href: '/admin/users?segment=never_started',
+      href: '/admin/users?segment=enrolled_not_started',
       tone: 'bg-amber-400',
     },
     {
@@ -249,7 +251,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
             label="Needs a look"
             value={data.kpis.neverStartedEnrollments.toLocaleString()}
             hint="Paid or enrolled, not started"
-            href="/admin/users?segment=never_started"
+            href="/admin/users?segment=enrolled_not_started"
             alert={data.kpis.neverStartedEnrollments > 0}
           />
           <PulseStat

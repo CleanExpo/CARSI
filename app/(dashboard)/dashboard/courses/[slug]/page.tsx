@@ -13,6 +13,7 @@ import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { getOnboardingLearnPath } from '@/lib/onboarding/navigation';
 import { getEnrollmentsForStudent } from '@/lib/server/learner-dashboard-data';
 import { findEnrolledCoursePrerequisiteBlock } from '@/lib/server/course-prerequisites';
+import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
 import { getServerSessionClaims } from '@/lib/server/session-server';
 import { getCourse, generateMetadata } from '../../../../(public)/courses/[slug]/page';
 
@@ -45,8 +46,7 @@ export default async function DashboardCourseDetailPage({
       ? await getEnrollmentsForStudent(claims.sub)
       : [];
   const enrollment = enrollments.find((e) => e.course_slug === course.slug) ?? null;
-  const completed =
-    enrollment?.all_lessons_complete === true || enrollment?.status === 'completed';
+  const completed = isEnrollmentCompleted(enrollment?.status);
   const action = courseDetailPrimaryAction({
     enrolled: Boolean(enrollment),
     percent: enrollment?.completion_percentage ?? 0,

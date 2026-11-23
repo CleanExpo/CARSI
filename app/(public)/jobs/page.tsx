@@ -14,6 +14,7 @@ import {
 } from '@/components/marketing/hub/HubUi';
 import { getBackendOrigin } from '@/lib/env/public-url';
 import { OG_IMAGES } from '@/lib/seo/og-image';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 export const metadata: Metadata = {
   title: 'Jobs | CARSI Industry Hub',
@@ -29,6 +30,7 @@ export const metadata: Metadata = {
     'CARSI job board',
   ],
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     images: OG_IMAGES,
     title: 'Jobs | CARSI Industry Hub',
     description: 'Industry jobs across restoration, HVAC, flooring, and indoor environments.',

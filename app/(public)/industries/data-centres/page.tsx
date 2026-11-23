@@ -12,6 +12,7 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
@@ -63,8 +64,7 @@ const faqs = [
   },
   {
     question: 'Can data centre operations staff complete this training without downtime?',
-    answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced. NOC and facility staff can complete modules during scheduled maintenance windows or between shifts. All courses issue verifiable digital credentials on completion.',
+    answer: `Yes. CARSI, an ${IICRC_APPROVED_CEC_PROVIDER}, offers courses online and self-paced. NOC and facility staff can complete modules during scheduled maintenance windows or between shifts. All courses issue verifiable digital credentials on completion.`,
   },
 ];
 

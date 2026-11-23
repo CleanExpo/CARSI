@@ -279,6 +279,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
     const email = owner?.email ?? '';
     const status = normalizeEnrollmentStatus(e.status);
     const done = completedLessonCounts.get(`${e.studentId}-${e.courseId}`) ?? 0;
+    // "Bought, not started" card: Stripe-bought seats only, as in the users filter (GP-766).
     if (status === 'active' && done <= 0 && enrollmentIsStripePaid(e) && neverStarted.length < 8) {
       neverStarted.push({ userId: e.studentId, name, email, courseTitle: e.course.title });
     }

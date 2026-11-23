@@ -7,7 +7,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const portal = vi.hoisted(() => ({ canEdit: true }));
 
 vi.mock('@/components/coaching-portal/CoachingPortalContext', () => ({
-  useCoachingPortal: () => ({ access: { canEdit: portal.canEdit, mode: 'subscriber' } }),
+  useCoachingPortal: () => ({
+    access: { canEdit: portal.canEdit, mode: 'subscriber' },
+    marketing: { profileReady: true, hasPack: false, proposedFixCount: 0 },
+  }),
 }));
 
 import { CoachingMarketingPackPage } from './CoachingMarketingPackPage';

@@ -244,16 +244,18 @@ webhook or new events are needed — the same five events from Step C cover E2/E
 | Teams Starter (5 seats) | CARSI Teams Starter | A$299.00 | Yearly | `carsi_teams_starter` | `STRIPE_PRICE_TEAMS_STARTER` | `starter` |
 | Teams Growth (15 seats) | CARSI Teams Growth | A$799.00 | Yearly | `carsi_teams_growth` | `STRIPE_PRICE_TEAMS_GROWTH` | `growth` |
 | Teams Full Library (25 seats) | CARSI Teams Full Library | A$2,499.00 | Yearly | `carsi_teams_full_library` | `STRIPE_PRICE_TEAMS_FULL_LIBRARY` | `full_library` |
-| Organisation monthly (unlimited) | CARSI Organisation Onboarding | A$1,295.00 | **Monthly** | `carsi_org_monthly` | `STRIPE_PRICE_ORG_MONTHLY` | `org_monthly` |
+| Business owner plan (organisation; GP-773) | CARSI Business Owner Plan | A$1,295.00 GST included | **Yearly** | `carsi_org_annual` | `STRIPE_PRICE_ORG_ANNUAL` | `org_monthly` (stored plan id, unchanged) |
 
 Notes:
 - **Teams seat billing = subscription `quantity`.** Create ONE Price per tier as a
   per-unit price; the app sets the `quantity` to the tier's included seats
   (5 / 15 / 25) at checkout. Seat expansion increases the `quantity` with
   proration — no separate per-seat Price is required. So set each Teams Price as
-  a **standard per-unit** price (e.g. Starter = A$299 ÷ 5 = A$59.80/seat) OR keep
-  it a flat tier price and rely on Stripe's quantity multiplication — confirm the
-  per-seat unit amount with Phill before creating, since it multiplies by seats.
+  a **standard per-unit** price (e.g. Starter = A$299 ÷ 5 = A$59.80/seat). GP-773: the
+  Teams checkout refuses a Price unless unit amount × included seats equals the tier total
+  shown on /pricing (AUD, yearly), so a flat tier price is refused. Teams Growth
+  (A$799 ÷ 15) has no whole-cent unit amount, so it cannot go on sale until its price is
+  decided.
 - **GST**: match E1's decision. E1's A$795 annual is **inclusive**. Confirm with
   the accountant whether Teams/org Prices are inclusive or use Stripe Tax. The org
   plan is quoted "$1,295/month **+ GST**" in the plan doc — if that means GST is
@@ -266,16 +268,25 @@ Notes:
 ## Env vars (DigitalOcean App-Level)
 Optional explicit bindings (the app resolves by lookup key without them):
 `STRIPE_PRICE_TEAMS_STARTER`, `STRIPE_PRICE_TEAMS_GROWTH`,
-`STRIPE_PRICE_TEAMS_FULL_LIBRARY`, `STRIPE_PRICE_ORG_MONTHLY`.
+`STRIPE_PRICE_TEAMS_FULL_LIBRARY`, `STRIPE_PRICE_ORG_ANNUAL`. (GP-773: `STRIPE_PRICE_ORG_MONTHLY`
+and the `carsi_org_monthly` lookup key are no longer read; a monthly Price is never sold as
+the yearly plan.)
 The go/no-go switch is `TEAMS_SUBSCRIPTIONS_ENABLED=true`, set only once
 `SUBSCRIPTIONS_ENABLED=true` is already on. Rollback = set
 `TEAMS_SUBSCRIPTIONS_ENABLED=false`; the yearly membership is unaffected.
 
-**Known gap before Teams goes on sale:** the Teams cards advertise "+$49/seat",
-"+$39/seat" and "+$29/seat", but seat expansion raises the subscription
-`quantity` on the tier's single Price, so each extra seat is billed at that
-Price's unit amount, not the advertised per-seat figure. Resolve this (per-seat
-Prices, or change the labels) before setting `TEAMS_SUBSCRIPTIONS_ENABLED=true`.
+**Founder prices (GP-773, 20/10/2026, ruled 22/11/2026).** Individual A$795/yr, business
+owner A$1,295/yr, each extra staff member A$695/yr, no promotion codes. The amounts live in
+`src/lib/lms/membership-prices.ts`, and the individual and business owner checkouts refuse any
+Price whose amount, currency or interval differs. Seat expansion refuses unless the
+subscription's seat Price is A$695 per year.
+
+**Known gap before Teams goes on sale:** the Teams cards now advertise "+$695/seat per year"
+(GP-773; previously $49, $39 or $29). Seat expansion raises the subscription `quantity` on
+the tier's single Price, and it now refuses (409, nothing charged) unless that Price is
+exactly A$695 AUD yearly. A bundle tier Price is not, so online seat expansion stays refused
+until the founder decides how the A$695 extra seat is billed (a separate seat line item, or a
+different tier model). Decide this before setting `TEAMS_SUBSCRIPTIONS_ENABLED=true`.
 
 ## E3 — flip the onboarding course off `isFree` (ops, LAST)
 Once the org Price exists, the flag is on, and at least one org is provisioned

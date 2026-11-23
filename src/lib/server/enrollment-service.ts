@@ -188,14 +188,22 @@ export const ADMIN_ACCESS_PAYMENT_REFERENCE = 'admin:full-access';
  * Admin-panel users get a self-service enrolment on first access so the whole
  * learner stack (curriculum, lesson view, progress, certificates) works for any
  * course without a purchase.
+ *
+ * Callers gate this on `shouldStaffAutoEnrol` (the staff helpers below, and the
+ * curriculum route). GP-737: staff access follows the role, so a staff member's
+ * own row in a no-access status (e.g. `revoked` after an admin removed it) is
+ * reactivated as a staff enrolment. Otherwise the empty upsert update left them
+ * locked out, while a staff member with no row at all was let in. An active or
+ * completed row is never changed.
  */
 export async function ensureAdminEnrollmentForCourse(
   claims: SessionClaims,
   courseId: string
 ): Promise<void> {
   await ensureLmsUserFromClaims(claims);
+  let row: { id: string; status: string } | null | undefined = null;
   try {
-    await prisma.lmsEnrollment.upsert({
+    row = await prisma.lmsEnrollment.upsert({
       where: { studentId_courseId: { studentId: claims.sub, courseId } },
       create: {
         id: randomUUID(),
@@ -205,9 +213,22 @@ export async function ensureAdminEnrollmentForCourse(
         paymentReference: ADMIN_ACCESS_PAYMENT_REFERENCE,
       },
       update: {},
+      select: { id: true, status: true },
     });
   } catch (error) {
+    // A concurrent request created the row (as 'active') between the read and the write.
     if (!isUniqueConstraintError(error)) throw error;
+  }
+  if (row && !isEnrolmentAccessAllowed(row.status)) {
+    await prisma.lmsEnrollment.update({
+      where: { id: row.id },
+      data: {
+        status: 'active',
+        paymentReference: ADMIN_ACCESS_PAYMENT_REFERENCE,
+        completedAt: null,
+        certificateIssuedAt: null,
+      },
+    });
   }
 }
 
@@ -234,6 +255,24 @@ export async function ensureStaffEnrollmentForLesson(
     select: { module: { select: { course: { select: { id: true, slug: true } } } } },
   });
   const course = lesson?.module.course;
+  if (!course || !shouldStaffAutoEnrol(claims, course.slug)) return;
+  await ensureAdminEnrollmentForCourse(claims, course.id);
+}
+
+/**
+ * GP-737: the same staff access for a quiz, so an allow-listed instructor who opens a
+ * knowledge check or quiz before any lesson is not refused. Everyone else is untouched.
+ */
+export async function ensureStaffEnrollmentForQuiz(
+  claims: SessionClaims,
+  quizId: string
+): Promise<void> {
+  if (!isAdminClaims(claims) && !isInstructorClaims(claims)) return;
+  const quiz = await prisma.lmsQuiz.findUnique({
+    where: { id: quizId },
+    select: { course: { select: { id: true, slug: true } } },
+  });
+  const course = quiz?.course;
   if (!course || !shouldStaffAutoEnrol(claims, course.slug)) return;
   await ensureAdminEnrollmentForCourse(claims, course.id);
 }

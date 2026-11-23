@@ -1,10 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   PURCHASE_SURVEY_KEY_STORAGE_NAME,
   PURCHASE_SURVEY_KEY_LIMIT,
-  purchaseSurveyKeyForCheckout,
+  newPurchaseSurveyKey,
+  purchaseSurveyCheckoutField,
   readPurchaseSurveyKeys,
+  rememberPurchaseSurveyKey,
 } from './purchase-survey-key';
 
 /** A minimal Storage, one per simulated browser tab. */
@@ -32,12 +34,19 @@ function copyOf(tab: Storage): Storage {
   return copy;
 }
 
+/** One checkout that reached Stripe: a key is made, sent, and kept once checkout_url returns. */
+function paidCheckout(tab: Storage): string {
+  const key = newPurchaseSurveyKey(tab)!;
+  expect(rememberPurchaseSurveyKey(key, tab)).toBe(true);
+  return key;
+}
+
 describe('the browser tab purchase-survey keys (GP-662)', () => {
   it('makes a fresh 32-hex key for every checkout and keeps the newest first', () => {
     const tab = memoryStorage();
     expect(readPurchaseSurveyKeys(tab)).toEqual([]);
-    const first = purchaseSurveyKeyForCheckout(tab);
-    const second = purchaseSurveyKeyForCheckout(tab);
+    const first = paidCheckout(tab);
+    const second = paidCheckout(tab);
     expect(first).toMatch(/^[0-9a-f]{32}$/);
     expect(second).toMatch(/^[0-9a-f]{32}$/);
     expect(second).not.toBe(first);
@@ -47,16 +56,16 @@ describe('the browser tab purchase-survey keys (GP-662)', () => {
   it('keeps at most five keys; the oldest drops off', () => {
     expect(PURCHASE_SURVEY_KEY_LIMIT).toBe(5);
     const tab = memoryStorage();
-    const made = Array.from({ length: 7 }, () => purchaseSurveyKeyForCheckout(tab));
+    const made = Array.from({ length: 7 }, () => paidCheckout(tab));
     expect(readPurchaseSurveyKeys(tab)).toEqual(made.slice(2).reverse());
   });
 
   it('a copied tab shares only the keys made before the copy; later checkouts get keys the other tab never sees', () => {
     const opener = memoryStorage();
-    const before = purchaseSurveyKeyForCheckout(opener);
+    const before = paidCheckout(opener);
     const child = copyOf(opener);
-    const openerLater = purchaseSurveyKeyForCheckout(opener)!;
-    const childLater = purchaseSurveyKeyForCheckout(child)!;
+    const openerLater = paidCheckout(opener);
+    const childLater = paidCheckout(child);
     expect(openerLater).not.toBe(childLater);
     expect(readPurchaseSurveyKeys(opener)).toEqual([openerLater, before]);
     expect(readPurchaseSurveyKeys(child)).toEqual([childLater, before]);
@@ -66,8 +75,8 @@ describe('the browser tab purchase-survey keys (GP-662)', () => {
 
   it('two tabs get different keys and neither changes the other', () => {
     const [one, two] = [memoryStorage(), memoryStorage()];
-    const a = purchaseSurveyKeyForCheckout(one);
-    const b = purchaseSurveyKeyForCheckout(two);
+    const a = paidCheckout(one);
+    const b = paidCheckout(two);
     expect(a).not.toBe(b);
     expect(readPurchaseSurveyKeys(one)).toEqual([a]);
     expect(readPurchaseSurveyKeys(two)).toEqual([b]);
@@ -83,23 +92,101 @@ describe('the browser tab purchase-survey keys (GP-662)', () => {
     const tab = memoryStorage();
     tab.setItem(PURCHASE_SURVEY_KEY_STORAGE_NAME, 'not-a-key');
     expect(readPurchaseSurveyKeys(tab)).toEqual([]);
-    const key = purchaseSurveyKeyForCheckout(tab);
+    const key = paidCheckout(tab);
     expect(key).toMatch(/^[0-9a-f]{32}$/);
     expect(readPurchaseSurveyKeys(tab)).toEqual([key]);
     tab.setItem(PURCHASE_SURVEY_KEY_STORAGE_NAME, `${key},zz,${'A'.repeat(32)}`);
     expect(readPurchaseSurveyKeys(tab)).toEqual([key]);
   });
 
-  it('no storage, throwing storage, or storage that drops writes: no key and no throw', () => {
-    expect(purchaseSurveyKeyForCheckout(null)).toBeNull();
+  it('no storage, throwing storage, or storage that drops writes: no key, nothing kept, no throw', () => {
+    expect(newPurchaseSurveyKey(null)).toBeNull();
+    expect(rememberPurchaseSurveyKey('0'.repeat(32), null)).toBe(false);
     const throwing = memoryStorage();
     throwing.getItem = () => {
       throw new Error('SecurityError');
     };
-    expect(purchaseSurveyKeyForCheckout(throwing)).toBeNull();
+    expect(newPurchaseSurveyKey(throwing)).toBeNull();
+    expect(rememberPurchaseSurveyKey('0'.repeat(32), throwing)).toBe(false);
     expect(readPurchaseSurveyKeys(throwing)).toEqual([]);
     const dropping = memoryStorage();
     dropping.setItem = () => {};
-    expect(purchaseSurveyKeyForCheckout(dropping)).toBeNull();
+    expect(rememberPurchaseSurveyKey(newPurchaseSurveyKey(dropping), dropping)).toBe(false);
+  });
+
+  it('remembering refuses a missing or malformed key and leaves the list alone', () => {
+    const tab = memoryStorage();
+    const kept = paidCheckout(tab);
+    for (const bad of [undefined, null, '', 'zz'.repeat(16), kept.toUpperCase()]) {
+      expect(rememberPurchaseSurveyKey(bad, tab)).toBe(false);
+    }
+    expect(readPurchaseSurveyKeys(tab)).toEqual([kept]);
+  });
+});
+
+describe('a key is kept only once checkout returns a checkout_url (GP-694)', () => {
+  it('making a key for a checkout request stores nothing', () => {
+    const tab = memoryStorage();
+    expect(newPurchaseSurveyKey(tab)).toMatch(/^[0-9a-f]{32}$/);
+    expect(purchaseSurveyCheckoutField(tab).survey_key).toMatch(/^[0-9a-f]{32}$/);
+    expect(tab.length).toBe(0);
+    expect(readPurchaseSurveyKeys(tab)).toEqual([]);
+  });
+
+  it('five failed or enrolled attempts after a paid checkout do not push its key out of the list', () => {
+    const tab = memoryStorage();
+    const paid = paidCheckout(tab);
+    // Each attempt builds a checkout body, but checkout never returns a checkout_url.
+    for (let i = 0; i < PURCHASE_SURVEY_KEY_LIMIT; i++) purchaseSurveyCheckoutField(tab);
+    expect(readPurchaseSurveyKeys(tab)).toEqual([paid]);
+  });
+
+  it('remembering the same key twice keeps one copy', () => {
+    const tab = memoryStorage();
+    const key = paidCheckout(tab);
+    expect(rememberPurchaseSurveyKey(key, tab)).toBe(true);
+    expect(readPurchaseSurveyKeys(tab)).toEqual([key]);
+  });
+});
+
+describe('purchaseSurveyCheckoutField(): the wrapper every checkout body spreads (GP-694)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("with this tab's sessionStorage: { survey_key } with a 32-hex key, and that key is what gets kept", () => {
+    const tab = memoryStorage();
+    vi.stubGlobal('window', { sessionStorage: tab });
+    const field = purchaseSurveyCheckoutField();
+    expect(Object.keys(field)).toEqual(['survey_key']);
+    expect(field.survey_key).toMatch(/^[0-9a-f]{32}$/);
+    // The body a checkout sends carries the key under exactly this name.
+    expect(JSON.parse(JSON.stringify({ slug: 'x', ...field }))).toEqual({ slug: 'x', survey_key: field.survey_key });
+    expect(rememberPurchaseSurveyKey(field.survey_key)).toBe(true);
+    expect(readPurchaseSurveyKeys()).toEqual([field.survey_key]);
+  });
+
+  it('a new key for every checkout body', () => {
+    vi.stubGlobal('window', { sessionStorage: memoryStorage() });
+    const a = purchaseSurveyCheckoutField().survey_key;
+    const b = purchaseSurveyCheckoutField().survey_key;
+    expect(a).toMatch(/^[0-9a-f]{32}$/);
+    expect(b).not.toBe(a);
+  });
+
+  it('no window, blocked sessionStorage, or storage that throws: an empty object (checkout works without a survey)', () => {
+    expect(purchaseSurveyCheckoutField()).toEqual({});
+    vi.stubGlobal('window', {
+      get sessionStorage(): Storage {
+        throw new Error('SecurityError');
+      },
+    });
+    expect(purchaseSurveyCheckoutField()).toEqual({});
+    const throwing = memoryStorage();
+    throwing.getItem = () => {
+      throw new Error('SecurityError');
+    };
+    vi.stubGlobal('window', { sessionStorage: throwing });
+    expect(purchaseSurveyCheckoutField()).toEqual({});
   });
 });

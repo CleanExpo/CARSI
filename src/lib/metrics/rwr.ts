@@ -11,8 +11,10 @@
  * part that can be quietly wrong is the part these unit tests cover.
  */
 
+import { INDIVIDUAL_MEMBERSHIP } from '@/lib/lms/membership-prices';
+
 /** GOAL.md fixes the membership term at $795 a year, whatever a single invoice was discounted to. */
-export const RWR_MEMBERSHIP_ANNUAL_CENTS = 79_500;
+export const RWR_MEMBERSHIP_ANNUAL_CENTS = INDIVIDUAL_MEMBERSHIP.amountCents;
 export const WEEKS_PER_YEAR = 52;
 export const COURSE_SALES_WINDOW_DAYS = 28;
 export const COURSE_SALES_WINDOW_WEEKS = 4;

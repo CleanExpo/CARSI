@@ -6,6 +6,8 @@ import {
   buildContactReplyText,
   buildReplyProvenance,
   citedStandards,
+  findStandardWordingInFreeText,
+  STANDARD_WORDING_REJECTION,
   validateReplyNoVerbatim,
   type JudgeVerdict,
   type ReplySource,
@@ -113,6 +115,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // GP-706: the typed answer is checked for standard wording, whoever typed it.
+  const wordingHit = findStandardWordingInFreeText(answerParagraphs.join('\n\n'));
+  if (wordingHit) {
+    return NextResponse.json(
+      { detail: STANDARD_WORDING_REJECTION, reason: wordingHit.reason },
+      { status: 422 },
+    );
+  }
+
   // Enforced copyright guardrail — fail closed.
   const verbatim = validateReplyNoVerbatim(replyBody, sources, 8);
   if (!verbatim.ok) {
@@ -191,6 +202,15 @@ export async function PATCH(request: NextRequest) {
       console.error('[admin/contacts/reply-drafts] discard failed:', error);
       return NextResponse.json({ detail: 'Failed to discard draft.' }, { status: 500 });
     }
+  }
+
+  // GP-706: an admin's edit at approval is free text too, so it is checked before send.
+  const wordingHit = body.replyBody?.trim() ? findStandardWordingInFreeText(body.replyBody) : null;
+  if (wordingHit) {
+    return NextResponse.json(
+      { detail: STANDARD_WORDING_REJECTION, reason: wordingHit.reason },
+      { status: 422 },
+    );
   }
 
   const result = await dispatchContactReplyDraft({

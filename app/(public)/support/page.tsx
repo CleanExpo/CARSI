@@ -8,6 +8,7 @@ import {
   marketingTextStrong,
 } from '@/components/marketing/LegalDocumentShell';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export const metadata: Metadata = {
   title: 'Support',
   description:
@@ -76,7 +77,7 @@ export default function SupportPage() {
       <section>
         <h2 className={marketingLegalH2}>Continuing education credits</h2>
         <p>
-          CARSI is an IICRC CEC Accredited provider and issues its own CARSI Southern Hemisphere
+          CARSI is an {IICRC_APPROVED_CEC_PROVIDER} and issues its own CARSI Southern Hemisphere
           Restoration Designations. IICRC certification is obtained through a school approved by the IICRC,
           by sitting its examination — not from CARSI.
         </p>

@@ -414,16 +414,16 @@
           "explanation": "A dirty room and a clean room keep heavy dust and spores out of clean areas when large amounts of material are being removed."
         },
         {
-          "questionText": "What minimum pressure difference does S520 recommend for a containment?",
+          "questionText": "Why is a start-of-shift reading not enough on a multi-zone job?",
           "options": [
-            "−1 Pa",
-            "−5 Pa",
-            "−50 Pa",
-            "+5 Pa"
+            "The reading is too hard to record",
+            "A zone can lose pressure and recover unseen",
+            "Managers dislike manual log entries",
+            "Manometers only work in the evening"
           ],
           "correctIndex": 1,
           "points": 1,
-          "explanation": "S520 section 9.3.3 recommends a minimum of −5 Pa. Confirm the figure against AS-IICRC S520:2025."
+          "explanation": "A zone can lose pressure for an hour and recover before anyone looks, so each zone needs a data-logging manometer with an alarm."
         },
         {
           "questionText": "Where does a zone manometer's reference tube go?",
@@ -780,16 +780,16 @@
           "explanation": "Remove soaked porous materials, then clean and sanitise, then dry. Drying first spreads contamination."
         },
         {
-          "questionText": "What does S520 section 9.3.5 give as the minimum air changes per hour?",
+          "questionText": "Why keep a spare air scrubber on site?",
           "options": [
-            "4 per hour",
-            "1 per hour",
-            "2 per hour",
-            "12 per hour"
+            "It turns a filter failure into a quick swap",
+            "It lets you ignore the plate rating",
+            "It replaces the need for a manometer",
+            "It allows fewer zones to be sealed"
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "Section 9.3.5 gives at least 4 air changes per hour. Confirm against AS-IICRC S520:2025."
+          "explanation": "A spare turns a filter failure into a ten-minute swap instead of a lost day."
         },
         {
           "questionText": "What should a data-logging manometer do when a zone loses pressure?",

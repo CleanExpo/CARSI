@@ -179,6 +179,7 @@ npm run dev
 npm run build
 npm run start
 npm run lint
+npm run verify:product-excellence
 npm run prisma:generate
 npm run prisma:migrate
 npm run db:studio

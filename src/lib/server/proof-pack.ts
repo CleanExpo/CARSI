@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
+import { proofPackReferencesForCourse } from '@/lib/server/proof-pack-references';
 import type { ProofPackCredentialRow, ProofPackPayload } from '@/types/proof-pack';
 
 export type { ProofPackCredentialRow, ProofPackPayload } from '@/types/proof-pack';
@@ -47,6 +48,8 @@ export async function getProofPackPayloadForStudent(
     cec_hours: roundCec(resolveLmsCourseCecHours({ slug: e.course.slug }) ?? 0),
     issued_date: (e.certificateIssuedAt ?? e.completedAt)!.toISOString().slice(0, 10),
     verification_url: `${base}/verify/credential/${e.id}`,
+    // BACKLOG #26: citations only, IICRC-naming ones dropped unless the course is CEC-approved.
+    references: proofPackReferencesForCourse(e.course.slug),
   }));
 
   const byDisc = new Map<string, number>();
