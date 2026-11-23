@@ -205,8 +205,9 @@ const BANNED = [
     re: /\bcertification[\s-]+(?:courses?|training|programs?|programmes?|class(?:es)?|workshops?|bootcamps?)\b/i,
     allow:
       // Denials, incl. one paired adjective ("not an accredited or certification course",
-      // data/seed/ccw-truckmount-assessment.json), and the IICRC-approved-school route.
-      /\b(?:not|never|no|isn['’]t|aren['’]t)\s+(?:an?\s+)?(?:[\w-]+\s+or\s+)?(?:IICRC[\s-]+)?certification[\s-]+(?:courses?|training|programs?|programmes?|class(?:es)?|workshops?|bootcamps?)\b|\bIICRC[\s-]*approved\s+(?:schools?|instructors?|examinations?|exams?)\b/i,
+      // data/seed/ccw-truckmount-assessment.json), and the IICRC-approved-school route in the same
+      // sentence (anchored to the ban for GP-584 per-occurrence matching).
+      /\b(?:not|never|no|isn['’]t|aren['’]t)\s+(?:an?\s+)?(?:[\w-]+\s+or\s+)?(?:IICRC[\s-]+)?certification[\s-]+(?:courses?|training|programs?|programmes?|class(?:es)?|workshops?|bootcamps?)\b|\bcertification[\s-]+(?:courses?|training|programs?|programmes?|class(?:es)?|workshops?|bootcamps?)\b[^.!?\n|]{0,80}?\bIICRC[\s-]*approved\s+(?:schools?|instructors?|examinations?|exams?)\b|\bIICRC[\s-]*approved\s+(?:schools?|instructors?|examinations?|exams?)\b[^.!?\n|]{0,80}?\bcertification[\s-]+(?:courses?|training|programs?|programmes?|class(?:es)?|workshops?|bootcamps?)\b/i,
     baselined: true,
     message:
       'Do not sell a CARSI course as a "certification course / training / program". CARSI is an IICRC Approved CEC Provider and issues CARSI designations; name the CARSI designation, or say "from an IICRC Approved CEC Provider".',
@@ -216,7 +217,9 @@ const BANNED = [
     // the third-person IICRC-school route pass. "be certified" is not matched (third-person
     // requirements: "technicians must be certified by the IICRC").
     re: /(?<!\b(?:not|never|no|cannot|can['’]t)\s+(?:\w+\s+){0,3})(?<!n['’]t\s+(?:\w+\s+){0,3})\b(?:get|gets|getting|become|becomes|becoming)\s+(?:(?:an?|fully|officially|properly|industry|professionally)\s+)*(?:IICRC[\s-]*)?certified\b/i,
-    allow: /\bthrough\s+(?:an?\s+)?IICRC[\s-]*approved\s+(?:schools?|examinations?|exams?)\b/i,
+    // Anchored to the ban (GP-584 per-occurrence matching): the school route must follow the
+    // same "get / become certified", so it cannot excuse another claim on the line.
+    allow: /\b(?:get|gets|getting|become|becomes|becoming)\s+(?:(?:an?|fully|officially|properly|industry|professionally)\s+)*(?:IICRC[\s-]*)?certified\s+(?:only\s+)?through\s+(?:an?\s+)?IICRC[\s-]*approved\s+(?:schools?|examinations?|exams?)\b/i,
     baselined: true,
     message:
       'CARSI does not certify anyone — do not say "get certified" / "become certified". Say "earn a CARSI designation" or "earn IICRC CECs toward your existing certification".',
@@ -225,7 +228,8 @@ const BANNED = [
     // "earn your certification", "achieve certification", "gain an industry certification".
     // Holder forms ("maintain / renew / keep your certification") use other verbs and pass.
     re: /(?<!\b(?:not|never|no|cannot|can['’]t)\s+(?:\w+\s+){0,3})(?<!n['’]t\s+(?:\w+\s+){0,3})\b(?:earn|earns|earning|gain|gains|gaining|achiev(?:e|es|ing)|obtain|obtains|obtaining|receiv(?:e|es|ing)|get|gets|getting)\s+(?:(?:your|a|an|the|full|official|industry|recognised|recognized|professional|accredited)\s+)*certifications?\b/i,
-    allow: /\bthrough\s+(?:an?\s+)?IICRC[\s-]*approved\s+(?:schools?|examinations?|exams?)\b/i,
+    // Anchored to the ban (GP-584): the school route must follow the same certification noun.
+    allow: /\b(?:earn|earns|earning|gain|gains|gaining|achiev(?:e|es|ing)|obtain|obtains|obtaining|receiv(?:e|es|ing)|get|gets|getting)\s+(?:(?:your|a|an|the|full|official|industry|recognised|recognized|professional|accredited)\s+)*certifications?\s+(?:only\s+)?through\s+(?:an?\s+)?IICRC[\s-]*approved\s+(?:schools?|examinations?|exams?)\b/i,
     baselined: true,
     message:
       'CARSI does not grant certification — do not say "earn / achieve / get your certification". Say "earn your CARSI designation" or "verifiable CARSI credentials".',
