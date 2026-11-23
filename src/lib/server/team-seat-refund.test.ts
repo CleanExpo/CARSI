@@ -56,9 +56,7 @@ vi.mock('@/lib/server/sentry', () => ({ captureServerError: vi.fn(async () => {}
 // covered by stripe-webhook-unfulfilled.test.ts and payment-reversal-sticky.test.ts.
 vi.mock('@/lib/server/payment-integrity-ledger', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/server/payment-integrity-ledger')>()),
-  isCheckoutPaymentReversed: vi.fn(async () => false),
-  recordCheckoutPaymentReversed: vi.fn(async () => {}),
-  clearDisputedCheckoutReversal: vi.fn(async () => {}),
+  // GP-759: the reversal markers run for real over the fake's stripeWebhookEvent table.
   recordUnfulfilledPayment: vi.fn(async () => {}),
   resolveUnfulfilledPayment: vi.fn(async () => {}),
 }));
@@ -161,6 +159,11 @@ vi.mock('@/lib/prisma', () => {
         const row = db.markers.find((m) => m.id === args.where.id)!;
         Object.assign(row, args.data);
         return row;
+      }),
+      updateMany: vi.fn(async (args: { where: { id: string; type?: string }; data: { type?: string; processedAt: Date } }) => {
+        const rows = db.markers.filter((m) => m.id === args.where.id && (args.where.type === undefined || m.type === args.where.type));
+        rows.forEach((m) => Object.assign(m, args.data));
+        return { count: rows.length };
       }),
     },
     lmsUser: {
@@ -328,6 +331,7 @@ describe('GP-759 (c): refunding a team seat purchase revokes those seats', () =>
         teamSeatCount: 5,
       }),
     ).rejects.toThrow('PAYMENT_REVERSED');
+    expect(db.markers.find((m) => m.id === 'payment-reversed:cs_test_first')?.type).toBe('payment_reversed:refunded');
 
     expect(db.team.seatLimit).toBe(0);
     expect(db.purchases.map((p) => p.seatLimit)).toEqual([0, 0]);

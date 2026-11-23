@@ -70,6 +70,17 @@ describe('GP-759: the seat step is the only writer of seat and session state', (
     expect(writersOutsideOwner(/\bissuePreparedEnrolment\(/, [service])).toEqual([]);
   });
 
+  it('every read and write in the step uses its transaction, never the global client', () => {
+    const owner = FILES.find((f) => f.path === OWNER)!.text;
+    expect(owner).not.toMatch(/from '@\/lib\/prisma'/);
+    // The revocation writers default to the global client; the step must pass its transaction.
+    for (const fn of ['revokeEnrollmentsByPaymentReference', 'reactivateDisputeWonEnrollmentsByPaymentReference']) {
+      const calls = [...owner.matchAll(new RegExp(`\\b${fn}\\(([^)]*)\\)`, 'g'))].map((m) => m[1]);
+      expect(calls.length).toBeGreaterThan(0);
+      for (const args of calls) expect(args.trim().endsWith('tx')).toBe(true);
+    }
+  });
+
   it('the shared enrolment writer refuses checkout and team seat references outside the step', async () => {
     const { isSeatStatePaymentReference } = await import('./enrollment-service');
     expect(isSeatStatePaymentReference('cs_test_x')).toBe(true);

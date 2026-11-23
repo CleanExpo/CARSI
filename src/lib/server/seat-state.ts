@@ -1,6 +1,7 @@
 import type { Prisma } from '@/generated/prisma/client';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { isStripeCheckoutPaymentReference } from '@/lib/lms/course-prerequisites';
+import { isUniqueConstraintError } from '@/lib/server/db-errors';
 import { runSerializable } from '@/lib/server/db-tx';
 import { isRevokedStatus } from '@/lib/server/enrollment-access';
 import {
@@ -52,8 +53,24 @@ declare const seatStep: unique symbol;
 /** A transaction client inside the seat step. Only `runSeatStateStep` makes one. */
 export type SeatTx = Prisma.TransactionClient & { readonly [seatStep]: true };
 
-export function runSeatStateStep<T>(fn: (tx: SeatTx) => Promise<T>): Promise<T> {
-  return runSerializable((tx) => fn(tx as SeatTx));
+const MAX_UNIQUE_CLASH_RERUNS = 2;
+
+/**
+ * Run `fn` as the seat step. A serialisation conflict is retried by `runSerializable`. A
+ * unique-key clash (for example the webhook and the success page fulfilling the same session at
+ * once) has aborted the transaction, so the whole step is run again: the rerun reads the row the
+ * other writer committed and answers as a duplicate ('already_enrolled'), as the shared writer
+ * does outside a transaction.
+ */
+export async function runSeatStateStep<T>(fn: (tx: SeatTx) => Promise<T>): Promise<T> {
+  for (let rerun = 0; ; rerun += 1) {
+    try {
+      return await runSerializable((tx) => fn(tx as SeatTx));
+    } catch (error) {
+      if (rerun < MAX_UNIQUE_CLASH_RERUNS && isUniqueConstraintError(error)) continue;
+      throw error;
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------------------------
