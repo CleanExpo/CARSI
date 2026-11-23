@@ -18,6 +18,7 @@ export type CoachingPortalAccess = {
   subscribeUrl: string;
   subscription: {
     status: string | null;
+    startedAt: string | null;
     currentPeriodEnd: string | null;
     cancelAtPeriodEnd: boolean;
   } | null;
@@ -48,6 +49,7 @@ export async function getCoachingPortalAccess(
     subscription: row
       ? {
           status: row.status,
+          startedAt: row.createdAt?.toISOString() ?? null,
           currentPeriodEnd: row.currentPeriodEnd?.toISOString() ?? null,
           cancelAtPeriodEnd: row.cancelAtPeriodEnd,
         }

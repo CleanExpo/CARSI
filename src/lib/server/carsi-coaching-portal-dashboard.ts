@@ -1,4 +1,6 @@
 import type { SessionClaims } from '@/lib/auth/session-jwt';
+import { resolveCoachingMemberCoach } from '@/lib/coaching-portal/coach-routing';
+import type { CoachingChapterCurrency } from '@/lib/coaching-portal/coaching-chapters';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { MARKETING_ACTION_GOAL_PREFIX } from '@/lib/coaching-portal/marketing-pack/proposed-actions';
 import { hasMinimumMarketingVoice } from '@/lib/coaching-portal/marketing-pack/voice-gate';
@@ -9,8 +11,8 @@ import {
   importLegacyActionsFromSubscriptionJson,
   listCoachingActionsForUser,
 } from '@/lib/server/carsi-coaching-actions-store';
-import { isCarsiCoachingMonthlyEnabled } from '@/lib/server/carsi-coaching-monthly-flag';
 import { getLatestMarketingPackForUser } from '@/lib/server/carsi-coaching-marketing-pack';
+import { isCarsiCoachingMonthlyEnabled } from '@/lib/server/carsi-coaching-monthly-flag';
 import { getCoachingPortalAccess } from '@/lib/server/carsi-coaching-portal-access';
 import { getCoachingPortalRowForUser } from '@/lib/server/carsi-coaching-subscription-store';
 
@@ -103,6 +105,16 @@ export type CoachingPortalDashboard = {
     proposedFixCount: number;
     checksPassed: number | null;
     checksTotal: number | null;
+  };
+  coach: {
+    id: string;
+    displayName: string;
+    chapterSlug: string;
+    chapterTitle: string;
+    currency: CoachingChapterCurrency;
+    priceLabel: string;
+    headline: string;
+    isDemoChapter?: boolean;
   };
 };
 
@@ -284,6 +296,12 @@ export async function loadCoachingPortalDashboard(
     displayName = 'Support team';
   }
 
+  const coachProfile = resolveCoachingMemberCoach({
+    sessionCoachName: upcoming?.coachName ?? null,
+    chapterSlug: profile?.chapterSlug ?? null,
+    coachUserId: profile?.coachUserId ?? null,
+  });
+
   return {
     user: {
       firstName,
@@ -361,10 +379,18 @@ export async function loadCoachingPortalDashboard(
       hasPack: Boolean(latestPack),
       generatedAt: latestPack?.generatedAt ?? null,
       proposedFixCount: proposedMarketingFixCount,
-      checksPassed: latestPack
-        ? latestPack.review.checks.filter((c) => c.passed).length
-        : null,
+      checksPassed: latestPack ? latestPack.review.checks.filter((c) => c.passed).length : null,
       checksTotal: latestPack ? latestPack.review.checks.length : null,
+    },
+    coach: {
+      id: coachProfile.id,
+      displayName: coachProfile.displayName,
+      chapterSlug: coachProfile.chapterSlug,
+      chapterTitle: coachProfile.chapterTitle,
+      currency: coachProfile.currency,
+      priceLabel: coachProfile.priceLabel,
+      headline: coachProfile.headline,
+      isDemoChapter: coachProfile.isDemoChapter,
     },
   };
 }

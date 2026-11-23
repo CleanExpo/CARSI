@@ -10,6 +10,8 @@
  * same question always gets the same answer and the coach can see exactly why.
  */
 
+import { COACHING_AI_CONSENT_COPY } from '@/lib/coaching-portal/coaching-ai-governance';
+
 export type CoachKnowledgeItem = {
   id: string;
   title: string;
@@ -175,6 +177,7 @@ export const ASK_COACH_COPY = {
   title: 'Ask a question between sessions',
   intro:
     'Answers come only from your coach’s own material, with the source shown. If the material does not cover your question, it goes straight to your coach.',
+  aiDisclaimer: COACHING_AI_CONSENT_COPY.askCoachDisclaimer,
   placeholder: 'For example: how do I stop undercharging when I quote a job?',
   submit: 'Ask',
   answeredLead: 'From your coach’s material',
