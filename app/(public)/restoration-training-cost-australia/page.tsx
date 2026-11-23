@@ -15,6 +15,7 @@ import { OG_IMAGES } from '@/lib/seo/og-image';
 import { getPublicCatalogueFacts } from '@/lib/server/public-catalogue-facts';
 
 import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 /**
  * AU price-anchoring page (BACKLOG row 14).
  *
@@ -102,6 +103,7 @@ export const metadata: Metadata = {
     'continuing education credits restoration',
   ],
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     images: OG_IMAGES,
     title: 'What restoration training actually costs in Australia | CARSI',
     description:

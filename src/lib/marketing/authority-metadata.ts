@@ -9,6 +9,7 @@ import {
 } from '@/lib/marketing/authority-pages';
 import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
 import { loadAuthorityPageCourses } from '@/lib/server/authority-page-data';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 /**
  * Metadata for a /for/<industry> page. Indexable only when `isAuthorityPagePublishable` passes
@@ -30,6 +31,7 @@ export function buildAuthorityMetadata(
     robots: { index: indexable, follow: indexable },
     alternates: { canonical: url },
     openGraph: {
+      ...OG_LOCALE_FIELDS,
       title: entry.title,
       description: entry.metaDescription,
       type: 'website',
