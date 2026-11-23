@@ -238,9 +238,7 @@ vi.mock('@/lib/prisma', () => {
 });
 
 const { POST: acceptPost } = await import('../../../app/api/lms/teams/invite/accept/route');
-const { POST: webhookPost } = await import('../../../app/api/lms/webhooks/stripe/route');
 const { addCourseTeamMemberByEmail } = await import('./team-member-provision');
-const { fulfillCourseCheckoutForUser } = await import('./team-course-purchase');
 const { findCoursePrerequisiteBlock } = await import('@/lib/server/course-prerequisites');
 const { getOrCreateCourseBySlug } = await import('@/lib/server/course-catalog-sync');
 const { sendTeamMemberAddedEmail } = await import('@/lib/server/transactional-email');
@@ -266,37 +264,6 @@ function direct(email: string) {
     () => 200,
     (e: Error) => (e.message === 'COURSE_SEATS_FULL' ? 409 : 500),
   );
-}
-
-let evt = 0;
-function refund(sessionId: string) {
-  evt += 1;
-  h.refundedSession = sessionId;
-  h.event = {
-    id: `evt_gp759_race_${evt}`,
-    object: 'event',
-    livemode: false,
-    type: 'charge.refunded',
-    created: 1_790_000_000 + evt,
-    data: { object: { payment_intent: `pi_${sessionId}`, amount: 100_000, amount_refunded: 100_000, currency: 'aud' } },
-  };
-  return webhookPost(
-    new Request('https://carsi.com.au/api/lms/webhooks/stripe', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'stripe-signature': `t=1790000000,v1=${'ab'.repeat(32)}` },
-      body: '{}',
-    }) as never,
-  );
-}
-
-function fulfil(sessionId: string) {
-  return fulfillCourseCheckoutForUser({
-    claims: { sub: 'buyer', email: 'buyer@seat-race-test.invalid' } as never,
-    courseSlug: COURSE.slug,
-    paymentReference: sessionId,
-    purchaseMode: 'team',
-    teamSeatCount: 3,
-  });
 }
 
 /** Live seats the team paid for: the seat references and the blocks' own checkouts. */
