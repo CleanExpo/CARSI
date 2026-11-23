@@ -9,6 +9,7 @@ import {
   type CheckpointInput, type CheckpointResponse, type LessonCheckpoint, type LessonCheckpointContent,
 } from '@/lib/lms/lesson-checkpoint';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
+import { lockEnrollmentRow } from '@/lib/server/enrollment-row-lock';
 import { withSerializationRetry } from '@/lib/server/db-tx';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 import { countCountedQuizAttempts } from '@/lib/server/quiz-attempt-count';
@@ -192,6 +193,10 @@ async function transact(studentId: string, lessonId: string, input: CheckpointIn
   return withSerializationRetry(() => client.$transaction(async (tx) => {
     const graph = await loadGraph(tx, studentId, lessonId);
     const version = contentVersion(graph);
+    // GP-432 lock order: enrolment row first, then lesson progress (patchLessonProgress,
+    // force-complete and admin revoke take the enrolment lock before touching progress). A save
+    // that locked progress first and then updated the enrolment pointer could deadlock with them.
+    if (input) await lockEnrollmentRow(tx, graph.context.enrollmentId);
     const progress = await tx.$queryRaw<{ checkpoint: unknown }[]>`
       SELECT checkpoint FROM lms_lesson_progress WHERE student_id = ${studentId}::uuid
         AND lesson_id = ${lessonId}::uuid FOR UPDATE`;

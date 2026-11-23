@@ -44,6 +44,10 @@ const client = {
           title: 'Quiz', passPercentage: 80, timeLimitMinutes: null, attemptsAllowed: 2 }];
         if (query.includes('FROM lms_quiz_questions')) return [{ id: questionId, questionText: 'Original question?',
           options: [{ text: 'A' }, { text: 'B' }], correctIndex, orderIndex: 0, points: 1 }];
+        // GP-432 lock order: a save locks the enrolment row before the progress row.
+        if (query.includes('FROM lms_enrollments') && query.includes('FOR UPDATE')) {
+          return [{ id: '10000000-0000-4000-8000-000000000005', studentId: 'student', courseId: '10000000-0000-4000-8000-000000000006', status: 'active' }];
+        }
         if (query.includes('FROM lms_lesson_progress')) return stored === null ? [] : [{ checkpoint: stored }];
         if (query.includes('COUNT(*)')) return [{ count: 1 }];
         if (query.includes('FROM lms_quiz_attempts')) {

@@ -44,13 +44,14 @@ import {
  *    with no CEC approval and no assessment completes on lessons, and claims no CEC.
  */
 async function requiredAssessmentsPassed(
+  db: Prisma.TransactionClient,
   courseId: string,
   courseSlug: string | null,
   studentId: string,
 ): Promise<boolean> {
   const [quizzes, practicals] = await Promise.all([
-    prisma.lmsQuiz.findMany({ where: { courseId }, select: { id: true } }),
-    prisma.lmsPracticalAssessment.findMany({
+    db.lmsQuiz.findMany({ where: { courseId }, select: { id: true } }),
+    db.lmsPracticalAssessment.findMany({
       where: { courseId, isPublished: true },
       select: { id: true },
     }),
@@ -63,7 +64,7 @@ async function requiredAssessmentsPassed(
   }
 
   if (quizIds.length > 0) {
-    const passed = await prisma.lmsQuizAttempt.findMany({
+    const passed = await db.lmsQuizAttempt.findMany({
       where: { quizId: { in: quizIds }, studentId, passed: true },
       select: { quizId: true },
       distinct: ['quizId'],
@@ -72,7 +73,7 @@ async function requiredAssessmentsPassed(
   }
 
   if (practicalIds.length > 0) {
-    const passed = await prisma.lmsAssessmentSubmission.findMany({
+    const passed = await db.lmsAssessmentSubmission.findMany({
       where: { assessmentId: { in: practicalIds }, studentId, status: 'passed' },
       select: { assessmentId: true },
       distinct: ['assessmentId'],
@@ -533,26 +534,23 @@ export async function syncEnrollmentCompletion(
   // never complete it, and this sync never downgrades the attendance completion (GP-736).
   if (isCohortOnlyCourse(slug)) return;
 
-  // Evidence first (lessons and assessments); the status decision is made below from the
-  // LOCKED enrolment row.
-  const completed =
-    total === 0
-      ? 0
-      : await prisma.lmsLessonProgress.count({
-          where: { studentId, lessonId: { in: ids }, completed: true },
-        });
-  const allLessonsDone = total > 0 && completed >= total;
-  const quizGateSatisfied =
-    total === 0 ? false : await requiredAssessmentsPassed(courseId, slug, studentId);
-
-  // GP-432: read the prior state and write the new one under the enrolment row lock (one owner:
-  // enrollment-row-lock.ts). A revocation (Stripe or admin) either committed before the lock,
-  // and is seen here, or waits until this commits; it can no longer land between the read and
-  // the write and be overwritten. One transaction also keeps the first-completion record with
-  // the completion, so a failed write rolls both back and a retry is still a new completion.
-  let newlyGatedCompletion = false;
-  await prisma.$transaction(async (tx) => {
-    if (!(await lockEnrollmentRow(tx, enrollmentId))) return;
+  // GP-432: completion is decided ONLY from evidence read under the enrolment row lock (one
+  // owner: enrollment-row-lock.ts). The lock is taken FIRST; the prior state, the learner's
+  // lesson progress and the assessment results are all read after it, in this transaction,
+  // and the decision is written before it commits.
+  //  - A revocation (Stripe or admin) either committed before the lock, and is seen here, or
+  //    waits until this commits; it cannot land between the read and the write.
+  //  - Every writer that can REMOVE completion evidence (a learner un-marking a lesson in
+  //    patchLessonProgress, admin revoke) takes the same lock first, so its change is either
+  //    seen here or waits until this decision is committed. A decision made on evidence that
+  //    was already gone can no longer be written (found by the 69b54a55 review).
+  //  - Writers that only ADD evidence (a quiz attempt, a practical submission or review)
+  //    re-run this sync after they commit (syncCompletionAfterAssessmentPassed), so a read
+  //    that missed them can only leave the enrolment active until that re-run.
+  // One transaction also keeps the first-completion record with the completion, so a failed
+  // write rolls both back and a retry is still a new completion.
+  const newlyGatedCompletion = await prisma.$transaction(async (tx): Promise<boolean> => {
+    if (!(await lockEnrollmentRow(tx, enrollmentId))) return false;
     const prior = await tx.lmsEnrollment.findUnique({
       where: { id: enrollmentId },
       select: { completedAt: true, status: true },
@@ -564,15 +562,22 @@ export async function syncEnrollmentCompletion(
     // or opening their certificate (completedAt survives revocation, so the
     // wasAlreadyCompleted branch below would flip it straight back). This guard
     // covers BOTH the zero-lesson branch and the main completion write.
-    if (!prior || isRevokedStatus(prior.status)) return;
+    if (!prior || isRevokedStatus(prior.status)) return false;
 
     if (total === 0) {
       await tx.lmsEnrollment.update({
         where: { id: enrollmentId },
         data: { status: 'active', completedAt: null },
       });
-      return;
+      return false;
     }
+
+    // Evidence, read under the lock (see above).
+    const completed = await tx.lmsLessonProgress.count({
+      where: { studentId, lessonId: { in: ids }, completed: true },
+    });
+    const allLessonsDone = completed >= total;
+    const quizGateSatisfied = await requiredAssessmentsPassed(tx, courseId, slug, studentId);
 
     const wasAlreadyCompleted = prior.status === 'completed' || prior.completedAt != null;
 
@@ -585,10 +590,6 @@ export async function syncEnrollmentCompletion(
       wasAlreadyCompleted,
     });
 
-    // Only fire the (irreversible) IICRC CEC auto-submit on a genuinely new,
-    // fully-gated completion — not on a lesson-count-only or downgrade-protected one.
-    newlyGatedCompletion = allLessonsDone && quizGateSatisfied && !wasAlreadyCompleted;
-
     const completedAt = isCompleted ? (prior.completedAt ?? new Date()) : null;
     await tx.lmsEnrollment.update({
       where: { id: enrollmentId },
@@ -598,6 +599,10 @@ export async function syncEnrollmentCompletion(
       },
     });
     if (completedAt) await recordFirstCompletion(enrollmentId, completedAt, tx);
+
+    // Only a genuinely new, fully-gated completion written by THIS transaction may fire the
+    // (irreversible) IICRC CEC auto-submit; it runs below, after the commit.
+    return allLessonsDone && quizGateSatisfied && !wasAlreadyCompleted;
   });
 
   if (newlyGatedCompletion && !options?.skipIicrcAutoSubmit) {
@@ -654,27 +659,35 @@ export async function patchLessonProgress(params: {
   // server holds for that lesson type; un-marking needs none.
   if (completed) await assertLessonCompletionEvidence(studentId, lessonId);
 
-  await prisma.lmsLessonProgress.upsert({
-    where: {
-      studentId_lessonId: { studentId, lessonId },
-    },
-    create: {
-      studentId,
-      lessonId,
-      completed,
-      completedAt: completed ? now : null,
-      lastAccessedAt: now,
-    },
-    update: {
-      completed,
-      completedAt: completed ? now : null,
-      lastAccessedAt: now,
-    },
-  });
+  // GP-432: a lesson mark or un-mark changes completion evidence, so it is written under the
+  // enrolment row lock (one owner: enrollment-row-lock.ts), the same lock the completion sync
+  // decides under. A sync either decides before this commits (and this change then follows
+  // it) or after (and sees it); it can no longer complete on a lesson already un-marked.
+  // Lock order everywhere: enrolment row first, then lesson progress.
+  await prisma.$transaction(async (tx) => {
+    await lockEnrollmentRow(tx, enrollmentId);
+    await tx.lmsLessonProgress.upsert({
+      where: {
+        studentId_lessonId: { studentId, lessonId },
+      },
+      create: {
+        studentId,
+        lessonId,
+        completed,
+        completedAt: completed ? now : null,
+        lastAccessedAt: now,
+      },
+      update: {
+        completed,
+        completedAt: completed ? now : null,
+        lastAccessedAt: now,
+      },
+    });
 
-  await prisma.lmsEnrollment.update({
-    where: { id: enrollmentId },
-    data: { lastAccessedLessonId: lessonId },
+    await tx.lmsEnrollment.update({
+      where: { id: enrollmentId },
+      data: { lastAccessedLessonId: lessonId },
+    });
   });
 
   await syncEnrollmentCompletion(enrollmentId, studentId, courseId);

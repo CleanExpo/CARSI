@@ -276,6 +276,68 @@ describe.runIf(RUNNABLE)('GP-432 learner record (real PostgreSQL)', () => {
     expect(await status()).toBe('revoked');
   });
 
+  // GP-432 (69b54a55 review, P1): completion is decided only from evidence read under the
+  // enrolment row lock. A second connection plays the learner's un-mark the way
+  // patchLessonProgress now runs it: lock the enrolment, write the progress, commit. The sync
+  // starts while that lock is held; it must decide on the un-marked lesson.
+  it('a lesson un-mark that commits while the sync waits for the lock wins: no completion, certificate or CEC', async () => {
+    const progressId = randomUUID();
+    await db.query(
+      'INSERT INTO lms_lesson_progress (id, student_id, lesson_id, completed, completed_at) VALUES ($1, $2, $3, TRUE, now())',
+      [progressId, ids.learner, ids.lesson],
+    );
+    await addQuiz(ids.quiz);
+    await addAttempt(ids.quiz, true);
+    iicrcAutoSubmit.mockClear();
+
+    const other = await otherConnection();
+    await other.query('SELECT 1 FROM lms_enrollments WHERE id = $1 FOR UPDATE', [ids.enrolment]);
+    const pending = settle(service.syncEnrollmentCompletion(ids.enrolment, ids.learner, ids.course));
+    await pause();
+    await other.query('UPDATE lms_lesson_progress SET completed = FALSE, completed_at = NULL WHERE id = $1', [progressId]);
+    await other.query('COMMIT');
+    await other.end();
+
+    expect(await pending).toBe('resolved');
+    expect(await status()).toBe('active');
+    const row = await db.query<{ completed_at: Date | null; first_completed_at: Date | null }>(
+      'SELECT completed_at, first_completed_at FROM lms_enrollments WHERE id = $1',
+      [ids.enrolment],
+    );
+    expect(row.rows[0]).toEqual({ completed_at: null, first_completed_at: null });
+    expect(await service.getEnrollmentForCertificate(ids.learner, ids.enrolment)).toBeNull();
+    expect(iicrcAutoSubmit).not.toHaveBeenCalled();
+  });
+
+  it('a lesson un-mark waits for a holder of the enrolment lock before it writes progress', async () => {
+    const progressId = randomUUID();
+    await db.query(
+      'INSERT INTO lms_lesson_progress (id, student_id, lesson_id, completed, completed_at) VALUES ($1, $2, $3, TRUE, now())',
+      [progressId, ids.learner, ids.lesson],
+    );
+    const other = await otherConnection();
+    await other.query('SELECT 1 FROM lms_enrollments WHERE id = $1 FOR UPDATE', [ids.enrolment]);
+    const pending = settle(
+      service.patchLessonProgress({
+        studentId: ids.learner,
+        lessonId: ids.lesson,
+        enrollmentId: ids.enrolment,
+        courseId: ids.course,
+        completed: false,
+      }),
+    );
+    await pause();
+    // Still waiting on the lock: the learner's progress is unchanged.
+    const during = await db.query<{ completed: boolean }>('SELECT completed FROM lms_lesson_progress WHERE id = $1', [progressId]);
+    await other.query('COMMIT');
+    await other.end();
+    expect(during.rows[0]!.completed).toBe(true);
+
+    expect(await pending).toBe('resolved');
+    const after = await db.query<{ completed: boolean }>('SELECT completed FROM lms_lesson_progress WHERE id = $1', [progressId]);
+    expect(after.rows[0]!.completed).toBe(false);
+  });
+
   it('quiz-attempt reset refuses a revoked enrolment and voids nothing', async () => {
     await addQuiz(ids.quiz);
     await addAttempt(ids.quiz, false);
