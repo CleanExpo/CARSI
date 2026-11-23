@@ -921,6 +921,8 @@ export function renderRenewalReminderEmail(params: {
   renewalDateLabel: string;
   /** e.g. "A$795.00 incl. GST" */
   amountLabel: string;
+  /** The GST inside amountLabel, e.g. "A$72.27" (total / 11). */
+  gstLabel: string;
   manageUrl: string;
   /** How the subscriber cancels before the renewal date (plain sentence). */
   cancelInstruction: string;
@@ -938,6 +940,7 @@ export function renderRenewalReminderEmail(params: {
     ...(params.teamName ? [{ label: 'Team', value: params.teamName }] : []),
     { label: 'Renewal date', value: params.renewalDateLabel },
     { label: 'Amount', value: params.amountLabel },
+    { label: 'GST included', value: params.gstLabel },
   ];
 
   return render(
@@ -966,6 +969,7 @@ export function renderRenewalReminderEmail(params: {
       ...(params.teamName ? [`Team: ${params.teamName}`] : []),
       `Renewal date: ${params.renewalDateLabel}`,
       `Amount: ${params.amountLabel}`,
+      `GST included: ${params.gstLabel}`,
       '',
       ...(recap ? [...renewalRecapText(recap), ''] : []),
       `Manage your plan: ${params.manageUrl}`,

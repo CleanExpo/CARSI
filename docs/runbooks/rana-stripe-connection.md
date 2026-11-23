@@ -158,14 +158,16 @@ What the app does with the event (`src/lib/server/renewal-reminder.ts`):
 
 | Situation | Result |
 |---|---|
-| Yearly membership or Teams plan, invoice has an AUD amount and a payment date | One email to the billing email on the invoice (fallback: the member, or the team owner), showing plan, renewal date, amount (for example `A$795.00 incl. GST`), how to cancel, and that no action is needed to continue. A matching bell notification is saved. |
-| The same renewal is delivered again (Stripe retry or a second event) | Nothing is sent. Dedupe key: `renewal_reminder:<subscription id>:<renewal date>` in `lms_notifications`. |
+| Yearly membership or Teams plan, invoice has an AUD amount and a payment date | One email to the billing email on the invoice (fallback: the member, or the team owner), showing plan, renewal date, amount (for example `A$795.00 incl. GST`), the GST in that amount as its own line (total / 11, for example `GST included: A$72.27`), how to cancel, and that no action is needed to continue. A matching bell notification is saved. |
+| The same renewal is delivered again (Stripe retry or a second event) | Nothing is sent. Dedupe key: `renewal_reminder:<subscription id>:<renewal date>` in `lms_notifications`. The record is saved as `renewal_reminder_pending` before the email goes and becomes `renewal_reminder` once it has gone. |
 | Amount or payment date missing, currency not AUD, or amount is zero | Nothing is sent. A warning is logged with the reason (`missing_amount`, `missing_renewal_date`, `non_aud_currency`, `zero_amount`). |
 | Subscription already set to cancel, or it is an organisation plan | Nothing is sent (`not_renewing`, `unsupported_plan`). |
-| Two deliveries for the same renewal arrive at the same time | Each tries to save the dedupe record first. Only the one whose save succeeds sends the email. |
+| Two deliveries for the same renewal arrive at the same time | Each tries to save the dedupe record first. Only the one whose save succeeds sends the email. A delivery that finds a pending record less than 5 minutes old sends nothing and returns 500, so Stripe tries again later. |
 | The email fails, or Mailtrap is not configured | The saved record is removed, the webhook returns 500, the error goes to Sentry, and Stripe retries, so the retry can send. |
 
-Known limit: if the server is killed after the record is saved but before the email goes out, that reminder is not retried. If Sentry reports `release_renewal_reminder_claim`, the record could not be removed after a failed send. In either case, delete that `lms_notifications` row (its `dedupe_key` is in the log) so a retry can send.
+A record left pending (the server was killed after saving it, or Sentry reported `release_renewal_reminder_claim` because it could not be removed after a failed send) no longer needs a person: the next Stripe delivery for that renewal more than 5 minutes later takes it over and sends the email once (GP-595). Nothing to delete by hand.
+
+Known limits: if the server is killed after the email went out but before the record was marked sent, the next delivery sends the same reminder a second time (a duplicate, never a missing reminder). Sentry `confirm_renewal_reminder_claim` means the email went out but the record could not be marked sent. If Stripe has stopped retrying the event (after about three days), a pending record is not picked up again; resend the event from the Stripe Dashboard.
 
 **Open items for the founder:**
 - **Teams owners have no self-serve cancel button.** The billing portal route only serves individual members. The Teams reminder tells owners to reply or email `support@carsi.com.au`, and someone must then set that subscription to cancel at period end in the Stripe Dashboard. Decide who handles those requests before Teams goes on sale, or add a Teams portal.
