@@ -64,6 +64,34 @@ export function teamSubscriptionItems<T extends ItemLike>(
 }
 
 /**
+ * THE one owner of the seat-grant rule for a seat purchase (Phill 23/11/2026, "Charge first").
+ *
+ * Seat expansion updates the subscription with `proration_behavior: 'always_invoice'` and
+ * `payment_behavior: 'error_if_incomplete'`, so Stripe invoices the added seats at once and
+ * applies the item change only when that invoice is paid; a declined or incomplete payment
+ * makes the update fail and leaves the subscription unchanged. Seats are granted only when the
+ * invoice the update returns (`latest_invoice`, expanded) is `paid`. Anything else (open,
+ * draft, unreadable, not expanded) grants nothing.
+ *
+ * The webhook needs no second copy of this rule: it counts seats from the subscription's items
+ * (`readSubscriptionSeatQuantity`), and under these two settings the items only change once
+ * the charge is paid.
+ */
+export function seatChargePaid(updated: {
+  latest_invoice?: string | { status?: string | null } | null;
+}): boolean {
+  const invoice = updated.latest_invoice;
+  return typeof invoice === 'object' && invoice !== null && invoice.status === 'paid';
+}
+
+/** The update parameters every seat purchase must carry so the charge comes first. */
+export const SEAT_CHARGE_FIRST = {
+  proration_behavior: 'always_invoice',
+  payment_behavior: 'error_if_incomplete',
+  expand: ['latest_invoice'],
+} as const;
+
+/**
  * Read the paid seat count of a Teams subscription.
  *
  * Seat billing (GP-773): the tier's included seats when the base item is present (quantity at

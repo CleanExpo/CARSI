@@ -226,11 +226,89 @@ describe('expand-seats: changes the seat item, never the base item', () => {
       seatLimit: 7,
     });
     mocks.teamSubUpdate.mockResolvedValue({});
-    mocks.subsUpdate.mockResolvedValue({});
+    // Charge first: Stripe returns the subscription with its proration invoice already paid.
+    mocks.subsUpdate.mockResolvedValue({ id: 'sub_1', latest_invoice: { id: 'in_1', status: 'paid' } });
+  });
+
+  it('charges first: always_invoice + error_if_incomplete, and reads back the invoice', async () => {
+    mocks.subsRetrieve.mockResolvedValue({
+      collection_method: 'charge_automatically',
+      metadata: META,
+      items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_extra_seat', 69_500) }] },
+    });
+    const res = await expandSeats(request({ additional_seats: 1 }));
+    expect(res.status).toBe(200);
+    const [, params] = mocks.subsUpdate.mock.calls[0];
+    expect(params.proration_behavior).toBe('always_invoice');
+    expect(params.payment_behavior).toBe('error_if_incomplete');
+    expect(params.expand).toContain('latest_invoice');
+  });
+
+  it('declined payment: clear 402 refusal, seats unchanged', async () => {
+    mocks.subsRetrieve.mockResolvedValue({
+      collection_method: 'charge_automatically', metadata: META, items: { data: [BASE_ITEM] } });
+    mocks.subsUpdate.mockRejectedValue(
+      Object.assign(new Error('Your card was declined.'), {
+        type: 'StripeCardError',
+        statusCode: 402,
+        code: 'card_declined',
+      }),
+    );
+    const res = await expandSeats(request({ additional_seats: 2 }));
+    expect(res.status).toBe(402);
+    const body = await res.json();
+    expect(body.reason).toBe('seat_payment_failed');
+    expect(body.detail).toMatch(/no seats were added/i);
+    expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
+  });
+
+  it('payment needing customer action (incomplete): 402, seats unchanged', async () => {
+    mocks.subsRetrieve.mockResolvedValue({
+      collection_method: 'charge_automatically', metadata: META, items: { data: [BASE_ITEM] } });
+    mocks.subsUpdate.mockRejectedValue(
+      Object.assign(new Error('This payment requires additional user action.'), {
+        type: 'StripeInvalidRequestError',
+        statusCode: 402,
+        code: 'subscription_payment_intent_requires_action',
+      }),
+    );
+    const res = await expandSeats(request({ additional_seats: 2 }));
+    expect(res.status).toBe(402);
+    expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
+  });
+
+  it('update returned but the invoice is not paid: no seats granted', async () => {
+    mocks.subsRetrieve.mockResolvedValue({
+      collection_method: 'charge_automatically', metadata: META, items: { data: [BASE_ITEM] } });
+    mocks.subsUpdate.mockResolvedValue({ id: 'sub_1', latest_invoice: { id: 'in_1', status: 'open' } });
+    const res = await expandSeats(request({ additional_seats: 2 }));
+    expect(res.status).toBe(402);
+    expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
+  });
+
+  it('a subscription not charged automatically is refused before any change', async () => {
+    mocks.subsRetrieve.mockResolvedValue({
+      collection_method: 'send_invoice', metadata: META, items: { data: [BASE_ITEM] } });
+    const res = await expandSeats(request({ additional_seats: 2 }));
+    expect(res.status).toBe(409);
+    expect(mocks.subsUpdate).not.toHaveBeenCalled();
+    expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
+  });
+
+  it('successful payment grants the paid seats', async () => {
+    mocks.subsRetrieve.mockResolvedValue({
+      collection_method: 'charge_automatically', metadata: META, items: { data: [BASE_ITEM] } });
+    const res = await expandSeats(request({ additional_seats: 3 }));
+    expect(res.status).toBe(200);
+    expect((await res.json()).seat_limit).toBe(8);
+    expect(mocks.teamSubUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { seatLimit: 8 } }),
+    );
   });
 
   it('raises the existing seat item quantity (2 -> 4) and the seat limit to 5 + 4', async () => {
     mocks.subsRetrieve.mockResolvedValue({
+      collection_method: 'charge_automatically',
       metadata: META,
       items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_extra_seat', 69_500) }] },
     });
@@ -240,14 +318,15 @@ describe('expand-seats: changes the seat item, never the base item', () => {
     const [subId, params] = mocks.subsUpdate.mock.calls[0];
     expect(subId).toBe('sub_1');
     expect(params.items).toEqual([{ id: 'si_seat', quantity: 4 }]);
-    expect(params.proration_behavior).toBe('create_prorations');
+    expect(params.proration_behavior).toBe('always_invoice');
     expect(mocks.teamSubUpdate).toHaveBeenCalledWith(
       expect.objectContaining({ data: { seatLimit: 9 } }),
     );
   });
 
   it('adds the seat item at the verified A$695 Price when the subscription has none', async () => {
-    mocks.subsRetrieve.mockResolvedValue({ metadata: META, items: { data: [BASE_ITEM] } });
+    mocks.subsRetrieve.mockResolvedValue({
+      collection_method: 'charge_automatically', metadata: META, items: { data: [BASE_ITEM] } });
     mocks.teamSubFind.mockResolvedValueOnce({
       teamId: 'team-1',
       stripeSubscriptionId: 'sub_1',
@@ -267,7 +346,8 @@ describe('expand-seats: changes the seat item, never the base item', () => {
 
   it('seat Price unresolvable: 503, no Stripe update, no seat change', async () => {
     vi.stubEnv('STRIPE_PRICE_TEAMS_EXTRA_SEAT', '');
-    mocks.subsRetrieve.mockResolvedValue({ metadata: META, items: { data: [BASE_ITEM] } });
+    mocks.subsRetrieve.mockResolvedValue({
+      collection_method: 'charge_automatically', metadata: META, items: { data: [BASE_ITEM] } });
     const res = await expandSeats(request({ additional_seats: 1 }));
     expect(res.status).toBe(503);
     expect(mocks.subsUpdate).not.toHaveBeenCalled();
@@ -276,6 +356,7 @@ describe('expand-seats: changes the seat item, never the base item', () => {
 
   it('no recognised base item (old single per-unit item): 409, nothing charged', async () => {
     mocks.subsRetrieve.mockResolvedValue({
+      collection_method: 'charge_automatically',
       metadata: { plan: 'starter' },
       items: { data: [{ id: 'si_1', quantity: 5, price: price('price_team_starter', 5_980) }] },
     });
@@ -287,6 +368,7 @@ describe('expand-seats: changes the seat item, never the base item', () => {
 
   it('existing seat item on a Price other than the verified seat Price: 409, nothing charged', async () => {
     mocks.subsRetrieve.mockResolvedValue({
+      collection_method: 'charge_automatically',
       metadata: { ...META, seat_price_id: 'price_old_seat' },
       items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_old_seat', 4_900) }] },
     });
@@ -297,6 +379,7 @@ describe('expand-seats: changes the seat item, never the base item', () => {
 
   it('seat item on a lookalike A$695 Price that is not the verified seat Price: 409', async () => {
     mocks.subsRetrieve.mockResolvedValue({
+      collection_method: 'charge_automatically',
       metadata: { ...META, seat_price_id: 'price_lookalike' },
       items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_lookalike', 69_500) }] },
     });

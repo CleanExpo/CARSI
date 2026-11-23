@@ -263,7 +263,9 @@ Notes:
   app bills it at quantity 1, and it includes the tier's seats (5 / 15 / 25). Create ONE
   extra-seat Price at A$695.00 yearly; each extra seat is one unit of that separate
   subscription item. Checkout adds the seat item when the buyer chooses extra seats; seat
-  expansion raises its quantity (or adds it) with proration and never changes the base item.
+  expansion raises its quantity (or adds it) and never changes the base item. Expansion is
+  charged first (`always_invoice` + `error_if_incomplete`): the prorated amount is charged at
+  once and seats are granted only when that payment succeeds.
   The webhook counts seats as included seats + extra-seat quantity, matching items by the
   Price ids the checkout stamps into the subscription metadata (`base_price_id`,
   `seat_price_id`).
@@ -315,9 +317,11 @@ gated to active-org members (402 for everyone else), so this only removes the
 - **Teams**: start a Starter checkout → Stripe shows A$299.00 per year once (and A$695.00
   per extra seat if chosen) → 5 seats provisioned; invite 5 members → all seated; the **6th
   invite is rejected 409 with a seat-expansion path**;
-  `POST /api/lms/subscription/teams/expand-seats {additional_seats:1}` adds the A$695 seat
-  item (proration) → seat limit 6 → the 6th can then join. Expand again → the seat item's
-  quantity rises; the A$299 base item is unchanged. Refund → seats revoked.
+  `POST /api/lms/subscription/teams/expand-seats {additional_seats:1}` charges the prorated
+  A$695 at once and, only when that payment succeeds, adds the seat item → seat limit 6 → the
+  6th can then join. Expand again → the seat item's quantity rises; the A$299 base item is
+  unchanged. With the test card `4000 0000 0000 0341` (attaches, then declines) the expansion
+  answers 402 "no seats were added" and the seat limit stays put. Refund → seats revoked.
 - **Org**: start an org checkout with an organisation name → subscription active →
   a member of that org can enrol in an onboarding-brand course; cancel/refund →
   new enrolment blocked, existing progress + certificates retained.

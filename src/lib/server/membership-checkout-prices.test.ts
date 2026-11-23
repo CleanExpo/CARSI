@@ -338,7 +338,7 @@ describe('extra staff seats: A$695 per year each', () => {
       seatLimit: 5,
     });
     mocks.teamSubUpdate.mockResolvedValue({});
-    mocks.subsUpdate.mockResolvedValue({});
+    mocks.subsUpdate.mockResolvedValue({ id: 'sub_1', latest_invoice: { id: 'in_1', status: 'paid' } });
   });
 
   const META = { plan: 'starter', base_price_id: 'price_team_starter', seat_price_id: 'price_seat' };
@@ -346,6 +346,7 @@ describe('extra staff seats: A$695 per year each', () => {
 
   it('adds seats when the seat item is on the A$695 per year Price', async () => {
     mocks.subsRetrieve.mockResolvedValue({
+      collection_method: 'charge_automatically',
       metadata: META,
       items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_seat', 69_500) }] },
     });
@@ -369,6 +370,7 @@ describe('extra staff seats: A$695 per year each', () => {
     it(`refuses, and charges nothing, when the seat Price is ${label}`, async () => {
       catalogue.price_seat = seatPrice;
       mocks.subsRetrieve.mockResolvedValue({
+        collection_method: 'charge_automatically',
         metadata: META,
         items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: seatPrice }] },
       });
@@ -382,6 +384,7 @@ describe('extra staff seats: A$695 per year each', () => {
   // The seat item on the subscription is not on the verified seat Price: refused (409).
   it('refuses, and charges nothing, when the seat item is on a different Price', async () => {
     mocks.subsRetrieve.mockResolvedValue({
+      collection_method: 'charge_automatically',
       metadata: { ...META, seat_price_id: 'price_other' },
       items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_other', 4_900) }] },
     });
