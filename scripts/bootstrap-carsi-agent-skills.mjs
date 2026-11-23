@@ -358,6 +358,9 @@ const MANIFEST = [
     when: ['visual qa', 'screenshot', 'SDA', 'playwright visual', 'check-visuals'],
     focus: [
       'node scripts/premium-visuals/check-visuals.mjs',
+      '../../references/premium-visuals-triage.md',
+      'npm run media:manifest:sync',
+      'npm run quality:sda-gate',
       'Playwright at 390/768/1440; reduced-motion check.',
       'Owner review still required; scanner is heuristic.',
     ],

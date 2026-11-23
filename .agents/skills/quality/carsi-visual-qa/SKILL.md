@@ -24,6 +24,9 @@ See `../../references/engineering-principle.md`.
 ## Focus for this discipline
 
 - node scripts/premium-visuals/check-visuals.mjs
+- See `../../references/premium-visuals-triage.md`.
+- npm run media:manifest:sync
+- npm run quality:sda-gate
 - Playwright at 390/768/1440; reduced-motion check.
 - Owner review still required; scanner is heuristic.
 

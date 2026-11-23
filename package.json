@@ -18,6 +18,8 @@
     "audit:skill-references": "node scripts/audit/legacy-skill-references.mjs",
     "check:approved-dependencies": "node scripts/audit/check-approved-dependencies.mjs",
     "quality:sda-gate": "node scripts/quality/sda-evidence-gate.mjs",
+    "media:manifest:sync": "node scripts/quality/sync-media-manifest.mjs",
+    "test:media-manifest-sync": "node scripts/quality/sync-media-manifest.test.mjs",
     "check:secrets": "node scripts/check-secrets.mjs",
     "check:iicrc-terminology": "node scripts/check-iicrc-terminology.mjs",
     "check:built-site": "node scripts/check-built-site.mjs",

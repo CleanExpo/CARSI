@@ -37,8 +37,11 @@ const steps = [
   ['Product excellence smoke', 'npm', ['run', 'verify:product-excellence']],
 ];
 if (process.env.SDA_FULL === '1') {
-  steps.splice(3, 0, ['Type check', 'npm', ['run', 'type-check']]);
-  steps.push(['Accessibility e2e', 'npm', ['run', 'test:a11y']]);
+  steps.splice(3, 0, ['Prisma client', 'npm', ['run', 'prisma:generate']]);
+  steps.splice(4, 0, ['Type check', 'npm', ['run', 'type-check']]);
+  if (process.env.SDA_SKIP_A11Y !== '1') {
+    steps.push(['Accessibility e2e', 'npm', ['run', 'test:a11y']]);
+  }
 }
 
 let code = 0;
@@ -57,6 +60,7 @@ for (const [label, cmd, args] of steps) {
 
 console.log('\n--- SDA evidence reminders ---');
 console.log('Capture Playwright screenshots at 390, 768, 1440 px for changed customer pages.');
+console.log('Manifest gaps: npm run media:manifest:sync (see .agents/references/premium-visuals-triage.md).');
 console.log('Verify prefers-reduced-motion and real media credits in media.manifest.json.');
 console.log('Owner visual sign-off still required (.agents/skills/quality/carsi-visual-qa).');
 
