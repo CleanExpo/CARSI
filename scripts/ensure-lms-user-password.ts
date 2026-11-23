@@ -13,7 +13,7 @@ import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
 
 import { prisma } from '../src/lib/prisma';
-import { hashPassword } from '../src/lib/server/lms-auth';
+import { hashPassword, setPasswordEndingSessions } from '../src/lib/server/lms-auth';
 
 async function main() {
   const emailArg = process.argv[2]?.trim().toLowerCase();
@@ -33,13 +33,8 @@ async function main() {
   const existing = await prisma.lmsUser.findUnique({ where: { email: emailArg } });
 
   if (existing) {
-    await prisma.lmsUser.update({
-      where: { id: existing.id },
-      data: {
-        hashedPassword,
-        isActive: true,
-      },
-    });
+    // GP-760: a new password ends the account's older sessions.
+    await setPasswordEndingSessions(existing.id, hashedPassword, { isActive: true });
     console.log(`Updated password for ${emailArg} (id ${existing.id})`);
   } else {
     const id = randomUUID();

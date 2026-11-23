@@ -145,6 +145,29 @@ describe('GP-760 /api/auth/me shows the database role now', () => {
     const body = (await res.json()) as { roles: string[]; can_access_admin: boolean };
     expect(body.can_access_admin).toBe(true);
   });
+
+  // GP-760 review of f512fd90 (fail closed): with a database configured, /me reports a signed-in
+  // user only when the database confirms the session; an unreadable database or a missing user is
+  // not a session.
+  it('reports no session when the database cannot be read', async () => {
+    db.fail = true;
+    const res = await me(
+      new NextRequest('https://carsi.example.test/api/auth/me', {
+        headers: { cookie: `auth_token=${await adminToken()}` },
+      })
+    );
+    expect(res.status).toBe(401);
+  });
+
+  it('reports no session for a user the database does not have', async () => {
+    db.user = null;
+    const res = await me(
+      new NextRequest('https://carsi.example.test/api/auth/me', {
+        headers: { cookie: `auth_token=${await adminToken()}` },
+      })
+    );
+    expect(res.status).toBe(401);
+  });
 });
 
 describe('GP-760 refresh: one database read for the user and roles', () => {

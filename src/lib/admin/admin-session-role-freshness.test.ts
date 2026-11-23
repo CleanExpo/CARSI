@@ -171,7 +171,6 @@ describe('GP-760 admin panel: the database role now, not the token role', () => 
 describe('GP-760 token-role checks on request handlers (instructor/admin gates)', () => {
   it('a demoted admin token no longer passes the request session reader', async () => {
     const { getSessionClaimsFromRequest } = await import('@/lib/server/auth-from-request');
-    const { __clearActiveCache } = await import('@/lib/server/user-active-cache');
     const token = await signSessionToken(adminClaims());
     const req = () =>
       new NextRequest('https://carsi.example.test/api/lms/courses', {
@@ -179,11 +178,10 @@ describe('GP-760 token-role checks on request handlers (instructor/admin gates)'
         headers: { cookie: `auth_token=${token}` },
       });
 
-    __clearActiveCache();
     expect((await getSessionClaimsFromRequest(req()))?.role).toBe('admin');
 
     db.user = dbUser({ roleNames: ['student'] });
-    __clearActiveCache(); // the 30-second cache is per instance; a new read sees the demotion
+    // no session cache: the very next request reads the demotion
     expect(await getSessionClaimsFromRequest(req())).toBeNull();
   });
 });

@@ -29,26 +29,32 @@ export async function GET(request: NextRequest) {
   let is_active = true;
   let is_verified = false;
   // GP-760: the role shown, and the admin toggle, follow the database role now. Without a database
-  // (local runs) the token's role is shown; with one, a failed read shows no admin toggle.
+  // (local runs) the token's role is shown; with one, a failed read refuses the session.
   let role = claims.role;
   let can_access_admin = isLmsClaimsAllowedAdminPanel(claims);
 
   if (process.env.DATABASE_URL?.trim()) {
     can_access_admin = false;
+    // GP-760 (fail closed): the session is reported only when the database confirms it now. An
+    // unreadable database or an unknown user is not a session, the same rule as verifyActiveSession.
+    let user: Awaited<ReturnType<typeof readLmsUserNow>>;
     try {
-      const user = await readLmsUserNow(prisma, claims.sub);
-      if (user && !user.active) {
-        return NextResponse.json({ detail: 'Account deactivated' }, { status: 401 });
-      }
-      // GP-760: a session from an earlier generation (ended by a password reset) is over.
-      if (user && !isCurrentGeneration(claims.sg, user.generation)) {
-        return NextResponse.json({ detail: 'Session ended' }, { status: 401 });
-      }
-      if (user) {
-        role = user.role;
-        can_access_admin = user.role === 'admin';
-        if (user.fullName?.trim()) full_name = user.fullName.trim();
-      }
+      user = await readLmsUserNow(prisma, claims.sub);
+    } catch (e) {
+      console.error('[auth/me] session re-check failed; refusing:', e instanceof Error ? e.message : String(e));
+      return NextResponse.json({ detail: 'Session could not be verified' }, { status: 401 });
+    }
+    if (!user || !user.active) {
+      return NextResponse.json({ detail: 'Account deactivated' }, { status: 401 });
+    }
+    // GP-760: a session from an earlier generation (ended by a password reset) is over.
+    if (!isCurrentGeneration(claims.sg, user.generation)) {
+      return NextResponse.json({ detail: 'Session ended' }, { status: 401 });
+    }
+    role = user.role;
+    can_access_admin = user.role === 'admin';
+    if (user.fullName?.trim()) full_name = user.fullName.trim();
+    try {
       const row = await prisma.lmsUser.findUnique({
         where: { id: claims.sub },
         select: { themePreference: true, isActive: true, isVerified: true },
@@ -59,7 +65,7 @@ export async function GET(request: NextRequest) {
         is_verified = row.isVerified;
       }
     } catch {
-      /* ignore — fall back to the token's name, with no admin toggle */
+      /* display preferences only — the session itself was confirmed above */
     }
   }
 

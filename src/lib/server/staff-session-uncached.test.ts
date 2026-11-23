@@ -7,8 +7,8 @@ import { signSessionToken } from '@/lib/auth/session-jwt';
  * GP-760, Phill's ruling 22/11/2026: admin AND instructor role gates follow a demotion within one
  * request. The shared session reader (getSessionClaimsFromRequest / verifyActiveSession) feeds
  * staff gates such as staff lesson auto-enrolment and practical-assessment review, so a token that
- * claims admin or instructor is re-read from the database on every request, never from the
- * 30-second cache. Learner tokens keep the cache.
+ * claims admin or instructor is re-read from the database on every request. (Since the review of
+ * f512fd90 every token is: there is no session cache at all; session-freshness-authoritative.test.ts.)
  */
 
 const USER_ID = '50000000-0000-4000-8000-000000000760';
@@ -37,7 +37,6 @@ vi.mock('@/lib/prisma', () => ({
 }));
 
 const { getSessionClaimsFromRequest } = await import('@/lib/server/auth-from-request');
-const { __clearActiveCache } = await import('@/lib/server/user-active-cache');
 
 async function requestAs(role: string) {
   const token = await signSessionToken({ sub: USER_ID, email: EMAIL, full_name: 'Staff', role, sg: 0 });
@@ -47,19 +46,18 @@ async function requestAs(role: string) {
 }
 
 beforeEach(() => {
-  __clearActiveCache();
   db.reads = 0;
   db.fail = false;
   vi.spyOn(console, 'warn').mockImplementation(() => {});
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
-describe('GP-760 staff tokens are never served from the session cache', () => {
+describe('GP-760 staff tokens are re-read from the database on every request', () => {
   it.each(['admin', 'instructor'])('a demoted %s is refused on the very next request', async (role) => {
     db.roleNames = [role];
     expect((await getSessionClaimsFromRequest(await requestAs(role)))?.role).toBe(role);
 
-    db.roleNames = ['student']; // demoted; the cache is NOT cleared
+    db.roleNames = ['student']; // demoted between two requests
     expect(await getSessionClaimsFromRequest(await requestAs(role))).toBeNull();
   });
 
@@ -68,10 +66,10 @@ describe('GP-760 staff tokens are never served from the session cache', () => {
     expect(await getSessionClaimsFromRequest(await requestAs('instructor'))).toBeNull();
   });
 
-  it('a learner token still uses the cache (one read for two requests)', async () => {
+  it('a learner token is also read from the database on every request (two reads for two requests)', async () => {
     db.roleNames = ['student'];
     expect(await getSessionClaimsFromRequest(await requestAs('student'))).not.toBeNull();
     expect(await getSessionClaimsFromRequest(await requestAs('student'))).not.toBeNull();
-    expect(db.reads).toBe(1);
+    expect(db.reads).toBe(2);
   });
 });

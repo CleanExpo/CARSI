@@ -94,6 +94,19 @@ vi.mock('@/lib/prisma', () => ({
   prisma: {
     lmsUser: { findUnique: mocks.findUser },
     lmsEnrollment: { findUnique: mocks.findEnrollment },
+    // GP-760: verifyActiveSession reads the session's user on every request (readLmsUserNow) and
+    // refuses when it cannot; the signed-in buyer here is a current, active student.
+    $queryRaw: vi.fn(async () => [
+      {
+        id: 'user-disc',
+        email: 'member@example.test',
+        full_name: 'Member',
+        is_active: true,
+        role: null,
+        session_generation: 0,
+        role_names: ['student'],
+      },
+    ]),
   },
 }));
 
@@ -279,7 +292,7 @@ describe('campaign attribution', () => {
   });
 
   it('keeps the campaign on a discounted checkout, and the cookie cannot replace discount_id', async () => {
-    mocks.verifySession.mockResolvedValue({ sub: 'user-disc' });
+    mocks.verifySession.mockResolvedValue({ sub: 'user-disc', role: 'student' });
     mocks.findUser.mockResolvedValue({ id: 'user-disc', isActive: true });
     mocks.findEnrollment.mockResolvedValue(null);
     mocks.discount.mockResolvedValue({ id: 'disc-1', discountType: 'percent', value: 20 });
@@ -429,7 +442,7 @@ describe('purchase survey tab key (Authority Machine slice 1b, GP-662)', () => {
 
   it('flag on: the discounted path binds it too, next to discount_id', async () => {
     process.env[FLAG] = 'true';
-    mocks.verifySession.mockResolvedValue({ sub: 'user-disc' });
+    mocks.verifySession.mockResolvedValue({ sub: 'user-disc', role: 'student' });
     mocks.findUser.mockResolvedValue({ id: 'user-disc', isActive: true });
     mocks.findEnrollment.mockResolvedValue(null);
     mocks.discount.mockResolvedValue({ id: 'disc-1', discountType: 'percent', value: 20 });
@@ -464,7 +477,7 @@ describe('first-touch attribution (Authority Machine slice 1a)', () => {
   }
 
   function discountedMember() {
-    mocks.verifySession.mockResolvedValue({ sub: 'user-disc' });
+    mocks.verifySession.mockResolvedValue({ sub: 'user-disc', role: 'student' });
     mocks.findUser.mockResolvedValue({ id: 'user-disc', isActive: true });
     mocks.findEnrollment.mockResolvedValue(null);
     mocks.discount.mockResolvedValue({ id: 'disc-1', discountType: 'percent', value: 20 });

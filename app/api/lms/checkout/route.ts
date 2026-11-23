@@ -13,7 +13,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
 
-import { verifyActiveSession } from '@/lib/server/user-active-cache';
+import { type SessionClaims, verifySessionToken } from '@/lib/auth/session-jwt';
+import { isLmsSessionCurrent } from '@/lib/server/user-active-cache';
 import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
 import {
   parsePurchaseMode,
@@ -153,25 +154,36 @@ export async function POST(request: NextRequest) {
 
     // The buyer's session comes from the same credentials `resolveCheckoutEmail` accepts:
     // the `auth_token` cookie first, else a `Bearer` session token. Both are verified by
-    // `verifyActiveSession` (GP-760: signature, then the active, session generation and role
+    // the verifyActiveSession rule (GP-760: signature, then the active, session generation and role
     // re-check, so a session ended by a password reset is not a buyer); a Bearer-only buyer must
     // not be treated as a guest (the prerequisite gate would otherwise refuse a learner who has
     // completed it).
     const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
     let studentId: string | undefined;
-    let buyerClaims: Awaited<ReturnType<typeof verifyActiveSession>> = null;
+    let buyerClaims: SessionClaims | null = null;
+    // GP-760 (fail closed): a signed session the server refuses (deactivated, deleted, ended by a
+    // password reset, or not confirmable because the database cannot be read) is refused here. It
+    // must not fall through to the guest path, which would resolve the buyer from that same token's
+    // email (resolveCheckoutEmail checks the signature only).
+    let refusedSession = false;
     for (const token of [authTokenCookie, bearerToken]) {
       if (!token) continue;
-      const c = await verifyActiveSession(token);
-      if (c?.sub) {
-        studentId = c.sub;
-        buyerClaims = c;
+      const signed = await verifySessionToken(token);
+      if (!signed) continue;
+      if (!(await isLmsSessionCurrent(signed))) {
+        refusedSession = true;
         break;
       }
+      studentId = signed.sub;
+      buyerClaims = signed;
+      break;
     }
     // A still-valid token for a deactivated or deleted learner can't be fulfilled by the webhook,
     // so refuse before charging.
-    if (studentId && !(await guardLookup(() => isActiveLearnerId(studentId!)))) {
+    if (
+      refusedSession ||
+      (studentId && !(await guardLookup(() => isActiveLearnerId(studentId!))))
+    ) {
       return NextResponse.json(
         { detail: 'Your session is no longer valid. Please sign in again.', code: 'inactive_account' },
         { status: 401 },

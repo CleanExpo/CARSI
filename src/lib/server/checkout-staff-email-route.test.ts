@@ -27,6 +27,23 @@ vi.mock('@/lib/prisma', () => ({
           db.users.find((u) => (where.id ? u.id === where.id : u.email === where.email)) ?? null
       ),
     },
+    // GP-760: verifyActiveSession reads the session's user on every request (readLmsUserNow).
+    $queryRaw: vi.fn(async (_strings: TemplateStringsArray, ...values: unknown[]) => {
+      const u = db.users.find((x) => x.id === values[0]);
+      return u
+        ? [
+            {
+              id: u.id,
+              email: u.email,
+              full_name: 'X',
+              is_active: u.isActive,
+              role: null,
+              session_generation: 0,
+              role_names: ['student'],
+            },
+          ]
+        : [];
+    }),
   },
 }));
 
@@ -164,6 +181,21 @@ describe('POST /api/lms/checkout — unclaimed staff email', () => {
       'auth_token=valid:learner-9'
     );
     expect(ok.status).toBe(404);
+    expect(stripe.create).not.toHaveBeenCalled();
+  });
+
+  // GP-760 review of f512fd90: a signed cookie the server refuses must not fall through to the
+  // guest path (which would take the buyer's email from that same refused token).
+  it('refuses a signed cookie whose session cannot be confirmed (database read fails), before Stripe', async () => {
+    db.users.push({ id: 'learner-8', email: 'learner8@example.com', isActive: true });
+    const { prisma } = await import('@/lib/prisma');
+    vi.mocked(prisma.$queryRaw).mockRejectedValueOnce(new Error('connection refused'));
+    const res = await post(
+      { slug: 'water-damage-essentials', customer_email: 'learner8@example.com' },
+      'auth_token=valid:learner-8'
+    );
+    expect(res.status).toBe(401);
+    expect((await res.json()).code).toBe('inactive_account');
     expect(stripe.create).not.toHaveBeenCalled();
   });
 
