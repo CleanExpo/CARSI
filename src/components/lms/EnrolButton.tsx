@@ -22,6 +22,14 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { purchaseSurveyCheckoutField, rememberPurchaseSurveyKey } from '@/lib/marketing/purchase-survey-key';
 
+/**
+ * Full-page sign-in redirect for a logged-out Enrol click. Always on the current origin, with the
+ * page to come back to in `next` (GP-745).
+ */
+export function loginRedirectHref(returnTo: string, origin: string): string {
+  return new URL(`/login?next=${encodeURIComponent(returnTo)}`, origin).href;
+}
+
 interface EnrolButtonProps {
   slug: string;
   priceAud?: number;
@@ -189,10 +197,7 @@ export function EnrolButton({
 
     const currentUser = user ?? (await authApi.getCurrentUser());
     if (!currentUser) {
-      window.location.href = new URL(
-        `/login?next=${encodeURIComponent(returnTo)}`,
-        window.location.origin,
-      ).href;
+      window.location.href = loginRedirectHref(returnTo, window.location.origin);
       setLoading(false);
       return;
     }

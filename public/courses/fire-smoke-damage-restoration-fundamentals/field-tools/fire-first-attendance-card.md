@@ -1,7 +1,7 @@
 # Fire first-attendance card
 
 **CARSI Fire & Smoke Restoration Practitioner — field tool (Module 1)**
-*DRAFT v1 for SME review. Australian and New Zealand. 230 V / 50 Hz, metric, AS/NZS. Standards named only (aligned to the principles of ANSI/IICRC S700:2025); no standard text reproduced.*
+*DRAFT v1 for SME review. Australian and New Zealand. 230 V / 50 Hz, metric, AS/NZS.*
 
 ## Step 1 — make safe before anyone works
 

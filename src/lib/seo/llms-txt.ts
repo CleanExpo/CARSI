@@ -16,6 +16,7 @@
  */
 import { CARSI_ENTITY, postalAddressLine } from './carsi-entity';
 
+import { CARSI_PROVIDER_STATUS, IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export type LlmsCourse = { slug: string; title: string };
 export type LlmsCecCourse = LlmsCourse & { approvedHours: number; expiresAt: string };
 /** A published course whose page lists the sources its lessons cite (BACKLOG #22). */
@@ -167,7 +168,7 @@ export function buildLlmsTxt(facts: LlmsFacts, opts: LlmsBuildOptions = {}): str
     '',
     '## What is CARSI?',
     '',
-    'CARSI is an Australian online training platform for cleaning, restoration and indoor-air-quality professionals, including technicians maintaining an IICRC certification they already hold. Courses are Australian-produced and self-paced online, and span water and fire restoration, structural drying, mould and indoor air quality, odour control, carpet and textile cleaning, biosecurity awareness and business operations. CARSI is an IICRC CEC Accredited provider. CEC hours apply only to the courses listed under "IICRC CEC approvals" below.',
+    `CARSI is an Australian online training platform for cleaning, restoration and indoor-air-quality professionals, including technicians maintaining an IICRC certification they already hold. Courses are Australian-produced and self-paced online, and span water and fire restoration, structural drying, mould and indoor air quality, odour control, carpet and textile cleaning, biosecurity awareness and business operations. ${CARSI_PROVIDER_STATUS} CEC hours apply only to the courses listed under "IICRC CEC approvals" below.`,
     '',
     '## Key facts',
     '',
@@ -195,7 +196,7 @@ export function buildLlmsTxt(facts: LlmsFacts, opts: LlmsBuildOptions = {}): str
     ...eventLines(events, sourced),
     '## About the IICRC',
     '',
-    "The IICRC (Institute of Inspection, Cleaning and Restoration Certification) awards its own certifications through its approved schools and examinations. CARSI is not such a school. CARSI's standing with the IICRC is as an accredited CEC provider: an existing certificate holder can use an approved CARSI course toward the continuing education required to keep the certification they already hold.",
+    `The IICRC (Institute of Inspection, Cleaning and Restoration Certification) awards its own certifications through its approved schools and examinations. CARSI is not such a school. CARSI's standing with the IICRC is as an ${IICRC_APPROVED_CEC_PROVIDER}: an existing certificate holder can use an approved CARSI course toward the continuing education required to keep the certification they already hold.`,
     '',
     'CARSI courses are named for their subject, never for an IICRC designation or its acronym.',
     '',

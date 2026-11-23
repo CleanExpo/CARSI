@@ -132,16 +132,16 @@
           "explanation": "Safe Work Australia says to aim to eliminate risks first and ranks PPE among the least effective controls, so it never replaces controls higher in the order."
         },
         {
-          "questionText": "What does AS 4586 classify?",
+          "questionText": "Which of these can make a hard floor more slippery?",
           "options": [
-            "Slip resistance when wet",
-            "Hardness of timber boards",
-            "Acid resistance of stone",
-            "Dilution of cleaning products"
+            "A tap test on grout",
+            "Incorrect cleaning or a sealer",
+            "Reading the product SDS first",
+            "Measuring the room in metres"
           ],
-          "correctIndex": 0,
+          "correctIndex": 1,
           "points": 1,
-          "explanation": "AS 4586 classifies the slip resistance of new pedestrian surface materials. A coating applied later can change how the floor grips, so record the class and any later test."
+          "explanation": "SafeWork NSW notes that sealing an interior concrete surface can increase slipperiness, and WorkSafe Queensland says incorrect cleaning can make floors more slippery. That is why slip is part of the pre-job check and the handover."
         },
         {
           "questionText": "What is the supply voltage for the machines you use?",
@@ -170,12 +170,12 @@
         {
           "questionText": "A new product arrives. Which step comes before the first use?",
           "options": [
-            "Read label and SDS",
-            "Mix it extra strong",
             "Use it on timber",
+            "Mix it extra strong",
+            "Read label and SDS",
             "Pour it in bucket"
           ],
-          "correctIndex": 0,
+          "correctIndex": 2,
           "points": 1,
           "explanation": "The label and SDS state the dilution, hazards, protective equipment and surface warnings. Never mix two products, and never guess a dilution."
         },
@@ -230,12 +230,12 @@
         {
           "questionText": "Grinding is finished. How should the silica dust be cleaned up?",
           "options": [
-            "With an H-class vacuum or wet methods",
+            "Left to settle overnight, then swept",
             "With a broom, then a household vacuum",
             "Blown outside with compressed air",
-            "Left to settle overnight, then swept"
+            "With an H-class vacuum or wet methods"
           ],
-          "correctIndex": 0,
+          "correctIndex": 3,
           "points": 1,
           "explanation": "Dry sweeping, compressed air and general-purpose vacuums put the fine dust back in the air. Use wet methods or an H-class vacuum (Australia also allows M-class)."
         }
@@ -336,11 +336,11 @@
           "questionText": "What decides the dilution of a cleaner?",
           "options": [
             "The pad colour",
-            "The product label",
             "The machine speed",
+            "The product label",
             "The soil colour"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1,
           "explanation": "The label states the dilution. One commercial vinyl maker's sheet says to always dilute chemicals to appropriate levels for each application."
         },
@@ -348,11 +348,11 @@
           "questionText": "A label says 1 part product to 20 parts water. How much product is in 10 L of mix?",
           "options": [
             "About 0.95 L",
-            "About 0.48 L",
+            "About 2.0 L",
             "About 1.0 L",
-            "About 2.0 L"
+            "About 0.48 L"
           ],
-          "correctIndex": 1,
+          "correctIndex": 3,
           "points": 1,
           "explanation": "One part in 21 is product: 10 divided by 21 is 0.476 L. Check the label's ratio each time, because 1:20 is only an illustration."
         },
@@ -360,11 +360,11 @@
           "questionText": "Two products are both on the van. What is the rule?",
           "options": [
             "Mix them equally",
-            "Never mix them",
             "Mix when cold",
+            "Never mix them",
             "Mix for stains"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1,
           "explanation": "Never mix two products. Each SDS states incompatibilities, and a mix can release gas or damage the floor."
         },
@@ -513,11 +513,11 @@
           "questionText": "A limit cannot be found. What is the correct step?",
           "options": [
             "Use the last number",
-            "Pick a mid setting",
             "Stop and obtain advice",
+            "Pick a mid setting",
             "Start low and rise"
           ],
-          "correctIndex": 2,
+          "correctIndex": 1,
           "points": 1,
           "explanation": "When a limit cannot be established, stop and obtain technical advice. Do not substitute a generic number or work upward from a guess."
         },
@@ -615,16 +615,16 @@
           "explanation": "A stone that cannot be identified is treated as acid-sensitive until proven otherwise, because acid etching on calcium-based stone is permanent."
         },
         {
-          "questionText": "What does AS 4586 classify?",
+          "questionText": "A sealer goes on a tile floor. What do you record about slip?",
           "options": [
-            "Grout age on tiles",
-            "Acid use on stone",
-            "Wax levels on floors",
-            "Wet slip on surfaces"
+            "Any class, then later tests",
+            "Nothing, sealers never change grip",
+            "Only the sealer's colour name",
+            "Only the room's floor area"
           ],
-          "correctIndex": 3,
+          "correctIndex": 0,
           "points": 1,
-          "explanation": "The standard classifies the wet slip resistance of a new surface. A coating applied later can change how the floor grips, so record the class and any later test."
+          "explanation": "SafeWork NSW notes that sealing an interior concrete surface can increase slipperiness, and WorkSafe Queensland says incorrect cleaning can make floors more slippery. Note any slip class on record before coating, record any test afterwards and call a slip tester when in doubt."
         },
         {
           "questionText": "A coating is unknown. What is the step?",
@@ -665,12 +665,12 @@
         {
           "questionText": "A 300 mm tile is how many square metres?",
           "options": [
-            "0.09 m2",
-            "0.3 m2",
             "0.9 m2",
+            "0.3 m2",
+            "0.09 m2",
             "3.0 m2"
           ],
-          "correctIndex": 0,
+          "correctIndex": 2,
           "points": 1,
           "explanation": "0.3 m times 0.3 m is 0.09 m2. A 20 m2 floor holds about 222 tiles of that size."
         }
@@ -746,12 +746,12 @@
         {
           "questionText": "What does ATFA advise about steam on timber?",
           "options": [
-            "Assume it is safe",
+            "Assume it is unsafe",
             "Use it every week",
             "Use it sparingly always",
-            "Assume it is unsafe"
+            "Assume it is safe"
           ],
-          "correctIndex": 3,
+          "correctIndex": 0,
           "points": 1,
           "explanation": "ATFA says that unless the floor or finish maker says it is OK, it is safest to assume steam cleaning is not appropriate on timber."
         },
@@ -784,10 +784,10 @@
           "options": [
             "A strong detergent",
             "An abrasive powder",
-            "Any bleach mix",
-            "A neutral cleaner"
+            "A neutral cleaner",
+            "Any bleach mix"
           ],
-          "correctIndex": 3,
+          "correctIndex": 2,
           "points": 1,
           "explanation": "ATFA advises a neutral pH wood floor cleaner or the product the finish maker recommends, and says to avoid harsh detergents and abrasives."
         },
@@ -1007,26 +1007,26 @@
         {
           "questionText": "Where does tile cleaning wastewater go?",
           "options": [
-            "The stormwater drain",
-            "The street gutter",
             "Approved waste route",
+            "The street gutter",
+            "The stormwater drain",
             "A garden bed"
           ],
-          "correctIndex": 2,
+          "correctIndex": 0,
           "points": 1,
           "explanation": "NSW EPA guidance states that nothing other than clean rainwater should enter the stormwater drain. Use the approved site or council route."
         },
         {
-          "questionText": "What does AS 4586 set out?",
+          "questionText": "A client asks if a newly coated floor still grips like new. What do you do?",
           "options": [
-            "Grout colour rating bands",
-            "Wet slip resistance classes",
-            "Pad wear rating bands",
-            "Stone hardness rating bands"
+            "Refer to a slip tester",
+            "Promise it still grips well",
+            "Judge it by its shine",
+            "Walk on it when wet"
           ],
-          "correctIndex": 1,
+          "correctIndex": 0,
           "points": 1,
-          "explanation": "The standard classifies the wet slip resistance of new pedestrian surfaces. A later coating can change how the floor grips."
+          "explanation": "A coating can change how a floor grips, and the look of a floor does not measure it. Record what you applied and refer the question to a slip tester."
         },
         {
           "questionText": "Who records Met or Not yet on the practical day?",

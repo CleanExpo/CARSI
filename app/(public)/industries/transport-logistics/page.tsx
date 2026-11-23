@@ -12,6 +12,7 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
@@ -63,8 +64,7 @@ const faqs = [
   },
   {
     question: 'Can transport and logistics staff train online around shift schedules?',
-    answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced. Drivers and warehouse staff can complete modules during downtime, between shifts, or during scheduled stand-down periods. All courses issue verifiable digital credentials on completion.',
+    answer: `Yes. CARSI, an ${IICRC_APPROVED_CEC_PROVIDER}, offers courses online and self-paced. Drivers and warehouse staff can complete modules during downtime, between shifts, or during scheduled stand-down periods. All courses issue verifiable digital credentials on completion.`,
   },
 ];
 
