@@ -1,6 +1,6 @@
 # SME claim checklist - CARSI Hard Floor Care (v1 DRAFT)
 
-**For:** the subject-matter expert (SME) reviewing this draft. **Ledger:** `data/courses/hard-floor-care/v1-draft/evidence/evidence-ledger.jsonl` with 108 claims: 44 VERIFIED, 38 JUSTIFIED, **26 GAP (listed below)**.
+**For:** the subject-matter expert (SME) reviewing this draft. **Ledger:** `data/courses/hard-floor-care/v1-draft/evidence/evidence-ledger.jsonl` with 123 claims: 56 VERIFIED, 40 JUSTIFIED, **27 GAP (listed below)**. Last updated 21/11/2026 for the GP-728 P2 review findings.
 
 Only the GAP claims, the open items and the JUSTIFIED claims that name an SME check (all listed below) need an answer. VERIFIED claims carry a source, and the other JUSTIFIED claims carry stated reasoning. Tick one box per claim:
 
@@ -20,7 +20,7 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 
 ## Open decisions and items
 
-- [ ] OK  [ ] Fix  [ ] Cut - **O01 Price**: The course is listed at A$495. Founder to confirm.
+- [ ] OK  [ ] Fix  [ ] Cut - **O01 Price**: The course is listed at A$495. The founder's stated price intent is A$495 including GST (the original course pack, recorded on GP-728 on 16/11/2026). The price stays held until the founder confirms the included entitlement (online only or with the practical day), the commercial, tax and refund basis, qualified review and implementation acceptance. This draft activates no price, code or payment route.
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O02 Final exam pass mark**: The final exam and every module check use an 80% pass mark, from the founder decision of 02/11/2026 in the CARSI Course Standard. The review pack proposed a 90% final exam with six must-pass questions. The platform cannot enforce must-pass questions, so the 90% proposal is an open founder decision.
 
@@ -44,7 +44,7 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O12 Held pack wording on pH and soils**: The pack's wording about soil chemistry and pH, including its statement about grease, is not used. No universal pH band, pad colour, machine speed or pressure is taught as a rule.
 
-- [ ] OK  [ ] Fix  [ ] Cut - **O13 Slip claims**: The AS 4586 pendulum classes P0 to P5 rest on a secondary summary from a drainage supplier. The standard text was not read. Confirm against the standard (HFC-029 and HFC-030 are open GAP claims; HFC-083 rests on the standard's title only).
+- [ ] OK  [ ] Fix  [ ] Cut - **O13 Slip claims**: No lesson or quiz question now teaches what an AS 4586 class means. The P0 to P5 detail was removed on 16/11/2026, and on 21/11/2026 the three quiz questions about the class (Module 1, Module 4, final exam) were re-keyed to slip practice sourced from SafeWork NSW, WorkSafe Queensland and WorkSafe New Zealand (HFC-138 to HFC-140). The title and edition (AS 4586-2013, Amd 1:2017 current, standard pending revision) are VERIFIED from the Standards Australia catalogue page (HFC-141). HFC-029 and HFC-030 stay open GAP claims about the standard's content. HFC-083 now rests on the regulator pages and the catalogue title. HFC-142 (New Zealand slip rules) is open. Confirm against the licensed standard before any class is taught.
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O14 Timber care sheet host**: The ATFA care sheet was read from a copy hosted by a paint company. Confirm it matches the current ATFA edition.
 
@@ -54,16 +54,39 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O17 Critical-criterion rule (GP-729)**: The platform grades from the total percentage only, so a learner can pass with a failed critical criterion. Do not seed this course until the critical-criterion rule is decided (GP-729). Until then the assessor applies the rule by hand.
 
-- [ ] OK  [ ] Fix  [ ] Cut - **O18 Power example figure**: The worked examples use a 10 A outlet at 230 V as an example figure and say the circuit's own rating is confirmed on site. No regulator page for the outlet rating was opened (HFC-031). Confirm the wording.
+- [ ] OK  [ ] Fix  [ ] Cut - **O18 Power example figure**: The worked examples use a 10 A outlet at 230 V as an example figure and say the circuit's own rating is confirmed on site. No regulator page for the outlet rating was found on 21/11/2026 (HFC-031). Confirm the wording.
 
-- [ ] OK  [ ] Fix  [ ] Cut - **O19 Standard editions**: AS/NZS 3760 (HFC-028) and AS 4586 (HFC-029, HFC-030) are named by the sources that were opened without an edition, so each is a GAP. Confirm the edition in force and what each covers against the licensed copy. The lessons give no test interval and no class limit.
+- [ ] OK  [ ] Fix  [ ] Cut - **O19 Standard editions**: AS/NZS 3760 (HFC-028) is named by the source that was opened without an edition, so it is a GAP. The AS 4586 edition is now known from the Standards Australia catalogue (HFC-141), but what it covers stays a GAP (HFC-029, HFC-030). Confirm the edition in force and what each covers against the licensed copy. The lessons give no test interval and no class limit.
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O20 Stop rules**: The Pre-job check and stop sheet (section 6) is the one list of the 19 stop rules the lessons teach, S1 to S19, and every other field tool points back to it. Confirm the list is complete and each rule is worded as you want it taught.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **O21 Emergency and poisons contacts (GP-728 item 1)**: The SDS lesson and the pre-job sheet give both countries, each labelled. Australia: Triple Zero (000) and the Poisons Information Centre 13 11 26 (HFC-136, HFC-137, HFC-027). New Zealand: 111 and the National Poisons Centre 0800 764 766 (HFC-129, HFC-128). Confirm the labels stay attached to the numbers in the LMS and in the exported student and trainer handbooks.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **O22 Quiz answer order (GP-728 item 2)**: Correct-answer positions were rebalanced on 21/11/2026 in every check and the final exam (Module 1 had 8 of 19 in position 0; Module 5 had 5 of 10 in position 3), by swapping option order only. No question text, option wording or explanation changed except the three re-keyed slip questions (O13). Read each question once to confirm the new order reads well. Module 1 questions 16, 17 and 19 (silica) still fail the option-length balance check and need rewording at the silica review.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **O23 "Remedial work" wording (GP-728 item 4)**: "Repair" was reworded to "remedial work" because the licence inventory test treats "repair" as an unsold-subject term in public files. Confirm these lines read correctly: stop rule S12 in the pre-job sheet, the tile-sequence diagram, the tile and grout lesson (twice), two quiz explanations and final exam question 9.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **O24 Asbestos licensing wording (asbestos reviewer)**: The sentence "Removal of asbestos-containing material is licensed work" was removed. The lesson now says Safe Work Australia requires a licence to remove asbestos with limited unlicensed exceptions in some states or territories, and that licences differ by state and territory (HFC-130, HFC-131). It adds that WorkSafe New Zealand separates licensed and unlicensed removal (HFC-132). It ends with the stop wording drafted on GP-728: stop work, do not disturb it, escalate to a competent asbestos professional and follow the applicable local requirements. No licence class or area limit is taught (HFC-018 stays open).
+
+- [ ] OK  [ ] Fix  [ ] Cut - **O25 New Zealand asbestos trigger date (asbestos reviewer)**: Stop rule S1 and the resilient and timber job record now name a trigger date for each country. Australia: a floor laid before the 31 December 2003 ban. New Zealand: a building built before 1 January 2000, which WorkSafe New Zealand says is likely to contain asbestos (HFC-133). The 1 October 2016 New Zealand import ban (HFC-134) is stated as an import date, not a building date. Neither date rules asbestos out (HFC-135). The assessment task and its critical criterion now ask for the dates and contacts of the country the learner selected.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **O26 Supply path rating (electrical reviewer)**: The pre-job sheet now asks for the lowest rating of any power board, extension lead or outlet in the supply path, and stop rule S4 covers a load over any of those ratings (HFC-143 from NT WorkSafe, HFC-144). No New Zealand regulator page was opened for this check. A qualified electrical reviewer should confirm the wording.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **O27 Pressure, pH and pad claims (qualified technical reviewer)**: No universal pressure, pH band, pad colour or machine speed is taught. The attributed maker examples (HFC-045 pH 6 to 8, HFC-060 and HFC-091 300 rpm or lower, HFC-064 pad colour) and the open GAPs (HFC-066, HFC-067, HFC-077, HFC-099, HFC-100, HFC-112) need qualified sign-off before release.
 
 ## JUSTIFIED claims that name an SME check
 
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-004** - The three floor families (tile and stone, resilient, timber) are a CARSI teaching grouping, not a regulatory or standards classification.
-    - _Why it needs the SME:_ A teaching device chosen to sort the failure modes the course covers. No regulator or standard defines these three families, and the lesson says so. Best available source: CARSI course design decision; SME to confirm the grouping is useful.
+    - _Why it needs the SME:_ A teaching device chosen by CARSI to sort the failure modes the course covers. The lesson presents it only as CARSI's own grouping and makes no claim about how any regulator or standard groups floors. Best available source: CARSI course design decision; SME to confirm the grouping is useful.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-083** - A coating applied on site can change a floor's slip resistance, so note the class before coating, record any test afterwards and refer to a slip tester when in doubt.
+    - _Why it needs the SME:_ CARSI practice that follows from the SafeWork NSW and WorkSafe Queensland slip pages (HFC-138, HFC-139) and the AS 4586-2013 catalogue title (HFC-141). What a class means was not read from the standard. Best available source: SafeWork NSW and WorkSafe Queensland slip pages; Standards Australia catalogue page.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-135** - The Australian and New Zealand asbestos trigger dates used in S1, and that neither date rules asbestos out.
+    - _Why it needs the SME:_ Follows from HFC-008, HFC-133 and HFC-134. An asbestos reviewer should confirm the wording (O25).
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-144** - Check the lowest rating in the supply path as well as the circuit rating, and stop if any is exceeded.
+    - _Why it needs the SME:_ Supported for power boards by NT WorkSafe (HFC-143); no New Zealand regulator page was opened. An electrical reviewer should confirm the wording (O26).
 
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-040** - If a stone cannot be identified, treat it as acid-sensitive and use only products the maker states are safe for stone until advice is obtained.
     - _Why it needs the SME:_ Conservative default that follows from the etching rule: a wrong guess on calcium-based stone is permanent. The pack's drop-of-acid test was not used because it is itself a risk and is unsourced. Best available source: Stone supplier care guide; SME to confirm.
@@ -94,7 +117,7 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 ### Module 1: Asbestos: identify, presume, stop and refer
 
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-018** - Which Australian state or territory rules apply to assessment, sampling, registers and licensing for floor coverings, and the licence class or area limits for removal.
-    - _Why it is open:_ State and territory rules differ and only the national model code and one New Zealand regulator page were opened. The lesson gives no licence class or area limit. (suggested action: substantiate)
+    - _Why it is open:_ Safe Work Australia (HFC-130, HFC-131) and WorkSafe New Zealand (HFC-132) were opened on 21/11/2026. Both describe licensed and unlicensed removal, with exceptions that differ by jurisdiction. The lesson now states only that, with no blanket licence claim. The licence classes, area limits and each state or territory position were not verified and are not taught. (suggested action: substantiate; owner: qualified asbestos reviewer)
 
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-019** - Whether a commercial site must hold an asbestos register, and in which jurisdictions.
     - _Why it is open:_ The review pack says sites must have one. That was not verified for every jurisdiction and is left out of the lesson; the learner is told to ask whether a register exists. (suggested action: rewrite)
@@ -109,10 +132,13 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
     - _Why it is open:_ The opened SafeWork NSW page (Electrical inspection and testing) names AS/NZS 3760 without an edition, and the licensed standard text is not available here. An unversioned citation is a GAP until the licence holder confirms the edition in force and what it covers. (suggested action: substantiate)
 
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-029** - Slip resistance classification of new pedestrian surface materials is the title of AS 4586; its wet pendulum test gives P0 to P5 classes with P5 the highest slip resistance.
-    - _Why it is open:_ The only source opened was a secondary summary from a drainage supplier. The standard text was not read, so the class names and their order are not confirmed. Standards wording stays open until a qualified person checks it against the standard. (suggested action: substantiate)
+    - _Why it is open:_ The only source opened for the classes was a secondary summary from a drainage supplier, and the standard text was not read. The title and edition alone are now VERIFIED (HFC-141). Since 21/11/2026 no lesson or quiz question teaches what a class means. (suggested action: substantiate against the licensed AS 4586-2013 copy)
 
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-030** - The AS 4586 class describes a new surface, so a coating applied on site can change how the floor grips and the published class may no longer apply.
-    - _Why it is open:_ The claim names AS 4586 without an edition, and the standard was not read (its title was seen only through a secondary summary). An unversioned citation is a GAP until the licence holder confirms the edition and the statement. (suggested action: substantiate)
+    - _Why it is open:_ What a class describes is standards wording, and the standard was not read. The edition is now known (HFC-141), but the meaning of a class is not. The lessons no longer rely on this claim; the coating and slip advice rests on HFC-138 to HFC-140 and HFC-083. (suggested action: substantiate against the licensed AS 4586-2013 copy)
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-142** - Which slip resistance requirements apply to floors in New Zealand, and whether and how New Zealand building rules cite AS 4586-2013.
+    - _Why it is open:_ A BRANZ bulletin found by search says the acceptable solution D1/AS1 cites AS 4586-2013 for access routes. The MBIE building.govt.nz page could not be read from the session, so nothing about New Zealand slip rules is taught. (suggested action: substantiate)
 
 
 ### Module 2: The floor identification routine

@@ -28,6 +28,7 @@ import { OnboardingModuleOverview } from '@/components/onboarding/OnboardingModu
 import { Button } from '@/components/ui/button';
 import { useOnlineStatus } from '@/hooks/use-online-status';
 import { apiClient, ApiClientError } from '@/lib/api/client';
+import { WATER_DAMAGE_HAZARD_LESSON_ID } from '@/lib/lms/append-interactive-pilot';
 import type { LessonResource } from '@/lib/lms/lesson-resources';
 import { applyNoteFormatting, type NoteFormatAction } from '@/lib/lms/note-formatting';
 import {
@@ -126,6 +127,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   const [lessonError, setLessonError] = useState<string | null>(null);
   const [savingComplete, setSavingComplete] = useState(false);
   const [completeError, setCompleteError] = useState<string | null>(null);
+  const [interactivePracticeReady, setInteractivePracticeReady] = useState(false);
   const [noteText, setNoteText] = useState('');
   const [loadingNote, setLoadingNote] = useState(false);
   const [savingNote, setSavingNote] = useState(false);
@@ -285,6 +287,18 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     setActiveLessonId(flatLessons.some((lesson) => lesson.id === curriculum.resume_lesson_id) ? curriculum.resume_lesson_id! : flatLessons[0].id);
     setActiveModuleId(null);
   }, [curriculum, lessonFromQuery, moduleFromQuery, flatLessons]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset the practice gate when the lesson changes; behaviour-preserving, came in with the interactive pilot (5593ab7e)
+    setInteractivePracticeReady(false);
+  }, [activeLessonId]);
+
+  const handleInteractivePilotComplete = useCallback(() => {
+    setInteractivePracticeReady(true);
+    requestAnimationFrame(() => {
+      document.querySelector('[data-testid="lesson-footer"]')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  }, []);
 
   const loadLesson = useCallback(async (lessonId: string) => {
     if (!user) return;
@@ -1017,6 +1031,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                         moduleLessonNumber={moduleLessonPosition?.current}
                         moduleLessonTotal={moduleLessonPosition?.total}
                         courseProgressPercent={isOnboardingProgram ? onboardingProgressPct : null}
+                        onInteractivePilotComplete={handleInteractivePilotComplete}
                         footer={
                           isOnboardingProgram ? (
                             <EnterpriseLessonFooter
@@ -1057,6 +1072,11 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                         onComplete={() => void toggleComplete(true)}
                         onShare={openLessonSharePrompt}
                         error={completeError}
+                        emphasizeComplete={
+                          interactivePracticeReady &&
+                          activeLessonId === WATER_DAMAGE_HAZARD_LESSON_ID &&
+                          !currentMeta?.completed
+                        }
                       />
                       <LearnerLessonNotes
                         noteText={noteText}

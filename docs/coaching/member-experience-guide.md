@@ -44,6 +44,8 @@ Marketing pack stats/jump links: `src/lib/coaching-portal/marketing-pack/marketi
 ## Tests
 
 ```bash
+npm run verify:product-excellence
+
 npm run test:unit -- \
   src/lib/coaching-portal/coaching-page-meta.test.ts \
   src/lib/coaching-portal/coaching-route-metadata.test.ts \

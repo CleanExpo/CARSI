@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useAuth } from '@/components/auth/auth-provider';
 import { ViewModeToggle } from '@/components/layout/ViewModeToggle';
@@ -77,6 +77,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const [menuPathname, setMenuPathname] = useState(pathname);
+  const desktopSidebarRef = useRef<HTMLElement>(null);
 
   if (menuPathname !== pathname) {
     setMenuPathname(pathname);
@@ -138,7 +139,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       <nav
         aria-label="Admin navigation"
-        className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-2 py-4 whitespace-nowrap md:min-h-auto md:overflow-visible [&>*]:shrink-0"
+        className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-2 py-4 whitespace-nowrap [&>*]:shrink-0"
         onClick={(event) => {
           if ((event.target as HTMLElement).closest('a')) setOpen(false);
         }}
@@ -284,6 +285,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           side="left"
           aria-modal="true"
           aria-describedby={undefined}
+          onCloseAutoFocus={(event) => {
+            // The menu button lives in the md:hidden header. When the drawer closes
+            // because the window grew to desktop width, send focus to the visible
+            // sidebar instead of letting it fall to the page body.
+            if (!window.matchMedia('(min-width: 768px)').matches) return;
+            event.preventDefault();
+            desktopSidebarRef.current?.querySelector<HTMLElement>('nav a')?.focus();
+          }}
           className="scrollbar-glass flex w-[min(100%,280px)] flex-col gap-0 overflow-hidden border-white/6 bg-[#080c18] p-0 text-white motion-reduce:animate-none motion-reduce:transition-none"
         >
           <SheetTitle className="sr-only">Admin navigation</SheetTitle>
@@ -291,6 +300,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </SheetContent>
       </Sheet>
       <aside
+        ref={desktopSidebarRef}
         className="scrollbar-glass hidden w-full shrink-0 flex-col overflow-hidden md:flex md:h-full md:w-[240px]"
         style={{
           background: 'rgba(8, 12, 24, 0.88)',

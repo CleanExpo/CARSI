@@ -248,3 +248,47 @@ test('real catalogue and baseline: passes as is, and fails with a planted lesson
   assert.match(r.out, /planted-no-diagram.*missing diagram/);
   assert.doesNotMatch(r.out, /planted-no-diagram.*missing image/);
 });
+
+// GP-754: URL parsing findings from the GP-752 Codex review. Each case failed on the old parser.
+
+test('a protocol-relative URL is remote, not a file under public/', () => {
+  // //cdn.example.com/... is fetched over the page's own scheme (https on the live site), like an
+  // https URL. The old parser looked for public/cdn.example.com/... and reported it missing.
+  const c = course({ thumbnailUrl: '//cdn.example.com/cover.webp' });
+  c.modules[0].lessons[0] = lesson('a', `<img src="//cdn.example.com/l1.webp"><img src="${SVG}">`);
+  const r = run(repo({ courses: [c] }));
+  assert.equal(r.code, 0, r.out);
+});
+
+test('data-src attributes and images inside HTML comments do not count', () => {
+  const c = course();
+  c.modules[0].lessons[0] = lesson(
+    'a',
+    `<img data-src="${IMG}" alt="lazy"><!-- <img src="${SVG}"> --><p>text</p>`
+  );
+  const r = run(repo({ courses: [c] }));
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /\ba\b.*missing image/);
+  assert.match(r.out, /\ba\b.*missing diagram/);
+});
+
+test('an unquoted <img src=...> value is read', () => {
+  const c = course();
+  c.modules[0].lessons[0] = lesson('a', `<img src=${IMG} alt=a><img alt=b src=${SVG}>`);
+  const r = run(repo({ courses: [c] }));
+  assert.equal(r.code, 0, r.out);
+});
+
+test('an upper-case .SVG is not a diagram, because check:course-diagrams reads only .svg', () => {
+  const root = repo();
+  write(root, 'public/courses/fix/diagrams/L2.SVG', 'x');
+  const c = course();
+  c.modules[0].lessons[0] = lesson(
+    'a',
+    `<img src="${IMG}"><img src="/courses/fix/diagrams/L2.SVG">`
+  );
+  write(root, 'data/seed/courses-catalog.json', JSON.stringify({ courses: [c] }));
+  const r = run(root);
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /\ba\b.*missing diagram/);
+});

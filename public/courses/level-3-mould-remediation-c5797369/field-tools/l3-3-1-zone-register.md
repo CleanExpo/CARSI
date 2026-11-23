@@ -7,7 +7,7 @@ Australian-produced. Metric units. Use on site, then file it in the job record.
 Job address: ______________________   Date: ____/____/______   Supervisor: ______________________
 
 - [ ] Floor plan attached with every zone numbered and the work sequence marked.
-- [ ] For each zone: rooms included, volume in m³, air changes per hour (at least 4), real airflow per scrubber, scrubbers needed.
+- [ ] For each zone: rooms included, volume in m³, air changes per hour (from your plan), real airflow per scrubber, scrubbers needed.
 - [ ] Exhaust point for each zone: outdoors, with the duct sealed through the opening.
 - [ ] Critical barriers listed for each zone: doors, windows, grilles, light fittings, penetrations.
 - [ ] Decontamination chamber type (one or two stage) and location. Exit route to outdoors.

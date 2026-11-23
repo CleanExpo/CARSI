@@ -9,6 +9,7 @@ import { findScrollRoot, scrollLessonToTop } from '@/lib/lms/lesson-scroll';
 import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { DriveFileViewer } from '@/components/lms/DriveFileViewer';
 import { FlashcardDeck } from '@/components/lms/FlashcardDeck';
+import { InteractiveExperiencePlayer } from '@/components/lms/interactive/InteractiveExperiencePlayer';
 import { SlideDeckViewer } from '@/components/lms/SlideDeckViewer';
 import { EnterpriseLessonContent } from '@/components/onboarding/EnterpriseLessonContent';
 import { EnterpriseLessonHeader } from '@/components/onboarding/EnterpriseLessonHeader';
@@ -17,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { dash } from '@/lib/dashboard-light-ui';
 import {
   isFlashcardResource,
+  isInteractiveLessonResource,
   isSlidesResource,
   type LessonResource,
 } from '@/lib/lms/lesson-resources';
@@ -53,6 +55,7 @@ interface LessonPlayerProps {
    * lesson is free to sample; once enrolled it is noise, so the badge is hidden.
    */
   enrolled?: boolean;
+  onInteractivePilotComplete?: () => void;
 }
 
 export function LessonPlayer({
@@ -70,6 +73,7 @@ export function LessonPlayer({
   initialPosition,
   onPositionChange,
   enrolled = false,
+  onInteractivePilotComplete,
 }: LessonPlayerProps) {
   const showPreviewBadge = lesson.is_preview && !enrolled;
   const rootRef = useRef<HTMLDivElement>(null);
@@ -82,9 +86,13 @@ export function LessonPlayer({
   }, [lesson.id]);
   const flashcardDecks = resources.filter(isFlashcardResource);
   const slideResources = resources.filter(isSlidesResource);
+  const interactiveExperiences = resources.filter(isInteractiveLessonResource);
   const downloads = resources.filter(
     (r): r is { label?: string; url?: string } =>
-      !isFlashcardResource(r) && !isSlidesResource(r) && Boolean(r.url && r.label)
+      !isFlashcardResource(r) &&
+      !isSlidesResource(r) &&
+      !isInteractiveLessonResource(r) &&
+      Boolean(r.url && r.label)
   );
   const enterprise = variant === 'enterprise';
 
@@ -129,6 +137,17 @@ export function LessonPlayer({
                 label={deck.label}
                 cards={deck.cards}
                 enterprise
+              />
+            ))}
+            {interactiveExperiences.map((exp, i) => (
+              <InteractiveExperiencePlayer
+                key={`interactive-${i}`}
+                label={exp.label}
+                experience={exp.experience}
+                progressKey={lesson.id}
+                enterprise
+                lessonCompleted={completed}
+                onAllComplete={onInteractivePilotComplete}
               />
             ))}
             {downloads.length > 0 ? <DownloadsPanel downloads={downloads} enterprise /> : null}
@@ -178,6 +197,16 @@ export function LessonPlayer({
       ))}
       {flashcardDecks.map((deck, i) => (
         <FlashcardDeck key={`flashcards-${i}`} label={deck.label} cards={deck.cards} />
+      ))}
+      {interactiveExperiences.map((exp, i) => (
+        <InteractiveExperiencePlayer
+          key={`interactive-${i}`}
+          label={exp.label}
+          experience={exp.experience}
+          progressKey={lesson.id}
+          lessonCompleted={completed}
+          onAllComplete={onInteractivePilotComplete}
+        />
       ))}
       {downloads.length > 0 ? <DownloadsPanel downloads={downloads} /> : null}
       {footer}
