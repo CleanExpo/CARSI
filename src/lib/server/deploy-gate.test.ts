@@ -228,12 +228,61 @@ describe('deploy job when the gate refuses', () => {
     expect(job.summary).not.toContain('NOT DEPLOYED');
   });
 
-  it('re-reads the head of main before asking DigitalOcean for a build, and refuses if it moved', () => {
-    const release = steps.find((s) => s.id === 'release')?.run ?? '';
-    const recheck = release.indexOf('commits/main');
-    expect(recheck).toBeGreaterThan(-1);
-    expect(recheck).toBeLessThan(release.indexOf('doctl apps create-deployment'));
-    expect(release).toMatch(/NOT DEPLOYED: main moved/);
+  /**
+   * RUN the release step with stubs: `gh` answers the head of main, `doctl` records every call and
+   * reports `live` as already live (so a passing path makes no deployment), `node` (the health
+   * wait) succeeds. Nothing reaches GitHub or DigitalOcean.
+   */
+  function runRelease(sha: string, mainNow: string, live: string) {
+    const release = steps.find((s) => s.id === 'release');
+    expect(release?.run, 'the deploy job has a release step').toBeTruthy();
+    const dir = mkdtempSync(join(tmpdir(), 'deploy-release-'));
+    const bin = join(dir, 'bin');
+    mkdirSync(bin);
+    const calls = join(dir, 'doctl-calls');
+    writeFileSync(calls, '');
+    writeFileSync(join(bin, 'gh'), `#!/bin/sh\necho ${mainNow}\n`, { mode: 0o755 });
+    writeFileSync(
+      join(bin, 'doctl'),
+      `#!/bin/sh\necho "$*" >> '${calls}'\n` +
+        `case "$*" in "apps get "*) echo '[{"active_deployment":{"id":"dep-1","services":[{"source_commit_hash":"${live}"}]}}]' ;; *) echo dep-2 ;; esac\n`,
+      { mode: 0o755 },
+    );
+    writeFileSync(join(bin, 'node'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+    const summary = join(dir, 'summary.md');
+    const output = join(dir, 'output');
+    writeFileSync(summary, '');
+    writeFileSync(output, '');
+    const result = spawnSync('bash', ['-e', '-c', release!.run!], {
+      encoding: 'utf8',
+      env: {
+        PATH: `${bin}:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin`,
+        SHA: sha,
+        FORCE: 'false',
+        DO_TOKEN: 'not-a-token',
+        GH_TOKEN: 'not-a-token',
+        DO_APP_ID: 'app-under-test',
+        GITHUB_REPOSITORY: 'CleanExpo/CARSI',
+        GITHUB_OUTPUT: output,
+        GITHUB_STEP_SUMMARY: summary,
+      },
+    });
+    return { status: result.status, summary: readFileSync(summary, 'utf8'), doctl: readFileSync(calls, 'utf8') };
+  }
+
+  it('refuses before any DigitalOcean call when main moved after the checks (refusal reaches no build)', () => {
+    const run = runRelease(OLD, HEAD, OLD);
+    expect(run.status).not.toBe(0);
+    expect(run.summary).toContain(`NOT DEPLOYED: main moved to ${HEAD}`);
+    expect(run.doctl).toBe('');
+  });
+
+  it('carries on to DigitalOcean when main is still the checked commit', () => {
+    const run = runRelease(HEAD, HEAD, HEAD);
+    expect(run.status).toBe(0);
+    expect(run.summary).not.toContain('NOT DEPLOYED');
+    expect(run.doctl).toContain('apps get');
+    expect(run.doctl).not.toContain('create-deployment');
   });
 
   it('names the commit whose CI finished in the run title, not the head of main (refused runs were misread)', () => {
