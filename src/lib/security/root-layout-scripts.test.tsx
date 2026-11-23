@@ -36,9 +36,10 @@ vi.hoisted(() => {
   process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID = 'agent-under-test';
 });
 
-vi.mock('next/font/google', () => ({
-  Outfit: () => ({ variable: 'font-display' }),
-  Plus_Jakarta_Sans: () => ({ variable: 'font-sans' }),
+vi.mock('@/lib/brand/fonts', () => ({
+  fontDisplay: { variable: '--font-display' },
+  fontSans: { variable: '--font-sans' },
+  fontMono: { variable: '--font-mono' },
 }));
 vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
 // next/script defers afterInteractive scripts to the client, so a static render would hide them.

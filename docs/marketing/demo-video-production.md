@@ -23,13 +23,13 @@ Flows with `brandVideoScriptId: null` are **silent b-roll** (transcode only).
 
 ## Prerequisites
 
-| Requirement | How |
-| --- | --- |
-| App running | `npm run dev` (or point `DEMO_RECORD_BASE_URL` at a deployed preview) |
+| Requirement         | How                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| App running         | `npm run dev` (or point `DEMO_RECORD_BASE_URL` at a deployed preview)                                                                                                                                                                                                                                                                                                                                                                                                       |
 | Demo account seeded | **Local or disposable database only:** `npm run db:seed-courses -- --all --apply` then `npm run db:seed-e2e-user` (creates `student@carsi.com.au`, enrolled in the first catalogue course). Without `--apply` the seed only previews. `--all --apply` rewrites course metadata and lesson content for **every** catalogue course from the repo, so never point it at production — seed the one slug you are recording and follow `docs/runbooks/course-go-live.md` instead. |
-| HeyGen secret | `HEYGEN_API_KEY` (+ optional `HEYGEN_AVATAR_ID`, `HEYGEN_VOICE_ID` for avatar mode) |
-| Cloudinary secrets | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` |
-| FFmpeg | bundled via `@ffmpeg-installer/ffmpeg` (installed with `npm ci`); or set `FFMPEG_PATH` |
+| HeyGen secret       | `HEYGEN_API_KEY` (+ optional `HEYGEN_AVATAR_ID`, `HEYGEN_VOICE_ID` for avatar mode)                                                                                                                                                                                                                                                                                                                                                                                         |
+| Cloudinary secrets  | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`                                                                                                                                                                                                                                                                                                                                                                                                      |
+| FFmpeg              | bundled via `@ffmpeg-installer/ffmpeg` (installed with `npm ci`); or set `FFMPEG_PATH`                                                                                                                                                                                                                                                                                                                                                                                      |
 
 Optional overrides (safe defaults — see `.env.example`): `DEMO_RECORD_BASE_URL`
 (`http://localhost:3000`), `DEMO_VIDEO_MAX` (12), `DEMO_PIP_MARGIN` (24),
@@ -69,13 +69,13 @@ Composite audio flags (see "Artlist audio" below): `--voiceover=<file>`, `--musi
 
 ## Current flows (`src/lib/screencast/demo-flows.ts`)
 
-| Flow id | Purpose | Avatar (`brandVideoScriptId`) |
-| --- | --- | --- |
-| `lesson-player-walkthrough` | `lesson-walkthrough` | `learner-day-three-nudge` |
-| `welcome-public-tour` | `marketing-reel` | `carsi-public-introduction` |
-| `dashboard-broll` | `brand-broll` | _none (silent)_ |
-| `pathways-tour` | `marketing-reel` | `pathways-advisor-intro` |
-| `course-catalogue-discipline-tour` | `brand-broll` | _none (silent)_ |
+| Flow id                            | Purpose              | Avatar (`brandVideoScriptId`) |
+| ---------------------------------- | -------------------- | ----------------------------- |
+| `lesson-player-walkthrough`        | `lesson-walkthrough` | `learner-day-three-nudge`     |
+| `welcome-public-tour`              | `marketing-reel`     | `carsi-public-introduction`   |
+| `dashboard-broll`                  | `brand-broll`        | _none (silent)_               |
+| `pathways-tour`                    | `marketing-reel`     | `pathways-advisor-intro`      |
+| `course-catalogue-discipline-tour` | `brand-broll`        | _none (silent)_               |
 
 ## Artlist audio (licensed music bed / voiceover)
 
@@ -113,7 +113,7 @@ Behaviour:
 3. `--dry-run`, then `--record` one and scrub the `.webm`; then `--composite` and review the
    PiP framing + caption sync; then `--generate`.
 
-Full guidance + rubric: `skills/content/demo-screencasts.skill.md`.
+Full guidance + rubric: `.agents/skills/learning/carsi-demo-screencasts/SKILL.md`.
 
 ## Output locations
 
