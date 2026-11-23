@@ -66,7 +66,11 @@ export async function GET(request: NextRequest, ctx: Ctx) {
     },
   });
 
-  if (!enrollment && shouldStaffAutoEnrol(claims, course.slug)) {
+  // GP-737: a staff row in a no-access status (e.g. revoked) is reactivated too.
+  if (
+    (!enrollment || !isEnrolmentAccessAllowed(enrollment.status)) &&
+    shouldStaffAutoEnrol(claims, course.slug)
+  ) {
     await ensureAdminEnrollmentForCourse(claims, course.id);
     enrollment = await prisma.lmsEnrollment.findUnique({
       where: {

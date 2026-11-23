@@ -5,6 +5,7 @@ import { CcwCarsiTruckmountClient } from '@/components/ccw/CcwCarsiTruckmountCli
 import { CcwFreeTools } from '@/components/marketing/CcwFreeTools';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
 import { OG_IMAGES } from '@/lib/seo/og-image';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 const siteUrl = getPublicSiteUrl();
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
     'A specialised operator course for HydraMaster & Sapphire Scientific truck-mounts in Australian configuration — safe operation, storage, transport, road safety, maintenance, and competency sign-off. Standards-sourced.',
   alternates: { canonical: `${siteUrl}/ccw-truckmount-operations` },
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     images: OG_IMAGES,
     title: 'CCW-CARSI Truckmount Operations Course | CARSI',
     description:

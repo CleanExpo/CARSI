@@ -20,7 +20,7 @@ export function OnboardingLearnHeader({
   progressPercent,
   hubHref,
 }: Props) {
-  const priceLabel = formatOnboardingPrice(pricing ?? { amountAud: 1295, billingCycle: 'monthly', gst: 'exclusive', seats: 'unlimited' });
+  const priceLabel = formatOnboardingPrice(pricing ?? { seats: 'unlimited' });
 
   return (
     <div className="mb-6 overflow-hidden rounded-2xl border border-[#2490ed]/20 bg-gradient-to-r from-[#eef7ff] via-white to-white shadow-sm">

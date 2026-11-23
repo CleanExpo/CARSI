@@ -33,7 +33,7 @@ vi.mock('@/lib/server/team-subscription-price', () => ({
   resolveTeamTierPriceId: async () => 'price_test_team',
 }));
 vi.mock('@/lib/server/org-subscription-price', () => ({
-  resolveOrgMonthlyPriceId: async () => 'price_test_org',
+  resolveOrgAnnualPriceId: async () => 'price_test_org',
 }));
 vi.mock('@/lib/server/org-subscription-provision', () => ({
   provisionOrgSubscriptionContainer: async () => ({ ok: true, result: { teamId: 'team-1' } }),

@@ -53,6 +53,11 @@ import {
 } from '@/lib/server/event-attribution';
 import { parseUtmCookie, UTM_COOKIE_NAME } from '@/lib/analytics/utm-cookie';
 import {
+  PARTNER_REF_COOKIE_NAME,
+  PARTNER_REF_METADATA_KEY,
+  parseReferralPartnerId,
+} from '@/lib/partners/referral-partners';
+import {
   FIRST_TOUCH_COOKIE_NAME,
   firstTouchMetadata,
   parseFirstTouchCookie,
@@ -103,9 +108,15 @@ export async function POST(request: NextRequest) {
     // Purchase survey (slice 1b, GP-662): bind the browser tab's own key to the session being
     // created. The server sets no cookie, so overlapping checkouts cannot overwrite each other.
     const surveyKey = isPurchaseSurveyEnabled() ? parsePurchaseSurveyKey(body.survey_key) : null;
-    const checkoutMetadata: Record<string, string> = surveyKey
+    const surveyMetadata: Record<string, string> = surveyKey
       ? { ...attributionMetadata, [PURCHASE_SURVEY_BINDING_METADATA_KEY]: purchaseSurveyBinding(surveyKey) }
       : attributionMetadata;
+    // GP-767: the partner whose link brought the buyer (carsi_ref cookie, allow-listed again here
+    // because the browser holds it). The webhook stores it as a partner sale for settlement.
+    const referralPartner = parseReferralPartnerId(request.cookies.get(PARTNER_REF_COOKIE_NAME)?.value);
+    const checkoutMetadata: Record<string, string> = referralPartner
+      ? { ...surveyMetadata, [PARTNER_REF_METADATA_KEY]: referralPartner }
+      : surveyMetadata;
 
     const slug = typeof body.slug === 'string' ? body.slug.trim() : '';
     if (!slug) {

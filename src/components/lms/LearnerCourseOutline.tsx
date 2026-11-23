@@ -74,6 +74,7 @@ export function LearnerCourseOutline({
                       </span>
                       <span className="min-w-0 text-pretty">
                         {outlineLessonLabel(les.title, mod.title)}
+                        {les.completed ? <span className="sr-only"> (completed)</span> : null}
                       </span>
                     </button>
                   </li>
@@ -151,6 +152,7 @@ function ModuleHeading({
         )}
       >
         {title}
+        {done ? <span className="sr-only"> (completed)</span> : null}
       </span>
     </p>
   );

@@ -75,7 +75,8 @@ async function main() {
       slug: c.slug,
       isFree: false,
       priceAud: c.priceAud,
-      published: true,
+      // GP-776: courses are created as drafts; publish through review, approval and the gate.
+      published: false,
       modules: c.modules.map((m) => ({
         title: m.title,
         textContent: paragraphsToLessonHtml(m.bodyParagraphs),
