@@ -7,7 +7,7 @@
  * avatar composited as a picture-in-picture corner, with the avatar's voiceover as the audio.
  *
  * `scripts/generate-demo-videos.ts` consumes this file. Authoring guidance lives in
- * `skills/content/demo-screencasts.skill.md`.
+ * `.agents/skills/learning/carsi-demo-screencasts/SKILL.md`.
  *
  * Routes/IDs below come from the seed snapshot (`scripts/seed-e2e-user.ts` enrols the student
  * in the FIRST course of `data/seed/courses-catalog.json`):
@@ -41,7 +41,11 @@ export const demoFlowsFile: DemoFlowsFile = {
       steps: [
         { action: 'goto', path: '/dashboard/student' },
         { action: 'wait', ms: 4000 },
-        { action: 'highlight', selector: 'a[href*="/lessons/"]', label: 'Continue-learning resume link' },
+        {
+          action: 'highlight',
+          selector: 'a[href*="/lessons/"]',
+          label: 'Continue-learning resume link',
+        },
         { action: 'wait', ms: 3000 },
         { action: 'goto', path: `/dashboard/courses/${COURSE_SLUG}` },
         { action: 'wait', ms: 4000 },
@@ -72,13 +76,21 @@ export const demoFlowsFile: DemoFlowsFile = {
         { action: 'scroll', to: 'top' },
         { action: 'goto', path: '/courses' },
         { action: 'wait', ms: 5000 },
-        { action: 'highlight', selector: 'main a[href^="/courses/"]:not([href="/courses"])', label: 'First course card' },
+        {
+          action: 'highlight',
+          selector: 'main a[href^="/courses/"]:not([href="/courses"])',
+          label: 'First course card',
+        },
         { action: 'wait', ms: 4000 },
         { action: 'scroll', to: 'bottom' },
         { action: 'wait', ms: 4000 },
         { action: 'scroll', to: 'top' },
         { action: 'wait', ms: 3000 },
-        { action: 'click', selector: 'main a[href^="/courses/"]:not([href="/courses"])', label: 'Open a course' },
+        {
+          action: 'click',
+          selector: 'main a[href^="/courses/"]:not([href="/courses"])',
+          label: 'Open a course',
+        },
         { action: 'wait', ms: 6000 },
         { action: 'scroll', to: 'bottom' },
         { action: 'wait', ms: 5000 },

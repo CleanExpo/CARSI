@@ -101,9 +101,9 @@ top of every portal screen.
   checklist, 30 days of claim-safe social drafts, and ranked fixes. Fixes land on the action board
   as proposed items until the coach approves them."
 
-## 10. Coming next: assistant, your chapter and the Hall
+## 10. Coach chapter, Ask coach & TradeHall preview
 
-- **Status:** coming (GP-630 assistant, GP-632 chapters, GP-636 TradeHall). Nothing to click yet.
+- **Status:** live. Home shows your coach chapter; Sessions shows receipts; Resources includes TradeHall preview (`#tradehall`). Full seminar video ships with GP-636.
 - **Proves:** A3, A5 and A9.
 - **Say:** "Members will ask questions answered from your own material, and unanswered ones come to
   you. You would run your own chapter: your name, your members, your currency. A US chapter

@@ -5,8 +5,9 @@
  * complete coaching journey: frozen onboarding packet, reviewed assessment, approved plan, six
  * actions in mixed states, one past session with decisions and one upcoming session with prep.
  *
- * Works on the CURRENT schema only. The "Demo US" chapter with USD pricing needs GP-632's coach
- * table and is kept as a draft in docs/coaching/partner-demo-chapter-DRAFT.md, not written here.
+ * Works on the CURRENT schema only. Partner demo members default to the CARSI chapter slug and
+ * coach id (GP-632); a separate "Demo US" chapter with USD pricing remains a draft in
+ * docs/coaching/partner-demo-chapter-DRAFT.md.
  *
  * Safety properties (each one has a test in partner-demo-seed.test.ts):
  *   - guarded: refuses unless CARSI_COACHING_DEMO_ENABLED === 'true' AND the database host is local
@@ -20,6 +21,11 @@
 import { createHash, randomUUID } from 'node:crypto';
 
 import { COACHING_ASSESSMENT_SECTIONS } from '@/lib/coaching-portal/assessment-schema';
+import {
+  DEFAULT_COACHING_CHAPTER_SLUG,
+  DEFAULT_COACHING_COACH,
+} from '@/lib/coaching-portal/coach-routing';
+import { composeFallbackCoachBrief } from '@/lib/coaching-portal/onboarding-coach-brief';
 import type { CoachingOnboardingSnapshot } from '@/lib/coaching-portal/onboarding-snapshot';
 import {
   PARTNER_DEMO_ASSESSMENT_ANSWERS,
@@ -46,7 +52,9 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Deterministic RFC 4122 version-5-shaped UUID for a demo row key. */
 export function partnerDemoId(key: string): string {
-  const h = createHash('sha256').update(ID_NAMESPACE + key).digest();
+  const h = createHash('sha256')
+    .update(ID_NAMESPACE + key)
+    .digest();
   h[6] = (h[6] & 0x0f) | 0x50;
   h[8] = (h[8] & 0x3f) | 0x80;
   const hex = h.subarray(0, 16).toString('hex');
@@ -161,6 +169,10 @@ export function buildPartnerDemoSeedPlan(now: Date) {
     assessmentResponses: responses,
     statements,
   };
+  const onboardingCoachBrief = {
+    ...composeFallbackCoachBrief(snapshot),
+    generatedAt: reviewedAt.toISOString(),
+  };
 
   const action = (
     key: string,
@@ -268,12 +280,16 @@ export function buildPartnerDemoSeedPlan(now: Date) {
       id: partnerDemoId('profile'),
       userId,
       ...PROFILE,
+      chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
+      coachUserId: DEFAULT_COACHING_COACH.id,
       onboardingProblemStatement: statements.problemStatement,
       onboardingGoalStatement: statements.goalStatement,
       onboardingExtraNotes: statements.extraNotes,
       onboardingSubmittedAt: submittedAt,
       onboardingEmailsSentAt: submittedAt,
       onboardingSnapshotJson: JSON.stringify(snapshot),
+      onboardingCoachBriefJson: JSON.stringify(onboardingCoachBrief),
+      onboardingCoachBriefAt: reviewedAt,
       sessionPrepNotes: 'Bring the quote log and the crew-lead shortlist.',
       completedAt: submittedAt,
     },
@@ -314,7 +330,11 @@ export function buildPartnerDemoSeedPlan(now: Date) {
 // ---------------------------------------------------------------------------------------------
 
 type Where = Record<string, unknown>;
-type UpsertArgs = { where: Where; create: Record<string, unknown>; update: Record<string, unknown> };
+type UpsertArgs = {
+  where: Where;
+  create: Record<string, unknown>;
+  update: Record<string, unknown>;
+};
 type Delegate = {
   upsert(args: UpsertArgs): Promise<unknown>;
   deleteMany(args: { where: Where }): Promise<{ count: number }>;
@@ -371,7 +391,11 @@ function stripKeys<T extends Record<string, unknown>>(row: T, keys: string[]) {
   return out;
 }
 
-const MANY_ROW_TABLES = ['carsiCoachingAssessment', 'carsiCoachingAction', 'carsiCoachingSession'] as const;
+const MANY_ROW_TABLES = [
+  'carsiCoachingAssessment',
+  'carsiCoachingAction',
+  'carsiCoachingSession',
+] as const;
 
 /**
  * Reads, refuses or plans, then (unless dry run) writes — all through `d`. When writing, `d` is an

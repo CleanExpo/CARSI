@@ -207,6 +207,8 @@ describe.runIf(RUNNABLE)('partner demo seed (real PostgreSQL)', async () => {
     );
     expect(dashboard.sessions.hasBookedAny).toBe(true);
     expect(dashboard.sessions.upcoming?.coachName).toBe(seed.PARTNER_DEMO_COACH_LABEL);
+    expect(dashboard.coach.chapterSlug).toBe('carsi-business-coaching');
+    expect(dashboard.coach.displayName).toBe(seed.PARTNER_DEMO_COACH_LABEL);
   });
 
   it('the demo login is locked and not claimable', async () => {

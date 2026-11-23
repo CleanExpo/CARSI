@@ -33,9 +33,10 @@ import {
 } from './approved-wording';
 import { readingViews, sourceLine } from './reading-view';
 
-vi.mock('next/font/google', () => ({
-  Outfit: () => ({ variable: 'font-display' }),
-  Plus_Jakarta_Sans: () => ({ variable: 'font-sans' }),
+vi.mock('@/lib/brand/fonts', () => ({
+  fontDisplay: { variable: '--font-display' },
+  fontSans: { variable: '--font-sans' },
+  fontMono: { variable: '--font-mono' },
 }));
 vi.mock('next/navigation', () => ({
   usePathname: () => '/',
