@@ -5,7 +5,7 @@ pathways — for selling, the tradeshow/trade night, the pathway pages and staff
 conversations. Licence-safe (see guardrails). Live publishing is founder-gated.
 
 > **Claim discipline (read first).** CARSI is **additive**, never a replacement. CARSI is an
-> **IICRC CEC Accredited provider**; its own credential is the **CARSI Southern Hemisphere
+> **IICRC Approved CEC Provider**; its own credential is the **CARSI Southern Hemisphere
 > Restoration Designation**, which can *also* earn IICRC CECs where a course is approved. Never say
 > or imply CARSI replaces or outranks IICRC/RIA/ISSA/IAQ certification, and never claim
 > "registered"/"nationally recognised" until that status is actually granted. The value case below
@@ -33,7 +33,7 @@ different and complementary:
   quality-checked against AU *and* international references, and peer-challenged by practitioners
   (the Designation Vetting Standard) — built to stand up to a senior tech, a builder, an insurer or
   a regulator.
-- **It compounds, and it keeps your IICRC standing.** CARSI is an **IICRC CEC Accredited provider**;
+- **It compounds, and it keeps your IICRC standing.** CARSI is an **IICRC Approved CEC Provider**;
   a designation course **approved for IICRC CECs** (recorded in the approvals registry) gives your
   people credit toward maintaining their existing IICRC certification *while* they deepen
   capability. It's not either/or — it's both.
@@ -85,6 +85,6 @@ learn. What rises is the **value of each participant**:
 
 Enforced by `check:iicrc-terminology`, `check:iicrc-compliance`, `check:cec`, `check:cec-course-brand`,
 `check:standards-claims`, `check:au-english`, and `check:course-standard`. Follow CLAUDE.md § "IICRC CEC terminology" for the exact banned IICRC framings
-(the ones that imply the IICRC accredits or delivers a CARSI course, or that CARSI issues the
+(the ones that imply the IICRC delivers a CARSI course or certifies it, or that CARSI issues the
 certification); no "registered" / "nationally recognised" claim until granted; no
 guaranteed-income / ROI figures; cite standards nominatively only.

@@ -68,13 +68,13 @@ These values come from the live Organization schema on https://carsi.com.au/ (JS
    - It must look like `https://g.page/r/...` or `https://search.google.com/local/writereview?placeid=...`. Anything else is rejected by the site.
    - The site then offers that link to every reviewer after any star rating, never only to happy ones.
 
-**Google description (paste exactly; 576 characters, under Google's 750 limit):**
+**Google description (paste exactly; 574 characters, under Google's 750 limit):**
 
-> CARSI is an Australian training provider for restoration and cleaning technicians, and an IICRC CEC Accredited provider. Our online courses cover water damage restoration, structural drying, mould remediation, indoor air quality, odour control, fire and smoke restoration, and carpet and upholstery cleaning. Courses are written for Australian conditions, using AS/NZS standards, Safe Work Australia guidance, metric units and 230 V equipment. Learners study at their own pace and receive a CARSI certificate on completion. Each course page shows its details before you enrol.
+> CARSI is an Australian training provider for restoration and cleaning technicians, and an IICRC Approved CEC Provider. Our online courses cover water damage restoration, structural drying, mould remediation, indoor air quality, odour control, fire and smoke restoration, and carpet and upholstery cleaning. Courses are written for Australian conditions, using AS/NZS standards, Safe Work Australia guidance, metric units and 230 V equipment. Learners study at their own pace and receive a CARSI certificate on completion. Each course page shows its details before you enrol.
 
 Copy rules this description keeps:
 
-- It always pairs "Accredited" with "CEC", describing CARSI's standing as a CEC provider.
+- It uses the IICRC's own term, "IICRC Approved CEC Provider", for CARSI's standing, and never calls CARSI "accredited".
 - It does not claim CARSI delivers IICRC certification.
 - It names no IICRC discipline acronyms.
 - It makes no claim that a course earns CECs and states no CEC hours. Only 38 catalogue courses hold IICRC CEC approval (`data/seed/cec-approvals.json`, 18/10/2026), and the course pages already show which ones.

@@ -4,7 +4,7 @@
 
 ## Objective
 
-Generate qualified leads from decision-makers who control training budgets across 4 industry segments. Secondary objective: build brand awareness for CARSI as Australia's IICRC CEC Accredited training platform.
+Generate qualified leads from decision-makers who control training budgets across 4 industry segments. Secondary objective: build brand awareness for CARSI as an Australian training platform and IICRC Approved CEC Provider.
 
 **Targets:**
 
@@ -94,7 +94,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** Mould in FIFO accommodation cost one WA mine site $480,000 last year.
 >
-> **Body:** Most mining companies discover mould problems after they become safety incidents. CARSI offers IICRC CEC Accredited online training in mould assessment, water damage response and structural drying — designed for FIFO rosters with zero classroom time required.
+> **Body:** Most mining companies discover mould problems after they become safety incidents. CARSI, an IICRC Approved CEC Provider, offers online training in mould assessment, water damage response and structural drying — designed for FIFO rosters with zero classroom time required.
 >
 > Train your site supervisors and maintenance crew. Earn verifiable IICRC credentials. Protect your workforce and your balance sheet.
 >
@@ -104,7 +104,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** Is your mining site team trained to handle water ingress and mould?
 >
-> **Body:** WHS regulations require competent persons for mould and water damage response. CARSI delivers IICRC CEC Accredited courses 100% online — your team completes them between shifts, on any device, with no roster disruption.
+> **Body:** WHS regulations require competent persons for mould and water damage response. CARSI, an IICRC Approved CEC Provider, delivers courses 100% online — your team completes them between shifts, on any device, with no roster disruption.
 >
 > Verifiable digital certificates. Group licensing available for 10+ seats.
 >
@@ -114,7 +114,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** 40+ IICRC CEC courses. Zero classroom time. One annual subscription.
 >
-> **Body:** CARSI gives mining companies unlimited access to IICRC CEC Accredited restoration and safety training for $795/year per user. Water damage restoration, structural drying and mould remediation and more — all self-paced, all verifiable, all built for shift workers.
+> **Body:** CARSI gives mining companies unlimited access to restoration and safety training from an IICRC Approved CEC Provider for $795/year per user. Water damage restoration, structural drying and mould remediation and more — all self-paced, all verifiable, all built for shift workers.
 >
 > Bulk licensing discounts for teams of 10+.
 >
@@ -126,7 +126,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** Mould exposure is a serious risk for elderly residents. Is your facility team trained?
 >
-> **Body:** Aged care quality standards require proactive environmental management. CARSI offers IICRC CEC Accredited courses in mould assessment, remediation and indoor air quality — specifically relevant for facility managers and maintenance staff.
+> **Body:** Aged care quality standards require proactive environmental management. CARSI, an IICRC Approved CEC Provider, offers courses in mould assessment, remediation and indoor air quality — specifically relevant for facility managers and maintenance staff.
 >
 > Online, self-paced, and designed to fit around care rosters.
 >
@@ -136,7 +136,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** Aged care facilities in Australia face increasing scrutiny on indoor air quality.
 >
-> **Body:** Ensure your team holds recognised credentials in mould identification and remediation. CARSI's IICRC CEC Accredited online courses are designed for non-technical facility staff — practical, jargon-free, and verifiable.
+> **Body:** Ensure your team holds recognised credentials in mould identification and remediation. CARSI's online courses, from an IICRC Approved CEC Provider, are designed for non-technical facility staff — practical, jargon-free, and verifiable.
 >
 > Group rates available for multi-site operators.
 >
@@ -146,7 +146,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** Train your entire aged care team in mould safety — from $79 per course.
 >
-> **Body:** CARSI offers IICRC CEC Accredited training starting at $79 per course, or unlimited access for $795/year. Every completion earns a verifiable digital certificate your compliance team can audit.
+> **Body:** CARSI, an IICRC Approved CEC Provider, offers training starting at $79 per course, or unlimited access for $795/year. Every completion earns a verifiable digital certificate your compliance team can audit.
 >
 > No classroom time. No roster disruption. Instant online access.
 >
@@ -158,7 +158,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** A tenant mould complaint just became a $200,000 problem. Could your team have prevented it?
 >
-> **Body:** Property managers who understand mould assessment save owners thousands in remediation costs and legal disputes. CARSI's IICRC CEC Accredited online courses cover mould identification, moisture management and when to call a specialist.
+> **Body:** Property managers who understand mould assessment save owners thousands in remediation costs and legal disputes. CARSI's online courses, from an IICRC Approved CEC Provider, cover mould identification, moisture management and when to call a specialist.
 >
 > Earn verifiable credentials. Protect your properties and your reputation.
 >
@@ -168,7 +168,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** Property managers with IICRC credentials win more management agreements.
 >
-> **Body:** Differentiate yourself in a competitive market. CARSI offers IICRC CEC Accredited courses in water damage, mould assessment and restoration oversight — relevant CPD for every property professional.
+> **Body:** Differentiate yourself in a competitive market. CARSI, an IICRC Approved CEC Provider, offers courses in water damage, mould assessment and restoration oversight — relevant CPD for every property professional.
 >
 > 100% online. Self-paced. Certificate on completion.
 >
@@ -178,7 +178,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** Upskill your property management team in mould and water damage — 100% online.
 >
-> **Body:** From junior PMs to building managers — everyone handling tenant mould reports should know the basics. CARSI offers group licensing for teams of 10+ with IICRC CEC Accredited courses and verifiable certificates.
+> **Body:** From junior PMs to building managers — everyone handling tenant mould reports should know the basics. CARSI offers group licensing for teams of 10+, with courses from an IICRC Approved CEC Provider and verifiable certificates.
 >
 > **CTA:** Get Group Pricing →
 
@@ -188,7 +188,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** Credentialed cleaning crews stand out when remediation contracts go to tender.
 >
-> **Body:** Verifiable CARSI credentials show your team has trained in mould remediation, water damage extraction and carpet cleaning. CARSI is an IICRC CEC Accredited provider — your crew completes online courses between jobs.
+> **Body:** Verifiable CARSI credentials show your team has trained in mould remediation, water damage extraction and carpet cleaning. CARSI is an IICRC Approved CEC Provider — your crew completes online courses between jobs.
 >
 > Stand out in tenders. Win bigger contracts. CEC hours are shown only on courses the IICRC has approved.
 >
@@ -208,7 +208,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 > **Hook:** Franchise owners — train your entire network on one platform.
 >
-> **Body:** CARSI offers group licensing for cleaning franchises. IICRC CEC Accredited courses in carpet cleaning, mould remediation and water damage restoration. Track team progress, verify certificates, and demonstrate competence to clients.
+> **Body:** CARSI offers group licensing for cleaning franchises. Courses from an IICRC Approved CEC Provider in carpet cleaning, mould remediation and water damage restoration. Track team progress, verify certificates, and demonstrate competence to clients.
 >
 > **CTA:** Get Franchise Pricing →
 

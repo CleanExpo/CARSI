@@ -6,6 +6,7 @@ import { LinkedInShareButton } from '@/components/lms/LinkedInShareButton';
 import { useToast } from '@/hooks/use-toast';
 import { apiClient } from '@/lib/api/client';
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
+import { APPROVED_FOR_IICRC_CECS_LABEL } from '@/lib/iicrc/approved-wording';
 import { CecRenewalFigure, CecRenewalStatus } from '@/components/lms/CecRenewalStatus';
 import { useRenewalSummary } from '@/hooks/use-renewal-summary';
 import { renewalProgress } from '@/lib/renewal-progress';
@@ -144,7 +145,7 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
             <Award className="h-5 w-5" aria-hidden />
           </span>
           <div className="min-w-0">
-            <p className={kicker}>{hasCec ? 'IICRC CEC Accredited' : 'CARSI certificate'}</p>
+            <p className={kicker}>{hasCec ? APPROVED_FOR_IICRC_CECS_LABEL : 'CARSI certificate'}</p>
             <h3 className={`mt-2 text-[1.15rem] leading-snug ${heading}`}>
               {credential.course_title}
             </h3>

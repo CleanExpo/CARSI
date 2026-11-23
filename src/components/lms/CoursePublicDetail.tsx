@@ -16,6 +16,7 @@ import { ReviewPolicyLink } from '@/components/lms/ReviewPolicy';
 import { courseDurationLabel } from '@/lib/course-duration-label';
 import { approvedCecHours } from '@/lib/courses/course-credential-copy';
 import { CARSI_CREDENTIAL_STATEMENT } from '@/components/seo/JsonLd';
+import { CARSI_PROVIDER_STATUS } from '@/lib/iicrc/approved-wording';
 import type { DesignationDefinition } from '@/lib/designations/registry';
 
 /** The "Earns N IICRC CEC hour(s)" label, pluralised, from the resolved approval hours. */
@@ -179,8 +180,8 @@ export function CoursePublicDetail({
                     <span className="font-semibold text-slate-800">
                       A CARSI-issued credential — not an IICRC certification.
                     </span>{' '}
-                    CARSI is an IICRC CEC Accredited provider. IICRC certification is obtained
-                    through a school and examination approved by the IICRC.{' '}
+                    {CARSI_PROVIDER_STATUS} IICRC certification is obtained through a school and
+                    examination approved by the IICRC.{' '}
                   </>
                 ) : (
                   <>
