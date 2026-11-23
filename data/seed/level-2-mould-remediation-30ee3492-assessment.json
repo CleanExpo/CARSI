@@ -27,7 +27,7 @@
       },
       {
         "label": "Negative air calculation",
-        "description": "Volume × air changes (at least 4 per hour) ÷ real (derated) airflow, with the exhaust point, a manometer log against −5 Pa, a smoke-test plan and a stop-work rule for a breach.",
+        "description": "Volume × air changes ÷ real (derated) airflow, with the exhaust point, a manometer log, a smoke-test plan and a stop-work rule. The learner states the air-change target and the pressure target as numbers, names who set them in the job plan (supervisor, independent assessor or the equipment maker's rating) and states the reading that counts as a breach; marks are for a stated, sourced and consistently applied target, not for a particular value.",
         "maxPoints": 15
       },
       {

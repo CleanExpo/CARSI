@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CARSI_PROVIDER_STATUS } from '@/lib/iicrc/approved-wording';
 
 import { renderGovContractorGuideEmail } from './email-templates';
 
@@ -20,7 +21,7 @@ describe('renderGovContractorGuideEmail', () => {
 
   it('stays IICRC-CEC compliant (CEC-provider framing only)', () => {
     const blob = `${email.html} ${email.text}`.toLowerCase();
-    expect(blob).toContain('iicrc cec accredited');
+    expect(blob).toContain(CARSI_PROVIDER_STATUS.toLowerCase());
     // Needles built from fragments so this test file never itself contains the
     // banned phrases (the terminology guard scans staged test files too).
     const banned = [

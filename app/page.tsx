@@ -28,6 +28,7 @@ import { getHomepageFeaturedCourses } from '@/lib/server/public-courses-list';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import type { Metadata } from 'next';
 
+import { FROM_IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 // ISR: serve a CDN-cached render, refreshed every 5 minutes, instead of SSR on every
 // request (issue #129). Build-safe via the build-phase guard in the catalogue readers;
 // publish busts the cache via revalidatePath in the admin workflow route.
@@ -51,7 +52,7 @@ async function getFeaturedCourses(): Promise<CourseListItem[]> {
 
 const benefits = [
   '24/7 access, learn anytime, anywhere',
-  'IICRC CEC Accredited courses',
+  `Courses ${FROM_IICRC_APPROVED_CEC_PROVIDER}`,
   'Beginner, intermediate, and advanced levels',
   'Automatic credit tracking',
   'Verifiable digital credentials',

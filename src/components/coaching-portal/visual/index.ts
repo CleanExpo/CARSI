@@ -9,3 +9,5 @@ export { CoachingSection } from './CoachingSection';
 export { CoachingStatGrid } from './CoachingStatGrid';
 export { CoachingSupportPanel } from './CoachingSupportPanel';
 export { CoachingWorkspaceLoading } from './CoachingWorkspaceLoading';
+export { CoachingMonthSummaryCard } from './CoachingMonthSummaryCard';
+export { CoachingMarketingPackFirstWin } from './CoachingMarketingPackFirstWin';
