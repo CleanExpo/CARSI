@@ -85,6 +85,21 @@ function hostsBelongToPublisher(r: {
   return noticeHost === pageHost || (DESIGNATED_NOTICE_HOSTS[pageHost] ?? []).includes(noticeHost);
 }
 
+/**
+ * A card's link must reach the document it names. Copyright, licence and front-matter notice pages
+ * are evidence for licenceEvidence.url, never the card's url (GP-652). A card's url may equal its
+ * licenceEvidence.url only when the notice sits inside the document itself (a PDF, or a page such
+ * as SILO that states its own licence). Notes may not promise a PDF link nobody checked on the page.
+ */
+const NOTICE_PATH =
+  /copyright|licen[cs]e-notice|front-matter|acknowledg(?:e)?ment-(?:of-)?country/i;
+const PDF_LINK_PROMISE = /\blinks? (?:to|through to) the PDF\b|\bPDF (?:download )?link\b/i;
+
+function linksToDocument(r: { url: string; note: string }) {
+  if (NOTICE_PATH.test(new URL(r.url).pathname)) return false;
+  return !PDF_LINK_PROMISE.test(r.note);
+}
+
 /** True when the quoted notice names the same open licence as the card's label, and no restriction. */
 function quoteNamesLicence(label: string, quote: string): boolean {
   if (/non-?commercial|no ?deriv|\b(?:NC|ND)\b|all rights reserved|permission/i.test(quote))
@@ -175,6 +190,31 @@ describe('free-resources data', () => {
     }
   });
 
+  it('links each card to its document, not to the licence notice (GP-652)', () => {
+    for (const r of FREE_RESOURCES) {
+      expect(linksToDocument(r), `${r.id}: ${r.url}`).toBe(true);
+    }
+    // The NCC 2025 cards reach their editions' landing pages on the ABCB NCC site.
+    const edition = (id: string) => FREE_RESOURCES.find((r) => r.id === id)?.url;
+    expect(edition('ncc2025-housing-provisions')).toBe(
+      'https://ncc.abcb.gov.au/editions/ncc-2025/adopted/housing-provisions'
+    );
+    expect(edition('ncc2025-volume-two')).toBe(
+      'https://ncc.abcb.gov.au/editions/ncc-2025/adopted/volume-two'
+    );
+  });
+
+  it('rejects a card linked to a licence notice or promising an unchecked PDF link', () => {
+    const ncc = FREE_RESOURCES.find((r) => r.id === 'ncc2025-housing-provisions');
+    if (!ncc) throw new Error('positive control: no NCC 2025 Housing Provisions card');
+    expect(linksToDocument(ncc)).toBe(true);
+    const notice =
+      'https://ncc.abcb.gov.au/editions/ncc-2025/adopted/housing-provisions/front-matter/copyright-licence-notice-and-acknowledgment-country';
+    expect(linksToDocument({ ...ncc, url: notice })).toBe(false);
+    expect(linksToDocument({ ...ncc, url: 'https://www.yourhome.gov.au/copyright' })).toBe(false);
+    expect(linksToDocument({ ...ncc, note: 'The page has a link to the PDF.' })).toBe(false);
+  });
+
   it('records, for every card, the publisher notice its licence was read from', () => {
     for (const r of FREE_RESOURCES) {
       expect(r.licence, r.id).toMatch(OPEN_LICENCE);
@@ -210,6 +250,8 @@ describe('free-resources data', () => {
     );
     if (!getReady) throw new Error('positive control: no Get Ready card');
     expect(hostsBelongToPublisher(getReady)).toBe(true);
+    // GP-651: its licence was read from the PDF itself (p.73), so the notice is the card's PDF.
+    expect(getReady.licenceEvidence.url).toBe(getReady.url);
     expect(
       hostsBelongToPublisher({
         ...getReady,
