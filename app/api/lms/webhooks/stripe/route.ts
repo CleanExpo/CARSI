@@ -31,6 +31,13 @@ import { sendGa4PurchaseEvent } from '@/lib/server/ga4-measurement-protocol';
 import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { markOrgSubscriptionStatusBySubscriptionId } from '@/lib/server/org-subscription-store';
+import {
+  clearDisputedCheckoutReversal,
+  PAYMENT_REVERSED,
+  recordCheckoutPaymentReversed,
+  recordUnfulfilledPayment,
+  resolveUnfulfilledPayment,
+} from '@/lib/server/payment-integrity-ledger';
 import { recordPartnerReferralSale } from '@/lib/server/partner-referral-sales';
 import { captureServerError } from '@/lib/server/sentry';
 import { resolveStripePaymentReference } from '@/lib/server/stripe-payment-reference';
@@ -195,6 +202,10 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
       });
     }
     if (revokeEntitlement) {
+      // GP-759: record the reversal first, so the success page can never re-grant access
+      // from this session, even when no enrolment row exists yet.
+      await recordCheckoutPaymentReversed(ref, reason, eventTimestamp);
+      // A full refund also takes the session off the unfulfilled list, in the same transaction.
       await revokeEnrollmentsByPaymentReference(ref, reason, eventTimestamp);
     }
     // GP-759 (c): a refunded team seat checkout also takes its seats back.
@@ -279,6 +290,7 @@ async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
         currency: dispute.currency,
       });
     }
+    await clearDisputedCheckoutReversal(ref, eventTimestamp);
     await reactivateDisputeWonEnrollmentsByPaymentReference(ref, eventTimestamp);
   }
 }
@@ -393,37 +405,74 @@ export async function POST(request: NextRequest) {
       return await acknowledge();
     }
 
-    if (session.metadata?.source === 'carsi-ccw-roadshow') {
+    // GP-759: a paid roadshow or coaching checkout that could not be fulfilled is stored as
+    // an unfulfilled payment (admin list), never acknowledged silently. A thrown error or a
+    // failed send is retried by Stripe (each processor is idempotent per session); a terminal
+    // skip such as missing metadata or email is recorded and acknowledged.
+    const sourceOutcome = async (
+      label: string,
+      run: () => Promise<{ terminalSkip?: string; retry?: boolean }>,
+    ) => {
+      let outcome: { terminalSkip?: string; retry?: boolean };
       try {
-        await processCcwRoadshowBookingConfirmation(session, {
+        outcome = await run();
+      } catch (err) {
+        console.error(`[stripe webhook] ${label} fulfillment`, err);
+        void captureServerError(err, { route: '/api/lms/webhooks/stripe', tags: { source: label } });
+        outcome = { retry: true };
+      }
+      if (outcome.retry) {
+        await recordUnfulfilledPayment(session.id, 'fulfilment_failed');
+        return await retryLater(`${label} fulfilment failed; Stripe will retry.`);
+      }
+      if (outcome.terminalSkip) {
+        console.warn(`[stripe webhook] ${label} not fulfilled`, { skipped: outcome.terminalSkip });
+        await recordUnfulfilledPayment(session.id, 'fulfilment_failed');
+        return await acknowledge();
+      }
+      await resolveUnfulfilledPayment(session.id);
+      return await acknowledge();
+    };
+
+    if (session.metadata?.source === 'carsi-ccw-roadshow') {
+      return await sourceOutcome('carsi-ccw-roadshow', async () => {
+        const result = await processCcwRoadshowBookingConfirmation(session, {
           appOrigin: getAppOrigin(),
         });
-      } catch {
-        // Errors logged in sendCcwRoadshowBookingConfirmationEmail
-      }
-      return await acknowledge();
+        if (result.sent || result.skipped === 'already_sent') return {};
+        if (result.skipped === 'no_email' || result.skipped === 'invalid_metadata') {
+          return { terminalSkip: result.skipped };
+        }
+        if (result.skipped) return {};
+        // A genuine send failure: the sent-flag was not written, so a retry may send it.
+        return { retry: true };
+      });
     }
 
     if (session.metadata?.source === 'carsi-business-coaching') {
-      try {
-        await processBusinessCoachingCheckoutCompleted(session, {
+      return await sourceOutcome('carsi-business-coaching', async () => {
+        const result = await processBusinessCoachingCheckoutCompleted(session, {
           appOrigin: getAppOrigin(),
         });
-      } catch (err) {
-        console.error('[stripe webhook] carsi-business-coaching fulfillment', err);
-      }
-      return await acknowledge();
+        if (result.skipped === 'no_email' || result.skipped === 'invalid_metadata') {
+          return { terminalSkip: result.skipped };
+        }
+        return {};
+      });
     }
 
     if (session.metadata?.source === 'carsi-coaching-monthly') {
-      try {
-        await processCarsiCoachingMonthlyCheckoutCompleted(session, {
+      return await sourceOutcome('carsi-coaching-monthly', async () => {
+        const result = await processCarsiCoachingMonthlyCheckoutCompleted(session, {
           appOrigin: getAppOrigin(),
         });
-      } catch (err) {
-        console.error('[stripe webhook] carsi-coaching-monthly fulfillment', err);
-      }
-      return await acknowledge();
+        if (result.fulfilled) return {};
+        // Not a payment for this processor: nothing was owed.
+        if (result.skipped === 'not_paid' || result.skipped === 'not_coaching_monthly') return {};
+        // Paid but no address to fulfil to: a retry cannot fix it, so keep it for an admin.
+        if (result.skipped === 'no_email') return { terminalSkip: result.skipped };
+        return { retry: true };
+      });
     }
 
     const slug = session.metadata?.course_slug?.trim().toLowerCase();
@@ -459,6 +508,9 @@ export async function POST(request: NextRequest) {
         hasStudentMeta: Boolean(studentIdMeta),
         hasEmail: Boolean(email),
       });
+      // GP-759: no retry can create the account, so acknowledge, but keep the paid session on
+      // the admin list. The buyer's own success page (confirm / guest-complete) resolves it.
+      if (session.id) await recordUnfulfilledPayment(session.id, 'learner_unmatched');
       return await acknowledge();
     }
 
@@ -483,6 +535,7 @@ export async function POST(request: NextRequest) {
         purchaseMode,
         teamSeatCount: Number.isFinite(teamSeatCount) ? teamSeatCount : undefined,
       });
+      await resolveUnfulfilledPayment(ref);
 
       await recordAttributedStage(
         parseAttributionJourneyId(session.metadata?.attribution_journey_id),
@@ -534,7 +587,14 @@ export async function POST(request: NextRequest) {
         return await retryLater('Enrolment failed; Stripe will retry.');
       }
       // Terminal business condition — acknowledge so Stripe does not retry.
-      console.warn('[stripe webhook] team purchase blocked: user on another team');
+      if (msg === PAYMENT_REVERSED) {
+        // The session was refunded or charged back before this delivery; nothing is owed.
+        console.warn('[stripe webhook] checkout session payment was reversed; not enrolling');
+      } else {
+        // ALREADY_ON_TEAM: the buyer paid but cannot be seated. Keep it on the admin list.
+        console.warn('[stripe webhook] team purchase blocked: user on another team');
+        await recordUnfulfilledPayment(ref, 'already_on_team');
+      }
     }
 
     return await acknowledge();

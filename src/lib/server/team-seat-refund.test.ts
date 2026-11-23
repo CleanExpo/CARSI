@@ -51,6 +51,16 @@ vi.mock('@/lib/server/event-attribution', () => ({
   recordAttributedStage: vi.fn(async () => {}),
 }));
 vi.mock('@/lib/server/sentry', () => ({ captureServerError: vi.fn(async () => {}) }));
+// GP-759 (a) payment-integrity ledger (refund markers, unfulfilled records): database rows,
+// covered by stripe-webhook-unfulfilled.test.ts and payment-reversal-sticky.test.ts.
+vi.mock('@/lib/server/payment-integrity-ledger', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/server/payment-integrity-ledger')>()),
+  isCheckoutPaymentReversed: vi.fn(async () => false),
+  recordCheckoutPaymentReversed: vi.fn(async () => {}),
+  clearDisputedCheckoutReversal: vi.fn(async () => {}),
+  recordUnfulfilledPayment: vi.fn(async () => {}),
+  resolveUnfulfilledPayment: vi.fn(async () => {}),
+}));
 // The buyer's own enrolment is revoked by its checkout session (covered by its own tests).
 vi.mock('@/lib/server/stripe-revocation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/server/stripe-revocation')>()),

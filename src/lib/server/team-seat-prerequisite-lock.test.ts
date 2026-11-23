@@ -170,6 +170,11 @@ vi.mock('@/lib/prisma', () => {
   };
 });
 
+// GP-759 reversal ledger (a database read), covered by payment-reversal-sticky.test.ts.
+vi.mock('@/lib/server/payment-integrity-ledger', () => ({
+  PAYMENT_REVERSED: 'PAYMENT_REVERSED',
+  isCheckoutPaymentReversed: vi.fn(async () => false),
+}));
 // GP-759 paid-seat check (database reads), covered by team-seat-refund.test.ts.
 vi.mock('@/lib/server/team-seat-refund', () => ({ teamCourseSeatIsFree: vi.fn(async () => true) }));
 vi.mock('@/lib/server/lms-user-sync', () => ({ ensureLmsUserFromClaims: vi.fn(async () => {}) }));

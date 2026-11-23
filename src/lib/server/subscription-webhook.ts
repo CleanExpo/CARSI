@@ -57,6 +57,11 @@ import {
   resolveTeamIdForOrgSubscription,
   updateOrgSubscriptionFromStripe,
 } from '@/lib/server/org-subscription-store';
+import {
+  recordUnfulfilledPayment,
+  resolveUnfulfilledPayment,
+  type UnfulfilledPaymentReason,
+} from '@/lib/server/payment-integrity-ledger';
 import { sendUpcomingRenewalReminder } from '@/lib/server/renewal-reminder';
 import { trackSubscriptionLifecycleEvent } from '@/lib/server/subscription-analytics';
 
@@ -170,6 +175,27 @@ function eventCreatedToDate(event: Stripe.Event): Date | null {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
+/** Thrown so the route returns 5xx and Stripe redelivers once the owner row exists. */
+export const SUBSCRIPTION_OWNER_PENDING = 'SUBSCRIPTION_OWNER_PENDING';
+
+/**
+ * GP-759: a live (active or trialing) CARSI subscription whose owner cannot be matched is
+ * stored as an unfulfilled payment instead of being skipped silently. Team and org owners are
+ * usually a race with the checkout success page writing the row, so that case throws and Stripe
+ * retries; an individual or coaching subscriber who has no account is recorded and
+ * acknowledged, because a retry cannot create the account. A lapsed snapshot grants nothing,
+ * so it is left as before.
+ */
+async function holdUnownedEntitlingSubscription(
+  subscription: Stripe.Subscription,
+  reason: UnfulfilledPaymentReason,
+  mode: 'retry' | 'acknowledge',
+): Promise<void> {
+  if (subscription.status !== 'active' && subscription.status !== 'trialing') return;
+  await recordUnfulfilledPayment(subscription.id, reason);
+  if (mode === 'retry') throw new Error(SUBSCRIPTION_OWNER_PENDING);
+}
+
 /**
  * Upsert the correct subscription record from a full subscription object,
  * dispatching by `source` for coaching, otherwise `plan` (individual / team / org).
@@ -189,6 +215,7 @@ async function applySubscriptionSnapshot(
       console.warn('[subscription-webhook] team: could not resolve CARSI team; skipping', {
         subscriptionId: subscription.id,
       });
+      await holdUnownedEntitlingSubscription(subscription, 'team_unresolved', 'retry');
       return;
     }
     const plan =
@@ -206,6 +233,7 @@ async function applySubscriptionSnapshot(
       plan,
       eventTimestamp,
     });
+    await resolveUnfulfilledPayment(subscription.id);
     return;
   }
 
@@ -215,6 +243,7 @@ async function applySubscriptionSnapshot(
       console.warn('[subscription-webhook] org: could not resolve CARSI org; skipping', {
         subscriptionId: subscription.id,
       });
+      await holdUnownedEntitlingSubscription(subscription, 'team_unresolved', 'retry');
       return;
     }
     const applied = await updateOrgSubscriptionFromStripe({
@@ -232,7 +261,10 @@ async function applySubscriptionSnapshot(
       console.warn('[subscription-webhook] org: subscription row not yet provisioned; skipping', {
         subscriptionId: subscription.id,
       });
+      await holdUnownedEntitlingSubscription(subscription, 'org_not_provisioned', 'retry');
+      return;
     }
+    await resolveUnfulfilledPayment(subscription.id);
     return;
   }
 
@@ -243,6 +275,7 @@ async function applySubscriptionSnapshot(
       console.warn('[subscription-webhook] coaching: could not resolve CARSI user; skipping', {
         subscriptionId: subscription.id,
       });
+      await holdUnownedEntitlingSubscription(subscription, 'subscriber_unresolved', 'acknowledge');
       return;
     }
     await upsertCoachingMonthlySubscription({
@@ -254,6 +287,7 @@ async function applySubscriptionSnapshot(
       cancelAtPeriodEnd: readCancelAtPeriodEnd(subscription),
       eventTimestamp,
     });
+    await resolveUnfulfilledPayment(subscription.id);
     return;
   }
 
@@ -272,6 +306,7 @@ async function applySubscriptionSnapshot(
     console.warn('[subscription-webhook] could not resolve CARSI user; skipping', {
       subscriptionId: subscription.id,
     });
+    await holdUnownedEntitlingSubscription(subscription, 'subscriber_unresolved', 'acknowledge');
     return;
   }
 
@@ -284,6 +319,7 @@ async function applySubscriptionSnapshot(
     cancelAtPeriodEnd: readCancelAtPeriodEnd(subscription),
     eventTimestamp,
   });
+  await resolveUnfulfilledPayment(subscription.id);
 }
 
 /**

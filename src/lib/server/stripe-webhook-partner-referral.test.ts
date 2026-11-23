@@ -36,6 +36,14 @@ vi.mock('@/lib/server/stripe-webhook-idempotency', () => ({
   releaseStripeWebhookEventClaim: mocks.release,
 }));
 vi.mock('@/lib/server/sentry', () => ({ captureServerError: vi.fn() }));
+// GP-759 payment-integrity ledger: database writes, covered by stripe-webhook-unfulfilled.test.ts.
+vi.mock('@/lib/server/payment-integrity-ledger', () => ({
+  PAYMENT_REVERSED: 'PAYMENT_REVERSED',
+  clearDisputedCheckoutReversal: vi.fn(async () => {}),
+  recordCheckoutPaymentReversed: vi.fn(async () => {}),
+  recordUnfulfilledPayment: vi.fn(async () => {}),
+  resolveUnfulfilledPayment: vi.fn(async () => {}),
+}));
 vi.mock('@/lib/server/lms-auth', () => ({
   sessionClaimsForUserId: mocks.claimsFor,
 }));

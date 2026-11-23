@@ -16,6 +16,11 @@ const state = vi.hoisted(() => ({
   lastGated: undefined as boolean | undefined,
 }));
 
+// GP-759 reversal ledger (a database read), covered by payment-reversal-sticky.test.ts.
+vi.mock('@/lib/server/payment-integrity-ledger', () => ({
+  PAYMENT_REVERSED: 'PAYMENT_REVERSED',
+  isCheckoutPaymentReversed: vi.fn(async () => false),
+}));
 vi.mock('@/lib/server/lms-user-sync', () => ({ ensureLmsUserFromClaims: vi.fn(async () => {}) }));
 vi.mock('@/lib/server/course-catalog-sync', () => ({
   getOrCreateCourseBySlug: vi.fn(async () => ({

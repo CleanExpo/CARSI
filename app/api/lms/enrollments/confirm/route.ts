@@ -6,6 +6,11 @@ import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { confirmEmailOwnershipOk, resolveAccountEmail } from '@/lib/server/enrollment-confirm-guard';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
+import {
+  markUnfulfilledPaymentResolved,
+  PAYMENT_REVERSED,
+  PAYMENT_REVERSED_BODY,
+} from '@/lib/server/payment-integrity-ledger';
 import { captureServerError } from '@/lib/server/sentry';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
 import { isPrerequisiteNotMetError, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
@@ -142,6 +147,10 @@ export async function POST(request: NextRequest) {
       teamSeatCount,
     });
 
+    if (sessionId) {
+      await markUnfulfilledPaymentResolved(sessionId, '[enrollments/confirm]');
+    }
+
     if (!fulfilled.alreadyEnrolled && fulfilled.enrollmentId && fulfilled.courseId) {
       void sendEnrollmentWelcomeEmail({
         studentId: claims.sub,
@@ -188,6 +197,9 @@ export async function POST(request: NextRequest) {
         { detail: 'You already belong to another team. Contact support to move your purchase.' },
         { status: 409 },
       );
+    }
+    if (msg === PAYMENT_REVERSED) {
+      return NextResponse.json(PAYMENT_REVERSED_BODY, { status: 403 });
     }
     console.error('[enrollments/confirm]', e);
     void captureServerError(e, { route: '/api/lms/enrollments/confirm' });
