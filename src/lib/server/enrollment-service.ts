@@ -11,7 +11,7 @@ import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import { extractQuizIdFromLesson } from '@/lib/lms/quiz-from-lesson';
 import { parseLessonResources } from '@/lib/lms/lesson-resources';
 import { requireCurrentAdmin, type AdminSessionProvenance } from '@/lib/server/current-admin';
-import { lockEnrollmentForAdminChange, lockEnrollmentRow } from '@/lib/server/enrollment-row-lock';
+import { EnrollmentLockRefusal, withLockedEnrollment } from '@/lib/server/enrollment-row-lock';
 import { isEnrolmentAccessAllowed, isRevokedStatus } from '@/lib/server/enrollment-access';
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import {
@@ -104,8 +104,12 @@ export class LessonCompletionEvidenceError extends Error {
  *    video saves nothing), so the learner's mark stands. Such lessons cannot by themselves
  *    complete a course that needs an assessment: requiredAssessmentsPassed decides that.
  */
-async function assertLessonCompletionEvidence(studentId: string, lessonId: string): Promise<void> {
-  const lesson = await prisma.lmsLesson.findUnique({
+async function assertLessonCompletionEvidence(
+  db: Prisma.TransactionClient,
+  studentId: string,
+  lessonId: string,
+): Promise<void> {
+  const lesson = await db.lmsLesson.findUnique({
     where: { id: lessonId },
     select: { contentType: true, contentBody: true, resources: true },
   });
@@ -116,7 +120,7 @@ async function assertLessonCompletionEvidence(studentId: string, lessonId: strin
     parseLessonResources(lesson.resources),
   );
   if (!quizId) return;
-  const passed = await prisma.lmsQuizAttempt.findFirst({
+  const passed = await db.lmsQuizAttempt.findFirst({
     where: { quizId, studentId, passed: true },
     select: { id: true },
   });
@@ -426,46 +430,51 @@ export async function forceCompleteEnrollment(
 
   const admin = await prisma.$transaction(async (tx) => {
     const current = await requireCurrentAdmin(tx, options.session);
-    // Lock the row and re-check: a revocation either committed before this (refused here) or
-    // waits until this transaction commits.
-    await lockEnrollmentForAdminChange(tx, en.id);
-    for (const lessonId of ids) {
-      await tx.lmsLessonProgress.upsert({
-        where: { studentId_lessonId: { studentId: en.studentId, lessonId } },
-        create: {
-          studentId: en.studentId,
-          lessonId,
-          completed: true,
-          completedAt: now,
-          lastAccessedAt: now,
-        },
-        update: {
-          completed: true,
-          completedAt: now,
-          lastAccessedAt: now,
-        },
-      });
-    }
-    if (total > 0) {
-      await tx.lmsEnrollment.update({
-        where: { id: en.id },
-        data: { lastAccessedLessonId: ids[ids.length - 1]! },
-      });
-    }
-    await tx.lmsLearnerAdminAuditEvent.create({
-      data: {
-        action: 'force_complete',
-        reason,
-        actorKind: current.kind,
-        actorRef: current.ref,
-        actorEmail: current.email,
-        studentRef: en.studentId,
-        enrollmentRef: en.id,
-        courseRef: en.courseId,
-        details: { lessonsMarked: total },
+    // Lock the row and re-check it (one owner: enrollment-row-lock.ts): a revocation either
+    // committed before this (refused, ENROLLMENT_REVOKED) or waits until this commits.
+    return withLockedEnrollment(
+      tx,
+      { enrollmentId: en.id, studentId: en.studentId, require: 'admin-change' },
+      async () => {
+        for (const lessonId of ids) {
+          await tx.lmsLessonProgress.upsert({
+            where: { studentId_lessonId: { studentId: en.studentId, lessonId } },
+            create: {
+              studentId: en.studentId,
+              lessonId,
+              completed: true,
+              completedAt: now,
+              lastAccessedAt: now,
+            },
+            update: {
+              completed: true,
+              completedAt: now,
+              lastAccessedAt: now,
+            },
+          });
+        }
+        if (total > 0) {
+          await tx.lmsEnrollment.update({
+            where: { id: en.id },
+            data: { lastAccessedLessonId: ids[ids.length - 1]! },
+          });
+        }
+        await tx.lmsLearnerAdminAuditEvent.create({
+          data: {
+            action: 'force_complete',
+            reason,
+            actorKind: current.kind,
+            actorRef: current.ref,
+            actorEmail: current.email,
+            studentRef: en.studentId,
+            enrollmentRef: en.id,
+            courseRef: en.courseId,
+            details: { lessonsMarked: total },
+          },
+        });
+        return current;
       },
-    });
-    return current;
+    );
   });
 
   await syncEnrollmentCompletion(en.id, en.studentId, en.courseId, {
@@ -550,59 +559,70 @@ export async function syncEnrollmentCompletion(
   // One transaction also keeps the first-completion record with the completion, so a failed
   // write rolls both back and a retry is still a new completion.
   const newlyGatedCompletion = await prisma.$transaction(async (tx): Promise<boolean> => {
-    if (!(await lockEnrollmentRow(tx, enrollmentId))) return false;
-    const prior = await tx.lmsEnrollment.findUnique({
-      where: { id: enrollmentId },
-      select: { completedAt: true, status: true },
-    });
+    try {
+      return await withLockedEnrollment(
+        tx,
+        // A revoked/refunded row (or one that is not this learner's) is refused before any read.
+        { enrollmentId, studentId, require: 'admin-change' },
+        async () => {
+          const prior = await tx.lmsEnrollment.findUnique({
+            where: { id: enrollmentId },
+            select: { completedAt: true, status: true },
+          });
 
-    // STICKY REVOCATION (WS3 / P0-C): a revoked/refunded/disputed enrolment is a
-    // terminal state. NEVER resurrect it to active/completed on a later sync —
-    // otherwise a refunded learner un-revokes themselves simply by marking a lesson
-    // or opening their certificate (completedAt survives revocation, so the
-    // wasAlreadyCompleted branch below would flip it straight back). This guard
-    // covers BOTH the zero-lesson branch and the main completion write.
-    if (!prior || isRevokedStatus(prior.status)) return false;
+          // STICKY REVOCATION (WS3 / P0-C): a revoked/refunded/disputed enrolment is a
+          // terminal state. NEVER resurrect it to active/completed on a later sync —
+          // otherwise a refunded learner un-revokes themselves simply by marking a lesson
+          // or opening their certificate (completedAt survives revocation, so the
+          // wasAlreadyCompleted branch below would flip it straight back). This guard
+          // covers BOTH the zero-lesson branch and the main completion write.
+          if (!prior || isRevokedStatus(prior.status)) return false;
 
-    if (total === 0) {
-      await tx.lmsEnrollment.update({
-        where: { id: enrollmentId },
-        data: { status: 'active', completedAt: null },
-      });
-      return false;
+          if (total === 0) {
+            await tx.lmsEnrollment.update({
+              where: { id: enrollmentId },
+              data: { status: 'active', completedAt: null },
+            });
+            return false;
+          }
+
+          // Evidence, read under the lock (see above).
+          const completed = await tx.lmsLessonProgress.count({
+            where: { studentId, lessonId: { in: ids }, completed: true },
+          });
+          const allLessonsDone = completed >= total;
+          const quizGateSatisfied = await requiredAssessmentsPassed(tx, courseId, slug, studentId);
+
+          const wasAlreadyCompleted = prior.status === 'completed' || prior.completedAt != null;
+
+          // Certificate/CEC integrity: completion needs lessons AND every required assessment
+          // passed, but an already-completed enrollment is never downgraded (GP-439 item 3:
+          // issued certificates are always retained).
+          const isCompleted = decideEnrollmentCompleted({
+            allLessonsDone,
+            quizGateSatisfied,
+            wasAlreadyCompleted,
+          });
+
+          const completedAt = isCompleted ? (prior.completedAt ?? new Date()) : null;
+          await tx.lmsEnrollment.update({
+            where: { id: enrollmentId },
+            data: {
+              status: isCompleted ? 'completed' : 'active',
+              completedAt,
+            },
+          });
+          if (completedAt) await recordFirstCompletion(enrollmentId, completedAt, tx);
+
+          // Only a genuinely new, fully-gated completion written by THIS transaction may fire the
+          // (irreversible) IICRC CEC auto-submit; it runs below, after the commit.
+          return allLessonsDone && quizGateSatisfied && !wasAlreadyCompleted;
+        },
+      );
+    } catch (e) {
+      if (e instanceof EnrollmentLockRefusal) return false;
+      throw e;
     }
-
-    // Evidence, read under the lock (see above).
-    const completed = await tx.lmsLessonProgress.count({
-      where: { studentId, lessonId: { in: ids }, completed: true },
-    });
-    const allLessonsDone = completed >= total;
-    const quizGateSatisfied = await requiredAssessmentsPassed(tx, courseId, slug, studentId);
-
-    const wasAlreadyCompleted = prior.status === 'completed' || prior.completedAt != null;
-
-    // Certificate/CEC integrity: completion needs lessons AND every required assessment
-    // passed, but an already-completed enrollment is never downgraded (GP-439 item 3:
-    // issued certificates are always retained).
-    const isCompleted = decideEnrollmentCompleted({
-      allLessonsDone,
-      quizGateSatisfied,
-      wasAlreadyCompleted,
-    });
-
-    const completedAt = isCompleted ? (prior.completedAt ?? new Date()) : null;
-    await tx.lmsEnrollment.update({
-      where: { id: enrollmentId },
-      data: {
-        status: isCompleted ? 'completed' : 'active',
-        completedAt,
-      },
-    });
-    if (completedAt) await recordFirstCompletion(enrollmentId, completedAt, tx);
-
-    // Only a genuinely new, fully-gated completion written by THIS transaction may fire the
-    // (irreversible) IICRC CEC auto-submit; it runs below, after the commit.
-    return allLessonsDone && quizGateSatisfied && !wasAlreadyCompleted;
   });
 
   if (newlyGatedCompletion && !options?.skipIicrcAutoSubmit) {
@@ -625,24 +645,35 @@ export async function touchLessonProgress(params: {
   const { studentId, lessonId, enrollmentId } = params;
   const now = new Date();
 
-  await prisma.lmsLessonProgress.upsert({
-    where: {
-      studentId_lessonId: { studentId, lessonId },
-    },
-    create: {
-      studentId,
-      lessonId,
-      lastAccessedAt: now,
-    },
-    update: {
-      lastAccessedAt: now,
-    },
-  });
+  // GP-432: a learner-record write, so it runs under the enrolment lock with the access rule
+  // (one owner: enrollment-row-lock.ts). Recording a visit is best effort: an enrolment revoked
+  // after the caller's access check records nothing, and the caller's read is unaffected.
+  try {
+    await prisma.$transaction((tx) =>
+      withLockedEnrollment(tx, { enrollmentId, studentId, require: 'access' }, async () => {
+        await tx.lmsLessonProgress.upsert({
+          where: {
+            studentId_lessonId: { studentId, lessonId },
+          },
+          create: {
+            studentId,
+            lessonId,
+            lastAccessedAt: now,
+          },
+          update: {
+            lastAccessedAt: now,
+          },
+        });
 
-  await prisma.lmsEnrollment.update({
-    where: { id: enrollmentId },
-    data: { lastAccessedLessonId: lessonId },
-  });
+        await tx.lmsEnrollment.update({
+          where: { id: enrollmentId },
+          data: { lastAccessedLessonId: lessonId },
+        });
+      }),
+    );
+  } catch (e) {
+    if (!(e instanceof EnrollmentLockRefusal)) throw e;
+  }
 }
 
 export async function patchLessonProgress(params: {
@@ -655,40 +686,42 @@ export async function patchLessonProgress(params: {
   const { studentId, lessonId, enrollmentId, courseId, completed } = params;
   const now = new Date();
 
-  // GP-432: the server decides. A learner may mark a lesson complete only on evidence the
-  // server holds for that lesson type; un-marking needs none.
-  if (completed) await assertLessonCompletionEvidence(studentId, lessonId);
-
-  // GP-432: a lesson mark or un-mark changes completion evidence, so it is written under the
-  // enrolment row lock (one owner: enrollment-row-lock.ts), the same lock the completion sync
-  // decides under. A sync either decides before this commits (and this change then follows
-  // it) or after (and sees it); it can no longer complete on a lesson already un-marked.
+  // GP-432: a lesson mark or un-mark changes completion evidence. It runs under the enrolment
+  // row lock with the access rule (one owner: enrollment-row-lock.ts): the enrolment must be
+  // this learner's and grant access AT THE LOCK, so a revocation that committed after the
+  // route's access check is refused here (EnrollmentLockRefusal) and nothing is written. The
+  // completion sync decides under the same lock, so it either sees this change or this waits.
+  // The evidence for a mark (a passed quiz attempt) is also read under the lock.
   // Lock order everywhere: enrolment row first, then lesson progress.
-  await prisma.$transaction(async (tx) => {
-    await lockEnrollmentRow(tx, enrollmentId);
-    await tx.lmsLessonProgress.upsert({
-      where: {
-        studentId_lessonId: { studentId, lessonId },
-      },
-      create: {
-        studentId,
-        lessonId,
-        completed,
-        completedAt: completed ? now : null,
-        lastAccessedAt: now,
-      },
-      update: {
-        completed,
-        completedAt: completed ? now : null,
-        lastAccessedAt: now,
-      },
-    });
+  await prisma.$transaction((tx) =>
+    withLockedEnrollment(tx, { enrollmentId, studentId, require: 'access' }, async () => {
+      // The server decides: a learner may mark a lesson complete only on evidence the server
+      // holds for that lesson type; un-marking needs none.
+      if (completed) await assertLessonCompletionEvidence(tx, studentId, lessonId);
+      await tx.lmsLessonProgress.upsert({
+        where: {
+          studentId_lessonId: { studentId, lessonId },
+        },
+        create: {
+          studentId,
+          lessonId,
+          completed,
+          completedAt: completed ? now : null,
+          lastAccessedAt: now,
+        },
+        update: {
+          completed,
+          completedAt: completed ? now : null,
+          lastAccessedAt: now,
+        },
+      });
 
-    await tx.lmsEnrollment.update({
-      where: { id: enrollmentId },
-      data: { lastAccessedLessonId: lessonId },
-    });
-  });
+      await tx.lmsEnrollment.update({
+        where: { id: enrollmentId },
+        data: { lastAccessedLessonId: lessonId },
+      });
+    }),
+  );
 
   await syncEnrollmentCompletion(enrollmentId, studentId, courseId);
 }

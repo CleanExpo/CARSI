@@ -338,6 +338,32 @@ describe.runIf(RUNNABLE)('GP-432 learner record (real PostgreSQL)', () => {
     expect(after.rows[0]!.completed).toBe(false);
   });
 
+  // GP-432 round-2 finding: the route checks access before the lock. A revocation that commits
+  // in between must win: the progress write waits for the lock, sees the revoked row and writes
+  // nothing, and the enrolment stays revoked.
+  it('a revocation that commits while a progress write waits for the lock wins: no progress, still revoked', async () => {
+    const other = await otherConnection();
+    await other.query("UPDATE lms_enrollments SET status = 'revoked' WHERE id = $1", [ids.enrolment]);
+    await other.query('DELETE FROM lms_lesson_progress WHERE student_id = $1', [ids.learner]);
+    const pending = settle(
+      service.patchLessonProgress({
+        studentId: ids.learner,
+        lessonId: ids.lesson,
+        enrollmentId: ids.enrolment,
+        courseId: ids.course,
+        completed: false,
+      }),
+    );
+    await pause();
+    await other.query('COMMIT');
+    await other.end();
+
+    expect(await pending).toBe('ENROLLMENT_NO_ACCESS');
+    expect(await status()).toBe('revoked');
+    const progress = await db.query('SELECT 1 FROM lms_lesson_progress WHERE student_id = $1', [ids.learner]);
+    expect(progress.rows).toEqual([]);
+  });
+
   it('quiz-attempt reset refuses a revoked enrolment and voids nothing', async () => {
     await addQuiz(ids.quiz);
     await addAttempt(ids.quiz, false);

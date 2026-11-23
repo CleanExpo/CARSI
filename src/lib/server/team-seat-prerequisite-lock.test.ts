@@ -78,6 +78,14 @@ vi.mock('@/lib/prisma', () => {
       create: vi.fn(async () => ({})),
     },
     $executeRaw: vi.fn(async () => 0),
+    // GP-432: touchLessonProgress runs inside withLockedEnrollment; the row lock answers with the
+    // enrolment row by id, as the database would.
+    $queryRaw: vi.fn(async (_sql: TemplateStringsArray, id: string) => {
+      const e = db.enrolments.find((row) => row.id === id);
+      return e ? [{ id: e.id, studentId: e.studentId, courseId: e.courseId, status: e.status }] : [];
+    }),
+    lmsLessonProgress: { upsert: vi.fn(async () => ({})) },
+    lmsEnrollment: { update: vi.fn(async () => ({})) },
   };
   return {
     prisma: {

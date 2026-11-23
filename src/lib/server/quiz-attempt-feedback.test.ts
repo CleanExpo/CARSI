@@ -91,6 +91,10 @@ beforeEach(() => {
   mocks.create.mockResolvedValue({ id: 'legacy-attempt' });
   mocks.raw.mockImplementation(async (sql: TemplateStringsArray) => {
     const text = sql.join('?');
+    // GP-432: the owner's row lock (withLockedEnrollment) sees an active enrolment for the learner.
+    if (text.includes('FROM lms_enrollments') && text.includes('FOR UPDATE')) {
+      return [{ id: 'enr-1', studentId, courseId: 'course', status: 'active' }];
+    }
     if (text.includes('COUNT(*)')) {
       order.push('count');
       return [{ count: 0 }];

@@ -35,6 +35,17 @@ const body = { lessonId, contentVersion: version, answers: { [questionId]: 1 } }
 const quiz = { id: quizId, courseId: lessonId, passPercentage: 80, attemptsAllowed: 2,
   questions: [{ id: questionId, correctIndex: 1, points: 1, options: ['A', 'B'] }] };
 const ctx = { params: Promise.resolve({ quizId }) };
+let lockStatus = 'active';
+const isLock = (sql: TemplateStringsArray) => {
+  const text = sql.join('?');
+  return text.includes('FROM lms_enrollments') && text.includes('FOR UPDATE');
+};
+const lockRow = () => [{ id: 'enr-1', studentId, courseId: 'course', status: lockStatus }];
+/** Raw queries other than the owner's row lock, by kind. */
+const rawCalls = () => mocks.raw.mock.calls
+  .map(([sql]) => (sql as TemplateStringsArray).join('?'))
+  .filter((text) => !(text.includes('FROM lms_enrollments') && text.includes('FOR UPDATE')))
+  .map((text) => (text.includes('COUNT(*)') ? 'count' : text.includes('INSERT INTO') ? 'insert' : 'other'));
 function request(value: unknown, identity: string | null = studentId) {
   return new NextRequest('http://localhost/api/lms/quizzes/' + quizId + '/attempt', {
     method: 'POST', body: JSON.stringify(value), headers: identity === null ? {} : { 'x-carsi-learner-id': identity },
@@ -42,6 +53,7 @@ function request(value: unknown, identity: string | null = studentId) {
 }
 beforeEach(() => {
   vi.resetAllMocks();
+  lockStatus = 'active';
   vi.stubEnv('DATABASE_URL', 'postgresql://synthetic:synthetic@localhost/unused-no-connect');
   mocks.claims.mockResolvedValue({ sub: studentId }); mocks.upstream.mockReturnValue(null);
   mocks.graph.mockResolvedValue({ quiz, questions: quiz.questions, contentVersion: version });
@@ -49,6 +61,8 @@ beforeEach(() => {
   mocks.count.mockResolvedValue(0); mocks.create.mockResolvedValue({ id: 'legacy-attempt' });
   mocks.raw.mockImplementation(async (sql: TemplateStringsArray) => {
     const text = sql.join('?');
+    // GP-432: the owner's row lock (withLockedEnrollment) sees the enrolment as it is now.
+    if (isLock(sql)) return lockRow();
     if (text.includes('COUNT(*)')) return [{ count: 0 }];
     if (text.includes('explanation')) return [];
     return [{ id: 'bound-attempt' }];
@@ -117,9 +131,15 @@ describe('version-bound quiz attempts', () => {
     expect(mocks.transaction).not.toHaveBeenCalled();
   });
   it('rejects exhausted attempt limits before insert', async () => {
-    mocks.raw.mockResolvedValue([{ count: 2 }]);
+    mocks.raw.mockImplementation(async (sql: TemplateStringsArray) =>
+      isLock(sql) ? lockRow() : [{ count: 2 }]);
     expect((await POST(request(body), ctx)).status).toBe(409);
-    expect(mocks.raw).toHaveBeenCalledTimes(1);
+    expect(rawCalls()).toEqual(['count']);
+  });
+  it('GP-432: an enrolment revoked by the time of the lock is refused, with no count or insert', async () => {
+    lockStatus = 'revoked';
+    expect((await POST(request(body), ctx)).status).toBe(404);
+    expect(rawCalls()).toEqual([]);
   });
   it('revalidates binding on bounded serialization retries', async () => {
     mocks.raw.mockRejectedValueOnce({ code: 'P2034' });
@@ -173,9 +193,11 @@ describe('headerless legacy attempt compatibility', () => {
       pass_percentage: 80, correct_count: 1, question_count: 1, attempts_remaining: 1, feedback: [] });
     expect(mocks.create).toHaveBeenCalledWith({ data: { quizId, studentId, scorePercent: 100, passed: true,
       answers: { [questionId]: 1 } } });
-    // The only raw query is the shared attempt count (GP-432: voided attempts do not count).
-    expect(mocks.graph).not.toHaveBeenCalled(); expect(mocks.raw).toHaveBeenCalledTimes(1);
-    expect((mocks.raw.mock.calls[0][0] as TemplateStringsArray).join('?')).toMatch(/voided_at IS NULL/);
+    // Besides the owner's row lock, the only raw query is the shared attempt count (GP-432:
+    // voided attempts do not count).
+    expect(mocks.graph).not.toHaveBeenCalled(); expect(rawCalls()).toEqual(['count']);
+    const count = mocks.raw.mock.calls.find(([sql]) => !isLock(sql as TemplateStringsArray))!;
+    expect((count[0] as TemplateStringsArray).join('?')).toMatch(/voided_at IS NULL/);
   });
   it('retains legacy entitlement rejection', async () => {
     mocks.enrollment.mockResolvedValue(null);
@@ -184,8 +206,13 @@ describe('headerless legacy attempt compatibility', () => {
   });
   it('retains legacy atomic attempt limit', async () => {
     mocks.raw.mockImplementation(async (sql: TemplateStringsArray) =>
-      sql.join('?').includes('COUNT(*)') ? [{ count: 2 }] : [{ id: 'bound-attempt' }]);
+      isLock(sql) ? lockRow() : sql.join('?').includes('COUNT(*)') ? [{ count: 2 }] : [{ id: 'bound-attempt' }]);
     expect((await POST(request({ answers: {} }, null), ctx)).status).toBe(409);
     expect(mocks.create).not.toHaveBeenCalled();
+  });
+  it('GP-432: a legacy attempt on an enrolment revoked by the time of the lock is refused with no write', async () => {
+    lockStatus = 'refunded';
+    expect((await POST(request({ answers: { [questionId]: 1 } }, null), ctx)).status).toBe(403);
+    expect(mocks.create).not.toHaveBeenCalled(); expect(rawCalls()).toEqual([]);
   });
 });
