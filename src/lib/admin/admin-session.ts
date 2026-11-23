@@ -2,15 +2,21 @@ import { cookies } from 'next/headers';
 
 import {
   ADMIN_COOKIE_NAME,
-  isLmsClaimsAllowedAdminPanel,
   verifyAdminSessionToken,
   type AdminSessionClaims,
 } from '@/lib/admin/admin-auth';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
+import { isLmsSessionAdminNow } from '@/lib/server/lms-admin-now';
 
 /**
- * Admin cookie (`/api/admin/login`) or a valid LMS JWT (`/api/auth/login`) whose role is
- * `admin` (the database role minted at sign-in). No email list grants LMS admin.
+ * Admin cookie (`/api/admin/login`) or a valid LMS JWT (`/api/auth/login`) whose user is an
+ * admin NOW. No email list grants LMS admin.
+ *
+ * GP-760: the token's role claim only short-cuts a non-admin token. For an admin token the
+ * database decides on every request (isLmsSessionAdminNow: active now, current session
+ * generation, effective role 'admin' now), so a demotion or deactivation takes effect on the next request
+ * rather than when the 7-day token expires. A database failure refuses admin access (fail closed),
+ * as verifyAdminSessionToken does for the admin cookie.
  */
 export async function getAdminSessionOrNull(): Promise<AdminSessionClaims | null> {
   const cookieStore = await cookies();
@@ -25,9 +31,7 @@ export async function getAdminSessionOrNull(): Promise<AdminSessionClaims | null
     cookieStore.get('auth_token')?.value ?? cookieStore.get('carsi_token')?.value;
   if (lmsToken) {
     const claims = await verifySessionToken(lmsToken);
-    if (claims && isLmsClaimsAllowedAdminPanel(claims)) {
-      return { email: claims.email };
-    }
+    if (claims && (await isLmsSessionAdminNow(claims))) return { email: claims.email };
   }
 
   return null;

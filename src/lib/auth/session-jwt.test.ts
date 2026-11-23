@@ -19,7 +19,7 @@ describe('email unsubscribe token', () => {
   it('rejects a token minted for a different purpose (audience isolation)', async () => {
     // A password-reset token must NOT be accepted as an unsubscribe token, even
     // though both are signed with the same secret.
-    const reset = await signPasswordResetToken('user-123');
+    const reset = await signPasswordResetToken('user-123', 0);
     expect(await verifyEmailUnsubscribeToken(reset)).toBeNull();
   });
 });

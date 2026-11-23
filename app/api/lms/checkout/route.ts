@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
 
-import { verifySessionToken } from '@/lib/auth/session-jwt';
+import { verifyActiveSession } from '@/lib/server/user-active-cache';
 import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
 import {
   parsePurchaseMode,
@@ -44,7 +44,7 @@ import {
   findActivePaidCourseOwnership,
 } from '@/lib/server/paid-course-ownership';
 import { getPublishedCourseForCheckout } from '@/lib/server/public-courses-list';
-import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
+import { isLmsSessionAdminNow } from '@/lib/server/lms-admin-now';
 import { parseCoursePrerequisites, courseHasPrerequisites } from '@/lib/lms/course-prerequisites';
 import {
   findCoursePrerequisiteBlock,
@@ -153,14 +153,16 @@ export async function POST(request: NextRequest) {
 
     // The buyer's session comes from the same credentials `resolveCheckoutEmail` accepts:
     // the `auth_token` cookie first, else a `Bearer` session token. Both are verified by
-    // `verifySessionToken`; a Bearer-only buyer must not be treated as a guest (the
-    // prerequisite gate would otherwise refuse a learner who has completed it).
+    // `verifyActiveSession` (GP-760: signature, then the active, session generation and role
+    // re-check, so a session ended by a password reset is not a buyer); a Bearer-only buyer must
+    // not be treated as a guest (the prerequisite gate would otherwise refuse a learner who has
+    // completed it).
     const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
     let studentId: string | undefined;
-    let buyerClaims: Awaited<ReturnType<typeof verifySessionToken>> = null;
+    let buyerClaims: Awaited<ReturnType<typeof verifyActiveSession>> = null;
     for (const token of [authTokenCookie, bearerToken]) {
       if (!token) continue;
-      const c = await verifySessionToken(token);
+      const c = await verifyActiveSession(token);
       if (c?.sub) {
         studentId = c.sub;
         buyerClaims = c;
@@ -356,10 +358,11 @@ export async function POST(request: NextRequest) {
       const block =
         purchaseMode === 'team'
           ? null
-          : await guardLookup(() =>
+          : await guardLookup(async () =>
               findCoursePrerequisiteBlock({
                 userId: studentId!,
-                isAdmin: () => (buyerClaims ? isLmsClaimsAllowedAdminPanel(buyerClaims) : false),
+                // GP-760: the database role now, not the 7-day token's role.
+                isAdmin: await isLmsSessionAdminNow(buyerClaims),
                 course: { slug: dbCourse!.slug, meta: dbCourse!.meta },
               }),
             );
