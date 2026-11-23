@@ -171,7 +171,10 @@ const BANNED = [
     // credentials to your business", "Get your IICRC certification". Denials ("does not / No CARSI
     // course will get you …") and the third-person route through an IICRC-approved school pass.
     re: /(?<!\b(?:not|never|no)\s+(?:\w+\s+){0,3})(?<!n['’]t\s+(?:\w+\s+){0,3})\b(?:earn(?:s|ing)?|add(?:s|ing)?|gain(?:s|ing)?|get(?:s|ting)?|receiv(?:e|es|ing))\s+(?:(?:your|verifiable|recognised|recognized|real|official|full|new|an?|the|more)\s+)*IICRC[\s-]+(?:certifications?|certificates?|certs?|creds?|credentials?|qualifications?)\b/i,
-    allow: /\bthrough\s+(?:an?\s+)?IICRC[\s-]*approved\s+(?:schools?|examinations?|exams?)\b/i,
+    // Anchored to the credential noun (GP-584 per-occurrence matching): the allow must overlap the
+    // ban, so "IICRC certification through an IICRC-approved school" passes but a school phrase
+    // elsewhere on the line does not excuse an unrelated grant claim.
+    allow: /\bIICRC[\s-]+(?:certifications?|certificates?|certs?|creds?|credentials?|qualifications?)\s+(?:only\s+)?through\s+(?:an?\s+)?IICRC[\s-]*approved\s+(?:schools?|examinations?|exams?)\b/i,
     baselined: true,
     message:
       'CARSI does not grant IICRC certification or credentials — do not tell learners to "earn / add / get IICRC credentials" from CARSI. Say "verifiable CARSI credentials".',
@@ -232,7 +235,7 @@ const BANNED = [
   {
     re: /\bIICRC[\s-]*approved\b/i,
     allow:
-      /\bIICRC[\s-]*approved\s+(school|examination|exam|instructor|course\s+of\s+study)|IICRC[\s-]*board[\s-]*approv|(CE|CEC)[\s-]*provider|IICRC[\s-]*approv\w*\s+CE\b/i,
+      /\bIICRC[\s-]*approved\s+(school|examination|exam|instructor|course\s+of\s+study)|IICRC[\s-]*board[\s-]*approv|\bIICRC[\s-]*approved\s+CEC[\s-]+provider|IICRC[\s-]*approv\w*\s+CE\b/i,
     message:
       'Bare "IICRC-approved" implies IICRC approves CARSI\'s courses/certifications — say "IICRC Approved CEC Provider" for CARSI, or "approved for IICRC CECs" for a class in the register.',
   },
@@ -461,6 +464,25 @@ function isExempt(f) {
   return EXEMPT.some((e) => n === e || n.endsWith('/' + e));
 }
 
+/** All [start, end) spans where `re` matches `text` (zero-width matches skipped). */
+function matchSpans(re, text) {
+  const g = new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g');
+  const spans = [];
+  for (const m of text.matchAll(g)) {
+    if (m[0].length > 0) spans.push([m.index, m.index + m[0].length]);
+  }
+  return spans;
+}
+
+/** True when some match of `rule.re` in `content` is not overlapped by a match of `rule.allow`.
+ *  Exported for the self-test (GP-584). */
+export function hasUnexcusedBan(rule, content) {
+  const bans = matchSpans(rule.re, content);
+  if (!rule.allow) return bans.length > 0;
+  const allows = matchSpans(rule.allow, content);
+  return bans.some(([s, e]) => !allows.some(([as, ae]) => as < e && s < ae));
+}
+
 /** GP-753 known-findings baseline for the `baselined` certification-phrase rules. NOT an approval:
  *  it pins, by exact (file, normalised text), the lines that were already on main when the rules
  *  landed and that need the founder's wording decision. They are printed on every run. Anything
@@ -502,8 +524,10 @@ function scanLine(file, lineNo, content, findings, allowlist, certCtx = CERT_CTX
       // -approved in the allowlist. No regex exemption — the human review is the control.
       flagged = !allowlist.has(normaliseLine(content));
     } else {
-      // BANNED rules: line-wide, exempt-if-`allow`.
-      flagged = !(rule.allow && rule.allow.test(content));
+      // BANNED rules: per occurrence (GP-584). Each ban match must be excused by an allow match
+      // that overlaps ITS span. A legitimate phrase elsewhere on the line excuses nothing, so
+      // "Buy our IICRC courses today. We are an IICRC CEC provider." blocks.
+      flagged = hasUnexcusedBan(rule, content);
     }
     // GP-753: a pinned pre-existing line is reported as a known finding instead of blocking.
     if (flagged && rule.baselined && certCtx?.pinned.has(certKey(nf, content))) {
