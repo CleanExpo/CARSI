@@ -8,6 +8,10 @@ import type { CoachingMonthlyAction, CoachingPortalWorkspace } from '@/lib/coach
 import { EMPTY_COACHING_PORTAL_WORKSPACE } from '@/lib/coaching-portal/types';
 import { prisma } from '@/lib/prisma';
 import {
+  runGuardedSubscriptionWrite,
+  type SubscriptionRowLink,
+} from '@/lib/server/subscription-access-guard';
+import {
   readCancelAtPeriodEnd,
   readCurrentPeriodEnd,
   readCustomerId,
@@ -24,42 +28,48 @@ export interface CoachingSubscriptionUpsertInput {
   eventTimestamp?: Date | null;
 }
 
+/** The member's coaching row link, for `runGuardedSubscriptionWrite`. */
+function linkedTo(userId: string): SubscriptionRowLink<void> {
+  return {
+    linkedSubscriptionId: async (tx) =>
+      (
+        await tx.carsiCoachingMonthlySubscription.findUnique({
+          where: { userId },
+          select: { stripeSubscriptionId: true },
+        })
+      )?.stripeSubscriptionId,
+    skipped: undefined,
+  };
+}
+
+/** GP-641: runs in `runGuardedSubscriptionWrite`, so a reversed or deleted subscription is written as `canceled`. */
 export async function upsertCoachingMonthlySubscription(
   input: CoachingSubscriptionUpsertInput,
 ): Promise<void> {
-  const data = {
-    stripeCustomerId: input.stripeCustomerId,
-    stripeSubscriptionId: input.stripeSubscriptionId,
-    status: input.status,
-    currentPeriodEnd: input.currentPeriodEnd,
-    cancelAtPeriodEnd: input.cancelAtPeriodEnd,
-    statusEventAt: input.eventTimestamp ?? null,
-  };
-
-  if (input.eventTimestamp) {
-    const existing = await prisma.carsiCoachingMonthlySubscription.findUnique({
-      where: { userId: input.userId },
-      select: { statusEventAt: true },
-    });
-    if (existing?.statusEventAt && existing.statusEventAt > input.eventTimestamp) {
-      return;
+  await runGuardedSubscriptionWrite(input.stripeSubscriptionId, input.status, linkedTo(input.userId), async (tx, status) => {
+    if (input.eventTimestamp) {
+      const existing = await tx.carsiCoachingMonthlySubscription.findUnique({
+        where: { userId: input.userId },
+        select: { statusEventAt: true },
+      });
+      if (existing?.statusEventAt && existing.statusEventAt > input.eventTimestamp) {
+        return;
+      }
     }
-  }
 
-  await prisma.carsiCoachingMonthlySubscription.upsert({
-    where: { userId: input.userId },
-    create: { userId: input.userId, ...data },
-    update: data,
-  });
-}
-
-export async function markCoachingSubscriptionStatusBySubscriptionId(
-  stripeSubscriptionId: string,
-  status: string,
-): Promise<void> {
-  await prisma.carsiCoachingMonthlySubscription.updateMany({
-    where: { stripeSubscriptionId },
-    data: { status },
+    const data = {
+      stripeCustomerId: input.stripeCustomerId,
+      stripeSubscriptionId: input.stripeSubscriptionId,
+      status,
+      currentPeriodEnd: input.currentPeriodEnd,
+      cancelAtPeriodEnd: input.cancelAtPeriodEnd,
+      statusEventAt: input.eventTimestamp ?? null,
+    };
+    await tx.carsiCoachingMonthlySubscription.upsert({
+      where: { userId: input.userId },
+      create: { userId: input.userId, ...data },
+      update: data,
+    });
   });
 }
 
@@ -70,30 +80,32 @@ export async function upsertTerminalCoachingSubscriptionStatus(input: {
   status: string;
   eventTimestamp: Date;
 }): Promise<void> {
-  const existing = await prisma.carsiCoachingMonthlySubscription.findUnique({
-    where: { userId: input.userId },
-    select: { statusEventAt: true },
-  });
-  if (existing?.statusEventAt && existing.statusEventAt > input.eventTimestamp) {
-    return;
-  }
+  await runGuardedSubscriptionWrite(input.stripeSubscriptionId, input.status, linkedTo(input.userId), async (tx, status) => {
+    const existing = await tx.carsiCoachingMonthlySubscription.findUnique({
+      where: { userId: input.userId },
+      select: { statusEventAt: true },
+    });
+    if (existing?.statusEventAt && existing.statusEventAt > input.eventTimestamp) {
+      return;
+    }
 
-  const data = {
-    stripeCustomerId: input.stripeCustomerId,
-    stripeSubscriptionId: input.stripeSubscriptionId,
-    status: input.status,
-    statusEventAt: input.eventTimestamp,
-  };
+    const data = {
+      stripeCustomerId: input.stripeCustomerId,
+      stripeSubscriptionId: input.stripeSubscriptionId,
+      status,
+      statusEventAt: input.eventTimestamp,
+    };
 
-  await prisma.carsiCoachingMonthlySubscription.upsert({
-    where: { userId: input.userId },
-    create: {
-      userId: input.userId,
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      ...data,
-    },
-    update: data,
+    await tx.carsiCoachingMonthlySubscription.upsert({
+      where: { userId: input.userId },
+      create: {
+        userId: input.userId,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+        ...data,
+      },
+      update: data,
+    });
   });
 }
 

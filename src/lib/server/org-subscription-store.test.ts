@@ -65,6 +65,8 @@ const db = vi.hoisted(() => {
   return { store, findUnique, update, upsert, updateMany };
 });
 
+const markers = vi.hoisted(() => new Map<string, { id: string; type: string }>());
+
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     lmsOrgSubscription: {
@@ -73,13 +75,17 @@ vi.mock('@/lib/prisma', () => ({
       upsert: db.upsert,
       updateMany: db.updateMany,
     },
+    // GP-641: the guarded write reads the reversal markers on its own transaction.
+    stripeWebhookEvent: {
+      findUnique: async (args: { where: { id: string } }) => markers.get(args.where.id) ?? null,
+    },
+    $transaction: async (fn: (tx: unknown) => Promise<unknown>) => fn((await import('@/lib/prisma')).prisma),
   },
 }));
 
 import {
   updateOrgSubscriptionFromStripe,
   upsertOrgSubscription,
-  markOrgSubscriptionStatusBySubscriptionId,
 } from './org-subscription-store';
 
 const TEAM = 'team-1';
@@ -160,8 +166,11 @@ describe('updateOrgSubscriptionFromStripe', () => {
   });
 });
 
-describe('markOrgSubscriptionStatusBySubscriptionId', () => {
-  it('marks canceled by subscription id (refund/dispute revocation)', async () => {
+describe('GP-641: a reversal or deletion marker makes the write org row canceled', () => {
+  beforeEach(() => markers.clear());
+
+  it('writes unpaid (no paid-through access) when the latest payment was refunded', async () => {
+    markers.set(`payment-reversed:${SUB}`, { id: `payment-reversed:${SUB}`, type: 'payment_reversed:refunded' });
     await upsertOrgSubscription({
       teamId: TEAM,
       organisationName: 'Acme',
@@ -172,12 +181,36 @@ describe('markOrgSubscriptionStatusBySubscriptionId', () => {
       currentPeriodEnd: T2,
       cancelAtPeriodEnd: false,
     });
-    await markOrgSubscriptionStatusBySubscriptionId(SUB, 'canceled');
+    expect(row()?.status).toBe('unpaid');
+  });
+
+  it('writes canceled when Stripe deleted the subscription before this write', async () => {
+    markers.set(`subscription-ended:${SUB}`, { id: `subscription-ended:${SUB}`, type: 'subscription_ended:deleted' });
+    await upsertOrgSubscription({
+      teamId: TEAM,
+      organisationName: 'Acme',
+      contactEmail: 'ops@acme.example',
+      stripeCustomerId: null,
+      stripeSubscriptionId: SUB,
+      status: 'active',
+      currentPeriodEnd: T2,
+      cancelAtPeriodEnd: false,
+    });
     expect(row()?.status).toBe('canceled');
   });
 
-  it('is a no-op for an unknown subscription id', async () => {
-    await markOrgSubscriptionStatusBySubscriptionId('sub_absent', 'canceled');
-    expect(row()).toBeNull();
+  it('control: a lifted dispute (won) does not cancel', async () => {
+    markers.set(`payment-reversed:${SUB}`, { id: `payment-reversed:${SUB}`, type: 'payment_reversal_lifted:dispute_won' });
+    await upsertOrgSubscription({
+      teamId: TEAM,
+      organisationName: 'Acme',
+      contactEmail: 'ops@acme.example',
+      stripeCustomerId: null,
+      stripeSubscriptionId: SUB,
+      status: 'active',
+      currentPeriodEnd: T2,
+      cancelAtPeriodEnd: false,
+    });
+    expect(row()?.status).toBe('active');
   });
 });

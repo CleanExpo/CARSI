@@ -62,7 +62,7 @@ describe('readSubscriptionIdFromPaymentIntent (Finding 1 — detect a subscripti
 describe('refund/dispute → membership revoked → NOT entitled (Finding 1 end-to-end)', () => {
   it('a subscription refund marks the membership canceled, and canceled is NOT entitled', () => {
     // The revocation path writes status='canceled' (via
-    // markSubscriptionStatusBySubscriptionId). The entitlement decision core is
+    // applySubscriptionPaymentReversal in seat-state.ts). The entitlement decision core is
     // the single source of truth the enrol gate consults — prove it denies.
     const afterRevocation = decideMembershipEntitlement(
       { status: 'canceled', currentPeriodEnd: new Date('2099-01-01T00:00:00.000Z') },
@@ -89,15 +89,12 @@ describe('refund/dispute → membership revoked → NOT entitled (Finding 1 end-
  */
 
 const upsertTerminalSubscriptionStatus = vi.fn(async () => {});
-const markSubscriptionStatusBySubscriptionId = vi.fn(async () => {});
 const upsertSubscription = vi.fn(async () => {});
 const resolveUserIdForStripeSubscription = vi.fn(async () => 'user-42');
 
 vi.mock('./subscription-store', () => ({
   upsertTerminalSubscriptionStatus: (...a: unknown[]) =>
     upsertTerminalSubscriptionStatus(...(a as [])),
-  markSubscriptionStatusBySubscriptionId: (...a: unknown[]) =>
-    markSubscriptionStatusBySubscriptionId(...(a as [])),
   upsertSubscription: (...a: unknown[]) => upsertSubscription(...(a as [])),
   resolveUserIdForStripeSubscription: (...a: unknown[]) =>
     resolveUserIdForStripeSubscription(...(a as [])),
@@ -147,14 +144,12 @@ describe('customer.subscription.deleted → sticky terminal write (Finding 2 par
     expect(arg.stripeSubscriptionId).toBe('sub_795');
     expect(arg.status).toBe('canceled');
     expect(arg.eventTimestamp).toEqual(new Date(DELETED_AT * 1000));
-    // It must NOT silently no-op via the id-keyed legacy path.
-    expect(markSubscriptionStatusBySubscriptionId).not.toHaveBeenCalled();
   });
 
-  it('falls back to the id-keyed write when the user cannot be resolved', async () => {
+  it('writes no row itself when the user cannot be resolved (GP-641: the route records the deletion marker first)', async () => {
     resolveUserIdForStripeSubscription.mockResolvedValueOnce(null as unknown as string);
     await handleSubscriptionEvent(deletedEvent());
     expect(upsertTerminalSubscriptionStatus).not.toHaveBeenCalled();
-    expect(markSubscriptionStatusBySubscriptionId).toHaveBeenCalledWith('sub_795', 'canceled');
+    expect(upsertSubscription).not.toHaveBeenCalled();
   });
 });

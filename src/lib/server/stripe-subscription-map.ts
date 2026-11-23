@@ -110,6 +110,22 @@ export function readSubscriptionIdFromPaymentIntent(
   return null;
 }
 
+/**
+ * GP-641: when the invoice was created (Stripe's `invoice.created`), the order of a
+ * subscription's invoices whatever order their events arrive in. Null when the invoice is not an
+ * expanded object or has no creation time.
+ */
+export function readInvoiceCreatedAt(invoice: unknown): Date | null {
+  if (!invoice || typeof invoice !== 'object') return null;
+  const created = (invoice as { created?: unknown }).created;
+  return typeof created === 'number' && Number.isFinite(created) ? new Date(created * 1000) : null;
+}
+
+/** The creation time of a payment intent's expanded invoice (see `readInvoiceCreatedAt`). */
+export function readInvoiceCreatedAtFromPaymentIntent(paymentIntent: Stripe.PaymentIntent): Date | null {
+  return readInvoiceCreatedAt((paymentIntent as unknown as { invoice?: unknown }).invoice);
+}
+
 /** Invoice id used as the attribution transaction id for paid subscriptions. */
 export function readInvoiceIdFromPaymentIntent(
   paymentIntent: Stripe.PaymentIntent,

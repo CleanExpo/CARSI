@@ -16,6 +16,10 @@
 import type Stripe from 'stripe';
 
 import { prisma } from '@/lib/prisma';
+import {
+  runGuardedSubscriptionWrite,
+  type SubscriptionRowLink,
+} from '@/lib/server/subscription-access-guard';
 
 export interface SubscriptionUpsertInput {
   userId: string;
@@ -39,6 +43,10 @@ export interface SubscriptionUpsertInput {
  * Insert or update the membership row for a user. Idempotent: keyed on both the
  * unique `userId` and the unique `stripeSubscriptionId`.
  *
+ * GP-641: the write runs in `runGuardedSubscriptionWrite`, so a subscription that a refund,
+ * chargeback or deletion has already ended is written as `canceled`, even when that event was
+ * delivered before this row existed.
+ *
  * Out-of-order guard (GP-441): Stripe delivers webhooks at-least-once and NOT in
  * order. A late `customer.subscription.updated` (status `active`) arriving AFTER
  * `customer.subscription.deleted` would otherwise resurrect a canceled
@@ -48,50 +56,43 @@ export interface SubscriptionUpsertInput {
  * When `eventTimestamp` is omitted, or the stored `statusEventAt` is NULL, the
  * write proceeds unconditionally (unchanged legacy behaviour).
  */
-export async function upsertSubscription(input: SubscriptionUpsertInput): Promise<void> {
-  const data = {
-    stripeCustomerId: input.stripeCustomerId,
-    stripeSubscriptionId: input.stripeSubscriptionId,
-    status: input.status,
-    plan: input.plan ?? 'pro_annual',
-    currentPeriodEnd: input.currentPeriodEnd,
-    cancelAtPeriodEnd: input.cancelAtPeriodEnd,
-    statusEventAt: input.eventTimestamp ?? null,
+/** The owner's row link, for `runGuardedSubscriptionWrite`. */
+function linkedTo(userId: string): SubscriptionRowLink<void> {
+  return {
+    linkedSubscriptionId: async (tx) =>
+      (await tx.lmsSubscription.findUnique({ where: { userId }, select: { stripeSubscriptionId: true } }))
+        ?.stripeSubscriptionId,
+    skipped: undefined,
   };
-
-  if (input.eventTimestamp) {
-    const existing = await prisma.lmsSubscription.findUnique({
-      where: { userId: input.userId },
-      select: { statusEventAt: true },
-    });
-    // Stored state is strictly newer than this event → the event is stale; drop it.
-    if (existing?.statusEventAt && existing.statusEventAt > input.eventTimestamp) {
-      return;
-    }
-  }
-
-  await prisma.lmsSubscription.upsert({
-    where: { userId: input.userId },
-    create: { userId: input.userId, ...data },
-    update: data,
-  });
 }
 
-/**
- * Force a subscription row to a terminal status (used by
- * customer.subscription.deleted and subscription refund/dispute revocation)
- * without needing the full period snapshot. Updates by the unique subscription
- * id. No-op when the row does not exist — for the deleted-before-created race,
- * callers that CAN resolve the user should instead use
- * `upsertTerminalSubscriptionStatus` so the cancellation is sticky.
- */
-export async function markSubscriptionStatusBySubscriptionId(
-  stripeSubscriptionId: string,
-  status: string,
-): Promise<void> {
-  await prisma.lmsSubscription.updateMany({
-    where: { stripeSubscriptionId },
-    data: { status },
+export async function upsertSubscription(input: SubscriptionUpsertInput): Promise<void> {
+  await runGuardedSubscriptionWrite(input.stripeSubscriptionId, input.status, linkedTo(input.userId), async (tx, status) => {
+    if (input.eventTimestamp) {
+      const existing = await tx.lmsSubscription.findUnique({
+        where: { userId: input.userId },
+        select: { statusEventAt: true },
+      });
+      // Stored state is strictly newer than this event → the event is stale; drop it.
+      if (existing?.statusEventAt && existing.statusEventAt > input.eventTimestamp) {
+        return;
+      }
+    }
+
+    const data = {
+      stripeCustomerId: input.stripeCustomerId,
+      stripeSubscriptionId: input.stripeSubscriptionId,
+      status,
+      plan: input.plan ?? 'pro_annual',
+      currentPeriodEnd: input.currentPeriodEnd,
+      cancelAtPeriodEnd: input.cancelAtPeriodEnd,
+      statusEventAt: input.eventTimestamp ?? null,
+    };
+    await tx.lmsSubscription.upsert({
+      where: { userId: input.userId },
+      create: { userId: input.userId, ...data },
+      update: data,
+    });
   });
 }
 
@@ -100,9 +101,10 @@ export async function markSubscriptionStatusBySubscriptionId(
  * out-of-order delivery. Two hazards this closes (GP-441):
  *
  *  1. deleted-before-created: `customer.subscription.deleted` can arrive before
- *     the row exists. `markSubscriptionStatusBySubscriptionId` would no-op and
- *     the cancellation would be lost when `created` later inserts an active row.
- *     Here we UPSERT (create if absent) so the canceled state is recorded.
+ *     the row exists. an update by subscription id would no-op and the
+ *     cancellation would be lost when `created` later inserts an active row. Here
+ *     we UPSERT (create if absent) so the canceled state is recorded; the GP-641
+ *     `subscription-ended` marker also covers an owner that cannot be resolved.
  *  2. stale active after cancel: a late `updated`/`created` (active) arriving
  *     after this cancel must not win. We stamp `statusEventAt` with the cancel
  *     event's timestamp; the ordinary `upsertSubscription` guard then discards
@@ -118,35 +120,37 @@ export async function upsertTerminalSubscriptionStatus(input: {
   eventTimestamp: Date;
   plan?: string;
 }): Promise<void> {
-  const existing = await prisma.lmsSubscription.findUnique({
-    where: { userId: input.userId },
-    select: { statusEventAt: true },
-  });
-  // A strictly newer stored state (e.g. a genuine later reactivation) wins over
-  // a stale cancel event. Equal timestamps apply (idempotent).
-  if (existing?.statusEventAt && existing.statusEventAt > input.eventTimestamp) {
-    return;
-  }
+  await runGuardedSubscriptionWrite(input.stripeSubscriptionId, input.status, linkedTo(input.userId), async (tx, status) => {
+    const existing = await tx.lmsSubscription.findUnique({
+      where: { userId: input.userId },
+      select: { statusEventAt: true },
+    });
+    // A strictly newer stored state (e.g. a genuine later reactivation) wins over
+    // a stale cancel event. Equal timestamps apply (idempotent).
+    if (existing?.statusEventAt && existing.statusEventAt > input.eventTimestamp) {
+      return;
+    }
 
-  const data = {
-    stripeCustomerId: input.stripeCustomerId,
-    stripeSubscriptionId: input.stripeSubscriptionId,
-    status: input.status,
-    plan: input.plan ?? 'pro_annual',
-    // A canceled membership has no forward-looking paid period; leave existing
-    // period end untouched on update, null on create.
-    statusEventAt: input.eventTimestamp,
-  };
+    const data = {
+      stripeCustomerId: input.stripeCustomerId,
+      stripeSubscriptionId: input.stripeSubscriptionId,
+      status,
+      plan: input.plan ?? 'pro_annual',
+      // A canceled membership has no forward-looking paid period; leave existing
+      // period end untouched on update, null on create.
+      statusEventAt: input.eventTimestamp,
+    };
 
-  await prisma.lmsSubscription.upsert({
-    where: { userId: input.userId },
-    create: {
-      userId: input.userId,
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      ...data,
-    },
-    update: data,
+    await tx.lmsSubscription.upsert({
+      where: { userId: input.userId },
+      create: {
+        userId: input.userId,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+        ...data,
+      },
+      update: data,
+    });
   });
 }
 

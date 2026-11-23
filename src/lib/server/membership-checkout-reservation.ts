@@ -137,9 +137,11 @@ function claimableWhere(now: Date) {
  * old `stripeSubscriptionId`, and two webhook paths would then quietly undo the
  * reservation.
  *
- *  - `markSubscriptionStatusBySubscriptionId` updates by `stripeSubscriptionId`
- *    with no status filter and no ordering guard, so ANY late event for the old
- *    subscription overwrites `checkout_pending`. Nulling the id severs that.
+ *  - The subscription reversal and deletion step (`seat-state.ts`, GP-641)
+ *    cancels rows by `stripeSubscriptionId` with no status filter, so a late
+ *    refund or deletion of the old subscription would overwrite
+ *    `checkout_pending`. Nulling the id severs that (its markers are keyed by the
+ *    old id and never touch the new subscription).
  *  - `upsertSubscription` discards a snapshot only when the stored
  *    `statusEventAt` is NEWER than the event. Stamping it with the takeover time
  *    makes every event predating this claim stale, while the new subscription's

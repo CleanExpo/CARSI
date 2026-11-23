@@ -372,8 +372,8 @@ describe('a takeover detaches the row from the subscription it used to describe'
       () => mocks.orgUpdateMany,
     ],
   ])('nulls the old stripeSubscriptionId on the %s path', async (_label, run, updater) => {
-    // `markSubscriptionStatusBySubscriptionId` updates by stripeSubscriptionId
-    // with no status filter and no ordering guard, so leaving the old id on the
+    // The GP-641 reversal step cancels rows by stripeSubscriptionId with no
+    // status filter and no ordering guard, so leaving the old id on the
     // row lets ANY late event for the old subscription overwrite the claim —
     // dropping the reservation and reopening the duplicate checkout.
     mocks.create.mockRejectedValue(uniqueViolation());

@@ -12,6 +12,8 @@ import { runSerializable } from '@/lib/server/db-tx';
  *    a chargeback reverses a one-off checkout payment. Enrolment refuses to issue or reactivate
  *    access from a reversed session, even when the refund landed before any enrolment row
  *    existed. A refund is terminal; a dispute marker is removed only when the dispute is won.
+ *    GP-641: subscription payments have their own writers under the subscription id (see the
+ *    "Subscriptions" section below).
  *
  * 2. Unfulfilled payments — `unfulfilled-payment:<checkout session or subscription id>`. Written
  *    when a paid CARSI event could not be fulfilled, so the payment is never dropped silently.
@@ -128,6 +130,164 @@ export async function clearDisputedCheckoutReversal(
   }
 }
 
+/* ------------------------------------------------------------------------------------------ */
+/* Subscriptions (GP-641)                                                                       */
+/* ------------------------------------------------------------------------------------------ */
+
+/**
+ * A subscription's access is decided by three rows, keyed by the Stripe subscription id (`sub_*`,
+ * which cannot collide with a checkout session id). Only the seat step writes them.
+ *
+ *  - `payment-reversed:<sub>`: the newest refunded or charged-back invoice. `processedAt` is that
+ *    INVOICE's creation time (Stripe's `invoice.created`), not the event time, so it orders the
+ *    invoices themselves, whatever order Stripe delivers the events in.
+ *  - `subscription-paid:<sub>`: the creation time of the newest invoice paid with money.
+ *  - `subscription-ended:<sub>`: Stripe deleted the subscription. Terminal.
+ *
+ * Access is blocked when the subscription was deleted, or when the newest reversed invoice is at
+ * least as new as the newest paid one (the member's latest payment was taken back). A refund or
+ * chargeback of an older invoice, after a newer invoice was paid, takes nothing away. Both
+ * ordering rows only move forward, so no delivery order can overwrite a newer fact.
+ */
+const SUBSCRIPTION_PAID_PREFIX = 'subscription-paid:';
+const SUBSCRIPTION_PAID_TYPE = 'subscription_paid:invoice';
+const ENDED_PREFIX = 'subscription-ended:';
+const ENDED_TYPE = 'subscription_ended:deleted';
+
+function paidId(stripeSubscriptionId: string): string {
+  return `${SUBSCRIPTION_PAID_PREFIX}${stripeSubscriptionId.trim()}`;
+}
+function endedId(stripeSubscriptionId: string): string {
+  return `${ENDED_PREFIX}${stripeSubscriptionId.trim()}`;
+}
+
+/** Why a subscription gives no access: its latest payment was reversed, or Stripe deleted it. */
+export type SubscriptionAccessBlock = 'payment_reversed' | 'deleted';
+
+/**
+ * Record the refund or chargeback of the subscription invoice created at `invoiceCreatedAt`.
+ * The newest invoice decides. For the same invoice a refund wins over a dispute and over a won
+ * dispute; a dispute never replaces a refund or a won-dispute tombstone (a delayed
+ * dispute-created event).
+ */
+export async function recordSubscriptionPaymentReversed(
+  tx: Prisma.TransactionClient,
+  stripeSubscriptionId: string,
+  reason: PaymentReversalReason,
+  invoiceCreatedAt: Date,
+): Promise<void> {
+  const id = reversalId(stripeSubscriptionId);
+  const type = `${REVERSED_TYPE_PREFIX}${reason}`;
+  const existing = await tx.stripeWebhookEvent.findUnique({ where: { id } });
+  if (!existing) {
+    await tx.stripeWebhookEvent.create({ data: { id, type, processedAt: invoiceCreatedAt } });
+    return;
+  }
+  const markedAt = existing.processedAt?.getTime() ?? 0;
+  const at = invoiceCreatedAt.getTime();
+  if (at < markedAt) return; // an older invoice: the newer one decides
+  if (at === markedAt && (reason !== 'refunded' || existing.type === type)) return;
+  await tx.stripeWebhookEvent.updateMany({
+    where: { id, type: existing.type },
+    data: { type, processedAt: invoiceCreatedAt },
+  });
+}
+
+/**
+ * A dispute of the subscription invoice created at `invoiceCreatedAt` was won: a dispute marker
+ * for that invoice becomes a tombstone. A refund stays; a newer invoice's marker stays.
+ */
+export async function clearSubscriptionDisputedReversal(
+  tx: Prisma.TransactionClient,
+  stripeSubscriptionId: string,
+  invoiceCreatedAt: Date,
+): Promise<void> {
+  const id = reversalId(stripeSubscriptionId);
+  const existing = await tx.stripeWebhookEvent.findUnique({ where: { id } });
+  if (!existing) {
+    await tx.stripeWebhookEvent.create({
+      data: { id, type: DISPUTE_WON_TYPE, processedAt: invoiceCreatedAt },
+    });
+    return;
+  }
+  const markedAt = existing.processedAt?.getTime() ?? 0;
+  const at = invoiceCreatedAt.getTime();
+  if (at < markedAt) return;
+  if (at === markedAt && existing.type !== `${REVERSED_TYPE_PREFIX}disputed`) return;
+  await tx.stripeWebhookEvent.updateMany({
+    where: { id, type: existing.type },
+    data: { type: DISPUTE_WON_TYPE, processedAt: invoiceCreatedAt },
+  });
+}
+
+/** Record a subscription invoice paid with money. Keeps the newest invoice's creation time. */
+export async function recordSubscriptionInvoicePaid(
+  tx: Prisma.TransactionClient,
+  stripeSubscriptionId: string,
+  invoiceCreatedAt: Date,
+): Promise<void> {
+  const id = paidId(stripeSubscriptionId);
+  const existing = await tx.stripeWebhookEvent.findUnique({ where: { id } });
+  if (!existing) {
+    await tx.stripeWebhookEvent.create({
+      data: { id, type: SUBSCRIPTION_PAID_TYPE, processedAt: invoiceCreatedAt },
+    });
+    return;
+  }
+  if ((existing.processedAt?.getTime() ?? 0) >= invoiceCreatedAt.getTime()) return;
+  await tx.stripeWebhookEvent.updateMany({
+    where: { id },
+    data: { processedAt: invoiceCreatedAt },
+  });
+}
+
+/** Record that Stripe deleted this subscription. Terminal and idempotent. */
+export async function recordSubscriptionEnded(
+  tx: Prisma.TransactionClient,
+  stripeSubscriptionId: string,
+  eventAt: Date,
+): Promise<void> {
+  const id = endedId(stripeSubscriptionId);
+  await tx.stripeWebhookEvent.upsert({
+    where: { id },
+    create: { id, type: ENDED_TYPE, processedAt: eventAt },
+    update: {},
+  });
+}
+
+/**
+ * What blocks this subscription's access, or null. Callers deciding a write pass the write's own
+ * transaction, so a reversal committing concurrently is either seen or serialised after it.
+ */
+export async function subscriptionAccessBlock(
+  tx: Prisma.TransactionClient,
+  stripeSubscriptionId: string,
+): Promise<SubscriptionAccessBlock | null> {
+  if (!stripeSubscriptionId?.trim()) return null;
+  const reversal = await tx.stripeWebhookEvent.findUnique({
+    where: { id: reversalId(stripeSubscriptionId) },
+  });
+  if (reversal?.type.startsWith(REVERSED_TYPE_PREFIX)) {
+    const paid = await tx.stripeWebhookEvent.findUnique({ where: { id: paidId(stripeSubscriptionId) } });
+    const paidAt = paid?.processedAt?.getTime();
+    const reversedAt = reversal.processedAt?.getTime() ?? Number.POSITIVE_INFINITY;
+    if (paidAt === undefined || paidAt <= reversedAt) return 'payment_reversed';
+  }
+  const ended = await tx.stripeWebhookEvent.findUnique({ where: { id: endedId(stripeSubscriptionId) } });
+  return ended ? 'deleted' : null;
+}
+
+/** Close an open unfulfilled record for an object that is owed nothing, in the caller's step. */
+export async function closeUnfulfilledPayment(
+  tx: Prisma.TransactionClient,
+  stripeObjectId: string,
+): Promise<void> {
+  await tx.stripeWebhookEvent.updateMany({
+    where: { id: unfulfilledId(stripeObjectId), processedAt: null },
+    data: { processedAt: new Date() },
+  });
+}
+
 export async function isCheckoutPaymentReversed(
   db: Prisma.TransactionClient | typeof prisma,
   checkoutSessionId: string,
@@ -145,26 +305,33 @@ export async function isCheckoutPaymentReversed(
 export async function recordUnfulfilledPayment(
   stripeObjectId: string,
   reason: UnfulfilledPaymentReason,
-): Promise<void> {
+  options: { subscription?: boolean } = {},
+): Promise<boolean> {
   const id = unfulfilledId(stripeObjectId);
   const type = `${UNFULFILLED_TYPE_PREFIX}${reason}`;
   console.error('[payment-integrity] paid Stripe object not fulfilled', {
     stripeObjectId,
     reason,
   });
-  await runSerializable(async (tx) => {
+  return runSerializable(async (tx) => {
     // A fully refunded checkout session is owed nothing: keep it off the open list whichever
     // order Stripe delivered the refund and the checkout in. A dispute stays listed (it may
     // yet be won).
     const marker = await tx.stripeWebhookEvent.findUnique({
       where: { id: reversalId(stripeObjectId) },
     });
-    const refunded = marker?.type === `${REVERSED_TYPE_PREFIX}refunded`;
+    // GP-641: a subscription is owed nothing exactly when its access is blocked (latest payment
+    // refunded or charged back, or deleted); a refund of an older invoice, after a newer one was
+    // paid, leaves it owed. Read on this transaction, so a reversal racing it is serialised.
+    const refunded = options.subscription
+      ? (await subscriptionAccessBlock(tx, stripeObjectId)) !== null
+      : marker?.type === `${REVERSED_TYPE_PREFIX}refunded`;
     await tx.stripeWebhookEvent.upsert({
       where: { id },
       create: { id, type, ...(refunded ? { processedAt: new Date() } : {}) },
       update: refunded ? { type } : { type, processedAt: null },
     });
+    return !refunded;
   });
 }
 

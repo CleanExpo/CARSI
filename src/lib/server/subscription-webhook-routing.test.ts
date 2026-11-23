@@ -14,33 +14,27 @@ import { readSubscriptionSeatQuantity as realReadSeatQuantity } from './team-sub
 // --- store mocks (hoisted so vi.mock factories can see them) ---
 const indiv = vi.hoisted(() => ({
   upsertSubscription: vi.fn(async () => {}),
-  markSubscriptionStatusBySubscriptionId: vi.fn(async () => {}),
   upsertTerminalSubscriptionStatus: vi.fn(async () => {}),
   resolveUserIdForStripeSubscription: vi.fn(async () => 'user-1'),
 }));
 const team = vi.hoisted(() => ({
   upsertTeamSubscription: vi.fn(async () => {}),
-  markTeamSubscriptionStatusBySubscriptionId: vi.fn(async () => {}),
   upsertTerminalTeamSubscriptionStatus: vi.fn(async () => {}),
   resolveTeamIdForStripeSubscription: vi.fn(async () => 'team-1'),
   readSubscriptionSeatQuantity: vi.fn(() => 5),
 }));
 const org = vi.hoisted(() => ({
   updateOrgSubscriptionFromStripe: vi.fn(async () => true),
-  markOrgSubscriptionStatusBySubscriptionId: vi.fn(async () => {}),
   resolveTeamIdForOrgSubscription: vi.fn(async () => 'team-org-1'),
 }));
 const coaching = vi.hoisted(() => ({
   upsertCoachingMonthlySubscription: vi.fn(async () => {}),
-  markCoachingSubscriptionStatusBySubscriptionId: vi.fn(async () => {}),
   upsertTerminalCoachingSubscriptionStatus: vi.fn(async () => {}),
   resolveUserIdForCoachingSubscription: vi.fn(async () => 'user-coach-1'),
 }));
 
 vi.mock('./subscription-store', () => ({
   upsertSubscription: (...a: unknown[]) => indiv.upsertSubscription(...(a as [])),
-  markSubscriptionStatusBySubscriptionId: (...a: unknown[]) =>
-    indiv.markSubscriptionStatusBySubscriptionId(...(a as [])),
   upsertTerminalSubscriptionStatus: (...a: unknown[]) =>
     indiv.upsertTerminalSubscriptionStatus(...(a as [])),
   resolveUserIdForStripeSubscription: (...a: unknown[]) =>
@@ -52,8 +46,6 @@ vi.mock('./team-subscription-store', () => {
     // separately via team-subscription-store-pure).
     readSubscriptionSeatQuantity: team.readSubscriptionSeatQuantity,
     upsertTeamSubscription: (...a: unknown[]) => team.upsertTeamSubscription(...(a as [])),
-    markTeamSubscriptionStatusBySubscriptionId: (...a: unknown[]) =>
-      team.markTeamSubscriptionStatusBySubscriptionId(...(a as [])),
     upsertTerminalTeamSubscriptionStatus: (...a: unknown[]) =>
       team.upsertTerminalTeamSubscriptionStatus(...(a as [])),
     resolveTeamIdForStripeSubscription: (...a: unknown[]) =>
@@ -63,16 +55,12 @@ vi.mock('./team-subscription-store', () => {
 vi.mock('./org-subscription-store', () => ({
   updateOrgSubscriptionFromStripe: (...a: unknown[]) =>
     org.updateOrgSubscriptionFromStripe(...(a as [])),
-  markOrgSubscriptionStatusBySubscriptionId: (...a: unknown[]) =>
-    org.markOrgSubscriptionStatusBySubscriptionId(...(a as [])),
   resolveTeamIdForOrgSubscription: (...a: unknown[]) =>
     org.resolveTeamIdForOrgSubscription(...(a as [])),
 }));
 vi.mock('./carsi-coaching-subscription-store', () => ({
   upsertCoachingMonthlySubscription: (...a: unknown[]) =>
     coaching.upsertCoachingMonthlySubscription(...(a as [])),
-  markCoachingSubscriptionStatusBySubscriptionId: (...a: unknown[]) =>
-    coaching.markCoachingSubscriptionStatusBySubscriptionId(...(a as [])),
   upsertTerminalCoachingSubscriptionStatus: (...a: unknown[]) =>
     coaching.upsertTerminalCoachingSubscriptionStatus(...(a as [])),
   resolveUserIdForCoachingSubscription: (...a: unknown[]) =>
@@ -86,7 +74,7 @@ vi.mock('@/lib/api/stripe', () => ({
 }));
 // GP-759 unfulfilled-payment ledger: a database write, covered by stripe-webhook-unfulfilled.test.ts.
 vi.mock('./payment-integrity-ledger', () => ({
-  recordUnfulfilledPayment: vi.fn(async () => {}),
+  recordUnfulfilledPayment: vi.fn(async () => true),
   resolveUnfulfilledPayment: vi.fn(async () => {}),
 }));
 
