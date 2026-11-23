@@ -10,6 +10,7 @@ import type { EnrollmentDto, LearnerDashboardSummary } from '@/lib/server/learne
 import type { OnboardingProgramRow } from '@/lib/server/onboarding-programs';
 import { CecRenewalFigure, CecRenewalStatus } from '@/components/lms/CecRenewalStatus';
 import { renewalProgress } from '@/lib/renewal-progress';
+import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
 import type { RenewalCourseSuggestion, RenewalSummaryPayload } from '@/types/renewal';
 
 function greetingForHour(hour: number): string {
@@ -273,12 +274,8 @@ export function DashboardLearningSection({
 }) {
   const firstName = claims?.full_name?.trim().split(/\s+/)[0] || 'Learner';
   const enrollments = summary?.enrollments ?? [];
-  const completed = enrollments.filter(
-    (e) => e.all_lessons_complete === true || e.status === 'completed'
-  );
-  const inProgress = enrollments.filter(
-    (e) => e.status !== 'completed' && e.all_lessons_complete !== true
-  );
+  const completed = enrollments.filter((e) => isEnrollmentCompleted(e.status));
+  const inProgress = enrollments.filter((e) => !isEnrollmentCompleted(e.status));
   const certificates = completed.filter((e) => e.certificate_issued_at);
   // Lifetime CECs for the "CECs earned" stat; the renewal card uses the renewal period (GP-655).
   const cec = summary?.cecHoursFromCompleted ?? 0;
@@ -400,7 +397,7 @@ export function DashboardLearningSection({
           <ul className="grid w-full items-stretch gap-5 md:grid-cols-2">
             {previewCourses.map((enr) => {
               const started = enr.completion_percentage > 0;
-              const done = enr.all_lessons_complete === true || enr.status === 'completed';
+              const done = isEnrollmentCompleted(enr.status);
               const cecHours = enr.cec_hours != null && enr.cec_hours > 0 ? enr.cec_hours : null;
               const pct = done ? 100 : enr.completion_percentage;
               return (

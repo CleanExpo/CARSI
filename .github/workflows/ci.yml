@@ -129,6 +129,15 @@ jobs:
       - name: Course visibility guard self-test
         run: npm run test:course-visibility
 
+      # Site-address guard (GP-756). getAppOrigin is the one rule for links, emails,
+      # certificates and the CSP; six hand-built origins had drifted, two falling back to
+      # http://localhost:3000 in production. The self-test proves the guard can fail.
+      - name: Site-address guard
+        run: npm run check:app-origin
+
+      - name: Site-address guard self-test
+        run: npm run test:app-origin
+
       - name: IICRC terminology guard self-test
         run: npm run test:iicrc-terminology
 
@@ -178,6 +187,15 @@ jobs:
       # if it scans nothing.
       - name: Draft course content check (report only)
         run: npm run check:draft-content
+
+      # GP-678: applied Prisma migrations are frozen (Prisma checksums them; an edit makes
+      # `prisma migrate dev` demand a schema reset), and new ones must be whitespace-clean and
+      # pinned in prisma/migration-checksums.json. Exits 2 if it scans no migrations.
+      - name: Prisma migration guard
+        run: npm run check:migrations
+
+      - name: Prisma migration guard self-test
+        run: npm run test:migrations
 
       # Licence-critical backstop: scans all course-content + marketing surfaces
       # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC

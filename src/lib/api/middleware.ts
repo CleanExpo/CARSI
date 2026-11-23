@@ -22,6 +22,7 @@ import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { internalToolsEnabled, isInternalToolPath } from '@/lib/internal-tools';
 import { buildContentSecurityPolicy, isStrictCspPath } from '@/lib/security/csp';
+import { getAppOrigin } from '@/lib/server/app-url';
 
 interface User {
   id: string;
@@ -74,11 +75,8 @@ export async function updateSession(request: NextRequest) {
   // request header so Next applies it to its own scripts on the strict routes.
   const nonce = crypto.randomUUID();
   const isDev = process.env.NODE_ENV === 'development';
-  const appOrigin = (
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.NEXT_PUBLIC_FRONTEND_URL ||
-    'http://localhost:3000'
-  ).trim();
+  // Env-only on purpose: the CSP must not be shaped by the request's Host header.
+  const appOrigin = getAppOrigin();
   const strict = isStrictCspPath(pathname);
   const csp = buildContentSecurityPolicy({ nonce, isDev, appOrigin, strict });
 
