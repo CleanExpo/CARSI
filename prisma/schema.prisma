@@ -585,12 +585,38 @@ model LmsQuizAttempt {
   answers      Json
   contentVersion String? @map("content_version") @db.VarChar(64)
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  /// Set by an admin quiz-attempt reset on a FAILED attempt (GP-432). The attempt stays on
+  /// record but no longer counts against attemptsAllowed. Passed attempts are never voided.
+  voidedAt     DateTime? @map("voided_at") @db.Timestamptz(6)
 
   quiz    LmsQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
   student LmsUser @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@index([quizId, studentId])
   @@map("lms_quiz_attempts")
+}
+
+/// Append-only audit of admin actions on a learner's record (GP-432): force-complete and
+/// quiz-attempt reset. Snapshots only (no FKs), so the record outlives the learner, the
+/// course and the admin account. Application code only INSERTs.
+model LmsLearnerAdminAuditEvent {
+  id            String   @id @default(uuid()) @db.Uuid
+  /// force_complete | quiz_attempts_reset (DB CHECK)
+  action        String   @db.VarChar(32)
+  reason        String   @db.Text
+  /// bootstrap_admin | admin_user | lms_admin (DB CHECK)
+  actorKind     String   @map("actor_kind") @db.VarChar(16)
+  /// admin_users.id or lms_users.id; NULL only for the bootstrap admin.
+  actorRef      String?  @map("actor_ref") @db.Uuid
+  actorEmail    String   @map("actor_email")
+  studentRef    String   @map("student_ref") @db.Uuid
+  enrollmentRef String?  @map("enrollment_ref") @db.Uuid
+  courseRef     String?  @map("course_ref") @db.Uuid
+  details       Json     @default("{}")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([studentRef, createdAt], map: "ix_lms_learner_admin_audit_student")
+  @@map("lms_learner_admin_audit_events")
 }
 
 /// Practical (instructor-graded) assessment attached to a course, with a scoring rubric (GP-457).
