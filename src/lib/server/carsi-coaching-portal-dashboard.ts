@@ -1,4 +1,5 @@
 import type { SessionClaims } from '@/lib/auth/session-jwt';
+import { resolveCoachingMemberCoach } from '@/lib/coaching-portal/coach-routing';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { MARKETING_ACTION_GOAL_PREFIX } from '@/lib/coaching-portal/marketing-pack/proposed-actions';
 import { hasMinimumMarketingVoice } from '@/lib/coaching-portal/marketing-pack/voice-gate';
@@ -103,6 +104,12 @@ export type CoachingPortalDashboard = {
     proposedFixCount: number;
     checksPassed: number | null;
     checksTotal: number | null;
+  };
+  coach: {
+    id: string;
+    displayName: string;
+    chapterSlug: string;
+    headline: string;
   };
 };
 
@@ -284,6 +291,10 @@ export async function loadCoachingPortalDashboard(
     displayName = 'Support team';
   }
 
+  const coachProfile = resolveCoachingMemberCoach({
+    sessionCoachName: upcoming?.coachName ?? null,
+  });
+
   return {
     user: {
       firstName,
@@ -365,6 +376,12 @@ export async function loadCoachingPortalDashboard(
         ? latestPack.review.checks.filter((c) => c.passed).length
         : null,
       checksTotal: latestPack ? latestPack.review.checks.length : null,
+    },
+    coach: {
+      id: coachProfile.id,
+      displayName: coachProfile.displayName,
+      chapterSlug: coachProfile.chapterSlug,
+      headline: coachProfile.headline,
     },
   };
 }

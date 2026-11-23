@@ -10,4 +10,6 @@ export { CoachingStatGrid } from './CoachingStatGrid';
 export { CoachingSupportPanel } from './CoachingSupportPanel';
 export { CoachingWorkspaceLoading } from './CoachingWorkspaceLoading';
 export { CoachingMonthSummaryCard } from './CoachingMonthSummaryCard';
+export { CoachingCoachChapterCard } from './CoachingCoachChapterCard';
+export { CoachingSessionReceiptList } from './CoachingSessionReceiptList';
 export { CoachingMarketingPackFirstWin } from './CoachingMarketingPackFirstWin';

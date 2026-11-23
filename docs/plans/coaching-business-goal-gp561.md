@@ -2,11 +2,17 @@
 
 Parent goal for the coaching product line. Child work is tracked in Linear:
 
-| Issue | Scope | Repo status (2026-11-02) |
+| Issue | Scope | Repo status (2026-11-23) |
 | --- | --- | --- |
 | GP-591 | Stranger → first course (SPM) | Runbook + e2e smoke added |
-| GP-632 | A5 multi-coach chapters | `coach-routing.ts` types + default coach |
-| GP-637 | A10 partner demo | `/ccw-training/partner-demo` + `partner-demo.ts` |
-| (portal) | Member workspace | Live under `/dashboard/coaching`; onboarding email polish shipped |
+| GP-632 | A5 multi-coach chapters | Default chapter + member UI; DB assignment follow-up |
+| GP-637 | A10 partner demo | `/ccw-training/partner-demo` — step 10 now live |
+| GP-630 | A3 Ask my coach | Portal panel (flagged); corpus admin |
+| GP-636 | A9 TradeHall | Preview in Resources; full room TBD |
+| (portal) | Member workspace | `/dashboard/coaching` — receipts, chapter card, marketing pack |
+
+**Member-facing roof (engineering):** session receipts on `/dashboard/coaching/sessions`, coach chapter strip (A5 default), TradeHall preview under Resources, live portal copy on `/ccw-training`, `npm run verify:product-excellence`.
+
+**Still founder-owned for “100% business”:** Round 2 offer pricing/cadence, AI authority boundaries, record location (Mission Control vs CARSI), Stripe coaching in prod checklist.
 
 Next integration gates: Stripe coaching subscription in prod, founder-approved demo on sales calls, then A5 schema migration for `coachUserId` / `chapterSlug` on profiles.

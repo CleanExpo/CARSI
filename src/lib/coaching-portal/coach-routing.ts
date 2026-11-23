@@ -29,3 +29,17 @@ export const DEFAULT_COACHING_COACH: CoachingCoachProfile = {
   chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
   headline: 'Business growth coaching for Australian cleaning and restoration owners',
 };
+
+/**
+ * Resolves the coach chapter shown in the member workspace until per-member assignments
+ * (coachUserId / chapterSlug on profiles) ship in a follow-up migration (GP-632).
+ */
+export function resolveCoachingMemberCoach(input?: {
+  sessionCoachName?: string | null;
+}): CoachingCoachProfile {
+  const name = input?.sessionCoachName?.trim();
+  if (name && name !== DEFAULT_COACHING_COACH.displayName) {
+    return { ...DEFAULT_COACHING_COACH, displayName: name };
+  }
+  return DEFAULT_COACHING_COACH;
+}

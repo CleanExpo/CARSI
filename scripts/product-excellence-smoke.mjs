@@ -64,6 +64,9 @@ const STEPS = [
       'src/components/coaching-portal/visual',
       'src/lib/coaching-portal/marketing-pack/marketing-pack-view.test.ts',
       'src/components/coaching-portal/CoachingMarketingPackPage.test.tsx',
+      'src/lib/coaching-portal/session-receipt.test.ts',
+      'src/lib/marketing/carsi-coaching-program.test.ts',
+      'src/lib/coaching-portal/partner-demo-page.test.tsx',
     ],
   },
   {

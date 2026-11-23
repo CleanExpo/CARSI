@@ -24,12 +24,14 @@ import {
   CoachingFilterPills,
   CoachingPageHeader,
   CoachingSection,
+  CoachingSessionReceiptList,
   CoachingStatGrid,
   CoachingSupportPanel,
 } from '@/components/coaching-portal/visual';
 import { actionBoardStats } from '@/lib/coaching-portal/action-board-view';
 import { COACHING_PAGE_META } from '@/lib/coaching-portal/coaching-page-meta';
 import { COACHING_RESOURCE_SECTIONS } from '@/lib/coaching-portal/coaching-resources';
+import { buildSessionReceiptView, isPastSession } from '@/lib/coaching-portal/session-receipt';
 import {
   COACHING_GROWTH_SERVICE_CATEGORIES,
   type GrowthServiceItem,
@@ -360,6 +362,8 @@ type SessionRow = {
   meetingUrl: string | null;
   status: string;
   customerSummary: string | null;
+  decisionsJson: string | null;
+  followUpAt: string | null;
 };
 
 export function CoachingSessionsPage() {
@@ -376,6 +380,23 @@ export function CoachingSessionsPage() {
   }, []);
 
   const upcoming = sessions.upcoming;
+  const pastReceipts = useMemo(
+    () =>
+      history
+        .filter((s) => isPastSession(s))
+        .map((s) =>
+          buildSessionReceiptView({
+            id: s.id,
+            scheduledAt: s.scheduledAt,
+            coachName: s.coachName,
+            customerSummary: s.customerSummary,
+            decisionsJson: s.decisionsJson,
+            followUpAt: s.followUpAt,
+            status: s.status,
+          })
+        ),
+    [history]
+  );
 
   return (
     <div className={coachingPage} data-testid="coaching-sessions-page">
@@ -429,24 +450,12 @@ export function CoachingSessionsPage() {
         )}
       </CoachingSection>
 
-      <CoachingSection title="Session history" testId="coaching-sessions-history">
-        {history.filter((s) => s.status === 'completed' || new Date(s.scheduledAt) < new Date())
-          .length === 0 ? (
-          <p className={coachingMuted}>Past sessions will appear here after your first call.</p>
-        ) : (
-          <ul className="space-y-3">
-            {history.map((s) => (
-              <li key={s.id} className="border-b border-white/10 pb-3 last:border-0">
-                <p className="text-sm font-medium text-white">
-                  {new Date(s.scheduledAt).toLocaleDateString('en-AU', { dateStyle: 'medium' })}
-                </p>
-                {s.customerSummary ? (
-                  <p className={`mt-1 text-sm ${coachingMuted}`}>{s.customerSummary}</p>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        )}
+      <CoachingSection title="Session receipts" testId="coaching-sessions-history">
+        <p className={`-mt-2 mb-4 ${coachingMuted}`}>
+          Every completed call stores a short summary and the decisions you agreed — your
+          &quot;session receipt&quot; for the month.
+        </p>
+        <CoachingSessionReceiptList receipts={pastReceipts} />
       </CoachingSection>
 
       <CoachingSupportPanel
@@ -523,7 +532,12 @@ export function CoachingResourcesPage() {
       <div className="space-y-6">
         <CoachingLearningPathSection />
         {COACHING_RESOURCE_SECTIONS.map((section) => (
-          <CoachingSection key={section.id} title={section.title} testId={`coaching-resource-${section.id}`}>
+          <CoachingSection
+            key={section.id}
+            id={section.anchorId}
+            title={section.title}
+            testId={`coaching-resource-${section.id}`}
+          >
             <p className={`-mt-2 mb-4 ${coachingMuted}`}>{section.description}</p>
             <ul className="divide-y divide-white/[0.06]">
               {section.items.map((item) => (
