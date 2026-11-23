@@ -488,6 +488,12 @@ export const LIBRARY_FIELDS: ReadonlySet<string> = new Set([
   'ir',
   'ngs',
   'richsstsse',
+  // `rcb`: a small integer gtag.js puts on its own page_view (value 7 in the headless-Chromium
+  // consent proof on PR #1232, comment 7089443744; 4, 7 and 17 in public captures of other
+  // sites). Google does not document it. Public notes on gtag's `_&` escape name `_&rcb` among
+  // the library's internal fields, and the site never sets it, so it is library bookkeeping, not
+  // anything about the visitor. Its value is still screened for an email or a web address.
+  'rcb',
 ]);
 
 /** The only currency this site sends (`cu` on the wire, from the `currency` event parameter). */

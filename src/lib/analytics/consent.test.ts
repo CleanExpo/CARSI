@@ -323,6 +323,38 @@ describe('the wire: each request to Google is screened again as it leaves', () =
     expect(screenCollect(`${url}&user_id=abc123`, 'en=course_view', context)).toBeNull();
   });
 
+  // GP-750 regression: the real gtag.js page_view captured by the headless-Chromium consent proof
+  // on PR #1232 (comment 7089443744), with the proof's local origin swapped for carsi.com.au. Its
+  // key list is copied exactly. Before `rcb` was listed, the guard dropped this hit and GA4 page
+  // views stopped for every visitor who said yes.
+  const REAL_PAGE_VIEW =
+    'https://www.google-analytics.com/g/collect?v=2&tid=G-LF86765F5C' +
+    '&gtm=45je6bh1v9197316757za200zd9197316757xf1&_p=1795398513824&gcs=G101&gcd=13p3v3p3p7l1' +
+    '&npa=1&dma_cps=-&dma=0&cid=464839180.1795398514&frm=0&ngs=1&pscdl=denied&rcb=7' +
+    '&sr=1280x720&uaa=x86&uab=64' +
+    '&uafvl=Not-A.Brand%3B99.0.0.0%7CHeadlessChrome%3B157.0.8103.78%7CChromium%3B157.0.8103.78' +
+    '&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&_s=1' +
+    '&tag_exp=115938466~115938469~120213116~120385422~120469145~120469153~121246026~121246034~123785234' +
+    '&dl=https%3A%2F%2Fcarsi.com.au%2Fabout%3Futm_source%3Dproofcampaign&dr=&dt=%2Fabout' +
+    '&sid=1795398514&sct=1&seg=0&_tu=AAg&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=3542';
+
+  it('lets the real gtag.js page view through, rcb included', () => {
+    expect(new URL(REAL_PAGE_VIEW).searchParams.get('rcb')).toBe('7');
+    expect(screenCollect(REAL_PAGE_VIEW, undefined, context)).toEqual({
+      url: REAL_PAGE_VIEW,
+      body: undefined,
+    });
+  });
+
+  it.each([
+    ['an email field (em)', 'em=jane%40example.com'],
+    ['a hashed email field (em)', `em=${'a'.repeat(64)}`],
+    ['a made-up field', 'zz_carsi_probe=1'],
+    ['rcb carrying an email', 'rcb=jane%40example.com'],
+  ])('still drops the real page view when it also carries %s', (_label, extra) => {
+    expect(screenCollect(`${REAL_PAGE_VIEW}&${extra}`, undefined, context)).toBeNull();
+  });
+
   it('lets through the fields the Google library adds to a real page view and funnel events', () => {
     // The shape of a gtag.js GA4 hit: request-level bookkeeping in the address, events in the body.
     const shared = new URLSearchParams({
