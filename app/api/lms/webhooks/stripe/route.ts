@@ -175,6 +175,7 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
         subscriptionInvoiceRef(
           invoiceTransactionId,
           readInvoiceCreatedAtFromPaymentIntent(paymentIntent),
+          'event_time',
           eventTimestamp,
           subscriptionId,
         ),
@@ -252,20 +253,23 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
 /**
  * GP-641: the subscription invoice an event is about, identified by its Stripe id (access is
  * decided by invoice identity, see `subscriptionAccessBlock`). Stripe always sends the id and the
- * creation time. A missing id is stored as unknown, which can never be matched and so never
- * opens access; a missing creation time falls back to the event time, which can only make the
- * invoice count as newer.
+ * creation time. A missing id is stored as unknown, which blocks until a strictly newer invoice
+ * is paid. A missing creation time must never help open access: a REVERSAL takes the event time
+ * (it can only count as newer, so it blocks); a payment or a won dispute takes the oldest
+ * possible time (it can never outrank a reversal; Stripe's latest invoice decides instead).
  */
 function subscriptionInvoiceRef(
   invoiceId: string | null,
   invoiceCreatedAt: Date | null,
+  missingCreatedAt: 'event_time' | 'oldest',
   eventTimestamp: Date,
   subscriptionId: string,
 ): SubscriptionInvoiceRef {
   if (!invoiceId || !invoiceCreatedAt) {
     console.warn(`[stripe webhook] invoice id or creation time missing for subscription=${subscriptionId}`);
   }
-  return { id: invoiceId, createdAt: invoiceCreatedAt ?? eventTimestamp };
+  const fallback = missingCreatedAt === 'event_time' ? eventTimestamp : new Date(0);
+  return { id: invoiceId, createdAt: invoiceCreatedAt ?? fallback };
 }
 
 /**
@@ -307,7 +311,13 @@ async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
   if (subscriptionId) {
     const result = await applySubscriptionDisputeWon(
       subscriptionId,
-      subscriptionInvoiceRef(invoiceId, readInvoiceCreatedAtFromPaymentIntent(paymentIntent), eventTimestamp, subscriptionId),
+      subscriptionInvoiceRef(
+        invoiceId,
+        readInvoiceCreatedAtFromPaymentIntent(paymentIntent),
+        'oldest',
+        eventTimestamp,
+        subscriptionId,
+      ),
     );
     await restoreReopenedSubscription(subscriptionId, result);
   }
@@ -446,6 +456,7 @@ export async function POST(request: NextRequest) {
             subscriptionInvoiceRef(
               typeof invoice.id === 'string' ? invoice.id : null,
               readInvoiceCreatedAt(invoice),
+              'oldest',
               new Date(event.created * 1000),
               paidSubscriptionId,
             ),

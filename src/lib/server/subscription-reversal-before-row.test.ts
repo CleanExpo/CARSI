@@ -632,6 +632,37 @@ describe('GP-641 sweep 2: invoices are told apart by id, never by their creation
     expect(rowFor(kind)?.status).toBe('unpaid');
   });
 
+  it.each(ALL_KINDS)('%s: a reversal whose invoice id is unusable still blocks a paid latest invoice', async (kind) => {
+    db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
+    expect(await created(kind, 50)).toBe(200);
+    withLatestInvoice(kind, 'in_Y', 100);
+    expect(await refund(200, true, 100, 'in_X')).toBe(200);
+    expect(rowFor(kind)?.status).toBe('active');
+    // A chargeback of the latest invoice whose id cannot be stored (empty) is kept as unknown.
+    expect(await dispute(250, 100, '')).toBe(200);
+    expect(await updated(kind, 300)).toBe(200);
+    expect(rowFor(kind)?.status).toBe('unpaid');
+  });
+
+  it.each(ALL_KINDS)('%s: an invoice.paid without a creation time never outranks a refund', async (kind) => {
+    db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
+    expect(await created(kind, 50)).toBe(200);
+    withLatestInvoice(kind, 'in_B', 200);
+    expect(await refund(250, true, 200, 'in_B')).toBe(200);
+    expect(rowFor(kind)?.status).toBe('unpaid');
+    // A late invoice.paid for the older invoice A arrives without `created`.
+    expect(
+      await deliver('invoice.paid', 300, {
+        id: 'in_A',
+        amount_paid: 79_500,
+        currency: 'aud',
+        billing_reason: 'subscription_cycle',
+        parent: { subscription_details: { subscription: SUB } },
+      }),
+    ).toBe(200);
+    expect(rowFor(kind)?.status).toBe('unpaid');
+  });
+
   it.each(ALL_KINDS)('%s: a won dispute of one invoice does not lift the dispute of another in the same second', async (kind) => {
     db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
     expect(await created(kind, 50)).toBe(200);

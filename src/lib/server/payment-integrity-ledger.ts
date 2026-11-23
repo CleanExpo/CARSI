@@ -370,10 +370,14 @@ async function reversalStillCurrent(
     }
   }
   if (latest.id === reversal.invoiceId) return true;
-  const latestReversal = await tx.stripeWebhookEvent.findUnique({
-    where: { id: invoiceReversalId(stripeSubscriptionId, latest.id) },
-  });
-  if (blocks(reversalState(latestReversal?.type))) return true;
+  // The latest invoice's own reversal, and any reversal whose invoice id we could not store:
+  // that one may BE the latest invoice, so it blocks until a strictly newer invoice is paid.
+  for (const invoiceId of [latest.id, UNKNOWN_INVOICE]) {
+    const own = await tx.stripeWebhookEvent.findUnique({
+      where: { id: invoiceReversalId(stripeSubscriptionId, invoiceId) },
+    });
+    if (blocks(reversalState(own?.type))) return true;
+  }
   return !latest.paidWithMoney;
 }
 
