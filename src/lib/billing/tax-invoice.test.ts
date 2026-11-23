@@ -24,6 +24,8 @@ const env = (abn?: string) => ({ [CARSI_ABN_ENV]: abn }) as NodeJS.ProcessEnv;
 const ISSUED_AT = new Date('2026-11-21T22:30:00.000Z');
 // Below $1,000 the buyer is optional; these older cases carry none.
 const NO_BUYER = { name: null, businessName: null, abn: null };
+// A Checkout session Stripe reports as paid, for the amount charged in cents.
+const paid = (amount_total: number | null) => ({ payment_status: 'paid', amount_total });
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -83,13 +85,13 @@ describe('buildTaxInvoice', () => {
   it('refuses to build without a valid ABN, so no placeholder can render', () => {
     expect(() =>
       buildTaxInvoice(
-        { item: 'Course', totalCents: 2900, issuedAt: ISSUED_AT, buyer: NO_BUYER },
+        { item: 'Course', checkout: paid(2900), issuedAt: ISSUED_AT, buyer: NO_BUYER },
         env()
       )
     ).toThrow(TaxInvoiceConfigError);
     expect(() =>
       buildTaxInvoice(
-        { item: 'Course', totalCents: 2900, issuedAt: ISSUED_AT, buyer: NO_BUYER },
+        { item: 'Course', checkout: paid(2900), issuedAt: ISSUED_AT, buyer: NO_BUYER },
         env('ABN to be confirmed')
       )
     ).toThrow(TaxInvoiceConfigError);
@@ -97,7 +99,12 @@ describe('buildTaxInvoice', () => {
 
   it('carries seller, ABN, Brisbane date, item, total and GST', () => {
     const inv = buildTaxInvoice(
-      { item: 'Water Damage Restoration', totalCents: 9900, issuedAt: ISSUED_AT, buyer: NO_BUYER },
+      {
+        item: 'Water Damage Restoration',
+        checkout: paid(9900),
+        issuedAt: ISSUED_AT,
+        buyer: NO_BUYER,
+      },
       env(TEST_ONLY_ABN)
     );
     expect(inv).toEqual({
@@ -116,7 +123,7 @@ describe('buildTaxInvoice', () => {
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(
       tryBuildTaxInvoice(
-        { item: 'Course', totalCents: 2900, issuedAt: ISSUED_AT, buyer: NO_BUYER },
+        { item: 'Course', checkout: paid(2900), issuedAt: ISSUED_AT, buyer: NO_BUYER },
         env()
       )
     ).toBeNull();
@@ -126,13 +133,13 @@ describe('buildTaxInvoice', () => {
   it('tryBuildTaxInvoice returns null for no charge', () => {
     expect(
       tryBuildTaxInvoice(
-        { item: 'Course', totalCents: 0, issuedAt: ISSUED_AT, buyer: NO_BUYER },
+        { item: 'Course', checkout: paid(0), issuedAt: ISSUED_AT, buyer: NO_BUYER },
         env(TEST_ONLY_ABN)
       )
     ).toBeNull();
     expect(
       tryBuildTaxInvoice(
-        { item: 'Course', totalCents: null, issuedAt: ISSUED_AT, buyer: NO_BUYER },
+        { item: 'Course', checkout: paid(null), issuedAt: ISSUED_AT, buyer: NO_BUYER },
         env(TEST_ONLY_ABN)
       )
     ).toBeNull();
@@ -141,7 +148,12 @@ describe('buildTaxInvoice', () => {
 
 describe('renderTaxInvoiceSection', () => {
   const inv = buildTaxInvoice(
-    { item: 'Water Damage <Restoration>', totalCents: 2900, issuedAt: ISSUED_AT, buyer: NO_BUYER },
+    {
+      item: 'Water Damage <Restoration>',
+      checkout: paid(2900),
+      issuedAt: ISSUED_AT,
+      buyer: NO_BUYER,
+    },
     env(TEST_ONLY_ABN)
   );
   const { html, text } = renderTaxInvoiceSection(inv);
@@ -185,14 +197,14 @@ describe('buyer identity on tax invoices of $1,000 or more (GP-761 review P1)', 
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(
       tryBuildTaxInvoice(
-        { item: 'Team purchase', totalCents: 100000, issuedAt: ISSUED_AT, buyer: noBuyer },
+        { item: 'Team purchase', checkout: paid(100000), issuedAt: ISSUED_AT, buyer: noBuyer },
         env(TEST_ONLY_ABN)
       )
     ).toBeNull();
     expect(err).toHaveBeenCalledWith(expect.stringContaining('NOT ISSUED'));
     expect(() =>
       buildTaxInvoice(
-        { item: 'Team purchase', totalCents: 100000, issuedAt: ISSUED_AT, buyer: noBuyer },
+        { item: 'Team purchase', checkout: paid(100000), issuedAt: ISSUED_AT, buyer: noBuyer },
         env(TEST_ONLY_ABN)
       )
     ).toThrow(TaxInvoiceBuyerIdentityError);
@@ -204,7 +216,7 @@ describe('buyer identity on tax invoices of $1,000 or more (GP-761 review P1)', 
       tryBuildTaxInvoice(
         {
           item: 'Team purchase',
-          totalCents: 150000,
+          checkout: paid(150000),
           issuedAt: ISSUED_AT,
           buyer: { name: '  ', businessName: '', abn: '12345678901' },
         },
@@ -217,7 +229,7 @@ describe('buyer identity on tax invoices of $1,000 or more (GP-761 review P1)', 
     const inv = tryBuildTaxInvoice(
       {
         item: 'Team purchase',
-        totalCents: 100000,
+        checkout: paid(100000),
         issuedAt: ISSUED_AT,
         buyer: { name: ' Sam Lee ', businessName: null, abn: null },
       },
@@ -235,7 +247,7 @@ describe('buyer identity on tax invoices of $1,000 or more (GP-761 review P1)', 
     const inv = buildTaxInvoice(
       {
         item: 'Team purchase',
-        totalCents: 250000,
+        checkout: paid(250000),
         issuedAt: ISSUED_AT,
         buyer: { name: 'Sam Lee', businessName: 'Lee Restorations Pty Ltd', abn: '20000000190' },
       },
@@ -252,7 +264,7 @@ describe('buyer identity on tax invoices of $1,000 or more (GP-761 review P1)', 
     const inv = buildTaxInvoice(
       {
         item: 'Team purchase',
-        totalCents: 100000,
+        checkout: paid(100000),
         issuedAt: ISSUED_AT,
         buyer: { name: null, businessName: null, abn: '20000000190' },
       },
@@ -264,7 +276,7 @@ describe('buyer identity on tax invoices of $1,000 or more (GP-761 review P1)', 
 
   it('at $999.99 with no buyer identity the invoice is still issued, with no Buyer row', () => {
     const inv = tryBuildTaxInvoice(
-      { item: 'Team purchase', totalCents: 99999, issuedAt: ISSUED_AT, buyer: noBuyer },
+      { item: 'Team purchase', checkout: paid(99999), issuedAt: ISSUED_AT, buyer: noBuyer },
       env(TEST_ONLY_ABN)
     );
     expect(inv).not.toBeNull();
@@ -275,7 +287,7 @@ describe('buyer identity on tax invoices of $1,000 or more (GP-761 review P1)', 
     const inv = buildTaxInvoice(
       {
         item: 'Team purchase',
-        totalCents: 100000,
+        checkout: paid(100000),
         issuedAt: ISSUED_AT,
         buyer: { name: 'Sam Lee', businessName: null, abn: null },
       },
@@ -284,5 +296,60 @@ describe('buyer identity on tax invoices of $1,000 or more (GP-761 review P1)', 
     expect(() =>
       renderTaxInvoiceSection({ ...inv, buyerIdentity: null, buyerAbn: null })
     ).toThrow();
+  });
+});
+
+// GP-761 review round 2 P1: a tax invoice is issued only for a Checkout session
+// Stripe reports as paid. The owner reads payment_status itself; callers pass the
+// session through. Literal objects here, so these fail on the behaviour.
+describe('a tax invoice needs a paid Checkout session (GP-761 review round 2 P1)', () => {
+  const buyer = { name: 'Sam Lee', businessName: null, abn: null };
+
+  it.each(['unpaid', 'no_payment_required', null])(
+    'payment_status %s: NOT ISSUED and logged, even with an amount',
+    (payment_status) => {
+      const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+      expect(
+        tryBuildTaxInvoice(
+          {
+            item: 'Coaching (monthly)',
+            checkout: { payment_status, amount_total: 9900 },
+            issuedAt: ISSUED_AT,
+            buyer,
+          },
+          env(TEST_ONLY_ABN)
+        )
+      ).toBeNull();
+      expect(err).toHaveBeenCalledWith(expect.stringContaining('NOT ISSUED'));
+      expect(err).toHaveBeenCalledWith(expect.stringContaining('not paid'));
+    }
+  );
+
+  it('buildTaxInvoice refuses an unpaid session with a not-paid error', () => {
+    expect(() =>
+      buildTaxInvoice(
+        {
+          item: 'Coaching (monthly)',
+          checkout: { payment_status: 'unpaid', amount_total: 9900 },
+          issuedAt: ISSUED_AT,
+          buyer,
+        },
+        env(TEST_ONLY_ABN)
+      )
+    ).toThrow(/not paid/);
+  });
+
+  it('a paid session is issued for the amount Stripe charged', () => {
+    const inv = tryBuildTaxInvoice(
+      {
+        item: 'Coaching (monthly)',
+        checkout: { payment_status: 'paid', amount_total: 9900 },
+        issuedAt: ISSUED_AT,
+        buyer,
+      },
+      env(TEST_ONLY_ABN)
+    );
+    expect(inv?.totalCents).toBe(9900);
+    expect(inv?.gstCents).toBe(900);
   });
 });

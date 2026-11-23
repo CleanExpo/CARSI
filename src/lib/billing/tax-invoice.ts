@@ -15,6 +15,11 @@
  * (https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/tax-invoices).
  * This file owns that rule too: at or above the threshold, `buildTaxInvoice` throws
  * without a buyer identity, so a non-compliant invoice is never issued.
+ *
+ * It also owns when an invoice may be issued at all: only for a Checkout session
+ * Stripe reports as `payment_status: 'paid'`. Callers pass the session itself
+ * (`checkout`), never their own amount or paid check; an `unpaid` session (funds
+ * not yet available) or `no_payment_required` gets no invoice.
  */
 
 /** The seller named on CARSI's Stripe account and on every payment and terms line. */
@@ -33,6 +38,14 @@ export class TaxInvoiceConfigError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'TaxInvoiceConfigError';
+  }
+}
+
+/** Thrown when the Checkout session is not paid: no tax invoice without proof of payment. */
+export class TaxInvoiceNotPaidError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'TaxInvoiceNotPaidError';
   }
 }
 
@@ -119,10 +132,20 @@ export type TaxInvoice = {
   gstCents: number;
 };
 
+/**
+ * The Stripe Checkout session the sale was paid through (structural subset of
+ * `Stripe.Checkout.Session`; pass the session object itself). The invoice total is
+ * its `amount_total`, the GST-inclusive amount charged, in cents.
+ */
+export type TaxInvoiceCheckout = {
+  payment_status?: string | null;
+  amount_total?: number | null;
+};
+
 export type TaxInvoiceInput = {
   item: string;
-  /** GST-inclusive amount charged, in cents (Stripe `amount_total`). */
-  totalCents: number;
+  /** Proof of payment: issued only when `payment_status` is 'paid'. */
+  checkout: TaxInvoiceCheckout;
   issuedAt: Date;
   buyer: TaxInvoiceBuyer;
 };
@@ -178,6 +201,7 @@ export function formatInvoiceDate(date: Date): string {
 
 /**
  * Throws TaxInvoiceConfigError when CARSI_ABN is unset or not a valid ABN,
+ * TaxInvoiceNotPaidError when the Checkout session is not 'paid',
  * TaxInvoiceBuyerIdentityError when a total of $1,000 or more has no buyer name,
  * business name or valid buyer ABN, and RangeError when the amount is not a
  * positive whole number of cents.
@@ -192,12 +216,19 @@ export function buildTaxInvoice(
       `${CARSI_ABN_ENV} is unset or not a valid ABN; a tax invoice cannot be issued without it`
     );
   }
-  if (!Number.isInteger(input.totalCents) || input.totalCents <= 0) {
-    throw new RangeError(`A tax invoice needs a positive charge in cents; got ${input.totalCents}`);
+  const paymentStatus = input.checkout.payment_status;
+  if (paymentStatus !== 'paid') {
+    throw new TaxInvoiceNotPaidError(
+      `the Checkout session is not paid (payment_status ${paymentStatus ?? 'missing'}); no tax invoice without proof of payment`
+    );
+  }
+  const totalCents = input.checkout.amount_total;
+  if (typeof totalCents !== 'number' || !Number.isInteger(totalCents) || totalCents <= 0) {
+    throw new RangeError(`A tax invoice needs a positive charge in cents; got ${totalCents}`);
   }
   const buyerIdentity = clean(input.buyer.businessName) ?? clean(input.buyer.name);
   const buyerAbn = isValidAbn(input.buyer.abn) ? formatAbn(input.buyer.abn!) : null;
-  if (!taxInvoiceBuyerRuleMet({ totalCents: input.totalCents, buyerIdentity, buyerAbn })) {
+  if (!taxInvoiceBuyerRuleMet({ totalCents, buyerIdentity, buyerAbn })) {
     throw new TaxInvoiceBuyerIdentityError(
       `a tax invoice of ${formatAudCents(TAX_INVOICE_BUYER_IDENTITY_THRESHOLD_CENTS)} or more needs the buyer's name, business name or ABN, and none was given`
     );
@@ -209,29 +240,34 @@ export function buildTaxInvoice(
     buyerAbn,
     issuedOn: formatInvoiceDate(input.issuedAt),
     item: input.item,
-    totalCents: input.totalCents,
-    gstCents: gstFromGstInclusiveCents(input.totalCents),
+    totalCents,
+    gstCents: gstFromGstInclusiveCents(totalCents),
   };
 }
 
 /**
  * For send paths: returns null when nothing was charged, and null with a loud log
- * when the ABN is missing or a $1,000+ sale has no buyer identity, so the purchase
+ * when the session is not paid, the ABN is missing or a $1,000+ sale has no buyer
+ * identity, so the purchase
  * email (which can carry the buyer's set-password link) still goes out without a
  * tax invoice rather than not at all, and no non-compliant invoice is ever sent.
  */
 export function tryBuildTaxInvoice(
-  input: Omit<TaxInvoiceInput, 'totalCents'> & { totalCents: number | null | undefined },
+  input: TaxInvoiceInput,
   env: NodeJS.ProcessEnv = process.env
 ): TaxInvoice | null {
-  const { totalCents } = input;
+  const totalCents = input.checkout.amount_total;
   if (typeof totalCents !== 'number' || !Number.isInteger(totalCents) || totalCents <= 0) {
     return null;
   }
   try {
-    return buildTaxInvoice({ ...input, totalCents }, env);
+    return buildTaxInvoice(input, env);
   } catch (e) {
-    if (e instanceof TaxInvoiceConfigError || e instanceof TaxInvoiceBuyerIdentityError) {
+    if (
+      e instanceof TaxInvoiceConfigError ||
+      e instanceof TaxInvoiceNotPaidError ||
+      e instanceof TaxInvoiceBuyerIdentityError
+    ) {
       console.error(
         `[tax-invoice] NOT ISSUED for "${input.item}" (${formatAudCents(totalCents)}): ${e.message}`
       );

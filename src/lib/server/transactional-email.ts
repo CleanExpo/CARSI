@@ -36,7 +36,11 @@ import type { BusinessCoachingSession } from '@/lib/marketing/business-coaching'
 import { businessCoachingPath } from '@/lib/marketing/business-coaching';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { isProvisionalPasswordHash } from '@/lib/server/lms-auth';
-import { tryBuildTaxInvoice, type TaxInvoiceBuyer } from '@/lib/billing/tax-invoice';
+import {
+  tryBuildTaxInvoice,
+  type TaxInvoiceBuyer,
+  type TaxInvoiceCheckout,
+} from '@/lib/billing/tax-invoice';
 
 export { isEmailConfigured };
 export type { SendEmailResult };
@@ -151,14 +155,15 @@ export async function sendEnrollmentWelcomeEmail(params: {
   appOrigin: string;
   offers?: import('@/lib/marketing/ccw-roadshow-offers').CcwAttendeeOffer[];
   /**
-   * Pass only from a paid purchase, with the GST-inclusive amount Stripe charged
-   * (`session.amount_total`). The email then carries a tax invoice (GP-761).
+   * Pass only from a purchase, with the Stripe Checkout session itself as
+   * `checkout`. The tax-invoice owner issues an invoice only when that session is
+   * paid, for its `amount_total` (GP-761).
    * Free, membership, team and attendance enrolments leave it out. `buyer` is the
    * payer as the Checkout session recorded them (`taxInvoiceBuyerFromCheckout`);
    * when it has no name, the learner's stored full name is used instead.
    */
   payment?: {
-    amountTotalCents: number | null | undefined;
+    checkout: TaxInvoiceCheckout;
     seatCount?: number;
     buyer: TaxInvoiceBuyer;
   };
@@ -206,7 +211,7 @@ export async function sendEnrollmentWelcomeEmail(params: {
             params.payment.seatCount && params.payment.seatCount > 1
               ? `${course.title}, team purchase (${params.payment.seatCount} seats)`
               : course.title,
-          totalCents: params.payment.amountTotalCents,
+          checkout: params.payment.checkout,
           issuedAt: new Date(),
           // Never `name` above: it falls back to the email local part, which is
           // not an identity on a tax invoice.
@@ -341,8 +346,8 @@ export async function sendCcwRoadshowBookingConfirmationEmail(params: {
   ticketLabel: string;
   seatCount: number;
   amountLabel: string;
-  /** GST-inclusive amount Stripe charged; makes the email a tax invoice (GP-761). */
-  amountTotalCents?: number | null;
+  /** The Stripe Checkout session; the email is a tax invoice only when it is paid (GP-761). */
+  checkout: TaxInvoiceCheckout;
   /** Who paid, for the tax invoice. Not `attendeeName`, which may be a greeting fallback. */
   buyer: TaxInvoiceBuyer;
   businessName?: string;
@@ -369,7 +374,7 @@ export async function sendCcwRoadshowBookingConfirmationEmail(params: {
     eventPageUrl,
     taxInvoice: tryBuildTaxInvoice({
       item: `CARSI Roadshow ${params.eventCity}, ${params.ticketLabel} (${params.seatCount} ${params.seatCount === 1 ? 'seat' : 'seats'})`,
-      totalCents: params.amountTotalCents,
+      checkout: params.checkout,
       issuedAt: new Date(),
       buyer: params.buyer,
     }),
@@ -661,8 +666,8 @@ export async function sendBusinessCoachingConfirmationEmail(params: {
   packageLabel: string;
   seatCount: number;
   amountLabel: string;
-  /** GST-inclusive amount Stripe charged; makes the email a tax invoice (GP-761). */
-  amountTotalCents?: number | null;
+  /** The Stripe Checkout session; the email is a tax invoice only when it is paid (GP-761). */
+  checkout: TaxInvoiceCheckout;
   /** Who paid, for the tax invoice. Not `attendeeName`, which may be a greeting fallback. */
   buyer: TaxInvoiceBuyer;
   registrationStatus: 'confirmed' | 'waitlisted';
@@ -689,7 +694,7 @@ export async function sendBusinessCoachingConfirmationEmail(params: {
     programUrl: `${base}${businessCoachingPath}`,
     taxInvoice: tryBuildTaxInvoice({
       item: `Owner Circle: ${params.session.title}, ${params.packageLabel} (${params.seatCount} ${params.seatCount === 1 ? 'seat' : 'seats'})`,
-      totalCents: params.amountTotalCents,
+      checkout: params.checkout,
       issuedAt: new Date(),
       buyer: params.buyer,
     }),

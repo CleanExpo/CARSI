@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getStripeClient } from '@/lib/api/stripe';
-import { taxInvoiceBuyerFromCheckout, type TaxInvoiceBuyer } from '@/lib/billing/tax-invoice';
+import {
+  taxInvoiceBuyerFromCheckout,
+  type TaxInvoiceBuyer,
+  type TaxInvoiceCheckout,
+} from '@/lib/billing/tax-invoice';
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { confirmEmailOwnershipOk, resolveAccountEmail } from '@/lib/server/enrollment-confirm-guard';
@@ -44,8 +48,8 @@ export async function POST(request: NextRequest) {
   let paymentReference: string;
   let purchaseMode: 'self' | 'team' = 'self';
   let teamSeatCount: number | undefined;
-  /** GST-inclusive amount Stripe charged; set only for a paid Stripe session (GP-761). */
-  let paidAmountTotalCents: number | null = null;
+  /** The retrieved Checkout session; the tax-invoice owner reads its paid status and amount (GP-761). */
+  let paidCheckout: TaxInvoiceCheckout | null = null;
   /** The payer as Checkout recorded them, for the tax invoice buyer row (GP-761). */
   let paidBuyer: TaxInvoiceBuyer = { name: null, businessName: null, abn: null };
 
@@ -84,7 +88,7 @@ export async function POST(request: NextRequest) {
       if (!confirmEmailOwnershipOk(sessionEmail, accountEmail)) {
         return NextResponse.json({ detail: 'Session email does not match account' }, { status: 403 });
       }
-      paidAmountTotalCents = session.amount_total ?? null;
+      paidCheckout = session;
       paidBuyer = taxInvoiceBuyerFromCheckout(session.customer_details);
     } catch (e) {
       console.error('[enrollments/confirm] stripe', e);
@@ -160,9 +164,9 @@ export async function POST(request: NextRequest) {
         studentId: claims.sub,
         courseSlug: slug,
         appOrigin: getAppOrigin(request),
-        payment: sessionId
+        payment: paidCheckout
           ? {
-              amountTotalCents: paidAmountTotalCents,
+              checkout: paidCheckout,
               seatCount: purchaseMode === 'team' ? teamSeatCount : undefined,
               buyer: paidBuyer,
             }

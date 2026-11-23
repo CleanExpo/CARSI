@@ -95,7 +95,7 @@ export async function processBusinessCoachingCheckoutCompleted(
       packageLabel: pkg.label,
       seatCount: result.seatCount,
       amountLabel,
-      amountTotalCents: session.amount_total,
+      checkout: session,
       buyer: {
         name: attendees[0] || session.customer_details?.name,
         businessName: session.metadata?.company_name || session.customer_details?.business_name,

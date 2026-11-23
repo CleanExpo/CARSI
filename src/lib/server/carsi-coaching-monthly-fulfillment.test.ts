@@ -259,4 +259,18 @@ describe('CARSI coaching monthly fulfillment', () => {
     expect(text).not.toContain('Buyer');
     vi.unstubAllEnvs();
   });
+
+  // GP-761 review round 2 P1: a completed subscription Checkout can be unpaid
+  // (funds not yet available). The welcome email goes, but no tax invoice.
+  it('an unpaid completed subscription session gets no tax invoice and a NOT ISSUED log', async () => {
+    vi.stubEnv('CARSI_ABN', '10000000000');
+    const session = paidSession();
+    session.payment_status = 'unpaid';
+    await processCarsiCoachingMonthlyCheckoutCompleted(session, OPTS);
+    expect(mocks.sendEmail).toHaveBeenCalledTimes(1);
+    const { text } = mocks.sendEmail.mock.calls[0]![0] as { text: string };
+    expect(text).not.toContain('Tax invoice');
+    expect(console.error).toHaveBeenCalledWith(expect.stringContaining('NOT ISSUED'));
+    vi.unstubAllEnvs();
+  });
 });

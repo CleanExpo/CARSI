@@ -30,13 +30,17 @@ vi.mock('@/lib/server/first-lesson', () => ({
   getFirstLessonLearnPath: async () => '/learn/paid-item',
 }));
 
-import { sendEnrollmentWelcomeEmail } from '@/lib/server/transactional-email';
+import {
+  sendBusinessCoachingConfirmationEmail,
+  sendCcwRoadshowBookingConfirmationEmail,
+  sendEnrollmentWelcomeEmail,
+} from '@/lib/server/transactional-email';
 
 // SYNTHETIC, TEST-ONLY ABN (checksum-valid). Never CARSI's ABN.
 const taxInvoice = buildTaxInvoice(
   {
     item: 'Paid item',
-    totalCents: 2900,
+    checkout: { payment_status: 'paid', amount_total: 2900 },
     issuedAt: new Date('2026-11-21T22:30:00.000Z'),
     buyer: { name: null, businessName: null, abn: null },
   },
@@ -151,7 +155,10 @@ describe('sendEnrollmentWelcomeEmail adds the tax invoice only for a charge (GP-
       studentId: 'u1',
       courseSlug: 'paid-item',
       appOrigin: 'https://carsi.example',
-      payment: { amountTotalCents: 2900, buyer: { name: null, businessName: null, abn: null } },
+      payment: {
+        checkout: { payment_status: 'paid', amount_total: 2900 },
+        buyer: { name: null, businessName: null, abn: null },
+      },
     });
     const body = sentBody();
     expect(body).toContain('Tax invoice');
@@ -175,7 +182,10 @@ describe('sendEnrollmentWelcomeEmail adds the tax invoice only for a charge (GP-
       studentId: 'u1',
       courseSlug: 'paid-item',
       appOrigin: 'https://carsi.example',
-      payment: { amountTotalCents: 2900, buyer: { name: null, businessName: null, abn: null } },
+      payment: {
+        checkout: { payment_status: 'paid', amount_total: 2900 },
+        buyer: { name: null, businessName: null, abn: null },
+      },
     });
     expect(result).toEqual({ sent: true });
     expect(sentBody()).not.toContain('Tax invoice');
@@ -192,7 +202,7 @@ describe('sendEnrollmentWelcomeEmail adds the tax invoice only for a charge (GP-
       courseSlug: 'paid-item',
       appOrigin: 'https://carsi.example',
       payment: {
-        amountTotalCents: 101500,
+        checkout: { payment_status: 'paid', amount_total: 101500 },
         seatCount: 35,
         buyer: { name: 'Sam Lee', businessName: null, abn: null },
       },
@@ -211,7 +221,7 @@ describe('sendEnrollmentWelcomeEmail adds the tax invoice only for a charge (GP-
       courseSlug: 'paid-item',
       appOrigin: 'https://carsi.example',
       payment: {
-        amountTotalCents: 100000,
+        checkout: { payment_status: 'paid', amount_total: 100000 },
         seatCount: 20,
         buyer: { name: null, businessName: null, abn: null },
       },
@@ -227,7 +237,7 @@ describe('sendEnrollmentWelcomeEmail adds the tax invoice only for a charge (GP-
       courseSlug: 'paid-item',
       appOrigin: 'https://carsi.example',
       payment: {
-        amountTotalCents: 101500,
+        checkout: { payment_status: 'paid', amount_total: 101500 },
         seatCount: 35,
         buyer: { name: null, businessName: null, abn: null },
       },
@@ -238,4 +248,96 @@ describe('sendEnrollmentWelcomeEmail adds the tax invoice only for a charge (GP-
     expect(body).not.toContain('Buyer');
     expect(err).toHaveBeenCalledWith(expect.stringContaining('NOT ISSUED'));
   });
+});
+
+// GP-761 review round 2 P1: each paid-email family takes Stripe's payment status
+// from the Checkout session, through the tax-invoice owner.
+describe('paid purchase emails carry a tax invoice only for a paid session (GP-761)', () => {
+  const sentBody = () => {
+    const call = mocks.sendEmail.mock.calls.at(-1)?.[0] as { html: string; text: string };
+    return `${call.html}\n${call.text}`;
+  };
+  const buyer = { name: 'Sam Lee', businessName: null, abn: null };
+  const paidSession = { payment_status: 'paid', amount_total: 2900 };
+  const unpaidSession = { payment_status: 'unpaid', amount_total: 2900 };
+
+  const roadshow = (checkout: typeof paidSession) =>
+    sendCcwRoadshowBookingConfirmationEmail({
+      to: 'buyer@example.test',
+      attendeeName: 'Sam',
+      eventCity: 'Brisbane',
+      eventDates: '1-2 March',
+      dateRangeLabel: '1-2 March 2027',
+      timeLabel: '9am',
+      venueName: 'Venue',
+      venueAddress: '1 Street',
+      ticketLabel: 'Standard',
+      seatCount: 1,
+      amountLabel: '$29',
+      checkout,
+      buyer,
+      appOrigin: 'https://carsi.example',
+    } as Parameters<typeof sendCcwRoadshowBookingConfirmationEmail>[0]);
+
+  const ownerCircle = (checkout: typeof paidSession) =>
+    sendBusinessCoachingConfirmationEmail({
+      to: 'buyer@example.test',
+      attendeeName: 'Sam',
+      session: {
+        slug: 's',
+        monthLabel: 'March',
+        title: 'Session',
+        dateLabel: '1 March',
+        startDateIso: '2027-03-01',
+        timeLabel: '9am',
+        venueName: 'Venue',
+        venueAddress: '1 Street',
+        city: 'Brisbane',
+        description: '',
+        capacity: 10,
+      },
+      packageLabel: 'Seat',
+      seatCount: 1,
+      amountLabel: '$29',
+      checkout,
+      buyer,
+      registrationStatus: 'confirmed',
+      appOrigin: 'https://carsi.example',
+    } as Parameters<typeof sendBusinessCoachingConfirmationEmail>[0]);
+
+  const course = (checkout: typeof paidSession) =>
+    sendEnrollmentWelcomeEmail({
+      studentId: 'u1',
+      courseSlug: 'paid-item',
+      appOrigin: 'https://carsi.example',
+      payment: { checkout, buyer },
+    } as Parameters<typeof sendEnrollmentWelcomeEmail>[0]);
+
+  const families = { 'course purchase': course, roadshow, 'Owner Circle': ownerCircle };
+
+  beforeEach(() => {
+    mocks.sendEmail.mockReset().mockResolvedValue({ sent: true });
+    mocks.findUser.mockReset().mockResolvedValue(storedLearner);
+    vi.stubEnv(CARSI_ABN_ENV, '10000000000');
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
+  });
+
+  for (const [label, send] of Object.entries(families)) {
+    it(`${label}: a paid session's email is a tax invoice`, async () => {
+      await send(paidSession);
+      expect(sentBody()).toContain('Tax invoice');
+      expect(sentBody()).toContain('$2.64');
+    });
+
+    it(`${label}: an unpaid session's email still sends, without an invoice, and logs NOT ISSUED`, async () => {
+      const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+      await send(unpaidSession);
+      expect(mocks.sendEmail).toHaveBeenCalledTimes(1);
+      expect(sentBody()).not.toContain('Tax invoice');
+      expect(err).toHaveBeenCalledWith(expect.stringContaining('NOT ISSUED'));
+    });
+  }
 });
