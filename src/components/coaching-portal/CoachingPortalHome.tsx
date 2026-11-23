@@ -18,6 +18,8 @@ import { CoachingOnboardingStatusBar } from '@/components/coaching-portal/Coachi
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
 import { CoachingFeatureSpotlight } from '@/components/coaching-portal/visual/CoachingFeatureSpotlight';
 import { CoachingQuickLinks } from '@/components/coaching-portal/visual/CoachingQuickLinks';
+import { CoachingMonthSummaryCard } from '@/components/coaching-portal/visual/CoachingMonthSummaryCard';
+import { buildCoachingHomeMonthSummary } from '@/lib/coaching-portal/coaching-home-month-summary';
 import { coachingHomeQuickLinks } from '@/lib/coaching-portal/coaching-home-quick-links';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { CheckCircle2, Circle, Megaphone } from 'lucide-react';
@@ -169,6 +171,14 @@ function AssessmentPendingHome() {
 
 function ActiveHome() {
   const { user, welcomeMessage, plan, actions, sessions, marketing } = useCoachingPortal();
+  const monthSummary = buildCoachingHomeMonthSummary({
+    completedThisMonth: actions.completedThisMonth,
+    totalThisMonth: actions.totalThisMonth,
+    proposedFixCount: marketing.proposedFixCount,
+    marketingHasPack: marketing.hasPack,
+    profileReady: marketing.profileReady,
+    nextActionTitle: actions.nextAction?.title ?? null,
+  });
 
   return (
     <div className={coachingPage}>
@@ -189,6 +199,8 @@ function ActiveHome() {
         })}
         testId="coaching-home-quick-links"
       />
+
+      <CoachingMonthSummaryCard summary={monthSummary} className="mb-2" />
 
       {marketing.profileReady ? (
         <CoachingFeatureSpotlight
@@ -247,39 +259,43 @@ function ActiveHome() {
           </section>
         )}
 
-        <section className={coachingCard}>
-          <h2 className="text-sm font-semibold text-slate-300">Your next action</h2>
-          {actions.nextAction ? (
-            <>
-              <p className="mt-2 text-lg font-semibold text-white">{actions.nextAction.title}</p>
-              {actions.nextAction.dueDate ? (
-                <p className={`mt-1 text-xs text-slate-500`}>
-                  Due{' '}
-                  {new Date(actions.nextAction.dueDate).toLocaleDateString('en-AU', {
-                    day: 'numeric',
-                    month: 'short',
-                  })}
-                </p>
-              ) : null}
-              <Link
-                href="/dashboard/coaching/actions"
-                className={`mt-4 inline-flex ${coachingPrimaryBtn}`}
-              >
-                View action
-              </Link>
-            </>
-          ) : (
-            <>
-              <p className={`mt-2 ${coachingMuted}`}>No actions assigned yet.</p>
-              <Link
-                href="/dashboard/coaching/actions"
-                className={`mt-4 inline-flex ${coachingSecondaryBtn}`}
-              >
-                Action board
-              </Link>
-            </>
-          )}
-        </section>
+        {!monthSummary.ctas.some((c) =>
+          /next action|proposed fix|action board/i.test(c.label)
+        ) ? (
+          <section className={coachingCard} data-testid="coaching-home-next-action">
+            <h2 className="text-sm font-semibold text-slate-300">Your next action</h2>
+            {actions.nextAction ? (
+              <>
+                <p className="mt-2 text-lg font-semibold text-white">{actions.nextAction.title}</p>
+                {actions.nextAction.dueDate ? (
+                  <p className={`mt-1 text-xs text-slate-500`}>
+                    Due{' '}
+                    {new Date(actions.nextAction.dueDate).toLocaleDateString('en-AU', {
+                      day: 'numeric',
+                      month: 'short',
+                    })}
+                  </p>
+                ) : null}
+                <Link
+                  href="/dashboard/coaching/actions"
+                  className={`mt-4 inline-flex ${coachingPrimaryBtn}`}
+                >
+                  View action
+                </Link>
+              </>
+            ) : (
+              <>
+                <p className={`mt-2 ${coachingMuted}`}>No actions assigned yet.</p>
+                <Link
+                  href="/dashboard/coaching/actions"
+                  className={`mt-4 inline-flex ${coachingSecondaryBtn}`}
+                >
+                  Action board
+                </Link>
+              </>
+            )}
+          </section>
+        ) : null}
 
         <section className={coachingCard}>
           <h2 className="text-sm font-semibold text-slate-300">Upcoming coaching session</h2>
@@ -339,21 +355,6 @@ function ActiveHome() {
         </section>
 
         <CoachingCheckInCard className="lg:col-span-2" />
-
-        <section className={`${coachingCard} lg:col-span-2`}>
-          <h2 className="text-sm font-semibold text-slate-300">Progress summary</h2>
-          {actions.totalThisMonth > 0 ? (
-            <p className="mt-2 text-lg text-white">
-              <span className="font-semibold">{actions.completedThisMonth}</span> of{' '}
-              <span className="font-semibold">{actions.totalThisMonth}</span> actions completed this
-              month.
-            </p>
-          ) : (
-            <p className={`mt-2 ${coachingMuted}`}>
-              No actions recorded this month yet. Check your action board after your plan is set.
-            </p>
-          )}
-        </section>
 
         <CoachingAskCoachPanel className="lg:col-span-2" />
       </div>

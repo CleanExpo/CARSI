@@ -1,0 +1,501 @@
+{
+  "version": 1,
+  "courses": [
+    {
+      "id": "b294f262-5c25-4260-aff2-eaae68d8bea4",
+      "slug": "assessing-indoor-environment-conditions",
+      "title": "CARSI Indoor Environment Assessment Practitioner",
+      "description": "<p>An Australian-produced practitioner course for restoration technicians, supervisors and assessors who read the condition of an indoor space before anyone decides how, or whether, to remediate it, and for property managers and insurance-support staff who need to understand a sound assessment. It covers Australia and New Zealand.</p><p>Six modules take you through the whole assessment: writing the question and framing it as source, pathway and receptor; the building as a system in Australian and New Zealand climates; psychrometry in metric (°C, %RH, g/kg, dew point); what thermo-hygrometers, moisture meters, particle counters, CO2 monitors and ATP luminometers can and cannot tell you; when sampling helps, how to plan it, and how to keep a chain of custody to a NATA- or IANZ-accredited laboratory; interpreting readings in context; when to stop and refer (carbon monoxide, asbestos, silica, questions for an occupational hygienist); and writing a report that occupants, owners and insurers can rely on.</p><p>Two rules run through it. There is no universal safe spore count, and workplace exposure limits are for workers, never a residential safe-occupancy or clearance threshold. And an assessor describes the building: health questions go to a doctor, animal-health questions to a vet. Each module ends with a check; a practical task (rubric, pass 80%) and a final designation exam (pass 80%) close the course. Australian English, metric units, 230 V power, AUD with GST.</p><p><strong>CARSI Indoor Environment Assessment Practitioner</strong> is a CARSI Southern Hemisphere Restoration Designation. No standard text is reproduced.</p>",
+      "shortDescription": "An Australian-produced practitioner course for Australia and New Zealand leading to the CARSI Indoor Environment Assessment Practitioner designation: the assessment process, psychrometry in metric, instruments and their limits, sampling and chain of custody, interpreting readings in context, stop-and-refer rules and reports that stand up.",
+      "thumbnailUrl": "https://res.cloudinary.com/dmaulkthb/image/upload/v1783789863/carsi/admin-courses/db9e3a84-a913-4a8a-a15e-7363b7b686ad.png",
+      "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      "status": "draft",
+      "priceAud": "99",
+      "isFree": false,
+      "durationHours": 3.5,
+      "level": "Foundational",
+      "category": "Indoor Air Quality",
+      "tags": [
+        "indoor environment assessment",
+        "psychrometry",
+        "moisture assessment",
+        "sampling and chain of custody",
+        "interpreting readings",
+        "stop and refer",
+        "defensible reporting",
+        "Australian",
+        "New Zealand",
+        "CARSI designation",
+        "Southern Hemisphere"
+      ],
+      "iicrcDiscipline": null,
+      "cecHours": 0,
+      "meta": {
+        "audience": "restoration technicians, supervisors and assessors; property managers and insurance-support staff",
+        "discipline": "CARSI Indoor Environment Assessment Practitioner — CARSI Southern Hemisphere Restoration Designation",
+        "buildStage": "v1-draft-pending-sme-review",
+        "standard": "v1",
+        "standardLevel": "L2-practitioner",
+        "rolePaths": [
+          "mould-and-indoor-air",
+          "supervisor-and-estimator"
+        ],
+        "linearIssue": "GP-468",
+        "australianProduced": true,
+        "newZealandCovered": true,
+        "standardsReferenced": "No standard named; no standard text reproduced or paraphrased.",
+        "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
+        "designation": "CARSI Indoor Environment Assessment Practitioner",
+        "quizFile": "data/courses/assessing-indoor-environment-conditions/v1-draft/assessing-indoor-environment-conditions-quiz.json",
+        "practicalAssessment": "data/courses/assessing-indoor-environment-conditions/v1-draft/assessing-indoor-environment-conditions-assessment.json",
+        "evidenceLedger": "data/courses/assessing-indoor-environment-conditions/v1-draft/evidence/evidence-ledger.jsonl",
+        "draftNote": "DRAFT v1 for SME (Phill) review; must not go live. Scenarios are illustrative and teaching numbers are labelled; every claim is in the evidence ledger, and each open GAP must be cleared before go-live (see research-pack.md). Diagrams are referenced by filename; briefs are in research-pack.md and the SVGs are not yet built. Cover and lesson images (COURSE_STANDARD 4.1 items 1-2) are not yet made.",
+        "sources": "Sources listed in data/courses/assessing-indoor-environment-conditions/v1-draft/research-pack.md and the evidence ledger: Safe Work Australia, WorkSafe Queensland, WorkSafe Victoria, WorkSafe ACT, enHealth (Australian Centre for Disease Control), Better Health Channel, ABCB / NCC, Bureau of Meteorology, NATA, ATO, Product Safety Australia, NSW Government; WorkSafe New Zealand, New Zealand Legislation, Tenancy Services (MBIE), IANZ; AIOH; and a peer-reviewed Australian ATP study.",
+        "introVideoUnlinked": "2026-11-02: unlinked pending re-render; the old render spoke an unapproved CEC claim (DECISIONS #40, #46)",
+        "retiredFromSeedOnPromotion": {
+          "modules": [
+            "fffb214e-27f3-48ca-b84e-f263f4f17ca9"
+          ],
+          "lessons": [
+            "309d59d1-dc3b-4681-abf7-817050e41327",
+            "0a49cf84-0153-449d-8c2a-bd443bebf89d"
+          ],
+          "quizzes": [
+            "16f9c422-8e30-5484-a126-32565b8144a6"
+          ]
+        },
+        "caseAssessments": {
+          "linearIssue": "GP-721",
+          "folder": "data/courses/assessing-indoor-environment-conditions/v1-draft/case-assessments",
+          "learnerCards": "public/courses/assessing-indoor-environment-conditions/case-assessments",
+          "cases": [
+            {
+              "id": "IE-001",
+              "quizId": "1467ead9-5d75-4ae1-a2ee-850dddd3c92b",
+              "lessonId": "24a3701d-5b8b-4c7e-a1f5-78ab15588e0d",
+              "pack": "IE-001-bedroom-moisture.md"
+            },
+            {
+              "id": "IE-002",
+              "quizId": "2c6669f8-83f8-47d3-adaf-a233d1fc7c66",
+              "lessonId": "d6183a6e-e1c4-4ee4-9f83-92f701b1d97a",
+              "pack": "IE-002-floodwater-with-pets.md"
+            },
+            {
+              "id": "IE-003",
+              "quizId": "eebd60b3-40f1-4d9d-b602-e143def5d2d7",
+              "lessonId": "804ed6cc-9aa3-4799-b522-b8deeae0d8df",
+              "pack": "IE-003-renovation-vocs-hvac.md"
+            },
+            {
+              "id": "IE-004",
+              "quizId": "5f1eb696-205c-404c-b5d3-6ab60f11ec31",
+              "lessonId": "7f6e4aeb-3afd-4571-a69f-cfa6660fe733",
+              "pack": "IE-004-commercial-dust.md"
+            }
+          ],
+          "status": "DRAFT; needs independent qualified SME and instructor signature before release"
+        }
+      },
+      "isPublished": false,
+      "modules": [
+        {
+          "id": "144e9534-35e9-4624-8043-3a2686925336",
+          "title": "Module 1: The Assessment Process and the Assessor’s Role",
+          "orderIndex": 0,
+          "lessons": [
+            {
+              "id": "aef481cf-f9eb-49fe-93e6-ef0a637b6950",
+              "title": "What an indoor environment assessment is, and what it is not",
+              "contentType": "text",
+              "orderIndex": 0,
+              "isPreview": true,
+              "contentBody": "<p><em>DRAFT for SME review. Scenarios and teaching numbers are illustrative and labelled; every claim is in the course evidence ledger.</em></p><h3>On the job</h3><p>A property manager in Launceston rings on a Monday in July. A tenant has reported a musty smell in the back bedroom of a 1960s weatherboard house. The tenant wants to know whether the air is safe for her toddler, the owner wants to know whether the insurer will pay, and the property manager wants a report by Friday. Three people, three questions, one site visit. Before you pack an instrument, you need to know which question you have been hired to answer, and which ones you have not.</p><h3>The idea</h3><p>An indoor environment assessment is a structured answer to a written question about the condition of a building. It is not a walk-through with a meter, and it is not a verdict on anyone's health. CARSI teaches it as four stages, each recorded separately so a reader can check your work: <strong>observe</strong> (what you saw, smelt and were told), <strong>measure</strong> (what your instruments read, where and when), <strong>interpret</strong> (what the readings mean against a reference, with your reasons) and <strong>recommend</strong> (what should happen next, and who should do it).</p><p>The question comes first. Write down who commissioned the assessment, what they need to decide, and what is excluded. \"Is there a moisture problem in the back bedroom, where is it coming from, and what should be done about it?\" is a question you can answer with readings. \"Is the air safe for my child?\" is not, and you should say so kindly and in writing. Australian public health guidance is clear that mould test results cannot be used to decide whether a health risk exists, because there are no health guideline values to compare them with. Health questions go to a doctor. Questions about pets go to a vet. Your report describes the building.</p><p>The same discipline applies on both sides of the Tasman. In Australia your employer's duties sit under the work health and safety laws of your state or territory; in New Zealand the Health and Safety at Work Act 2015 places the primary duty of care on the PCBU (section 36). Neither changes the method, but both mean you plan the visit so that you, the occupants and anyone else on site are not put at risk by the assessment itself.</p><p>Three things an assessment is not. It is not remediation: if the job moves to mould remediation, that work follows its own training and its own standard (Lesson 4.1). It is not a clearance certificate unless the scope, the method and your competency all support one. And it is not a promise: you record what you could not see, open or measure as clearly as what you could. A limitation written down protects everyone; a limitation left out becomes an argument later.</p><p>The CARSI Indoor Environment Assessment Practitioner is a CARSI designation. It is not a certification from any other body and does not lead to one.</p><h3>See it</h3><p><img src='/courses/assessing-indoor-environment-conditions/diagrams/assessment-four-stages.svg' alt='Four boxes in a row: observe, measure, interpret, recommend, with the written question at the start and the report at the end.'></p><p>The diagram shows the four stages as a chain. The written question sits before the first box and the report after the last. If a link is missing, the report cannot be tested.</p><h3>Do it in metric</h3><p>Size the space before you size the job. The Launceston bedroom measures 3.4 m by 3.0 m with a 2.4 m ceiling (illustrative figures).</p><ul><li>Floor area: 3.4 × 3.0 = <strong>10.2 m²</strong>.</li><li>Perimeter: 2 × (3.4 + 3.0) = <strong>12.8 m</strong>.</li><li>Gross wall area: 12.8 × 2.4 ≈ <strong>30.7 m²</strong> (before windows and doors).</li><li>Room volume: 10.2 × 2.4 ≈ <strong>24.5 m³</strong>.</li></ul><p>These four numbers go on the first page of your notes. Every later reading is located against them, and the volume matters when you look at ventilation in Module 2.</p><h3>Field download</h3><p>The <strong>Assessment scope and source-pathway-receptor worksheet</strong> has a box for the commissioning party, the written question, the decision it supports, exclusions, and the room dimensions. Fill the scope box before you leave the office.</p><h3>Check yourself</h3><p>The Module 1 check asks you to separate a building question from a health question, put the four stages in order, and explain why a limitation belongs in the report.</p><h3>Takeaway</h3><p>Write the question before you measure. Describe the building, not anyone's health, and record what you could not check. Next: the source-pathway-receptor frame that turns the question into a measurement plan.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.cdc.gov.au/system/files/2025-10/enhealth-guidance-potential-health-effects-of-mould-in-the-environment_0.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">enHealth guidance, Potential health effects of mould in the environment (Australian Centre for Disease Control)</a>. Read 21/11/2026.</li><li><a href=\"https://www.legislation.govt.nz/act/public/2015/0070/latest/DLM5976895.html\" target=\"_blank\" rel=\"noopener noreferrer\">New Zealand Legislation, Health and Safety at Work Act 2015, section 36</a>. Read 16/11/2026.</li></ul>",
+              "resources": [
+                {
+                  "label": "Assessment scope and source-pathway-receptor worksheet",
+                  "url": "/courses/assessing-indoor-environment-conditions/field-tools/assessment-scope-and-spr-worksheet.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "bef26c47-bb03-45a6-9a5f-804670e0a179",
+              "title": "Source, pathway, receptor: frame the question before you measure",
+              "contentType": "text",
+              "orderIndex": 1,
+              "isPreview": false,
+              "contentBody": "<p><em>DRAFT for SME review. Scenarios and teaching numbers are illustrative and labelled; every claim is in the course evidence ledger.</em></p><h3>On the job</h3><p>In a 1990s apartment block in Auckland, two units on the same level have a musty smell. Unit 4 has a slow leak from its shower mixer that the owner noticed three weeks ago. Unit 5, next door, has no plumbing on the shared wall, but its occupant has asthma and is worried. The body corporate wants to know whether the two problems are one problem. Before anyone drills a hole, you need a hypothesis to test.</p><h3>The idea</h3><p>A concern about an indoor environment needs three things: a <strong>source</strong>, a <strong>pathway</strong> and a <strong>receptor</strong>. The source is what produces the problem: water from a leak, condensation on a cold surface, active mould growth, a combustion appliance, dust from building work. The pathway is how it travels: through a wall cavity, under a door, through ductwork, by stack effect in a stairwell, or by direct contact. The receptor is the person or thing exposed: occupants, workers, contents. Break any one link and the concern changes.</p><p>The frame does two jobs. First, it turns a worry into hypotheses you can test. \"Water from the Unit 4 shower is wetting the shared wall cavity, and air from that cavity reaches Unit 5 through gaps around power points\" is a hypothesis. It tells you where to read moisture, where to look for gaps, and what comparison you need. Second, it stops you measuring things that cannot change the answer. A reading that cannot support or rule out a link is noise.</p><p>Moisture is almost always the root source when mould is the concern. Victorian health guidance puts it simply: mould only grows when there is enough moisture on a surface or in the air, and the way to control indoor mould is to control the source of moisture. So your first hypotheses are usually about water: where it is, where it came from, and how long it has been there.</p><p>Receptors matter for how you work and what you recommend, not for the readings themselves. Public health guidance notes that people with weakened immune systems, allergies, severe asthma or lung disease are more likely to have symptoms from mould. That is a reason to prioritise the work and to recommend that the Unit 5 occupant talk to their doctor. It is not a reason for you to judge their symptoms. Write the receptor down as a fact (\"occupant reports asthma\") and move on.</p><p>Write each hypothesis with the reading that would support it and the reading that would rule it out. Then go and get both.</p><h3>See it</h3><p><img src='/courses/assessing-indoor-environment-conditions/diagrams/source-pathway-receptor.svg' alt='Three linked boxes: source (for example a leaking shower), pathway (wall cavity and gaps) and receptor (occupants next door), with a break in any link marked as the point where risk stops.'></p><p>The diagram follows the Auckland case: source in Unit 4, pathway through the shared cavity, receptor in Unit 5. Each link carries the measurement that tests it.</p><h3>Do it in metric</h3><p>Turn the hypothesis into numbers (illustrative figures). The wet patch on the Unit 4 side of the shared wall measures 1.8 m wide and 0.6 m high: 1.8 × 0.6 = <strong>1.08 m²</strong>. The leak was noticed 21 days ago: 21 × 24 = <strong>504 hours</strong> of possible wetting. Plan moisture readings across the patch and at the same heights on the Unit 5 side, plus a reference reading on an unaffected wall of the same plasterboard in each unit. If Unit 5 reads like its reference, the cavity link is weak; if it reads high at the same height as Unit 4, the link holds.</p><h3>Field download</h3><p>Use the second half of the <strong>Assessment scope and source-pathway-receptor worksheet</strong>: one row per hypothesis, with the supporting reading, the ruling-out reading and the result.</p><h3>Check yourself</h3><p>The module check gives you a site and asks you to name the source, the pathway and the receptor, and to pick the reading that would rule a hypothesis out.</p><h3>Takeaway</h3><p>No source, no pathway or no receptor means no exposure. Every reading tests a link. Next: Module 2, the building as a system in Australian and New Zealand climates.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.betterhealth.vic.gov.au/health/ConditionsAndTreatments/mould-and-your-health\" target=\"_blank\" rel=\"noopener noreferrer\">Better Health Channel (Victorian Department of Health), Mould and your health</a>. Read 21/11/2026.</li><li><a href=\"https://www.cdc.gov.au/system/files/2025-10/enhealth-guidance-potential-health-effects-of-mould-in-the-environment_0.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">enHealth guidance, Potential health effects of mould in the environment (Australian Centre for Disease Control)</a>. Read 21/11/2026.</li></ul>",
+              "resources": [
+                {
+                  "label": "Assessment scope and source-pathway-receptor worksheet",
+                  "url": "/courses/assessing-indoor-environment-conditions/field-tools/assessment-scope-and-spr-worksheet.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "bcf06cc9-ddce-44ac-8fed-4be9dc2afb3f",
+              "title": "Module 1 check",
+              "contentType": "quiz",
+              "orderIndex": 2,
+              "isPreview": false,
+              "contentBody": "eebbd52e-33f5-448e-9a2a-66915769e72b",
+              "resources": [
+                {
+                  "label": "Module 1 check",
+                  "url": "quiz:eebbd52e-33f5-448e-9a2a-66915769e72b"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "1df8dd39-816f-4c32-8911-b53f707bf87c",
+          "title": "Module 2: Buildings, Climate and Moisture",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "id": "0aea90db-88e4-40b4-bf1d-9ecdd2bca36b",
+              "title": "The building as a system in Australian and New Zealand climates",
+              "contentType": "text",
+              "orderIndex": 0,
+              "isPreview": false,
+              "contentBody": "<p><em>DRAFT for SME review. Scenarios and teaching numbers are illustrative and labelled; every claim is in the course evidence ledger.</em></p><h3>On the job</h3><p>Two calls in the same week. In Brisbane, an air-conditioned 2010s house has mould on the back of built-in wardrobes on the external wall, found in February. In Hobart, a 1970s brick-veneer house has black spotting on a bedroom ceiling corner, found in August. Both owners ask the same thing: \"Why is this happening when the house is clean?\" The answer in each case is the building, its climate and how it is used, not housekeeping.</p><h3>The idea</h3><p>A building is a system of moisture sources, air movement and surface temperatures. Change one and the others respond. The <strong>sources</strong> are people and what they do (cooking, showers, drying clothes, breathing), leaks, ground moisture under the floor and moisture driven in from outside. The Australian Building Codes Board's condensation handbook notes that a family of four can easily generate 7 to 22 kg of water vapour a day. <strong>Ventilation</strong> removes some of it. <strong>Cold surfaces</strong> collect the rest as condensation.</p><p>Climate decides which way the problem runs. The National Construction Code groups Australian locations into 8 climate zones, and those zones are the main classification for condensation management requirements. Brisbane is in zone 2 (warm humid summer, mild winter): humid outdoor air reaching surfaces cooled by air conditioning can condense inside wall cavities and behind furniture in summer. Hobart is in zone 7 (cool temperate): warm, moist indoor air reaches cold external walls and ceilings in winter. The ABCB says condensation is a significant contributor to building defects, especially in cooler and mixed climates and in more airtight buildings, and NCC 2025 strengthened condensation provisions. When you assess a building, record its climate zone, its age and its construction, because they tell you which hypotheses to test first.</p><p>The ABCB handbook also refers to keeping relative humidity below the 70% needed for mould growth. Treat that as a reason to measure at the <em>surface</em>, not just in the room air: a cold corner can be far wetter than the middle of the room.</p><p><strong>New Zealand.</strong> The New Zealand Building Code covers external moisture (clause E2) and internal moisture (clause E3). For rental homes, the healthy homes standards add specific duties for landlords: openable windows, doors and skylights in each habitable room must total at least 5% of the room's floor area; kitchens and bathrooms need extractor fans venting outside (a new bathroom fan needs at least a 120 mm diameter or 25 litres per second capacity); and an enclosed subfloor must have a ground moisture barrier where one can be installed. When you assess a NZ rental, note what you see against these, as facts, and leave compliance decisions to the landlord and Tenancy Services.</p><p>Building age also flags hazards you must not disturb. That is covered in Module 5, but note the build year on day one.</p><h3>See it</h3><p><img src='/courses/assessing-indoor-environment-conditions/diagrams/building-moisture-system.svg' alt='A house cross-section showing moisture sources (occupants, leaks, ground), ventilation paths and cold surfaces, with arrows for where vapour moves in a humid climate and in a cool climate.'></p><p>The diagram shows one house twice: in a humid summer with vapour moving inward, and in a cool winter with vapour moving outward to cold surfaces.</p><h3>Do it in metric</h3><p>Put the moisture load into numbers. 7 to 22 kg of vapour a day is 7 ÷ 24 ≈ <strong>0.29 kg/h</strong> to 22 ÷ 24 ≈ <strong>0.92 kg/h</strong>, roughly 7 to 22 L of liquid water a day. Now the removal side (illustrative bathroom): 2.4 m × 1.8 m × 2.4 m = <strong>10.4 m³</strong>. A fan exhausting 25 L/s moves 25 × 3,600 = 90,000 L/h = <strong>90 m³/h</strong>, or about 90 ÷ 10.4 ≈ <strong>8.7 air changes per hour</strong> while it runs. Record whether the fan runs, vents outside and is switched on during showers; a fan that discharges into the roof space moves the problem, it does not remove it.</p><h3>Field download</h3><p>The <strong>Psychrometric reading log</strong> starts with a site panel: climate zone, build year, construction, heating and cooling, ventilation, and occupancy. Fill it before the first reading.</p><h3>Check yourself</h3><p>The Module 2 check asks you to place two cities in their climate zones, explain which way condensation risk runs in each, and convert a fan rate into air changes per hour.</p><h3>Takeaway</h3><p>Sources, ventilation and cold surfaces work as one system, and climate decides the direction. Record zone, age and construction first. Next: psychrometry in metric, and why relative humidity alone misleads.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.betterhealth.vic.gov.au/health/ConditionsAndTreatments/mould-and-your-health\" target=\"_blank\" rel=\"noopener noreferrer\">Better Health Channel (Victorian Department of Health), Mould and your health</a>. Read 21/11/2026.</li><li><a href=\"https://www.abcb.gov.au/sites/default/files/resources/2023/Condensation-in-buildings-handbook.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Condensation in buildings handbook (2023)</a>. Read 02/11/2026.</li><li><a href=\"https://ncc.abcb.gov.au/ncc-navigator/understanding-ncc-climate-zones\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Understanding NCC climate zones</a>. Read 21/11/2026.</li><li><a href=\"https://ncc.abcb.gov.au/ncc-2025/ncc-2025-key-changes/ncc-2025-condensation-mitigation-changes\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, NCC 2025 condensation mitigation changes</a>. Read 21/11/2026.</li><li><a href=\"https://www.legislation.govt.nz/secondary-legislation/pco-drafted/1992/150/en/2026-01-15.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">New Zealand Legislation, Building Regulations 1992, Schedule 1 (New Zealand Building Code)</a>. Read 20/11/2026.</li><li><a href=\"https://www.tenancy.govt.nz/healthy-homes/ventilation-standard/\" target=\"_blank\" rel=\"noopener noreferrer\">Tenancy Services (NZ MBIE), Healthy homes ventilation standard</a>. Read 21/11/2026.</li><li><a href=\"https://www.tenancy.govt.nz/healthy-homes/moisture-and-drainage-standard/\" target=\"_blank\" rel=\"noopener noreferrer\">Tenancy Services (NZ MBIE), Healthy homes moisture ingress and drainage standard</a>. Read 21/11/2026.</li></ul>",
+              "resources": [
+                {
+                  "label": "Psychrometric reading log",
+                  "url": "/courses/assessing-indoor-environment-conditions/field-tools/psychrometric-reading-log.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "f778d8a3-593b-4bd0-8589-fbba82dc062c",
+              "title": "Psychrometry in metric: why relative humidity alone misleads",
+              "contentType": "text",
+              "orderIndex": 1,
+              "isPreview": false,
+              "contentBody": "<p><em>DRAFT for SME review. Scenarios and teaching numbers are illustrative and labelled; every claim is in the course evidence ledger.</em></p><h3>On the job</h3><p>Back in the Hobart house in August. The owner has a cheap hygrometer in the living room that reads 55% and is proud of it. In the bedroom where the ceiling corner is spotted, your thermo-hygrometer reads 18 °C and 70% RH. The owner says the bedroom is \"only a bit damper\". Your infrared thermometer reads 12 °C on the corner where the spotting is. The numbers already tell the story, if you read them the right way.</p><h3>The idea</h3><p>Four measurements describe moist air. <strong>Temperature</strong> (°C) is what the thermometer reads. <strong>Relative humidity</strong> (%RH) is how close the air is to saturation at that temperature. The Bureau of Meteorology puts the trap plainly: relative humidity is not a measure of the actual amount of moisture in the air, because it depends on the air temperature. Warm the same air and its RH falls; cool it and RH rises, with no water added or removed.</p><p>That is why you also record the <strong>humidity ratio</strong> (grams of water vapour per kilogram of dry air, g/kg) and the <strong>dew point</strong> (°C). The humidity ratio is the actual moisture content: it lets you compare rooms at different temperatures, and indoors with outdoors. The dew point is the temperature to which the air must be cooled, at constant pressure, for dew to form. Any surface at or below the dew point will collect condensation.</p><p>Most thermo-hygrometers calculate dew point and humidity ratio for you. Know how: CARSI uses the Magnus approximation for saturation vapour pressure and the standard humidity-ratio formula at sea-level pressure. Calculated values are rounded to 0.1, and you note which method your instrument uses.</p><p>Three rules on site. First, compare rooms by g/kg, not %RH. Second, compare the dew point with <em>surface</em> temperatures where you see staining or growth: a surface at or below the dew point is wet, whatever the room RH says. The ABCB refers to keeping RH below the 70% needed for mould growth; at a cold surface the local RH is far higher than the room's. Third, record what equipment is running. A dehumidifier, heater or air conditioner changes the readings directly, so a reading taken with drying gear running on a 230 V circuit describes the building under that gear, not its normal state. Note the equipment, its setting and how long it has run with every reading.</p><h3>See it</h3><p><img src='/courses/assessing-indoor-environment-conditions/diagrams/dew-point-and-surfaces.svg' alt='A temperature scale showing room air at 18 °C, its dew point near 12.4 °C and a wall surface at 12 °C below it, with the condensation zone shaded.'></p><p>The diagram puts the Hobart numbers on one scale: room air, its dew point and the cold ceiling corner below it.</p><h3>Do it in metric</h3><p>Work the Hobart readings (illustrative, Magnus approximation at 101.325 kPa):</p><ul><li>Bedroom 18 °C / 70% RH → about <strong>9.0 g/kg</strong>, dew point about <strong>12.4 °C</strong>.</li><li>Living room 21 °C / 55% RH → about <strong>8.5 g/kg</strong>, dew point about <strong>11.6 °C</strong>.</li><li>Outdoors 9 °C / 90% RH → about <strong>6.4 g/kg</strong>.</li></ul><p>The two rooms hold almost the same moisture (9.0 vs 8.5 g/kg); the bedroom only looks \"damper\" because it is colder. The ceiling corner at 12 °C is at or just below the bedroom dew point of 12.4 °C, so the surface is at about 100% RH and condensation is expected. Indoors carries about 2.6 g/kg more than outdoors (9.0 − 6.4), which is the moisture the household is adding and ventilation is not removing.</p><h3>Field download</h3><p>The <strong>Psychrometric reading log</strong> has columns for temperature, %RH, g/kg, dew point, surface temperature and equipment state, room by room and outdoors, for each visit.</p><h3>Check yourself</h3><p>The module check gives you two rooms and a surface temperature and asks which room holds more moisture and whether the surface will condense.</p><h3>Takeaway</h3><p>%RH changes with temperature; g/kg does not. Compare dew point with surface temperature, and record what equipment is running. Next: Module 3, instruments and readings you can defend.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.betterhealth.vic.gov.au/health/ConditionsAndTreatments/mould-and-your-health\" target=\"_blank\" rel=\"noopener noreferrer\">Better Health Channel (Victorian Department of Health), Mould and your health</a>. Read 21/11/2026.</li><li><a href=\"https://ncc.abcb.gov.au/ncc-navigator/understanding-ncc-climate-zones\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Understanding NCC climate zones</a>. Read 21/11/2026.</li><li><a href=\"https://www.abcb.gov.au/sites/default/files/resources/2023/Condensation-in-buildings-handbook.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Condensation in buildings handbook (2023)</a>. Read 02/11/2026.</li><li><a href=\"https://www.bom.gov.au/climate/cdo/about/definitions9and3.shtml\" target=\"_blank\" rel=\"noopener noreferrer\">Bureau of Meteorology, Climate statistics definitions (dew point and relative humidity)</a>. Read 21/11/2026.</li></ul>",
+              "resources": [
+                {
+                  "label": "Psychrometric reading log",
+                  "url": "/courses/assessing-indoor-environment-conditions/field-tools/psychrometric-reading-log.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "e8df471d-ba05-4733-b11e-b54e892bcfb3",
+              "title": "Module 2 check",
+              "contentType": "quiz",
+              "orderIndex": 2,
+              "isPreview": false,
+              "contentBody": "2da4f327-0245-40ba-a9d6-f35c37e7ce55",
+              "resources": [
+                {
+                  "label": "Module 2 check",
+                  "url": "quiz:2da4f327-0245-40ba-a9d6-f35c37e7ce55"
+                }
+              ]
+            },
+            {
+              "id": "24a3701d-5b8b-4c7e-a1f5-78ab15588e0d",
+              "title": "Case assessment IE-001: bedroom moisture",
+              "contentType": "quiz",
+              "orderIndex": 3,
+              "isPreview": false,
+              "contentBody": "1467ead9-5d75-4ae1-a2ee-850dddd3c92b",
+              "resources": [
+                {
+                  "label": "Case assessment IE-001: bedroom moisture",
+                  "url": "quiz:1467ead9-5d75-4ae1-a2ee-850dddd3c92b"
+                },
+                {
+                  "label": "IE-001 case card",
+                  "url": "/courses/assessing-indoor-environment-conditions/case-assessments/IE-001-case-card.md",
+                  "kind": "template"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "1d8d3e31-d4f2-4e76-a922-873e0bd61263",
+          "title": "Module 3: Instruments and What They Tell You",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "id": "01cb4dd1-d65e-45e1-a8d1-4ae42373fbc9",
+              "title": "Thermo-hygrometers and moisture meters: readings you can defend",
+              "contentType": "text",
+              "orderIndex": 0,
+              "isPreview": false,
+              "contentBody": "<p><em>DRAFT for SME review. Scenarios and teaching numbers are illustrative and labelled; every claim is in the course evidence ledger.</em></p><h3>On the job</h3><p>A Geelong laundry had a washing-machine hose fail last month. The previous contractor's note says \"wall dry, 15\" with no location, no instrument and no reference. The owner now has peeling paint at skirting height and wants a second opinion before the insurer closes the claim. Your job is to produce readings that someone else could repeat next week and get the same answer.</p><h3>The idea</h3><p>A reading you can defend has five parts: the <strong>value</strong>, its <strong>unit or scale</strong>, the <strong>instrument and mode</strong>, the <strong>location</strong> (room, wall, height, distance from a corner) and the <strong>time</strong>. Drop one and the reading cannot be repeated or compared.</p><p><strong>Thermo-hygrometers</strong> read air temperature and RH, and usually calculate dew point and g/kg. Let the sensor settle before you record (the maker's manual says how long), hold it away from your body, heaters, windows and doorways, and record the height. Field-check it as the maker sets out, for example against a second instrument at the start of the day, and write the result in the log.</p><p><strong>Moisture meters</strong> come in two families. Pin meters measure electrical resistance between two pins pushed into the material; non-invasive (pinless) meters sense through the surface without damage. Many scales are relative or calibrated for a particular material, such as timber. So the only defensible comparison is like with like: the same material, the same instrument and mode, against a <strong>reference reading</strong> from an unaffected area of the same building. \"15\" means nothing; \"38 on the relative scale at P4, against a reference of 12 on the same plasterboard in the hallway\" means something.</p><p><strong>Infrared thermometers and thermal cameras</strong> show surface temperature, not moisture. A cool patch can be wet, draughty, uninsulated or simply shaded. Confirm anything they suggest with a moisture meter before it goes in the report.</p><p>Lay out readings on a grid so the wet boundary can be drawn, and repeat the same points on every visit. Most field instruments run on batteries. Charge them from a 230 V, 10 A GPO through an RCD: in Australia, portable electrical equipment and leads at a workplace must be RCD-protected, and New Zealand also supplies 230 V. Test-and-tag chargers and leads under your employer's system.</p><h3>See it</h3><p><img src='/courses/assessing-indoor-environment-conditions/diagrams/moisture-reading-grid.svg' alt='A 3.0 m wall elevation with reading points every 0.5 m at 300 mm and 1,000 mm, a shaded wet zone and a separate reference point on an unaffected wall.'></p><p>The diagram shows the Geelong laundry wall: a 0.5 m grid at two heights, the wet zone drawn from the readings, and the reference point on the hallway wall.</p><h3>Do it in metric</h3><p>Lay out the Geelong wall (illustrative figures). The wall is 3.0 m long. Readings every 0.5 m give 3.0 ÷ 0.5 = 6 intervals, so <strong>7 points</strong> per height. At 300 mm and 1,000 mm that is <strong>14 points</strong>. The readings above the reference of 12 run from P2 to P5 at 300 mm and only P3 and P4 at 1,000 mm, so draw the wet zone as about 1.5 m long and 0.6 m high: 1.5 × 0.6 = <strong>0.9 m²</strong>. Record the room at 19 °C and 72% RH (about 9.8 g/kg) and note that no drying equipment is running.</p><h3>Field download</h3><p>The <strong>Instrument check card</strong> lists, for each instrument, the daily field check, the record you keep, what the instrument can and cannot tell you, and the charging and test-and-tag notes.</p><h3>Check yourself</h3><p>The Module 3 check asks you to fix a reading that is missing its reference, and to say what a thermal camera can and cannot show.</p><h3>Takeaway</h3><p>Value, scale, instrument, location, time: every reading, every time. Compare like with like against a reference. Next: particle counters, CO2 and ATP, which are indicators, not verdicts.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.bom.gov.au/climate/cdo/about/definitions9and3.shtml\" target=\"_blank\" rel=\"noopener noreferrer\">Bureau of Meteorology, Climate statistics definitions (dew point and relative humidity)</a>. Read 21/11/2026.</li><li><a href=\"https://www.energy.nsw.gov.au/sites/default/files/2022-08/2016_04_NSW_VoltageOptimisationFactsheet.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">NSW Government, Voltage optimisation fact sheet</a>. Read 02/11/2026.</li><li><a href=\"https://www.worksafe.act.gov.au/health-and-safety-portal/safety-by-industry/electrical-and-electronics/residual-current-devices\" target=\"_blank\" rel=\"noopener noreferrer\">WorkSafe ACT, Residual current devices</a>. Read 02/11/2026.</li><li><a href=\"https://www.legislation.govt.nz/regulation/public/2010/0036/latest/whole.html\" target=\"_blank\" rel=\"noopener noreferrer\">New Zealand Legislation, Electricity (Safety) Regulations 2010</a>. Read 02/11/2026.</li></ul>",
+              "resources": [
+                {
+                  "label": "Instrument check card",
+                  "url": "/courses/assessing-indoor-environment-conditions/field-tools/instrument-check-card.md",
+                  "kind": "field-card"
+                }
+              ]
+            },
+            {
+              "id": "d0505492-e590-486a-b62a-f296bf98000f",
+              "title": "Particle counters, CO2 and ATP: indicators, not verdicts",
+              "contentType": "text",
+              "orderIndex": 1,
+              "isPreview": false,
+              "contentBody": "<p><em>DRAFT for SME review. Scenarios and teaching numbers are illustrative and labelled; every claim is in the course evidence ledger.</em></p><h3>On the job</h3><p>A Darwin office tenancy was refitted over the dry season. Staff now complain the meeting room is stuffy and there is fine dust on the desks. The office manager has bought a CO2 monitor that reads 1,400 ppm in the afternoon and wants you to confirm \"the air is toxic\". Someone else has suggested an ATP swab \"to check for mould\". Each instrument can help here, and each can mislead if you ask it the wrong question.</p><h3>The idea</h3><p><strong>Carbon dioxide (CO2)</strong> indoors comes mostly from people breathing, so it rises when ventilation is poor for the number of people in a room. The ABCB's indoor air quality handbook says CO2 can be relied on as an indicator of ventilation only when there are no significant indoor sources other than breathing, such as combustion. NCC 2025 Volume One includes a verification method (F6V1) for Class 2, 3, 5, 6, 9b and 9c buildings, and Class 4 parts, that sets CO2 at 850 ppm averaged over 8 hours and carbon monoxide at 90 ppm over 15 minutes. The handbook explains that the 850 ppm figure is built on a 450 ppm rise above an assumed outdoor level of 400 ppm, as a measure of odour and ventilation, not health. It also notes that workplace exposure standards are set for fit adult workers and are generally less stringent than indoor air quality guidelines. So a CO2 reading tells you about ventilation for the people present. It is not a toxicity verdict, and the workplace limit is not the comparison for occupants.</p><p><strong>Optical particle counters</strong> count particles by size channel (for example PM2.5, particles smaller than 2.5 microns). They do not identify what the particles are: plaster dust, smoke, pollen and spores look the same to them. Use them for comparisons with the same instrument: before and after cleaning, room against room, near against far from a suspected source.</p><p><strong>ATP luminometers</strong> measure adenosine triphosphate from a surface swab. A peer-reviewed Australian hospital study describes rapid ATP devices as measuring all cellular ATP, microbial or not, so they are a general measure of cleanliness; they cannot tell types of organic material apart, and devices vary widely with different threshold values. ATP is useful to show whether cleaning removed organic residue. It is not a mould test and not a germ count.</p><p>Record the instrument, its settings, the sampling time and the conditions (occupancy, doors, HVAC mode) with every reading. Without them, an indicator cannot be compared with anything.</p><h3>See it</h3><p><img src='/courses/assessing-indoor-environment-conditions/diagrams/indicator-instruments.svg' alt='Three instrument cards: CO2 monitor (ventilation indicator only without combustion), particle counter (counts by size, does not identify) and ATP luminometer (organic residue, not a mould or germ count).'></p><p>The diagram puts the three instruments side by side, each with the question it can answer and the question it cannot.</p><h3>Do it in metric</h3><p>Work the Darwin readings (illustrative). Indoor CO2 1,400 ppm, outdoor 420 ppm: the rise is 1,400 − 420 = <strong>980 ppm</strong>, which is 980 ÷ 450 ≈ <strong>2.2 times</strong> the rise the NCC figure is built on. That points to too little outdoor air for the people in the room at that time; record occupancy (say 12 people) and the HVAC mode. Particle counter: <strong>120,000 counts</strong> at 0.5 µm and above in a 2.0 L sample is 120,000 ÷ 2.0 = <strong>60,000 per litre</strong>, or 60,000 × 1,000 = <strong>60,000,000 per m³</strong>. Repeat the count outside the meeting room and after cleaning with the same instrument; the comparison is the finding, not the single number.</p><h3>Field download</h3><p>The <strong>Instrument check card</strong> includes the \"can tell you / cannot tell you\" panel for CO2 monitors, particle counters and ATP luminometers.</p><h3>Check yourself</h3><p>The module check asks when CO2 is a fair ventilation indicator, what a particle counter cannot do, and what an ATP result does and does not mean.</p><h3>Takeaway</h3><p>CO2 indicates ventilation, particle counts compare, ATP shows residue. None of them is a health verdict. Next: Module 4, when sampling helps and when it does not.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://ncc.abcb.gov.au/sites/default/files/resources/2023/Handbook-Indoor-Air-Quality-Verification-Methods-NCC-2022.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Indoor Air Quality Verification Methods handbook (NCC 2022, version 4.1, May 2023)</a>. Read 21/11/2026.</li><li><a href=\"https://www.abcb.gov.au/editions/ncc-2025/adopted/volume-one/f-health-and-amenity/part-f6-light-and-ventilation\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, NCC 2025 Volume One, Part F6 Light and ventilation</a>. Read 21/11/2026.</li><li><a href=\"https://www.health.gov.au/sites/default/files/documents/2020/12/bushfire-smoke-general-information-fact-sheet.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Government Department of Health, Bushfire smoke general information fact sheet</a>. Read 02/11/2026.</li><li><a href=\"https://www.idhjournal.com.au/article/S2468-0451(20)30007-9/fulltext\" target=\"_blank\" rel=\"noopener noreferrer\">Mitchell et al., ATP bioluminescence results from the REACH trial, Infection, Disease and Health (peer-reviewed)</a>. Read 21/11/2026.</li></ul>",
+              "resources": [
+                {
+                  "label": "Instrument check card",
+                  "url": "/courses/assessing-indoor-environment-conditions/field-tools/instrument-check-card.md",
+                  "kind": "field-card"
+                }
+              ]
+            },
+            {
+              "id": "5c705382-7b00-4aef-af0d-5e2058f1ac91",
+              "title": "Module 3 check",
+              "contentType": "quiz",
+              "orderIndex": 2,
+              "isPreview": false,
+              "contentBody": "c5dc143f-0393-4e00-99d3-fc3c6f349555",
+              "resources": [
+                {
+                  "label": "Module 3 check",
+                  "url": "quiz:c5dc143f-0393-4e00-99d3-fc3c6f349555"
+                }
+              ]
+            },
+            {
+              "id": "804ed6cc-9aa3-4799-b522-b8deeae0d8df",
+              "title": "Case assessment IE-003: renovation, VOCs and HVAC",
+              "contentType": "quiz",
+              "orderIndex": 3,
+              "isPreview": false,
+              "contentBody": "eebd60b3-40f1-4d9d-b602-e143def5d2d7",
+              "resources": [
+                {
+                  "label": "Case assessment IE-003: renovation, VOCs and HVAC",
+                  "url": "quiz:eebd60b3-40f1-4d9d-b602-e143def5d2d7"
+                },
+                {
+                  "label": "IE-003 case card",
+                  "url": "/courses/assessing-indoor-environment-conditions/case-assessments/IE-003-case-card.md",
+                  "kind": "template"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "7fce15a7-0059-4bf3-86eb-900a420a8fff",
+          "title": "Module 4: Sampling Strategy, Laboratories and Chain of Custody",
+          "orderIndex": 3,
+          "lessons": [
+            {
+              "id": "d339b599-5d7a-40ea-a7b6-de8f0c11fc25",
+              "title": "When sampling helps, and when it does not",
+              "contentType": "text",
+              "orderIndex": 0,
+              "isPreview": false,
+              "contentBody": "<p><em>DRAFT for SME review. Scenarios and teaching numbers are illustrative and labelled; every claim is in the course evidence ledger.</em></p><h3>On the job</h3><p>A buyer in Newcastle, NSW, rings two days before settlement on a 1950s fibro-and-brick house. Her building inspector noted black growth behind a wardrobe in the main bedroom and a musty smell under the house. She asks for \"a mould test, to see how bad it is\". The growth is already visible. Before you quote for sampling, ask what decision the result would change, and whether any result could answer her real question.</p><h3>The idea</h3><p>Australian public health guidance is direct. enHealth, the national environmental health committee, says that where mould is visible it is generally not considered necessary to test for it in the home, and that in general it does not recommend testing for mould at all, because there are no health guideline values to compare results with. Mould spores are in all indoor and outdoor air; if you test, you will find them. A result therefore cannot tell anyone whether a house is \"safe\".</p><p>That does not make sampling useless. It makes it a tool for a <strong>written question</strong> that a sample can actually answer. Examples: Is there hidden growth in a wall cavity where there is a smell but nothing visible? Has a defined area changed after works, compared with before? Do two areas of the same building differ, and does the difference support a source-pathway-receptor hypothesis? If you cannot write the question, do not take the sample. In the Newcastle case the visible growth and the smell are already the finding; the useful work is finding the moisture source and recommending what should happen next.</p><p>When sampling is justified, plan it before you arrive. Choose the method from the question: an air sample collected through a spore-trap cassette at a known flow for a known time; a surface sample by tape lift or swab from a defined spot; or a bulk sample of material sent whole. Choose locations, and the comparison samples you will need, at the same time. Many practitioners collect an outdoor sample and an unaffected indoor sample alongside the suspect area and compare them; how far that comparison can be pushed is a question for an occupational hygienist and the laboratory, and this draft flags it for SME review. Note what could skew the result: cleaning, people moving, doors and windows, HVAC mode, recent works.</p><p>Do not use ATP as a mould test. It measures organic residue in general and cannot tell types of organic material apart.</p><p><strong>New Zealand.</strong> Check the current advice of your public health service and local council on household mould testing; do not assume it matches the Australian guidance. If the job moves on to remediation, remediation training and the applicable remediation standard take over.</p><h3>See it</h3><p><img src='/courses/assessing-indoor-environment-conditions/diagrams/sampling-decision.svg' alt='A decision path: is mould visible? is there a written question a sample can answer? what comparison will you collect? leading to either no sampling or a sampling plan.'></p><p>The diagram walks the decision: visible growth, a written question, the comparison you need, and the point at which you stop and do not sample.</p><h3>Do it in metric</h3><p>If a spore-trap sample is justified, the volume is your arithmetic and the count is the laboratory's (illustrative figures; the laboratory and the cassette maker set the real flow and time). A pump at <strong>15 L/min</strong> for <strong>5 minutes</strong> samples 15 × 5 = <strong>75 L</strong>, which is 75 ÷ 1,000 = <strong>0.075 m³</strong>. If the laboratory counts 30 structures on that trace, the result per cubic metre is 30 ÷ 0.075 = <strong>400 per m³</strong>. Record flow, start and stop times and the calibration check so the laboratory's per-m³ figure can be traced back to your pump. A plan of 3 indoor samples plus 1 outdoor comparison is 4 cassettes; add 1 spare.</p><h3>Field download</h3><p>The <strong>Sampling plan and chain-of-custody form</strong> starts with the written question and the decision it supports. If that box is empty, the rest of the form stays empty too.</p><h3>Check yourself</h3><p>The Module 4 check asks you to decide whether a sample is justified, pick a method for a question, and calculate a sample volume.</p><h3>Takeaway</h3><p>No written question, no sample. Visible mould is a finding, not a reason to test. Next: accredited laboratories, chain of custody and records.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.cdc.gov.au/system/files/2025-10/enhealth-guidance-potential-health-effects-of-mould-in-the-environment_0.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">enHealth guidance, Potential health effects of mould in the environment (Australian Centre for Disease Control)</a>. Read 21/11/2026.</li><li><a href=\"https://www.idhjournal.com.au/article/S2468-0451(20)30007-9/fulltext\" target=\"_blank\" rel=\"noopener noreferrer\">Mitchell et al., ATP bioluminescence results from the REACH trial, Infection, Disease and Health (peer-reviewed)</a>. Read 21/11/2026.</li></ul>",
+              "resources": [
+                {
+                  "label": "Sampling plan and chain-of-custody form",
+                  "url": "/courses/assessing-indoor-environment-conditions/field-tools/sampling-plan-and-chain-of-custody-form.md",
+                  "kind": "form"
+                }
+              ]
+            },
+            {
+              "id": "8d195f4d-b2c3-4c2a-a150-7c02815af615",
+              "title": "Accredited laboratories, chain of custody and records",
+              "contentType": "text",
+              "orderIndex": 1,
+              "isPreview": false,
+              "contentBody": "<p><em>DRAFT for SME review. Scenarios and teaching numbers are illustrative and labelled; every claim is in the course evidence ledger.</em></p><h3>On the job</h3><p>A Townsville insurer has rejected an assessment report on a ground-floor unit. The laboratory results are fine, but the sample IDs on the lab report do not match the photo labels, two cassettes have no collection time, and nobody can say who handed the box to the courier. The results may be right. Nobody can prove which room they came from, so nobody can rely on them.</p><h3>The idea</h3><p>A laboratory result is only as good as the record that ties it to a place, a time and a method. That record is the <strong>chain of custody</strong>.</p><p><strong>Choose an accredited laboratory, for the test you need.</strong> In Australia, NATA accreditation recognises an organisation's compliance with relevant national and international standards, and it is granted for specific types of technical and scientific activities. In New Zealand, International Accreditation New Zealand (IANZ) accredits testing laboratories to international competence standards set by ISO. Not all laboratories are accredited, and an accredited laboratory is accredited for particular tests, not everything it offers. Before you send samples, check that the test you need is inside the laboratory's scope of accreditation, and put the accreditation details in your report. Suspected asbestos samples go to a laboratory accredited for asbestos identification, collected only by a competent person (Module 5).</p><p><strong>Build the chain on site.</strong> Each sample gets a unique ID written on the cassette or bag and on the form before it is collected. Against that ID, record the location (room, wall, height), the date and start and stop times, the method, the pump flow and duration for air samples, the collector, the condition of the sample and anything unusual (doors open, HVAC on, recent cleaning). Photograph the sample in position with its ID visible. Then every hand-over, to a colleague, a courier or the laboratory, is signed and timed. The laboratory's receipt closes the chain.</p><p><strong>Follow the laboratory's own submission rules.</strong> Storage, transport and how long samples can wait are set by the laboratory and the method, so read them before the job, not after.</p><p><strong>Keep the record whole.</strong> Attach the laboratory report as issued, without retyping its results. If a sample is lost or damaged, say so in the report. A gap you disclose is a limitation; a gap someone else finds is a credibility problem.</p><h3>See it</h3><p><img src='/courses/assessing-indoor-environment-conditions/diagrams/chain-of-custody.svg' alt='A timeline from collection on site to laboratory receipt, with each hand-over (collector, courier, laboratory) signed and the sample ID carried through photos, form and report.'></p><p>The diagram follows one cassette from the wall to the laboratory, with the ID, the times and each signature along the way.</p><h3>Do it in metric</h3><p>Cost the sampling before you collect it, and tell the client (illustrative prices, not a quote from any laboratory): 4 air samples at <strong>AUD 85</strong> each = 4 × 85 = AUD 340; 2 tape lifts at <strong>AUD 45</strong> each = AUD 90. Subtotal <strong>AUD 430 ex GST</strong>. GST at 10% = <strong>AUD 43</strong>. Total <strong>AUD 473 inc GST</strong>. Record the turnaround the laboratory quotes and plan the report date from it, not from the client's hopes. On the form, each air cassette shows its own volume: at 15 L/min for 5 minutes that is <strong>75 L</strong> (0.075 m³), written against its sample ID so the laboratory's per-m³ result can be checked.</p><h3>Field download</h3><p>The <strong>Sampling plan and chain-of-custody form</strong> carries the sample table (ID, location, time, method, flow, duration, photo ref) and the hand-over block with signatures and times.</p><h3>Check yourself</h3><p>The module check asks what to confirm about a laboratory before sending samples and which chain-of-custody gap makes a result unusable.</p><h3>Takeaway</h3><p>Accredited for the test you need, and traceable from wall to report. Disclose every gap. Next: Module 5, interpreting readings in context.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://nata.com.au/accreditation/\" target=\"_blank\" rel=\"noopener noreferrer\">NATA, What is accreditation?</a>. Read 21/11/2026.</li><li><a href=\"https://www.ianz.govt.nz/\" target=\"_blank\" rel=\"noopener noreferrer\">International Accreditation New Zealand (IANZ), What is accreditation?</a>. Read 21/11/2026.</li><li><a href=\"https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/how-gst-works\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Taxation Office, How GST works</a>. Read 02/11/2026.</li><li><a href=\"https://www.worksafe.vic.gov.au/bushfire-recovery-asbestos-clean\" target=\"_blank\" rel=\"noopener noreferrer\">WorkSafe Victoria, Bushfire recovery: asbestos clean-up</a>. Read 02/11/2026.</li></ul>",
+              "resources": [
+                {
+                  "label": "Sampling plan and chain-of-custody form",
+                  "url": "/courses/assessing-indoor-environment-conditions/field-tools/sampling-plan-and-chain-of-custody-form.md",
+                  "kind": "form"
+                }
+              ]
+            },
+            {
+              "id": "a316db6c-da62-47a1-8f0e-a12644161e7c",
+              "title": "Module 4 check",
+              "contentType": "quiz",
+              "orderIndex": 2,
+              "isPreview": false,
+              "contentBody": "663d808a-f9eb-4304-9740-bf67f9d5bab2",
+              "resources": [
+                {
+                  "label": "Module 4 check",
+                  "url": "quiz:663d808a-f9eb-4304-9740-bf67f9d5bab2"
+                }
+              ]
+            },
+            {
+              "id": "d6183a6e-e1c4-4ee4-9f83-92f701b1d97a",
+              "title": "Case assessment IE-002: floodwater with pets",
+              "contentType": "quiz",
+              "orderIndex": 3,
+              "isPreview": false,
+              "contentBody": "2c6669f8-83f8-47d3-adaf-a233d1fc7c66",
+              "resources": [
+                {
+                  "label": "Case assessment IE-002: floodwater with pets",
+                  "url": "quiz:2c6669f8-83f8-47d3-adaf-a233d1fc7c66"
+                },
+                {
+                  "label": "IE-002 case card",
+                  "url": "/courses/assessing-indoor-environment-conditions/case-assessments/IE-002-case-card.md",
+                  "kind": "template"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "53516f4c-d7bc-41a2-9ce9-4b0bf16d4b6a",
+          "title": "Module 5: Interpreting Readings and Knowing When to Stop",
+          "orderIndex": 4,
+          "lessons": [
+            {
+              "id": "25105b80-b8cf-4c76-b083-c6c959d0190c",
+              "title": "Interpreting readings in context",
+              "contentType": "text",
+              "orderIndex": 0,
+              "isPreview": false,
+              "contentBody": "<p><em>DRAFT for SME review. Scenarios and teaching numbers are illustrative and labelled; every claim is in the course evidence ledger.</em></p><h3>On the job</h3><p>A Toowoomba family has had their kitchen and bathroom renovated. The owner has read online that there is a \"safe spore count\", and the renovator has told him that a solvent smell is \"fine because it's under the workplace limit\". He wants your report to give him one number that says the house is safe. You cannot give him that number, and the reasons are worth explaining well.</p><h3>The idea</h3><p><strong>There is no universal safe spore count.</strong> enHealth says there is no exposure limit or health guideline value for exposure to mould. So you interpret mould-related readings by comparison: against an unaffected reference area of the same building, against outdoor air collected at the same time, and against the same location over time. A difference that supports or rules out a source-pathway-receptor link is a finding. A single number is not.</p><p><strong>Workplace exposure limits are for workers, not homes.</strong> In Australia, workplace exposure standards (WES) are being replaced by workplace exposure limits (WEL). Safe Work Australia says ministers agreed a harmonised transition ending on 30 November 2026, and from 1 December 2026 the WEL list is adopted throughout Australia as each jurisdiction implements it in its WHS laws. There are exceptions with their own dates. Benzene stays at <strong>1 ppm (3.2 mg/m³)</strong> as an 8-hour time-weighted average until <strong>1 June 2027</strong>, then falls to <strong>0.2 ppm (0.7 mg/m³)</strong>. Queensland and Victoria each have transition arrangements for <strong>15 substances until 1 December 2029</strong>. In New Zealand, WorkSafe's workplace exposure standards are guidance values, not prescribed exposure standards, now in a 16th edition effective from July 2026, and WorkSafe does not recommend that untrained people use them to assess risk.</p><p>None of these is a residential safe-occupancy or clearance threshold. WorkSafe Victoria notes that exposure limits do not mark the dividing line between a healthy and an unhealthy work environment, and the ABCB notes that workplace standards are set for fit adult workers and are generally less stringent than indoor air quality guidelines. A family with a toddler is not a fit adult workforce on a 40-hour week.</p><p><strong>Source-tag every figure.</strong> If a number from a regulator appears in your report, give its jurisdiction, the date it applies from, its units and its averaging time, and say what it is not. \"Benzene WEL, Australia (Safe Work Australia), 0.2 ppm (0.7 mg/m³) 8-hour TWA from 1 June 2027: a workplace limit for workers, not a residential threshold.\" Then say who can interpret exposure properly: an occupational hygienist (Lesson 5.2).</p><p><strong>No diagnosis.</strong> If occupants raise symptoms, record them as reported and recommend medical advice. Do not link a reading to an illness.</p><h3>See it</h3><p><img src='/courses/assessing-indoor-environment-conditions/diagrams/limits-are-not-thresholds.svg' alt='Two columns: workplace exposure limits (set for workers, jurisdiction, date, units, averaging time) and a home assessment (compare with references, outdoors and trends), with a barrier between them labelled not a residential threshold.'></p><p>The diagram separates workplace limits from home assessment and shows the source tag every figure carries.</p><h3>Do it in metric</h3><p>Check a unit conversion, then quote the regulator anyway. At 25 °C and 101.325 kPa, mg/m³ = ppm × molar mass ÷ 24.45. Benzene's molar mass is 78.11 g/mol, so 1 ppm = 78.11 ÷ 24.45 ≈ <strong>3.19 mg/m³</strong>, matching the published 3.2. For 0.2 ppm the same sum gives 0.2 × 3.19 ≈ <strong>0.64 mg/m³</strong>, but the published figure is <strong>0.7 mg/m³</strong>. The lesson: never convert or round a regulatory value yourself. Quote the published pair, with its source and date.</p><h3>Field download</h3><p>The <strong>Stop and escalate card</strong> includes the source-tag line to copy into reports, and the rule that a workplace figure is never presented as a home threshold.</p><h3>Check yourself</h3><p>The Module 5 check asks why there is no safe spore count, what a WEL is for, and what a source tag must contain.</p><h3>Takeaway</h3><p>Compare, do not certify. Workplace limits stay in the workplace; tag every figure with jurisdiction, date, units and averaging time. Next: when to stop and escalate.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.cdc.gov.au/system/files/2025-10/enhealth-guidance-potential-health-effects-of-mould-in-the-environment_0.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">enHealth guidance, Potential health effects of mould in the environment (Australian Centre for Disease Control)</a>. Read 21/11/2026.</li><li><a href=\"https://www.abcb.gov.au/editions/ncc-2025/adopted/volume-one/f-health-and-amenity/part-f6-light-and-ventilation\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, NCC 2025 Volume One, Part F6 Light and ventilation</a>. Read 21/11/2026.</li><li><a href=\"https://ncc.abcb.gov.au/sites/default/files/resources/2023/Handbook-Indoor-Air-Quality-Verification-Methods-NCC-2022.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Indoor Air Quality Verification Methods handbook (NCC 2022, version 4.1, May 2023)</a>. Read 21/11/2026.</li><li><a href=\"https://www.safeworkaustralia.gov.au/media-centre/news/new-workplace-exposure-limits-wel-apply-1-december-2026\" target=\"_blank\" rel=\"noopener noreferrer\">Safe Work Australia, New workplace exposure limits (WEL) to apply from 1 December 2026</a>. Read 21/11/2026.</li><li><a href=\"https://www.safeworkaustralia.gov.au/media-centre/news/reduced-workplace-exposure-limit-benzene-take-effect-1-june-2027\" target=\"_blank\" rel=\"noopener noreferrer\">Safe Work Australia, Reduced workplace exposure limit for benzene to take effect on 1 June 2027 (29/10/2026)</a>. Read 21/11/2026.</li><li><a href=\"https://www.worksafe.qld.gov.au/safety-and-prevention/hazards/hazardous-exposures/workplace-exposure-limits\" target=\"_blank\" rel=\"noopener noreferrer\">WorkSafe Queensland, Workplace Exposure Limits</a>. Read 21/11/2026.</li><li><a href=\"https://www.worksafe.vic.gov.au/workplace-exposure-limits-frequently-asked-questions\" target=\"_blank\" rel=\"noopener noreferrer\">WorkSafe Victoria, Workplace exposure limits: frequently asked questions</a>. Read 21/11/2026.</li><li><a href=\"https://www.worksafe.govt.nz/topic-and-industry/monitoring/workplace-exposure-standards-and-biological-exposure-indices/\" target=\"_blank\" rel=\"noopener noreferrer\">WorkSafe New Zealand, Workplace exposure standards and biological exposure indices</a>. Read 21/11/2026.</li></ul>",
+              "resources": [
+                {
+                  "label": "Stop and escalate card",
+                  "url": "/courses/assessing-indoor-environment-conditions/field-tools/stop-and-escalate-card.md",
+                  "kind": "field-card"
+                }
+              ]
+            },
+            {
+              "id": "ceb700cb-b92b-4500-8567-ce6bcd4974e4",
+              "title": "Stop and escalate: carbon monoxide, asbestos, silica and referral",
+              "contentType": "text",
+              "orderIndex": 1,
+              "isPreview": false,
+              "contentBody": "<p><em>DRAFT for SME review. Scenarios and teaching numbers are illustrative and labelled; every claim is in the course evidence ledger.</em></p><h3>On the job</h3><p>A winter visit to a 1970s house in Ballarat. The living room has an unflued gas heater running with the windows shut. Ten minutes in, your personal CO monitor alarms at 35 ppm and the occupant mentions headaches \"most evenings\". In the hallway, a ceiling sheet is cracked where a downlight was fitted, and the owner's brother has been sanding a brick wall in the next room to \"see if it's damp inside\". You came to assess a damp smell. You now have three reasons to stop.</p><h3>The idea</h3><p>Part of an assessor's competency is knowing when the assessment must pause, and handing over to the right person.</p><p><strong>Carbon monoxide.</strong> CO is invisible and has no smell or taste. WorkSafe New Zealand lists space heaters and oil or gas heaters among its sources, and notes that 35 ppm can cause headaches and dizziness within 6 to 8 hours of continual exposure. Product Safety Australia warns never to use gas or kerosene heaters or petrol or diesel generators inside a house or in poorly ventilated areas. If your monitor alarms: stop, turn off the appliance only if it is safe to do so, get everyone outside into fresh air, and call <strong>000</strong> in Australia or <strong>111</strong> in New Zealand if anyone is unwell. Do not resume until the appliance has been checked by a qualified person. The NZ workplace figure (20 ppm 8-hour TWA) and the NCC's 90 ppm 15-minute building verification figure are not the test for occupants; the alarm and the symptoms are.</p><p><strong>Suspected asbestos.</strong> You cannot tell by looking whether a material contains asbestos; Safe Work Australia says only a competent person can identify it in the workplace. Asbestos was banned in Australia in December 2003, and many homes built or renovated before 1990 still contain it. In New Zealand, any building built or renovated before 2000 could contain asbestos. Do not drill, cut, sample or disturb suspect material. Stop work in that area, keep people away, record it as suspected, and refer to a licensed asbestos assessor or competent person.</p><p><strong>Silica dust.</strong> Respirable crystalline silica is created when materials containing silica, such as brick, concrete and stone, are cut, ground, drilled or sanded. In Australia the 8-hour exposure standard is 0.05 mg/m³ and must not be exceeded; it carries into the WEL list on 1 December 2026 at the same value. New Zealand reduced its standard to 0.025 mg/m³ in November 2023. An assessor does not create silica dust to look inside a wall. Stop the sanding and choose a non-destructive method, or leave it to someone with the controls.</p><p><strong>Questions outside your competency.</strong> Exposure monitoring against a workplace limit, combustion faults, disputes needing an independent expert, health questions and animal-health questions all go to someone else: an occupational hygienist or other indoor environmental professional (IEP) for exposure (in Australia, the AIOH is the peak body; WorkSafe NZ names occupational hygienists among the competent people for CO monitoring), a doctor for health, a vet for pets. In New Zealand the PCBU's primary duty under HSWA 2015 section 36 covers you and others on site; in Australia, your state or territory WHS laws do the same.</p><h3>See it</h3><p><img src='/courses/assessing-indoor-environment-conditions/diagrams/stop-and-escalate.svg' alt='Four stop cards (carbon monoxide, suspected asbestos, silica dust, questions outside competency), each with the immediate action and who to refer to.'></p><p>The diagram gives the four stop cards with the first action and the referral for each.</p><h3>Do it in metric</h3><p>Record the stop in numbers (illustrative). CO: monitor alarm at <strong>35 ppm</strong> at 2:10 pm, 10 minutes after entry, heater running, windows shut. Ceiling: the cracked sheet measures 3.6 m × 1.2 m = <strong>4.32 m²</strong>. The size does not change the rule: suspect material is not disturbed at any size. Brick wall: sanding stopped; no dust sample taken by you. Each stop goes in the report with the time, the reading and the referral made.</p><h3>Field download</h3><p>The <strong>Stop and escalate card</strong> lists each stop trigger, the first action, the emergency numbers (000 in Australia, 111 in New Zealand) and who to refer to.</p><h3>Check yourself</h3><p>The module check gives you three site events and asks which ones stop the assessment and who you refer each to.</p><h3>Takeaway</h3><p>CO alarm, suspect asbestos, silica dust or a question beyond you: stop, make safe, refer, record. Next: Module 6, writing a report that stands up.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.cdc.gov.au/system/files/2025-10/enhealth-guidance-potential-health-effects-of-mould-in-the-environment_0.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">enHealth guidance, Potential health effects of mould in the environment (Australian Centre for Disease Control)</a>. Read 21/11/2026.</li><li><a href=\"https://www.legislation.govt.nz/act/public/2015/0070/latest/DLM5976895.html\" target=\"_blank\" rel=\"noopener noreferrer\">New Zealand Legislation, Health and Safety at Work Act 2015, section 36</a>. Read 16/11/2026.</li><li><a href=\"https://ncc.abcb.gov.au/ncc-navigator/understanding-ncc-climate-zones\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Understanding NCC climate zones</a>. Read 21/11/2026.</li><li><a href=\"https://www.worksafe.govt.nz/topic-and-industry/fumes/carbon-monoxide-invisible-and-deadly/\" target=\"_blank\" rel=\"noopener noreferrer\">WorkSafe New Zealand, Dangers of carbon monoxide</a>. Read 21/11/2026.</li><li><a href=\"https://www.productsafety.gov.au/about-us/product-safety-news/news/carbon-monoxide-safety\" target=\"_blank\" rel=\"noopener noreferrer\">Product Safety Australia (ACCC), Carbon monoxide safety</a>. Read 02/11/2026.</li><li><a href=\"https://www.worksafe.govt.nz/notifications/notify-worksafe/\" target=\"_blank\" rel=\"noopener noreferrer\">WorkSafe New Zealand, Notify WorkSafe</a>. Read 02/11/2026.</li><li><a href=\"https://www.safeworkaustralia.gov.au/safety-topic/hazards/asbestos/overview\" target=\"_blank\" rel=\"noopener noreferrer\">Safe Work Australia, Asbestos overview</a>. Read 21/11/2026.</li><li><a href=\"https://www.asbestos.nsw.gov.au/safety/safety-in-the-home/when-was-asbestos-banned-in-australia\" target=\"_blank\" rel=\"noopener noreferrer\">NSW Government asbestos website, When was asbestos banned in Australia?</a>. Read 02/11/2026.</li><li><a href=\"https://www.worksafe.govt.nz/topic-and-industry/asbestos/asbestos-information-for-homeowners/asbestos-in-aotearoa-new-zealand/\" target=\"_blank\" rel=\"noopener noreferrer\">WorkSafe New Zealand, Asbestos in Aotearoa New Zealand</a>. Read 21/11/2026.</li><li><a href=\"https://www.safeworkaustralia.gov.au/safety-topic/hazards/silica/whs-duties-silica/workplace-exposure-standard-respirable-crystalline-silica\" target=\"_blank\" rel=\"noopener noreferrer\">Safe Work Australia, Workplace exposure standard for respirable crystalline silica</a>. Read 21/11/2026.</li><li><a href=\"https://www.worksafe.vic.gov.au/workplace-exposure-limits-frequently-asked-questions\" target=\"_blank\" rel=\"noopener noreferrer\">WorkSafe Victoria, Workplace exposure limits: frequently asked questions</a>. Read 21/11/2026.</li><li><a href=\"https://www.worksafe.govt.nz/topic-and-industry/dust/accelerated-silicosis/our-prevention-activities-with-the-engineered-stone-industry/\" target=\"_blank\" rel=\"noopener noreferrer\">WorkSafe New Zealand, Our prevention activities with the engineered stone industry</a>. Read 02/11/2026.</li><li><a href=\"https://www.worksafe.govt.nz/topic-and-industry/dust/silica-dust-in-the-workplace/\" target=\"_blank\" rel=\"noopener noreferrer\">WorkSafe New Zealand, Silica dust in the workplace</a>. Read 21/11/2026.</li><li><a href=\"https://www.aioh.org.au/\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Institute of Occupational Hygienists (AIOH)</a>. Read 21/11/2026.</li></ul>",
+              "resources": [
+                {
+                  "label": "Stop and escalate card",
+                  "url": "/courses/assessing-indoor-environment-conditions/field-tools/stop-and-escalate-card.md",
+                  "kind": "field-card"
+                }
+              ]
+            },
+            {
+              "id": "f5f952e2-cbc8-43ca-9096-e3a9ae704d48",
+              "title": "Module 5 check",
+              "contentType": "quiz",
+              "orderIndex": 2,
+              "isPreview": false,
+              "contentBody": "aef944c9-fab8-4f0a-9750-f532123c1938",
+              "resources": [
+                {
+                  "label": "Module 5 check",
+                  "url": "quiz:aef944c9-fab8-4f0a-9750-f532123c1938"
+                }
+              ]
+            },
+            {
+              "id": "7f6e4aeb-3afd-4571-a69f-cfa6660fe733",
+              "title": "Case assessment IE-004: commercial renovation dust",
+              "contentType": "quiz",
+              "orderIndex": 3,
+              "isPreview": false,
+              "contentBody": "5f1eb696-205c-404c-b5d3-6ab60f11ec31",
+              "resources": [
+                {
+                  "label": "Case assessment IE-004: commercial renovation dust",
+                  "url": "quiz:5f1eb696-205c-404c-b5d3-6ab60f11ec31"
+                },
+                {
+                  "label": "IE-004 case card",
+                  "url": "/courses/assessing-indoor-environment-conditions/case-assessments/IE-004-case-card.md",
+                  "kind": "template"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "7e3101e2-0713-415f-8574-93de4a8f199f",
+          "title": "Module 6: Reports That Stand Up",
+          "orderIndex": 5,
+          "lessons": [
+            {
+              "id": "e11dbf71-6761-40db-be27-9d5a96db5bcf",
+              "title": "Writing an assessment report that stands up",
+              "contentType": "text",
+              "orderIndex": 0,
+              "isPreview": false,
+              "contentBody": "<p><em>DRAFT for SME review. Scenarios and teaching numbers are illustrative and labelled; every claim is in the course evidence ledger.</em></p><h3>On the job</h3><p>An insurer's claims assessor on the Sunshine Coast sends back a report from another firm with one line circled: \"Air quality poor, house unsafe for occupation.\" There are no readings behind it, no reference, no method, and no name on the report. The assessor asks you to reassess and write it again. Your report will be read by the owner, the tenant, the insurer and perhaps a tribunal, and each will test it.</p><h3>The idea</h3><p>A report that stands up keeps facts and opinion apart so a reader can check one against the other. CARSI's structure has ten parts:</p><ol><li><strong>Scope and question:</strong> who commissioned it, the written question, exclusions.</li><li><strong>Site:</strong> address, building type, age, construction, NCC climate zone (or NZ location), occupancy.</li><li><strong>Method and instruments:</strong> instrument types, models, serial numbers, the field check done that day.</li><li><strong>Conditions at the time:</strong> weather, outdoor readings, HVAC and equipment state, doors and windows.</li><li><strong>Observations:</strong> what you saw and smelt, with photo references.</li><li><strong>Measurements:</strong> every reading with value, unit or scale, location, time and its reference.</li><li><strong>Laboratory results:</strong> attached as issued, with the laboratory's accreditation and the chain-of-custody form.</li><li><strong>Interpretation:</strong> what the readings mean against references, with reasons, and which source-pathway-receptor hypotheses they support or rule out.</li><li><strong>Limitations:</strong> what you could not access, open or measure, and any stop events.</li><li><strong>Recommendations and referrals:</strong> what should happen next, by whom, tied to a finding. Then your name, designation and the date.</li></ol><p><strong>Words to avoid.</strong> Do not write \"safe\", \"unsafe\", \"toxic\", \"clear\" or \"healthy\" unless the scope, the method and your competency support it, and for a home they almost never do. There is no health guideline value for mould, so a report cannot certify a house as safe from it. If any figure from a regulator appears, source-tag it with jurisdiction, date, units and averaging time, and state that a workplace limit is not a residential threshold. Health questions are referred to a doctor in the recommendations.</p><p><strong>Write for the reader.</strong> Australian English, metric units, AUD with GST. Short sentences. Put a one-paragraph summary at the top that a tenant can understand, and keep the detail below it for the insurer. Do not paste text from any standard; name a standard only if it is relevant.</p><h3>See it</h3><p><img src='/courses/assessing-indoor-environment-conditions/diagrams/report-structure.svg' alt='A report spine with ten sections from scope to sign-off, with facts on one side (observations, measurements, lab results) and opinion on the other (interpretation, recommendations).'></p><p>The diagram shows the report spine, with the fact sections and the opinion sections side by side so you can see which supports which.</p><h3>Do it in metric</h3><p>Put the numbers in the report the way a reader can check them (illustrative). Three rooms assessed: 10.2 + 12.6 + 7.8 = <strong>30.6 m²</strong> of floor. Affected wall zone in the second bedroom: 2.4 m × 1.1 m = <strong>2.64 m²</strong>, drawn on the moisture map. Fee for the reassessment: <strong>AUD 680 ex GST</strong>; GST 10% = AUD 68; total <strong>AUD 748 inc GST</strong>. Readings table: point, material, instrument and mode, value, reference, time.</p><h3>Field download</h3><p>The <strong>Assessment report template</strong> gives the ten sections with prompts, a readings table, a limitations checklist and a source-tag line for any regulatory figure.</p><h3>Check yourself</h3><p>The Module 6 check asks you to rewrite an unsupported line, place items in the right report section and spot the word that needs a basis.</p><h3>Takeaway</h3><p>Facts, then interpretation, then recommendation, each in its own place, and a name on the end. Next: talking to occupants, insurers and other professionals.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://ncc.abcb.gov.au/ncc-navigator/understanding-ncc-climate-zones\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Understanding NCC climate zones</a>. Read 21/11/2026.</li><li><a href=\"https://www.cdc.gov.au/system/files/2025-10/enhealth-guidance-potential-health-effects-of-mould-in-the-environment_0.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">enHealth guidance, Potential health effects of mould in the environment (Australian Centre for Disease Control)</a>. Read 21/11/2026.</li><li><a href=\"https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/how-gst-works\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Taxation Office, How GST works</a>. Read 02/11/2026.</li></ul>",
+              "resources": [
+                {
+                  "label": "Assessment report template",
+                  "url": "/courses/assessing-indoor-environment-conditions/field-tools/assessment-report-template.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "02084198-7f4e-4a3a-8d3d-96a05f8552c6",
+              "title": "Talking to occupants, insurers and other professionals",
+              "contentType": "text",
+              "orderIndex": 1,
+              "isPreview": false,
+              "contentBody": "<p><em>DRAFT for SME review. Scenarios and teaching numbers are illustrative and labelled; every claim is in the course evidence ledger.</em></p><h3>On the job</h3><p>A rental in Wellington, New Zealand: the tenant has a newborn and has sent photos of mould on bedroom curtains and window frames to the property manager. The landlord thinks the tenant does not open the windows. The insurer wants to know whether there is a leak. You have readings from three visits. Everyone wants the report to say they are right.</p><h3>The idea</h3><p>Everyone who receives the findings gets <strong>the same facts</strong>. Only the language changes. A report that tells the tenant one thing and the landlord another cannot be defended, and you will be the one asked to defend it. State in the report who commissioned it, so every reader knows whose question it answers.</p><p><strong>Occupants</strong> want to know what is wrong and what happens next. Use plain words: \"The bedroom air holds about as much moisture as the living room, but the window frames are colder than the dew point, so water condenses on them overnight.\" Do not diagnose. If they ask about health, say that public health guidance does not use mould test results to decide health risk, and recommend they talk to their doctor; in a life-threatening emergency, phone 000 in Australia or 111 in New Zealand.</p><p><strong>Owners and landlords</strong> want to know cause and remedy. Give them the moisture source and pathway you found, and the recommendations tied to them. For a New Zealand rental, record the ventilation you observed (openable windows, extractor fans and where they vent) as facts against the healthy homes standards, and leave the compliance decision to the landlord and Tenancy Services.</p><p><strong>Insurers</strong> want to know whether there is an insured event, such as a sudden leak, or a long-term condition. Give them the evidence that separates the two: moisture readings at suspected leak points against references, the moisture pattern, and the timeline. Do not argue cover; describe the building.</p><p><strong>Other professionals</strong> (an occupational hygienist or other IEP, a plumber, a builder) need your data, not your summary. Hand over the readings, photos, laboratory reports and chain-of-custody forms in one package with your contact details.</p><p>When readers disagree, go back to the readings. \"The data show\" is stronger than \"in my opinion\", and it is the only thing that survives a tribunal.</p><h3>See it</h3><p><img src='/courses/assessing-indoor-environment-conditions/diagrams/one-finding-many-readers.svg' alt='One finding in the centre with five readers around it (occupant, owner or landlord, property manager, insurer, occupational hygienist), each receiving the same facts in different words.'></p><p>The diagram shows one finding with five readers around it, each receiving the same facts in the words that reader needs.</p><h3>Do it in metric</h3><p>Show the change, not just the state (illustrative, Magnus approximation). Visit 1: bedroom 19 °C / 72% RH ≈ <strong>9.8 g/kg</strong>. After the landlord fixed the extractor fan and the tenant ran it during showers, visit 3: <strong>7.9 g/kg</strong>. The fall is 9.8 − 7.9 = <strong>1.9 g/kg</strong>, or 1.9 ÷ 9.8 ≈ <strong>19%</strong>. Put the three visits in one table with dates and times so every reader sees the same trend, and say plainly that the trend supports the ventilation finding rather than a leak.</p><h3>Field download</h3><p>The <strong>Assessment report template</strong> includes the one-paragraph plain-English summary and the hand-over list for other professionals.</p><h3>Check yourself</h3><p>The module check asks what changes between readers and what never does, and how to answer an occupant's health question.</p><h3>Takeaway</h3><p>Same facts for every reader, different words. Hand professionals the data. Next: the final designation exam and the practical task.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.cdc.gov.au/system/files/2025-10/enhealth-guidance-potential-health-effects-of-mould-in-the-environment_0.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">enHealth guidance, Potential health effects of mould in the environment (Australian Centre for Disease Control)</a>. Read 21/11/2026.</li><li><a href=\"https://www.tenancy.govt.nz/healthy-homes/ventilation-standard/\" target=\"_blank\" rel=\"noopener noreferrer\">Tenancy Services (NZ MBIE), Healthy homes ventilation standard</a>. Read 21/11/2026.</li></ul>",
+              "resources": [
+                {
+                  "label": "Assessment report template",
+                  "url": "/courses/assessing-indoor-environment-conditions/field-tools/assessment-report-template.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "5450ae68-f5dd-4b2d-b560-d21ebb31e3e1",
+              "title": "Module 6 check",
+              "contentType": "quiz",
+              "orderIndex": 2,
+              "isPreview": false,
+              "contentBody": "f5af62d4-9ea4-498d-8e29-44ab9b89ccaf",
+              "resources": [
+                {
+                  "label": "Module 6 check",
+                  "url": "quiz:f5af62d4-9ea4-498d-8e29-44ab9b89ccaf"
+                }
+              ]
+            },
+            {
+              "id": "54331963-2a27-440d-a360-b2256f9e65ce",
+              "title": "Final designation exam",
+              "contentType": "quiz",
+              "orderIndex": 3,
+              "isPreview": false,
+              "contentBody": "c53ece9f-fdd0-494b-8fa9-38ad3552ed9a",
+              "resources": [
+                {
+                  "label": "Final designation exam",
+                  "url": "quiz:c53ece9f-fdd0-494b-8fa9-38ad3552ed9a"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

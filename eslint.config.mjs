@@ -19,11 +19,12 @@ import nextTypescript from "eslint-config-next/typescript";
 // `react-hooks/*`, `@next/next/*`, `@typescript-eslint/*`). In ESLint 9 flat config a rule's
 // plugin must be registered in the SAME object that enables the rule, so `eslint .` was
 // aborting before analysing any file. We reuse the exact plugin instances the Next configs
-// already loaded (so there is no "plugin redefined" conflict) and add `import` (which ships
-// transitively with eslint-config-next — no new dependency). GP-498: repairs the repo-wide
+// already loaded (so there is no "plugin redefined" conflict). GP-498: repairs the repo-wide
 // lint break (identical break existed on origin/main and failed CI's lint step).
-import importPlugin from "eslint-plugin-import";
-
+// `import` comes from that same collection, never from a direct `import ... from
+// "eslint-plugin-import"`: that package is a transitive dependency of eslint-config-next, and
+// under ESLint 10 (its peer range stops at 9) npm nests it inside eslint-config-next, so a
+// direct import fails with ERR_MODULE_NOT_FOUND.
 const nextPlugins = Object.assign(
   {},
   ...[...nextCoreWebVitals, ...nextTypescript].map((c) => c.plugins).filter(Boolean),
@@ -57,7 +58,7 @@ const config = [
     // rule below has an outstanding violation. `no-unused-vars` honours the
     // repo's `_`-prefix convention for intentionally-unused bindings (params
     // kept for a signature, caught-but-unused errors, etc.).
-    plugins: { ...nextPlugins, import: importPlugin },
+    plugins: { ...nextPlugins },
     rules: {
       "@typescript-eslint/no-unused-vars": [
         "error",
