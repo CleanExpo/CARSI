@@ -30,45 +30,24 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { chromium } from '@playwright/test';
 
+import {
+  evaluateAccept,
+  evaluatePrivatePage,
+  isGoogle,
+  isLibrary,
+  verdict,
+} from './consent-checks.mjs';
+
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const OUT = resolve(process.env.PROOF_OUT || join(ROOT, '..', 'carsi-ga4-consent-proof'));
 const NEXT_BIN = join(ROOT, 'node_modules', 'next', 'dist', 'bin', 'next');
 
-const GOOGLE_HOST =
-  /(^|\.)(google-analytics\.com|analytics\.google\.com|googletagmanager\.com|doubleclick\.net|googleadservices\.com|googlesyndication\.com)$/;
-const GOOGLE_SITE = /^(?:[a-z0-9-]+\.)?google\.(?:com|[a-z]{2,3}|com?\.[a-z]{2})$/;
 const LANDING =
   '/about?email=jane.proof%40example.invalid&token=proof-token-abc123&utm_source=proofcampaign';
 const VIEWPORTS = [
   { name: 'desktop', width: 1440, height: 900 },
   { name: 'phone', width: 390, height: 844 },
 ];
-
-function isGoogle(url) {
-  try {
-    const host = new URL(url).hostname.toLowerCase();
-    return GOOGLE_HOST.test(host) || GOOGLE_SITE.test(host);
-  } catch {
-    return false;
-  }
-}
-
-function isLibrary(url) {
-  try {
-    const u = new URL(url);
-    return u.hostname.endsWith('googletagmanager.com') && u.pathname.startsWith('/gtag/');
-  } catch {
-    return false;
-  }
-}
-
-/** Every event in a collection request: the URL fields merged with each body line. */
-function eventsOf(url, body) {
-  const shared = Object.fromEntries(new URL(url).searchParams);
-  const lines = (body || '').split(/\r?\n/).filter(Boolean);
-  if (lines.length === 0) return [shared];
-  return lines.map((line) => ({ ...shared, ...Object.fromEntries(new URLSearchParams(line)) }));
-}
 
 function freePort() {
   return new Promise((resolvePort, reject) => {
@@ -205,48 +184,15 @@ async function runViewport(browser, base, vp) {
   await page.waitForTimeout(2000);
   await shot(page, '2-after-accept');
   const accepted = log.filter((r) => r.phase === 'after-accept');
-  const libs = accepted.filter((r) => r.library);
-  const collects = accepted.filter((r) => !r.library);
-  check(
-    'B1-library-after-accept',
-    libs.length > 0,
-    `${libs.length} library request(s): ${libs.map((r) => r.url).join(' ')}`
-  );
-  const pageViews = collects
-    .flatMap((r) => eventsOf(r.url, r.body))
-    .filter((e) => e.en === 'page_view');
-  check(
-    'B2-page-view-after-accept',
-    pageViews.length > 0,
-    `${pageViews.length} page_view event(s) left the browser`
-  );
-  const expected = `${base}/about?utm_source=proofcampaign`;
-  check(
-    'B3-address-scrubbed',
-    pageViews.length > 0 && pageViews.every((e) => e.dl === expected),
-    `sent dl: ${JSON.stringify(pageViews.map((e) => e.dl))}; expected ${expected}`
-  );
-  const leaked = collects.filter((r) =>
-    /jane|proof-token|example\.invalid|token=/i.test(decodeURIComponent(`${r.url} ${r.body}`))
-  );
-  check(
-    'B4-no-personal-data-in-any-hit',
-    leaked.length === 0,
-    `${leaked.length} hit(s) carrying the planted email/token`
-  );
+  for (const c of evaluateAccept(accepted, `${base}/about?utm_source=proofcampaign`)) {
+    check(c.id, c.pass, c.detail);
+  }
 
   phase = 'private-page';
   await page.goto(`${base}/login?email=jane.proof%40example.invalid`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(3000);
-  const privateHits = log
-    .filter((r) => r.phase === 'private-page' && !r.library)
-    .flatMap((r) => eventsOf(r.url, r.body))
-    .filter((e) => (e.dl || '').includes('/login') || (e.dr || '').includes('/login'));
-  check(
-    'C1-no-hit-about-private-page',
-    privateHits.length === 0,
-    `${privateHits.length} hit(s) about /login`
-  );
+  const c1 = evaluatePrivatePage(log.filter((r) => r.phase === 'private-page'));
+  check(c1.id, c1.pass, c1.detail);
   const cookiesBefore = (await ctx.cookies()).filter(
     (c) => c.name === '_ga' || c.name.startsWith('_ga_')
   );
@@ -352,6 +298,7 @@ async function main() {
   }
 
   const checks = results.flatMap((r) => r.checks);
+  const outcome = verdict(checks, error);
   const report = {
     ticket: 'GP-731',
     head,
@@ -359,21 +306,16 @@ async function main() {
     base,
     generatedAt: new Date().toISOString(),
     error,
-    passed: !error && checks.length > 0 && checks.every((c) => c.pass),
+    passed: outcome.code === 0,
+    exitCode: outcome.code,
     checkCount: checks.length,
     results,
     serverLogTail: serverLog.slice(-4000),
   };
   writeFileSync(join(OUT, 'report.json'), JSON.stringify(report, null, 2));
   console.log(`report: ${join(OUT, 'report.json')}`);
-  if (error) {
-    console.error(`PROOF COULD NOT RUN: ${error}`);
-    process.exit(2);
-  }
-  console.log(
-    `${report.passed ? 'PROOF PASSED' : 'PROOF FAILED'}: ${checks.filter((c) => c.pass).length}/${checks.length} checks`
-  );
-  process.exit(report.passed ? 0 : 1);
+  (outcome.code === 0 ? console.log : console.error)(outcome.label);
+  process.exit(outcome.code);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
