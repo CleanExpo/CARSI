@@ -191,6 +191,14 @@ vi.mock('@/lib/server/team-course-slug-db', () => ({
 }));
 vi.mock('@/lib/server/lms-auth', () => ({
   sessionClaimsForUserId: vi.fn(async (id: string) => db.users.get(id) ?? null),
+  // GP-760: verifyActiveSession reads the session's user on every request and refuses when it
+  // cannot; every fixture user is active, on generation 0, with the role their claims carry.
+  readLmsUserNow: vi.fn(async (_db: unknown, id: string) => {
+    const c = db.users.get(id);
+    return c
+      ? { id: c.sub, email: c.email, fullName: c.full_name, active: true, role: c.role, generation: c.sg ?? 0 }
+      : null;
+  }),
 }));
 vi.mock('@/lib/server/teams', () => ({ createUniqueTeamSlug: vi.fn(async () => 'my-team') }));
 vi.mock('@/lib/server/first-lesson', () => ({ getFirstLessonLearnPath: vi.fn(async () => null) }));

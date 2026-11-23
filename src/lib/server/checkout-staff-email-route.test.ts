@@ -27,22 +27,32 @@ vi.mock('@/lib/prisma', () => ({
           db.users.find((u) => (where.id ? u.id === where.id : u.email === where.email)) ?? null
       ),
     },
+    // GP-760: verifyActiveSession reads the session's user on every request (readLmsUserNow).
+    $queryRaw: vi.fn(async (_strings: TemplateStringsArray, ...values: unknown[]) => {
+      const u = db.users.find((x) => x.id === values[0]);
+      return u
+        ? [
+            {
+              id: u.id,
+              email: u.email,
+              full_name: 'X',
+              is_active: u.isActive,
+              role: null,
+              session_generation: 0,
+              role_names: ['student'],
+            },
+          ]
+        : [];
+    }),
   },
 }));
 
 vi.mock('@/lib/server/local-course-checkout', () => ({
-  // A Bearer "email:<address>" header resolves to that address, as a verified Bearer JWT would.
+  // The current session's email when there is one (GP-760: buyer and payer are one credential),
+  // otherwise the typed email.
   resolveCheckoutEmail: vi.fn(
-    async ({
-      bodyEmail,
-      authorizationHeader,
-    }: {
-      bodyEmail?: string;
-      authorizationHeader?: string;
-    }) =>
-      authorizationHeader?.startsWith('Bearer email:')
-        ? authorizationHeader.slice('Bearer email:'.length)
-        : bodyEmail?.trim().toLowerCase() || null
+    async ({ session, bodyEmail }: { session: { email: string } | null; bodyEmail?: string }) =>
+      session ? session.email : bodyEmail?.trim().toLowerCase() || null
   ),
   createStripeCheckoutForCourse: stripe.create,
 }));
@@ -167,6 +177,21 @@ describe('POST /api/lms/checkout — unclaimed staff email', () => {
     expect(stripe.create).not.toHaveBeenCalled();
   });
 
+  // GP-760 review of f512fd90: a signed cookie the server refuses must not fall through to the
+  // guest path (which would take the buyer's email from that same refused token).
+  it('refuses a signed cookie whose session cannot be confirmed (database read fails), before Stripe', async () => {
+    db.users.push({ id: 'learner-8', email: 'learner8@example.com', isActive: true });
+    const { prisma } = await import('@/lib/prisma');
+    vi.mocked(prisma.$queryRaw).mockRejectedValueOnce(new Error('connection refused'));
+    const res = await post(
+      { slug: 'water-damage-essentials', customer_email: 'learner8@example.com' },
+      'auth_token=valid:learner-8'
+    );
+    expect(res.status).toBe(401);
+    expect((await res.json()).code).toBe('inactive_account');
+    expect(stripe.create).not.toHaveBeenCalled();
+  });
+
   it('answers 503 and opens no Stripe session when the account lookup fails', async () => {
     const { prisma } = await import('@/lib/prisma');
     vi.mocked(prisma.lmsUser.findUnique).mockRejectedValueOnce(new Error('connection refused'));
@@ -180,10 +205,12 @@ describe('POST /api/lms/checkout — unclaimed staff email', () => {
 
   it('refuses a deactivated account reached by Bearer token or typed email, with no cookie', async () => {
     db.users.push({ id: 'learner-7', email: 'gone@example.com', isActive: false });
+    // GP-760: a signed Bearer token is a session like the cookie; the server refuses it for a
+    // deactivated user, and checkout does not fall through to the guest path.
     const bearer = await post(
       { slug: 'water-damage-essentials', guest_checkout: true },
       undefined,
-      'Bearer email:gone@example.com'
+      'Bearer valid:learner-7'
     );
     expect(bearer.status).toBe(401);
     expect((await bearer.json()).code).toBe('inactive_account');

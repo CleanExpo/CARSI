@@ -56,7 +56,6 @@ describe.runIf(RUNNABLE)('GP-760 single-use password reset (real PostgreSQL)', (
   let refreshPOST: typeof import('../../../app/api/auth/refresh/route').POST;
   let meGET: typeof import('../../../app/api/auth/me/route').GET;
   let getSessionClaimsFromRequest: typeof import('@/lib/server/auth-from-request').getSessionClaimsFromRequest;
-  let clearCache: () => void;
   let secret: Uint8Array;
   let prisma: typeof import('@/lib/prisma').prisma;
 
@@ -73,7 +72,6 @@ describe.runIf(RUNNABLE)('GP-760 single-use password reset (real PostgreSQL)', (
     ({ POST: refreshPOST } = await import('../../../app/api/auth/refresh/route'));
     ({ GET: meGET } = await import('../../../app/api/auth/me/route'));
     ({ getSessionClaimsFromRequest } = await import('@/lib/server/auth-from-request'));
-    ({ __clearActiveCache: clearCache } = await import('@/lib/server/user-active-cache'));
     secret = (await import('@/lib/auth/jwt-secret')).getSessionSecretBytes();
     ({ prisma } = await import('@/lib/prisma'));
   });
@@ -126,7 +124,6 @@ describe.runIf(RUNNABLE)('GP-760 single-use password reset (real PostgreSQL)', (
     const olderLink = await resetLink(nowSec());
 
     // Before the reset the old session is current.
-    clearCache();
     expect(
       await getSessionClaimsFromRequest(withSession('https://carsi.example.test/x', oldSession))
     ).not.toBeNull();
@@ -151,7 +148,6 @@ describe.runIf(RUNNABLE)('GP-760 single-use password reset (real PostgreSQL)', (
     expect(older.status).toBe(400);
 
     // 3. The old session is refused everywhere; the new one is accepted.
-    clearCache();
     expect(
       await getSessionClaimsFromRequest(withSession('https://carsi.example.test/x', oldSession))
     ).toBeNull();

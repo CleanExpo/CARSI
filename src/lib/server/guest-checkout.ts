@@ -8,6 +8,7 @@ import {
   provisionalPasswordHash,
   registerUserWithPassword,
   sessionClaimsForUserId,
+  setPasswordEndingSessions,
 } from '@/lib/server/lms-auth';
 import { prisma } from '@/lib/prisma';
 
@@ -50,14 +51,9 @@ async function resolveExistingGuestUser(
 ): Promise<GuestUserOutcome> {
   const claimable = user.isActive && isProvisionalPasswordHash(user.hashedPassword);
   if (opts.allowClaim && claimable && opts.password) {
-    const hashedPassword = await hashPassword(opts.password);
-    await prisma.lmsUser.update({
-      where: { id: user.id },
-      data: {
-        hashedPassword,
-        fullName: opts.fullName || user.fullName,
-        isVerified: true,
-      },
+    await setPasswordEndingSessions(user.id, await hashPassword(opts.password), {
+      fullName: opts.fullName || user.fullName,
+      isVerified: true,
     });
     const claims = await sessionClaimsForUserId(user.id);
     if (claims) return { status: 'claimed', claims };
