@@ -87,7 +87,7 @@ for (const step of STEPS) {
   const r = spawnSync(step.cmd, step.args, { cwd: root, stdio: 'inherit', env: process.env });
   if (r.status !== 0) {
     failed += 1;
-    process.stderr.write(`✗ ${step.label} failed (exit ${r.status ?? 1})\n`);
+    process.stderr.write(`FAIL: ${step.label} failed (exit ${r.status ?? 1})\n`);
   }
 }
 
@@ -97,4 +97,4 @@ if (failed > 0) {
   );
   process.exit(1);
 }
-process.stdout.write('\n✓ product-excellence automated smoke passed\n');
+process.stdout.write('\nPASS: product-excellence automated smoke passed\n');

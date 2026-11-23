@@ -17,4 +17,33 @@ describe('buildCoachingHomeMonthSummary', () => {
     expect(s.ctas[0]?.label).toMatch(/proposed fix/);
     expect(s.ctas[0]?.variant).toBe('primary');
   });
+
+  // GP-781: every CTA set includes a label the home page uses to hide the "Your next action"
+  // card, so the summary line is the only place the member sees the next action. It must
+  // carry the due date, or the date is never shown.
+  it('names the next action due date in the summary line', () => {
+    const s = buildCoachingHomeMonthSummary({
+      completedThisMonth: 0,
+      totalThisMonth: 2,
+      proposedFixCount: 0,
+      marketingHasPack: true,
+      profileReady: true,
+      nextActionTitle: 'Post three social drafts',
+      nextActionDueLabel: '3 Dec',
+    });
+    expect(s.lines).toContain('Next up: Post three social drafts (due 3 Dec)');
+  });
+
+  it('leaves the next-action line unchanged when no due date is set', () => {
+    const s = buildCoachingHomeMonthSummary({
+      completedThisMonth: 0,
+      totalThisMonth: 2,
+      proposedFixCount: 0,
+      marketingHasPack: true,
+      profileReady: true,
+      nextActionTitle: 'Post three social drafts',
+      nextActionDueLabel: null,
+    });
+    expect(s.lines).toContain('Next up: Post three social drafts');
+  });
 });
