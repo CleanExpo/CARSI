@@ -45,6 +45,14 @@ export function getAnalyticsChoice(): AnalyticsChoice {
   return readAnalyticsChoice(localStore());
 }
 
+/**
+ * The visitor's choice, as a field for a checkout request body (GP-732). The checkout route records
+ * it on the Stripe session, and the webhook sends its server-side GA4 event only after a yes.
+ */
+export function analyticsConsentCheckoutField(): { analytics_consent: AnalyticsChoice } {
+  return { analytics_consent: getAnalyticsChoice() };
+}
+
 /** For useSyncExternalStore on the server: there is never a choice during rendering there. */
 export function getServerAnalyticsChoice(): AnalyticsChoice {
   return 'unset';

@@ -154,6 +154,32 @@ describe('a learner with no membership', () => {
   });
 });
 
+describe('the visitor analytics choice (GP-732)', () => {
+  it('records a yes on the session and on the subscription the webhook reads later', async () => {
+    const res = await POST(request({ analytics_consent: 'granted' }));
+
+    expect(res.status).toBe(200);
+    const params = mocks.sessionsCreate.mock.calls[0][0];
+    expect(params.metadata.analytics_consent).toBe('granted');
+    expect(params.subscription_data.metadata.analytics_consent).toBe('granted');
+    expect(params.subscription_data.metadata.analytics_consent_version).toBe(
+      params.metadata.analytics_consent_version
+    );
+  });
+
+  it.each([['denied'], ['unset'], [undefined], [true]])(
+    'records a no for analytics_consent=%s',
+    async (sent) => {
+      const res = await POST(request(sent === undefined ? {} : { analytics_consent: sent }));
+
+      expect(res.status).toBe(200);
+      const params = mocks.sessionsCreate.mock.calls[0][0];
+      expect(params.metadata.analytics_consent).toBe('denied');
+      expect(params.subscription_data.metadata.analytics_consent).toBe('denied');
+    }
+  );
+});
+
 describe('the removed CCW attendee discount stays removed', () => {
   // `CCW_MEMBERSHIP_COUPON_ID` is still set by `beforeEach`, deliberately: these
   // pass only because nothing reads it any more. If the attendee branch is ever
