@@ -204,7 +204,7 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Full Name</FormLabel>
               <FormControl>
-                <Input placeholder="John Smith" {...field} />
+                <Input placeholder="John Smith" autoComplete="name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -217,7 +217,7 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="name@example.com" {...field} />
+                <Input placeholder="name@example.com" autoComplete="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -266,7 +266,7 @@ export function RegisterForm() {
           )}
         />
         {error && (
-          <p className="text-destructive text-sm">
+          <p className="text-destructive text-sm" role="alert">
             {error}
             {error.includes('already exists') && (
               <>
