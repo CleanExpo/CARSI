@@ -133,8 +133,6 @@ const PENDING: Record<string, string> = {
     'certificate wording builder (fix/certificate-cec-wording)',
   'src/components/lms/diagrams/CertificatePreview.tsx':
     'certificate wording builder (fix/certificate-cec-wording)',
-  'app/(dashboard)/dashboard/student/credentials/page.tsx':
-    'certificate wording builder (fix/certificate-cec-wording)',
   'app/(public)/verify/credential/[credentialId]/page.tsx':
     'certificate wording builder (fix/certificate-cec-wording)',
   'docs/marketing/': 'GP-770: unsent marketing drafts',
