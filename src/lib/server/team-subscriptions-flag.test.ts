@@ -118,7 +118,7 @@ function post(): NextRequest {
   return new NextRequest('https://carsi.example.test/api/lms/subscription/x', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ tier: 'starter', slug: 'any', additional_seats: 1 }),
+    body: JSON.stringify({ tier: 'business_owner', slug: 'any', additional_seats: 1 }),
   });
 }
 

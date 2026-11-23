@@ -133,7 +133,7 @@ export function checkTeamsPricingCard({ name, res, expectOnSale }) {
     return { name, result: 'FAIL', detail: describeStatus(res) };
   }
   const html = res.text ?? '';
-  const state = pricingCardState(html, 'starter');
+  const state = pricingCardState(html, 'business_owner');
   const seatsCard = html.includes(`data-testid="${tierCtaTestId('team_seats', false)}"`);
   const ok = expectOnSale
     ? state === 'buy'
@@ -275,7 +275,7 @@ export async function runChecks({ base, env }) {
     request(base, '/api/lms/subscription/status', json),
     request(base, '/api/health/professional-directory', json),
     request(base, '/api/lms/subscription/checkout', post('{}')),
-    request(base, '/api/lms/subscription/teams/checkout', post('{"tier":"starter"}')),
+    request(base, '/api/lms/subscription/teams/checkout', post('{"tier":"business_owner"}')),
   ]);
 
   return [

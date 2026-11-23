@@ -133,14 +133,11 @@ beforeEach(() => {
   vi.stubEnv('STRIPE_PRICE_PRO_ANNUAL', 'price_individual');
   vi.stubEnv('STRIPE_PRICE_ORG_ANNUAL', 'price_owner');
   vi.stubEnv('STRIPE_PRICE_ORG_MONTHLY', 'price_owner_monthly_old');
-  vi.stubEnv('STRIPE_PRICE_TEAMS_STARTER', 'price_team_starter');
   vi.stubEnv('STRIPE_PRICE_TEAMS_EXTRA_SEAT', 'price_seat');
   catalogue = {
     price_individual: price('price_individual', 79_500),
     price_owner: price('price_owner', 129_500),
     price_owner_monthly_old: price('price_owner_monthly_old', 129_500, 'month'),
-    // Teams Starter shows $299 a year for 5 seats: a flat base Price billed once (GP-773 seat billing).
-    price_team_starter: price('price_team_starter', 29_900),
     // Each extra staff seat: A$695 a year, its own subscription item.
     price_seat: price('price_seat', 69_500),
   };
@@ -303,25 +300,25 @@ describe('onboarding checkout (the same business owner plan)', () => {
 });
 
 describe('Teams checkout', () => {
-  it('bills exactly the tier total shown ($299 for 5 seats) and accepts no promotion codes', async () => {
-    const res = await teams(request({ tier: 'starter' }));
+  it('bills exactly the business owner plan shown (A$1,295 a year) and accepts no promotion codes', async () => {
+    const res = await teams(request({ tier: 'business_owner' }));
     expect(res.status).toBe(200);
     const args = lastSessionArgs();
-    expect(args.line_items).toEqual([{ price: 'price_team_starter', quantity: 1 }]);
+    expect(args.line_items).toEqual([{ price: 'price_owner', quantity: 1 }]);
     expect(args).not.toHaveProperty('allow_promotion_codes');
   });
 
   for (const [label, wrong] of [
-    ['a A$695 base (not the $299 shown)', price('price_team_starter', 69_500)],
-    ['the old A$59.80 per-unit Price (no longer billed x 5)', price('price_team_starter', 5_980)],
-    ['a monthly base', price('price_team_starter', 29_900, 'month')],
-    ['another currency', price('price_team_starter', 29_900, 'year', 'usd')],
-    ['a quantity transform', transformed(price('price_team_starter', 29_900))],
-    ['tiered billing', tiered(price('price_team_starter', 29_900))],
+    ['a A$695 base (not the A$1,295 shown)', price('price_owner', 69_500)],
+    ['the old A$59.80 per-unit Price (no longer billed x 5)', price('price_owner', 5_980)],
+    ['a monthly base', price('price_owner', 129_500, 'month')],
+    ['another currency', price('price_owner', 129_500, 'year', 'usd')],
+    ['a quantity transform', transformed(price('price_owner', 129_500))],
+    ['tiered billing', tiered(price('price_owner', 129_500))],
   ] as const) {
-    it(`refuses a tier Price with ${label}, and Stripe Checkout is never opened`, async () => {
-      catalogue.price_team_starter = wrong;
-      const res = await teams(request({ tier: 'starter' }));
+    it(`refuses an owner plan Price with ${label}, and Stripe Checkout is never opened`, async () => {
+      catalogue.price_owner = wrong;
+      const res = await teams(request({ tier: 'business_owner' }));
       expect(res.status).toBe(503);
       expect(mocks.sessionsCreate).not.toHaveBeenCalled();
     });
@@ -341,8 +338,8 @@ describe('extra staff seats: A$695 per year each', () => {
     mocks.subsUpdate.mockResolvedValue({ id: 'sub_1', latest_invoice: { id: 'in_1', status: 'paid' } });
   });
 
-  const META = { plan: 'starter', base_price_id: 'price_team_starter', seat_price_id: 'price_seat' };
-  const BASE_ITEM = { id: 'si_base', quantity: 1, price: price('price_team_starter', 29_900) };
+  const META = { plan: 'business_owner', base_price_id: 'price_owner', seat_price_id: 'price_seat' };
+  const BASE_ITEM = { id: 'si_base', quantity: 1, price: price('price_owner', 129_500) };
 
   it('adds seats when the seat item is on the A$695 per year Price', async () => {
     mocks.subsRetrieve.mockResolvedValue({
@@ -361,7 +358,7 @@ describe('extra staff seats: A$695 per year each', () => {
   // The verified seat Price itself is wrong: refused before Stripe is touched (503).
   for (const [label, seatPrice] of [
     ['the old $49 seat', price('price_seat', 4_900)],
-    ['a tier bundle Price', price('price_seat', 29_900)],
+    ['the owner plan Price', price('price_seat', 129_500)],
     ['a monthly A$695', price('price_seat', 69_500, 'month')],
     // 2 -> 4 seats would bill 2 transformed units: the added seats cost less than A$695 each.
     ['A$695 yearly with a quantity transform', transformed(price('price_seat', 69_500))],

@@ -18,10 +18,6 @@
 import type Stripe from 'stripe';
 
 import { prisma } from '@/lib/prisma';
-import {
-  runGuardedSubscriptionWrite,
-  type SubscriptionRowLink,
-} from '@/lib/server/subscription-access-guard';
 
 export { readSubscriptionSeatQuantity } from '@/lib/server/team-subscription-store-pure';
 
@@ -43,48 +39,50 @@ export interface TeamSubscriptionUpsertInput {
  * both the unique `teamId` and the unique `stripeSubscriptionId`. Applies the
  * same out-of-order guard as the individual membership: a snapshot whose
  * `eventTimestamp` is strictly older than the stored `statusEventAt` is dropped.
- * GP-641: runs in `runGuardedSubscriptionWrite`, so a subscription whose latest
- * payment was reversed is written as `unpaid`, and a deleted one as `canceled`.
  */
-/** The team's row link, for `runGuardedSubscriptionWrite`. */
-function linkedTo(teamId: string): SubscriptionRowLink<void> {
-  return {
-    linkedSubscriptionId: async (tx) =>
-      (await tx.lmsTeamSubscription.findUnique({ where: { teamId }, select: { stripeSubscriptionId: true } }))
-        ?.stripeSubscriptionId,
-    skipped: undefined,
-  };
-}
-
 export async function upsertTeamSubscription(
   input: TeamSubscriptionUpsertInput,
 ): Promise<void> {
-  await runGuardedSubscriptionWrite(input.stripeSubscriptionId, input.status, linkedTo(input.teamId), async (tx, status) => {
-    if (input.eventTimestamp) {
-      const existing = await tx.lmsTeamSubscription.findUnique({
-        where: { teamId: input.teamId },
-        select: { statusEventAt: true },
-      });
-      if (existing?.statusEventAt && existing.statusEventAt > input.eventTimestamp) {
-        return;
-      }
-    }
+  const data = {
+    stripeCustomerId: input.stripeCustomerId,
+    stripeSubscriptionId: input.stripeSubscriptionId,
+    status: input.status,
+    plan: input.plan ?? 'business_owner',
+    seatLimit: input.seatLimit,
+    currentPeriodEnd: input.currentPeriodEnd,
+    cancelAtPeriodEnd: input.cancelAtPeriodEnd,
+    statusEventAt: input.eventTimestamp ?? null,
+  };
 
-    const data = {
-      stripeCustomerId: input.stripeCustomerId,
-      stripeSubscriptionId: input.stripeSubscriptionId,
-      status,
-      plan: input.plan ?? 'starter',
-      seatLimit: input.seatLimit,
-      currentPeriodEnd: input.currentPeriodEnd,
-      cancelAtPeriodEnd: input.cancelAtPeriodEnd,
-      statusEventAt: input.eventTimestamp ?? null,
-    };
-    await tx.lmsTeamSubscription.upsert({
+  if (input.eventTimestamp) {
+    const existing = await prisma.lmsTeamSubscription.findUnique({
       where: { teamId: input.teamId },
-      create: { teamId: input.teamId, ...data },
-      update: data,
+      select: { statusEventAt: true },
     });
+    if (existing?.statusEventAt && existing.statusEventAt > input.eventTimestamp) {
+      return;
+    }
+  }
+
+  await prisma.lmsTeamSubscription.upsert({
+    where: { teamId: input.teamId },
+    create: { teamId: input.teamId, ...data },
+    update: data,
+  });
+}
+
+/**
+ * Force a team seat subscription to a terminal status by subscription id
+ * (customer.subscription.deleted, refund/dispute revocation) without the full
+ * snapshot. No-op when the row does not exist.
+ */
+export async function markTeamSubscriptionStatusBySubscriptionId(
+  stripeSubscriptionId: string,
+  status: string,
+): Promise<void> {
+  await prisma.lmsTeamSubscription.updateMany({
+    where: { stripeSubscriptionId },
+    data: { status },
   });
 }
 
@@ -103,34 +101,32 @@ export async function upsertTerminalTeamSubscriptionStatus(input: {
   plan?: string;
   seatLimit: number;
 }): Promise<void> {
-  await runGuardedSubscriptionWrite(input.stripeSubscriptionId, input.status, linkedTo(input.teamId), async (tx, status) => {
-    const existing = await tx.lmsTeamSubscription.findUnique({
-      where: { teamId: input.teamId },
-      select: { statusEventAt: true },
-    });
-    if (existing?.statusEventAt && existing.statusEventAt > input.eventTimestamp) {
-      return;
-    }
+  const existing = await prisma.lmsTeamSubscription.findUnique({
+    where: { teamId: input.teamId },
+    select: { statusEventAt: true },
+  });
+  if (existing?.statusEventAt && existing.statusEventAt > input.eventTimestamp) {
+    return;
+  }
 
-    const data = {
-      stripeCustomerId: input.stripeCustomerId,
-      stripeSubscriptionId: input.stripeSubscriptionId,
-      status,
-      plan: input.plan ?? 'starter',
-      seatLimit: input.seatLimit,
-      statusEventAt: input.eventTimestamp,
-    };
+  const data = {
+    stripeCustomerId: input.stripeCustomerId,
+    stripeSubscriptionId: input.stripeSubscriptionId,
+    status: input.status,
+    plan: input.plan ?? 'business_owner',
+    seatLimit: input.seatLimit,
+    statusEventAt: input.eventTimestamp,
+  };
 
-    await tx.lmsTeamSubscription.upsert({
-      where: { teamId: input.teamId },
-      create: {
-        teamId: input.teamId,
-        currentPeriodEnd: null,
-        cancelAtPeriodEnd: false,
-        ...data,
-      },
-      update: data,
-    });
+  await prisma.lmsTeamSubscription.upsert({
+    where: { teamId: input.teamId },
+    create: {
+      teamId: input.teamId,
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+      ...data,
+    },
+    update: data,
   });
 }
 

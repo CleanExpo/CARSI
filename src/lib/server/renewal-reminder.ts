@@ -106,7 +106,7 @@ export function readRenewalFacts(
   return { ok: true, facts: { amountCents: amount, renewalAt: new Date(at * 1000) } };
 }
 
-/** Pure: "A$2,499.00 incl. GST" (matches the site's "incl. GST" wording). */
+/** Pure: "A$1,295.00 incl. GST" (matches the site's "incl. GST" wording). */
 export function formatRenewalAmount(cents: number): string {
   const formatted = new Intl.NumberFormat('en-AU', {
     style: 'currency',
@@ -141,10 +141,10 @@ export function renewalReminderDedupeKey(subscriptionId: string, renewalAt: Date
   return `${RENEWAL_REMINDER_TYPE}:${subscriptionId}:${day}`;
 }
 
+// GP-773 (Phill 23/11/2026, "Your 20/10 prices only"): the one Teams plan. The retired bundle
+// ids fall through to the generic label.
 const TEAM_PLAN_LABELS: Record<string, string> = {
-  starter: 'CARSI Teams Starter',
-  growth: 'CARSI Teams Growth',
-  full_library: 'CARSI Teams Full Library',
+  business_owner: 'CARSI Business Owner Plan',
 };
 
 function teamPlanLabel(plan: string | undefined): string {

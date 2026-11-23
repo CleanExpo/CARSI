@@ -149,6 +149,17 @@ describe('handleSubscriptionEvent — plan routing (created/updated)', () => {
     expect(arg.plan).toBe('starter');
   });
 
+  it('routes the business_owner Teams plan (GP-773) → team store only, never the org store', async () => {
+    await handleSubscriptionEvent(
+      subEvent('customer.subscription.updated', { plan: 'business_owner', carsi_team_id: 'team-1' }),
+    );
+    expect(team.upsertTeamSubscription).toHaveBeenCalledTimes(1);
+    expect(org.updateOrgSubscriptionFromStripe).not.toHaveBeenCalled();
+    expect(indiv.upsertSubscription).not.toHaveBeenCalled();
+    const arg = team.upsertTeamSubscription.mock.calls[0][0] as { plan: string };
+    expect(arg.plan).toBe('business_owner');
+  });
+
   it('routes org_monthly → org store only', async () => {
     await handleSubscriptionEvent(subEvent('customer.subscription.created', { plan: 'org_monthly', carsi_team_id: 'team-org-1' }));
     expect(org.updateOrgSubscriptionFromStripe).toHaveBeenCalledTimes(1);

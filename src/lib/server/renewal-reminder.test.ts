@@ -237,7 +237,7 @@ beforeEach(() => {
   h.race.gate = null;
   h.race.parked = null;
   h.subscriptionsRetrieve.mockImplementation(async (id: string) =>
-    id === 'sub_ind_1' ? subscription('pro_annual') : subscription('starter'),
+    id === 'sub_ind_1' ? subscription('pro_annual') : subscription('business_owner'),
   );
 });
 
@@ -278,15 +278,15 @@ describe('invoice.upcoming renewal reminder', () => {
 
   it('team plan: emails the billing contact about the team plan and records it for the owner', async () => {
     await handleSubscriptionEvent(
-      upcomingEvent('sub_team_1', { amount_due: 29_900, customer_email: null }),
+      upcomingEvent('sub_team_1', { amount_due: 129_500, customer_email: null }),
     );
 
     expect(h.sendEmail).toHaveBeenCalledTimes(1);
     const email = lastEmail();
     // No billing email on the invoice → falls back to the team owner.
     expect(email.to).toBe('owner@example.com');
-    expect(email.subject).toContain('CARSI Teams Starter');
-    expect(email.text).toContain('A$299.00');
+    expect(email.subject).toContain('CARSI Business Owner Plan');
+    expect(email.text).toContain('A$1,295.00');
     expect(email.text).toContain('17 October 2026');
     expect(email.text).toContain('Dry Crew Pty Ltd');
     expect(email.text).toMatch(/cancel/i);

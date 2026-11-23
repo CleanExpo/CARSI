@@ -53,10 +53,10 @@ export const BUSINESS_OWNER_PLAN: MembershipPrice = {
 };
 
 /**
- * One extra staff seat on a Teams subscription (founder ruling 23/11/2026, "Build seat billing
- * now"). Extra seats are their own subscription item on this Price, beside the tier's flat base
- * Price; the item's quantity is the number of extra seats. Checkout and seat expansion only use
- * a Price that matches this entry.
+ * One extra staff member on a Teams subscription, with their own login (founder rulings
+ * 23/11/2026). Extra seats are their own subscription item on this Price, beside the business
+ * owner plan Price; the item's quantity is the number of extra staff. Checkout and seat
+ * expansion only use a Price that matches this entry.
  */
 export const EXTRA_STAFF_SEAT: MembershipPrice = {
   amountCents: 69_500,
@@ -65,6 +65,16 @@ export const EXTRA_STAFF_SEAT: MembershipPrice = {
   envVar: 'STRIPE_PRICE_TEAMS_EXTRA_SEAT',
   lookupKey: 'carsi_teams_extra_seat',
 };
+
+/**
+ * Seats a Teams subscription (the business owner plan) includes before any extra staff seat.
+ *
+ * Phill 23/11/2026, "Your 20/10 prices only": Teams is the business owner plan at A$1,295 a year
+ * plus A$695 a year for each extra staff member, each with their own login. Nothing in the repo
+ * records how many staff the A$1,295 plan itself includes, so this is the owner only.
+ * UNVERIFIED: confirm with Phill before Teams goes on sale.
+ */
+export const TEAMS_OWNER_PLAN_INCLUDED_SEATS = 1;
 
 /** Whole dollars, e.g. 795 or 1295. */
 export function membershipAmountAud(price: MembershipPrice): number {

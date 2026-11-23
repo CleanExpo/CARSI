@@ -2,12 +2,13 @@
  * POST /api/lms/subscription/teams/checkout — start a Teams SEAT subscription
  * (WS1-E2, GP-442) Stripe Checkout in `mode: 'subscription'`.
  *
- * Body: { tier: 'starter' | 'growth' | 'full_library', extra_seats?: 0..50, success_url?, cancel_url? }
+ * Body: { tier?: 'business_owner', extra_seats?: 0..50, success_url?, cancel_url? }
  *
- * Seat billing (GP-773, founder ruling 23/11/2026 "Build seat billing now"): the subscription
- * carries the tier's verified flat base Price at quantity 1 (it includes 5 / 15 / 25 seats),
- * plus a SEPARATE item on the verified A$695 yearly extra-seat Price whose quantity is the
- * extra seats bought. With no extra seats the seat item is left out (Stripe Checkout is never
+ * Seat billing (GP-773, founder rulings 23/11/2026 "Build seat billing now" and "Your 20/10
+ * prices only"): Teams is the business owner plan. The subscription carries the verified
+ * A$1,295 yearly owner Price at quantity 1 (it includes the owner's seat), plus a SEPARATE item
+ * on the verified A$695 yearly extra-seat Price whose quantity is the extra staff bought, each
+ * with their own login. The retired A$299 / A$799 / A$2,499 bundle tiers answer 400. With no extra seats the seat item is left out (Stripe Checkout is never
  * sent a zero quantity); the seat-expansion route adds it later. Both verified Price ids are
  * stamped into the subscription metadata (`base_price_id`, `seat_price_id`) so the webhook and
  * seat expansion tell the items apart by id, not by amount. Both Prices must resolve and
@@ -30,7 +31,10 @@ import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
 import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { teamTierById, type TeamBundleTierId } from '@/lib/lms/pricing-tiers';
-import { resolveTeamSeatPriceId, resolveTeamTierPriceId } from '@/lib/server/team-subscription-price';
+import {
+  resolveTeamOwnerPlanPriceId,
+  resolveTeamSeatPriceId,
+} from '@/lib/server/team-subscription-price';
 import { ensureContainerTeamForOwner, getTeamForUser } from '@/lib/server/teams';
 import {
   checkoutSessionIdempotencyKey,
@@ -40,6 +44,7 @@ import {
 import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
 const UNAVAILABLE = 'Teams membership purchasing is not yet available.';
+const TEAMS_PLAN_ID: TeamBundleTierId = 'business_owner';
 const TEAMS_SUBSCRIPTION_TIER = 'teams_subscription';
 /** Same cap as the seat-expansion route. */
 const MAX_EXTRA_SEATS = 50;
@@ -68,10 +73,12 @@ export async function POST(request: NextRequest) {
     cancel_url?: string;
   };
 
-  const tierId = (body.tier ?? '').trim().toLowerCase() as TeamBundleTierId;
+  // One Teams plan. An omitted tier means that plan; any other value (including the retired
+  // starter / growth / full_library bundles) is refused.
+  const tierId = (body.tier ?? TEAMS_PLAN_ID).trim().toLowerCase() as TeamBundleTierId;
   const tier = teamTierById(tierId);
   if (!tier) {
-    return NextResponse.json({ detail: 'Unknown Teams tier.' }, { status: 400 });
+    return NextResponse.json({ detail: 'Unknown Teams plan.' }, { status: 400 });
   }
 
   const extraSeats = body.extra_seats === undefined ? 0 : body.extra_seats;
@@ -87,10 +94,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Fail closed: both the base and the seat Price must verify, never a wrong Price. The seat
-  // Price is required even with no extra seats, because the plan is sold with A$695 seats.
+  // Fail closed: both the owner plan and the seat Price must verify, never a wrong Price. The
+  // seat Price is required even with no extra staff, because the plan is sold with A$695 seats.
   const [basePriceId, seatPriceId] = await Promise.all([
-    resolveTeamTierPriceId(tierId),
+    resolveTeamOwnerPlanPriceId(),
     resolveTeamSeatPriceId(),
   ]);
   if (!basePriceId || !seatPriceId) {
