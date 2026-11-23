@@ -5,6 +5,7 @@ import {
   marketingLegalH2,
   marketingTextStrong,
 } from '@/components/marketing/LegalDocumentShell';
+import { CARSI_SELLER_LEGAL_NAME, readCarsiAbn } from '@/lib/billing/tax-invoice';
 
 import { APPROVED_FOR_IICRC_CECS, CARSI_PROVIDER_STATUS } from '@/lib/iicrc/approved-wording';
 export const metadata: Metadata = {
@@ -12,15 +13,21 @@ export const metadata: Metadata = {
   description: 'Terms of Service for CARSI Learning Management System',
 };
 
+// The ABN comes from the CARSI_ABN config value at request time (GP-761), so the
+// page must not be frozen at build time without it.
+export const dynamic = 'force-dynamic';
+
 export default function TermsPage() {
+  const abn = readCarsiAbn();
   return (
     <LegalDocumentShell title="Terms of Service" updated="22 March 2026">
       <section>
         <h2 className={marketingLegalH2}>1. Acceptance of Terms</h2>
         <p>
-          By accessing or using CARSI (&ldquo;the Service&rdquo;), operated by CARSI Pty Ltd (ABN to
-          be confirmed), you agree to be bound by these Terms of Service. If you do not agree to
-          these terms, do not use the Service.
+          By accessing or using CARSI (&ldquo;the Service&rdquo;), operated by{' '}
+          {abn ? `${CARSI_SELLER_LEGAL_NAME} (ABN ${abn})` : CARSI_SELLER_LEGAL_NAME}, you agree to be
+          bound by these Terms of Service. If you do not agree to these terms, do not use the
+          Service.
         </p>
       </section>
 

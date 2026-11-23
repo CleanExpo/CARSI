@@ -18,8 +18,6 @@ function credential(over: Partial<ProofPackCredentialRow> = {}): ProofPackCreden
   return {
     credential_id: 'enr-1',
     course_title: 'Moisture Meters, Readings and Dry Standards',
-    iicrc_discipline: null,
-    cec_hours: 0,
     issued_date: '2026-11-01',
     verification_url: 'https://carsi.com.au/verify/credential/enr-1',
     references: [],
@@ -29,13 +27,12 @@ function credential(over: Partial<ProofPackCredentialRow> = {}): ProofPackCreden
 
 function payload(credentials: ProofPackCredentialRow[], learner = 'Sam Example'): ProofPackPayload {
   return {
-    schema_version: 1,
+    schema_version: 2,
     learner_name: learner,
     learner_email: 'sam@example.com',
     issuing_organisation: 'CARSI Learning',
     generated_at: '2026-11-23T00:00:00.000Z',
-    summary: { completed_courses: credentials.length, total_cec_hours: 0 },
-    cec_by_discipline: [],
+    summary: { completed_courses: credentials.length },
     credentials,
   };
 }
