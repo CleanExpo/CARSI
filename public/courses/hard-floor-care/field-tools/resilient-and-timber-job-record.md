@@ -6,7 +6,7 @@ All stop rules on the Pre-job check and stop sheet (S1 to S19) apply before and 
 
 ## Gate (resilient floors)
 
-- Floor laid before the ban date for the country? Y / N / unknown (rule S1)
+- Floor laid before the trigger date for the country? Y / N / unknown (rule S1). Australia: laid before 31 December 2003. New Zealand: building built before 1 January 2000. A later date does not rule asbestos out.
 - Written asbestos-free result on file? Y / N  Reference: ______________
 - Asbestos-free result not confirmed in writing? Y / N (rule S1)  Who was told: ______________
 

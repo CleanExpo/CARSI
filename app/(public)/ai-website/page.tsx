@@ -5,13 +5,14 @@ import Advisor from './Advisor';
 import LeadMachine from './LeadMachine';
 import './ai-website.css';
 
+import { FROM_IICRC_APPROVED_CEC_PROVIDER, IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 // Render per-request so the AI_WEBSITE_ENABLED flag is honoured at runtime (not baked at build).
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'CARSI AI Website — training that enrols, advises and follows up',
   description:
-    'Australia’s restoration & cleaning training authority. IICRC CEC Accredited courses that earn CARSI Southern Hemisphere Restoration Designations — with an AI advisor, CRM and enrolment automation built in.',
+    `Australia’s restoration & cleaning training authority. Courses ${FROM_IICRC_APPROVED_CEC_PROVIDER} that earn CARSI Southern Hemisphere Restoration Designations — with an AI advisor, CRM and enrolment automation built in.`,
 };
 
 const HOOD = [
@@ -56,7 +57,7 @@ export default function AiWebsitePage() {
             <span className="aiw-eyebrow">Australia’s restoration &amp; cleaning training authority</span>
             <h1 className="aiw-title">A training site that <em>enrols, advises and follows up</em> — while you sleep.</h1>
             <p className="aiw-lede">
-              CARSI delivers <b>IICRC CEC Accredited</b> courses, Australian-produced, that earn <b>CARSI Southern
+              CARSI, an <b>{IICRC_APPROVED_CEC_PROVIDER}</b>, delivers Australian-produced courses that earn <b>CARSI Southern
               Hemisphere Restoration Designations</b>. CEC hours apply only to courses the IICRC has approved.
               This isn’t a brochure that lists them and waits. It <b>advises every visitor</b>, captures the enrolment,
               and starts the follow-up automatically. The site stops being a page and starts being an employee.
@@ -150,12 +151,12 @@ export default function AiWebsitePage() {
             </div>
             <div>
               <h4>CARSI</h4>
-              <p>carsi.com.au<br />Founder — Phill McGurk<br />IICRC CEC Accredited provider</p>
+              <p>carsi.com.au<br />Founder — Phill McGurk<br />{IICRC_APPROVED_CEC_PROVIDER}</p>
             </div>
           </div>
           <div className="aiw-compliance">
-            CARSI delivers <strong>IICRC CEC Accredited</strong> continuing education. CARSI is an accredited IICRC
-            Continuing Education Credit (CEC) provider — it does not deliver IICRC certification. IICRC certification is
+            CARSI is an <strong>{IICRC_APPROVED_CEC_PROVIDER}</strong> for continuing education — it does not
+            deliver IICRC certification. IICRC certification is
             obtained through schools and examinations approved by the IICRC; CARSI courses carry CARSI’s own Southern Hemisphere Restoration Designations.
           </div>
         </div>

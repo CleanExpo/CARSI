@@ -8,6 +8,7 @@ import {
   marketingLink,
   marketingTextStrong,
 } from '@/components/marketing/LegalDocumentShell';
+import { CookieSettingsButton } from '@/components/privacy/CookieSettingsButton';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -19,14 +20,14 @@ export const revalidate = 0;
 
 export default function PrivacyPage() {
   return (
-    <LegalDocumentShell title="Privacy Policy" updated="22 March 2026">
+    <LegalDocumentShell title="Privacy Policy" updated="16 November 2026">
       <section>
         <h2 className={marketingLegalH2}>1. Overview</h2>
         <p>
           CARSI Pty Ltd (&ldquo;CARSI&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;)
           is committed to protecting your privacy. This Privacy Policy explains how we collect, use,
-          disclose, and safeguard your personal information in accordance with the Australian Privacy
-          Principles (APPs) under the Privacy Act 1988 (Cth).
+          disclose, and safeguard your personal information in accordance with the Australian
+          Privacy Principles (APPs) under the Privacy Act 1988 (Cth).
         </p>
       </section>
 
@@ -35,7 +36,8 @@ export default function PrivacyPage() {
         <h3 className={marketingLegalH3}>2.1 Information You Provide</h3>
         <ul className="list-disc space-y-2 pl-6">
           <li>
-            Account information: name, email address, password, IICRC certification number (optional)
+            Account information: name, email address, password, IICRC certification number
+            (optional)
           </li>
           <li>Payment information: processed securely by Stripe (we do not store card details)</li>
           <li>Course progress: quiz answers, completion status, certificates earned</li>
@@ -56,8 +58,8 @@ export default function PrivacyPage() {
           collect the audio of your conversation and a text transcript of it, to answer your
           questions, provide support, and improve the assistant. The voice conversation is processed
           by our voice provider, ElevenLabs, whose servers are located outside Australia (including
-          the United States and Singapore) — see Section 9. The assistant tells you this at the start
-          of a voice conversation. You can use the written chat or the{' '}
+          the United States and Singapore) — see Section 9. The assistant tells you this at the
+          start of a voice conversation. You can use the written chat or the{' '}
           <Link href="/contact" className={marketingLink}>
             CARSI contact page
           </Link>{' '}
@@ -102,8 +104,8 @@ export default function PrivacyPage() {
             law, court order, or government authority.
           </li>
           <li>
-            <strong className={marketingTextStrong}>Business transfers:</strong> In connection with a
-            merger, acquisition, or sale of assets.
+            <strong className={marketingTextStrong}>Business transfers:</strong> In connection with
+            a merger, acquisition, or sale of assets.
           </li>
         </ul>
         <p>We do not sell your personal information to third parties for marketing purposes.</p>
@@ -122,8 +124,8 @@ export default function PrivacyPage() {
           <li>Regular security assessments</li>
         </ul>
         <p>
-          No method of transmission over the Internet is 100% secure. While we strive to protect your
-          information, we cannot guarantee absolute security.
+          No method of transmission over the Internet is 100% secure. While we strive to protect
+          your information, we cannot guarantee absolute security.
         </p>
       </section>
 
@@ -151,7 +153,7 @@ export default function PrivacyPage() {
         </p>
       </section>
 
-      <section>
+      <section id="cookies">
         <h2 className={marketingLegalH2}>7. Cookies</h2>
         <p>We use cookies and similar technologies to:</p>
         <ul className="list-disc space-y-2 pl-6">
@@ -164,6 +166,38 @@ export default function PrivacyPage() {
         <p>
           You can control cookies through your browser settings. Disabling cookies may affect the
           functionality of the Service.
+        </p>
+        <h3 className={marketingLegalH3}>Google Analytics</h3>
+        <p>
+          With your permission, we use Google Analytics, a service of Google LLC, to count visits to
+          our public pages. It does not load, and nothing is sent to Google, until you choose
+          &ldquo;Accept analytics&rdquo;. It is never used on your dashboard, account,
+          administration or sign-in pages. Before a page address is sent, we remove everything in it
+          except the page itself and standard campaign tags, so details such as an email address or
+          a link token are not sent.
+        </p>
+        <p>
+          Google Analytics sets two cookies on this site: <code>_ga</code> and{' '}
+          <code>_ga_&lt;id&gt;</code>, which Google keeps for up to two years by default. Google
+          processes this information in the United States (see Section 9).
+        </p>
+        <h3 className={marketingLegalH3}>PostHog</h3>
+        <p>
+          With the same permission, we use PostHog, a product analytics service of PostHog Inc., to
+          count a small number of steps on our public pages, such as viewing a course or starting a
+          checkout. It does not load, and nothing is sent to PostHog, until you choose &ldquo;Accept
+          analytics&rdquo;. It follows the same rules as Google Analytics: it is never used on your
+          dashboard, account, administration or sign-in pages, and page addresses are cleaned in the
+          same way before they are sent. PostHog keeps an identifier for this browser in a cookie
+          and in your browser&rsquo;s local storage on this site, and processes this information
+          outside Australia, in the United States or the European Union (see Section 9).
+        </p>
+        <p>
+          You can change your choice at any time with &ldquo;Cookie settings&rdquo; at the foot of
+          each page, or here: <CookieSettingsButton className={`${marketingLink} cursor-pointer`} />
+          . Choosing &ldquo;Reject optional&rdquo; stops Google Analytics and PostHog on this device
+          and deletes the Google Analytics cookies. It does not delete information Google or PostHog
+          already holds.
         </p>
       </section>
 
@@ -204,7 +238,9 @@ export default function PrivacyPage() {
           including the United States (for cloud hosting and payment processing) and, where you use
           the voice assistant, the United States and Singapore (voice processing and transcription
           by ElevenLabs — see Section 2.3). We ensure appropriate safeguards are in place to protect
-          your information in accordance with this Privacy Policy and applicable law.
+          your information in accordance with this Privacy Policy and applicable law. If you accept
+          analytics, Google Analytics information is processed in the United States, and PostHog
+          information in the United States or the European Union (see Section 7).
         </p>
       </section>
 
@@ -220,15 +256,17 @@ export default function PrivacyPage() {
       <section>
         <h2 className={marketingLegalH2}>11. Changes to This Policy</h2>
         <p>
-          We may update this Privacy Policy from time to time. We will notify you of material changes
-          by posting a notice on the Service or by email. Your continued use of the Service after
-          changes are posted constitutes acceptance of the updated Policy.
+          We may update this Privacy Policy from time to time. We will notify you of material
+          changes by posting a notice on the Service or by email. Your continued use of the Service
+          after changes are posted constitutes acceptance of the updated Policy.
         </p>
       </section>
 
       <section>
         <h2 className={marketingLegalH2}>12. Contact Us</h2>
-        <p>For privacy-related enquiries or to exercise your rights, contact our Privacy Officer:</p>
+        <p>
+          For privacy-related enquiries or to exercise your rights, contact our Privacy Officer:
+        </p>
         <address className="mt-2 not-italic">
           <strong className={marketingTextStrong}>CARSI Pty Ltd</strong>
           <br />

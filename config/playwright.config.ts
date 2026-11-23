@@ -1,6 +1,8 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, devices } from '@playwright/test';
+import { rejectedAnalytics } from './e2e-consent';
+import { allocateE2EPorts } from './e2e-ports';
 
 // This file lives in config/; every path (specs, output, auth state, web server working
 // directory) must resolve from the repo root, where package.json and next.config.ts live.
@@ -9,7 +11,14 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 // GitHub never sets E2E_PORT*, so CI listens on 3000, 3100 and 3101. The release gate's local
 // CI mirror sets them to free ports, because on a shared Mac another session's dev server
 // often holds 3000 (UNI-3468).
-const MAIN_PORT = process.env.E2E_PORT || '3000';
+// A developer's own PORT is kept when E2E_PORT is unset (UNI-3472); no workflow sets PORT.
+// All three server ports come from allocateE2EPorts: explicit E2E_PORT_2 / E2E_PORT_3 win, and a
+// default that another server holds is skipped, so two servers never share a port.
+const {
+  main: MAIN_PORT,
+  membership: MEMBERSHIP_CI_PORT,
+  survey: SURVEY_CI_PORT,
+} = allocateE2EPorts(process.env);
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${MAIN_PORT}`;
 
 /**
@@ -19,7 +28,6 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${MAIN_PORT
  * 3100 with the flag on, so the checkout journeys run in the normal gate. Locally, point
  * PLAYWRIGHT_MEMBERSHIP_BASE_URL at a flag-on server; without it the project is not defined.
  */
-const MEMBERSHIP_CI_PORT = process.env.E2E_PORT_2 || '3100';
 const membershipBaseURL =
   process.env.PLAYWRIGHT_MEMBERSHIP_BASE_URL ??
   (process.env.CI ? `http://localhost:${MEMBERSHIP_CI_PORT}` : undefined);
@@ -31,7 +39,6 @@ const MEMBERSHIP_SPEC = /e2e\/membership-checkout\.spec\.ts$/;
  * Flag-on tests carry the @survey-on tag and run only in the `purchase-survey` project; the
  * flag-off test in the same file runs in the default project.
  */
-const SURVEY_CI_PORT = process.env.E2E_PORT_3 || '3101';
 const surveyBaseURL =
   process.env.PLAYWRIGHT_SURVEY_BASE_URL ??
   (process.env.CI ? `http://localhost:${SURVEY_CI_PORT}` : undefined);
@@ -64,10 +71,12 @@ export default defineConfig({
       // `test.use({ storageState })`; unauthenticated specs are unaffected.
       name: 'setup',
       testMatch: /e2e\/auth\.setup\.ts$/,
+      // The saved student session carries the stored choice into the authenticated projects.
+      use: { storageState: rejectedAnalytics(baseURL) },
     },
     {
       name: 'desktop-chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'], storageState: rejectedAnalytics(baseURL) },
       grepInvert: /@authenticated|@survey-on/,
       // Flag-on journeys run only in the membership-checkout project below.
       testIgnore: [...BUILD_OUTPUT, MEMBERSHIP_SPEC],
@@ -90,7 +99,11 @@ export default defineConfig({
             name: 'membership-checkout',
             testMatch: MEMBERSHIP_SPEC,
             testIgnore: BUILD_OUTPUT,
-            use: { ...devices['Desktop Chrome'], baseURL: membershipBaseURL },
+            use: {
+              ...devices['Desktop Chrome'],
+              baseURL: membershipBaseURL,
+              storageState: rejectedAnalytics(membershipBaseURL),
+            },
           },
         ]
       : []),
@@ -101,7 +114,11 @@ export default defineConfig({
             testMatch: SURVEY_SPEC,
             testIgnore: BUILD_OUTPUT,
             grep: /@survey-on/,
-            use: { ...devices['Desktop Chrome'], baseURL: surveyBaseURL },
+            use: {
+              ...devices['Desktop Chrome'],
+              baseURL: surveyBaseURL,
+              storageState: rejectedAnalytics(surveyBaseURL),
+            },
           },
         ]
       : []),
