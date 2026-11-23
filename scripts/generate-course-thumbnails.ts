@@ -71,14 +71,14 @@ const DISCIPLINE_PALETTE_WORDS: Record<string, string> = {
 };
 
 // ---------------------------------------------------------------------------
-// IICRC CEC Accredited signature (licence-critical, FAIL-CLOSED)
+// Approved-for-IICRC-CECs signature (licence-critical, FAIL-CLOSED)
 // ---------------------------------------------------------------------------
 // A course earns the unified "accredited" thumbnail look ONLY when it appears in
 // the CEC approvals registry (data/seed/cec-approvals.json) with status
 // 'approved' — the SAME SSOT the compliance guards read
 // (scripts/check-iicrc-compliance.mjs). An empty/unreadable registry yields an
 // empty set → NO course is styled as accredited. This makes it impossible to
-// imply CEC accreditation on a course the IICRC has not approved.
+// imply an IICRC CEC approval on a course the IICRC has not approved.
 //
 // The signature is COLOUR + FINISH only — never a seal, badge, medallion, crest
 // or any mark. IICRC logos/marks are prohibited (CARSI/CLAUDE.md), and a generic

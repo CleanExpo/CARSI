@@ -18,6 +18,13 @@
  *     (`screenCollect`), because the Google library adds data of its own.
  */
 
+import {
+  COACHING_CTA_EVENT,
+  COURSE_CTA_EVENT,
+  EMPLOYER_TRUST_CTA_EVENT,
+  MARKETING_PACK_BUILD_EVENT,
+  ROLE_GUIDE_START_EVENT,
+} from './carsi-events';
 import { PUBLIC_ROUTES } from './public-routes';
 
 // ---------------------------------------------------------------------------
@@ -128,12 +135,12 @@ export const PRIVATE_FIRST_SEGMENTS: ReadonlySet<string> = new Set([
 export const PRIVATE_PATH_PREFIXES: readonly string[] = ['/events/ccw-roadshow/checkin'];
 
 /**
- * Public pages whose next segment is a record identifier (app/(public)/jobs/[id] and
- * calendar/[id]). The list page itself is counted; a page below it is not, whatever the
+ * Public pages whose next segment is a record identifier (app/(public)/jobs/[id],
+ * calendar/[id] and interactive-learning/[experienceId]). The list page itself is counted; a page below it is not, whatever the
  * identifier looks like, because a short id is still an id. consent.test.ts walks app/ and fails
  * when a new identifier route is not covered here or by PRIVATE_FIRST_SEGMENTS.
  */
-export const IDENTIFIER_ROUTES: readonly string[] = ['/calendar', '/jobs'];
+export const IDENTIFIER_ROUTES: readonly string[] = ['/calendar', '/interactive-learning', '/jobs'];
 
 const MAX_PATH = 200;
 const PATH_SHAPE = /^\/[a-z0-9\-_/]*$/;
@@ -311,6 +318,11 @@ export const ALLOWED_EVENTS: ReadonlySet<string> = new Set([
   'checkout_started',
   'membership_view',
   'membership_checkout_started',
+  COURSE_CTA_EVENT,
+  COACHING_CTA_EVENT,
+  ROLE_GUIDE_START_EVENT,
+  MARKETING_PACK_BUILD_EVENT,
+  EMPLOYER_TRUST_CTA_EVENT,
 ]);
 
 /** Event parameters with text values (`ep.` on the wire). */
@@ -321,6 +333,9 @@ export const ALLOWED_TEXT_PARAMS: ReadonlySet<string> = new Set([
   'is_free',
   'checkout_enabled',
   'currency',
+  /** Phase 5 product CTAs — set only via data-carsi-context / counted paths. */
+  'carsi_context',
+  'link_path',
 ]);
 
 /** Event parameters with number values (`epn.` on the wire). */
@@ -454,6 +469,14 @@ const FIXED_PARAM_VALUES: ReadonlyMap<string, ReadonlySet<string>> = new Map([
   ['checkout_enabled', new Set(['true', 'false', '1', '0'])],
 ]);
 const SLUG_VALUE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+/** Product-excellence contexts: hub, coaching-marketing, role-guide:slug, role-guide:slug:start-N. */
+const CARSi_CONTEXT_VALUE =
+  /^(?:hub(?::[a-z0-9-]+){0,2}|coaching-marketing|role-guide:[a-z0-9-]+(?::(?:start-[1-3]|employer-[1-9]|catalogue-fallback))?)$/;
+
+/** Rejects forged or mistyped `data-carsi-context` before anything is sent (GP-731). */
+export function isValidCarsiContext(value: string): boolean {
+  return value.length <= 120 && CARSi_CONTEXT_VALUE.test(value);
+}
 
 /**
  * True when an event parameter may be sent, for Google Analytics and PostHog alike. Fixed
@@ -469,6 +492,11 @@ export function isAllowedTextParam(name: string, value: unknown): boolean {
   const fixed = FIXED_PARAM_VALUES.get(name);
   if (fixed !== undefined) return fixed.has(value);
   if (value.length > 200 || looksPersonal(value) || DIGIT_RUN.test(value)) return false;
+  if (name === 'carsi_context') return CARSi_CONTEXT_VALUE.test(value);
+  if (name === 'link_path') {
+    const path = safePathname(value);
+    return path !== '' && path === value;
+  }
   return name !== 'course_slug' || SLUG_VALUE.test(value);
 }
 

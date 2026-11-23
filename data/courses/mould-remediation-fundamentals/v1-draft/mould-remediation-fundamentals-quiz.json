@@ -16,7 +16,7 @@
           "options": [
             "CARSI Level 2 Mould Remediation",
             "Nothing",
-            "IICRC certification",
+            "A first aid certificate",
             "A Certificate IV in WHS"
           ],
           "correctIndex": 0,
@@ -36,16 +36,16 @@
           "explanation": "Add the patches: 1.68 + 0.50 = 2.18 m². WorkSafe Queensland treats 1–10 m² as a medium job."
         },
         {
-          "questionText": "Is the CARSI Mould Remediation Practitioner designation IICRC certification?",
+          "questionText": "What kind of credential is the CARSI Mould Remediation Practitioner designation?",
           "options": [
-            "Yes",
-            "Only after the final exam",
-            "No; it is a CARSI credential, separate from IICRC certification, which comes only through IICRC-approved schools and examinations",
-            "Only in Queensland"
+            "A state government licence",
+            "A university degree",
+            "A CARSI credential, awarded by CARSI for this course",
+            "A licence valid in Queensland only"
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "The designation is a CARSI Southern Hemisphere Restoration Designation at the Practitioner tier. It is not IICRC certification and does not lead to it."
+          "explanation": "The designation is a CARSI Southern Hemisphere Restoration Designation at the Practitioner tier. It is a CARSI course and a CARSI credential."
         },
         {
           "questionText": "Why did Priya book a licensed asbestos assessor before cutting anything in a 1974 house?",
@@ -326,14 +326,14 @@
         {
           "questionText": "Which statement about the designation is accurate?",
           "options": [
-            "It is IICRC certification",
+            "It is a state government licence",
             "It is a CARSI Southern Hemisphere Restoration Designation at the Practitioner tier",
             "It replaces Level 2",
             "It is an RTO qualification"
           ],
           "correctIndex": 1,
           "points": 1,
-          "explanation": "It is a CARSI credential, separate from IICRC certification, which comes only through IICRC-approved schools and examinations."
+          "explanation": "It is a CARSI course and a CARSI credential at the Practitioner tier."
         },
         {
           "questionText": "In what order do the CARSI designation tiers run?",

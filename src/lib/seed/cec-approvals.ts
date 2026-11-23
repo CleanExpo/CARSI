@@ -84,6 +84,15 @@ export function getApprovedCecSlugs(): string[] {
 }
 
 /**
+ * True when the registry holds this exact slug with status 'approved' (GP-748). Only such a
+ * course may name the IICRC in its copy, page or structured data; every other course says only
+ * that it is a CARSI course and credential. scripts/check-iicrc-scope.mjs uses the same rule.
+ */
+export function isCecApprovedCourse(slug: string | null | undefined): boolean {
+  return getCecApproval(slug)?.status === 'approved';
+}
+
+/**
  * True when an approval is in force at `now`: status approved, positive hours, and an
  * `expiresAt` date that has not been reached. FAIL-CLOSED: a missing or unparseable
  * `expiresAt` is not current, because "we do not know when it lapses" must not advertise a
