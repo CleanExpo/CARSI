@@ -13,9 +13,10 @@ import { readPngInfo } from './png-info';
 
 vi.setConfig({ testTimeout: 30_000 });
 
-vi.mock('next/font/google', () => ({
-  Outfit: () => ({ variable: 'font-display' }),
-  Plus_Jakarta_Sans: () => ({ variable: 'font-sans' }),
+vi.mock('@/lib/brand/fonts', () => ({
+  fontDisplay: { variable: '--font-display' },
+  fontSans: { variable: '--font-sans' },
+  fontMono: { variable: '--font-mono' },
 }));
 
 type IconDescriptor = { url: string; sizes?: string; type?: string };

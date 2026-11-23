@@ -8,6 +8,7 @@ import {
   LineChart,
   Megaphone,
   Sparkles,
+  UsersRound,
   Video,
 } from 'lucide-react';
 
@@ -35,6 +36,7 @@ export const COACHING_PORTAL_NAV_MAIN: CoachingPortalNavItem[] = [
   { href: coachingPortalPath('/sessions'), label: 'Sessions', icon: Video },
   { href: coachingPortalPath('/marketing'), label: 'Marketing pack', icon: Megaphone },
   { href: coachingPortalPath('/resources'), label: 'Resources', icon: Library },
+  { href: coachingPortalPath('/tradehall'), label: 'TradeHall', icon: UsersRound },
   { href: coachingPortalPath('/billing'), label: 'Billing', icon: CircleDollarSign },
   { href: coachingPortalPath('/services'), label: 'Growth services', icon: Sparkles },
 ];

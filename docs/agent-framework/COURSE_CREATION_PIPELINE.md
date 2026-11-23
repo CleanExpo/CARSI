@@ -6,6 +6,7 @@ Code slash commands in `.claude/commands/` and reuses the existing media tooling
 adding parallel implementations.
 
 > **Status (2026-11-01).** Two things this doc assumes have moved:
+>
 > 1. **The `/course*` slash commands are not committed in this repo** (`.claude/commands/` is
 >    absent). Until they are, run the workflow through the `npm run …` targets, the
 >    `carsi-course-production` skill and the course-kit scripts directly — the stages below still
@@ -30,22 +31,22 @@ invoke `npm run …`, the skills, and (for previews) MCP tools.
 
 ## The commands (run in order, or resume one stage)
 
-| Command | Stage | Reuses | Writes |
-| --- | --- | --- | --- |
-| `/course` | orchestrator | the six below | — |
-| `/course-research` | research | `truth-finder`, `australian-context`, WebSearch | `data/courses/<slug>/research.md` |
-| `/course-construct` | structure | `foundation-first`, `courses-catalog-types.ts`, **Course Standard v1** (levels, role paths, 4–6 modules × ≥3 lessons) | catalogue skeleton + `meta.standardLevel`/`rolePaths` in `data/seed/courses-catalog.json` |
-| `/course-develop` | content | `truth-finder`, `australian-context`, **the seven-part lesson pattern** | lesson `contentBody` (7 parts, ≥400 words, a visual, a metric example) + module checks/final quiz + field downloads |
-| `/course-media` | media | `course-thumbnails` (gpt-image-1), `course-voiceover` (ElevenLabs), HeyGen repo scripts | `thumbnailUrl`, per-lesson audio in `resources`, brand video MP4s |
-| `/course-brand` | brand gate | `design-system`, `australian-context`, `check:course-diagrams` | fixes flagged upstream |
-| `/course-ship` | verify + seed | `verification-first`, **`check:course-standard` (14-floor audit)** | sets `meta.standard: "v1"` **last**, then DB (via `db:seed-courses -- --slug=<slug> --apply`) |
+| Command             | Stage         | Reuses                                                                                                                | Writes                                                                                                              |
+| ------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `/course`           | orchestrator  | the six below                                                                                                         | —                                                                                                                   |
+| `/course-research`  | research      | `truth-finder`, `australian-context`, WebSearch                                                                       | `data/courses/<slug>/research.md`                                                                                   |
+| `/course-construct` | structure     | `foundation-first`, `courses-catalog-types.ts`, **Course Standard v1** (levels, role paths, 4–6 modules × ≥3 lessons) | catalogue skeleton + `meta.standardLevel`/`rolePaths` in `data/seed/courses-catalog.json`                           |
+| `/course-develop`   | content       | `truth-finder`, `australian-context`, **the seven-part lesson pattern**                                               | lesson `contentBody` (7 parts, ≥400 words, a visual, a metric example) + module checks/final quiz + field downloads |
+| `/course-media`     | media         | `course-thumbnails` (gpt-image-1), `course-voiceover` (ElevenLabs), HeyGen repo scripts                               | `thumbnailUrl`, per-lesson audio in `resources`, brand video MP4s                                                   |
+| `/course-brand`     | brand gate    | `design-system`, `australian-context`, `check:course-diagrams`                                                        | fixes flagged upstream                                                                                              |
+| `/course-ship`      | verify + seed | `verification-first`, **`check:course-standard` (14-floor audit)**                                                    | sets `meta.standard: "v1"` **last**, then DB (via `db:seed-courses -- --slug=<slug> --apply`)                       |
 
 ## Connectors
 
 > Full connector map (ingest, export, media, products): [`CONNECTORS.md`](./CONNECTORS.md).
 
 - **ChatGPT image generator** = OpenAI `gpt-image-1` — `scripts/generate-course-thumbnails.ts` (`npm run db:thumbnails:*`). Already wired.
-- **ElevenLabs voice** — NEW `scripts/generate-course-voiceover.ts` (`npm run voice:plan` / `voice:generate`), skill `skills/content/course-voiceover.skill.md`, briefs `data/voice/course-voice-briefs.json`. Also exposed as an MCP server in `.mcp.json` (`elevenlabs`) for interactive previews — but committed, spend-capped narration must come from the script.
+- **ElevenLabs voice** — NEW `scripts/generate-course-voiceover.ts` (`npm run voice:plan` / `voice:generate`), skill `.agents/skills/learning/carsi-course-voiceover/SKILL.md`, briefs `data/voice/course-voice-briefs.json`. Also exposed as an MCP server in `.mcp.json` (`elevenlabs`) for interactive previews — but committed, spend-capped narration must come from the script.
 - **HeyGen video** — existing repo pipeline `scripts/automate-brand-videos.ts` (`npm run video:brand:*`) + `src/lib/brand-video-assistant.ts`. The HyperFrames MCP `compose`/`render_video` tools are **disabled on CLI agents**, so do not route generation through MCP.
 - **Cloudinary** — all media uploads (`src/lib/server/cloudinary-upload.ts`): thumbnails → `carsi/admin-courses`, audio → `carsi/course-audio`, video → `carsi/demo-videos`.
 
