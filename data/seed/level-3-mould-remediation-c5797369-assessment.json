@@ -22,7 +22,7 @@
       },
       {
         "label": "Zones, air, pressure",
-        "description": "Zones sized in m³, at least 4 air changes per hour with derated airflow, a decontamination chamber, continuous pressure logging against −5 Pa with alarms and a stop-work rule.",
+        "description": "Zones sized in m³, the air-change target set in the job plan with derated airflow, a decontamination chamber, continuous pressure logging against the plan's pressure target with alarms and a stop-work rule.",
         "maxPoints": 20
       },
       {

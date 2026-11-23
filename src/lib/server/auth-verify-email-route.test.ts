@@ -48,7 +48,7 @@ describe('POST /api/auth/verify-email (GP-699)', () => {
     expect(mocks.verifyToken).toHaveBeenCalledWith('good');
     expect(mocks.markVerified).toHaveBeenCalledWith('user-1', 'student@example.test');
     expect(res.status).toBe(303);
-    expect(res.headers.get('location')).toBe('/login?email_confirmed=1');
+    expect(res.headers.get('location')).toBe('/confirm-email?email_confirmed=1');
   });
 
   it('ignores a token in the query string: only the posted form field counts', async () => {
@@ -56,7 +56,7 @@ describe('POST /api/auth/verify-email (GP-699)', () => {
 
     expect(mocks.verifyToken).not.toHaveBeenCalled();
     expect(mocks.markVerified).not.toHaveBeenCalled();
-    expect(res.headers.get('location')).toBe('/login?email_confirmed=0');
+    expect(res.headers.get('location')).toBe('/confirm-email?email_confirmed=0');
   });
 
   it('changes nothing when the token is missing', async () => {
@@ -64,7 +64,7 @@ describe('POST /api/auth/verify-email (GP-699)', () => {
 
     expect(mocks.verifyToken).not.toHaveBeenCalled();
     expect(mocks.markVerified).not.toHaveBeenCalled();
-    expect(res.headers.get('location')).toBe('/login?email_confirmed=0');
+    expect(res.headers.get('location')).toBe('/confirm-email?email_confirmed=0');
   });
 
   it('changes nothing when the body is not a form', async () => {
@@ -77,7 +77,7 @@ describe('POST /api/auth/verify-email (GP-699)', () => {
     );
 
     expect(mocks.markVerified).not.toHaveBeenCalled();
-    expect(res.headers.get('location')).toBe('/login?email_confirmed=0');
+    expect(res.headers.get('location')).toBe('/confirm-email?email_confirmed=0');
   });
 
   it('changes nothing when the token is invalid or expired', async () => {
@@ -86,7 +86,7 @@ describe('POST /api/auth/verify-email (GP-699)', () => {
     const res = await POST(post({ token: 'bad' }));
 
     expect(mocks.markVerified).not.toHaveBeenCalled();
-    expect(res.headers.get('location')).toBe('/login?email_confirmed=0');
+    expect(res.headers.get('location')).toBe('/confirm-email?email_confirmed=0');
   });
 
   it('changes nothing when the database is not configured', async () => {
@@ -95,7 +95,7 @@ describe('POST /api/auth/verify-email (GP-699)', () => {
     const res = await POST(post({ token: 'good' }));
 
     expect(mocks.markVerified).not.toHaveBeenCalled();
-    expect(res.headers.get('location')).toBe('/login?email_confirmed=0');
+    expect(res.headers.get('location')).toBe('/confirm-email?email_confirmed=0');
   });
 
   it('reports failure when the account no longer has the address the token was issued for', async () => {
@@ -103,7 +103,7 @@ describe('POST /api/auth/verify-email (GP-699)', () => {
 
     const res = await POST(post({ token: 'stale' }));
 
-    expect(res.headers.get('location')).toBe('/login?email_confirmed=0');
+    expect(res.headers.get('location')).toBe('/confirm-email?email_confirmed=0');
   });
 
   it('reports failure, not a crash, when the database write throws', async () => {
@@ -112,7 +112,7 @@ describe('POST /api/auth/verify-email (GP-699)', () => {
     const res = await POST(post({ token: 'good' }));
 
     expect(res.status).toBe(303);
-    expect(res.headers.get('location')).toBe('/login?email_confirmed=0');
+    expect(res.headers.get('location')).toBe('/confirm-email?email_confirmed=0');
   });
 
   it('never redirects off-site, whatever host or destination the request names', async () => {
@@ -124,6 +124,6 @@ describe('POST /api/auth/verify-email (GP-699)', () => {
     );
 
     // A path-only Location cannot name another site.
-    expect(res.headers.get('location')).toBe('/login?email_confirmed=1');
+    expect(res.headers.get('location')).toBe('/confirm-email?email_confirmed=1');
   });
 });

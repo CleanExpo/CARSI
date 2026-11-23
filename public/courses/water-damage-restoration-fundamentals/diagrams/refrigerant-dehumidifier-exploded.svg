@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img" aria-labelledby="t d" font-family="Arial, Helvetica, sans-serif">
+<title id="t">Refrigerant dehumidifier: pull-apart view</title>
+<desc id="d">Pull-apart view of a generic refrigerant dehumidifier along its air path: 1 inlet grille and filter, 2 cold coil where air is cooled below its dew point and water condenses, 3 warm coil that reheats the dried air, 4 fan, 5 outlet. Below: 6 condensate tray and pump to a drain, 7 compressor that circulates refrigerant, 8 230 V lead and 10 A plug, tested and tagged, through an RCD. Lesson worked example: room air at about 16 g/kg is conditioned to about 8.4 g/kg, about 7.6 g/kg removed per kilogram of air; an LGR dehumidifier drawing 4.5 A at 230 V. Figures illustrative.</desc>
+<rect width="800" height="600" fill="#ffffff"/>
+<text x="24" y="36" font-size="20" font-weight="700" fill="#1f2933">Refrigerant dehumidifier: pull-apart view</text>
+<image x="656" y="14" width="120" height="31" href="data:image/png;base64,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"/>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52606d"/></marker>
+<marker id="arrowB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f5f8b"/></marker>
+<marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0b6e4f"/></marker>
+<linearGradient id="gCard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9eef3"/></linearGradient>
+<linearGradient id="gWarn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf3"/><stop offset="1" stop-color="#fde6c8"/></linearGradient>
+<linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3fbf7"/><stop offset="1" stop-color="#d3eee2"/></linearGradient>
+<linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f8fc"/><stop offset="1" stop-color="#d6e5f2"/></linearGradient>
+<linearGradient id="gRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6f5"/><stop offset="1" stop-color="#f9d7d3"/></linearGradient>
+<linearGradient id="gWood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3e3c8"/><stop offset="1" stop-color="#dcc29a"/></linearGradient>
+<linearGradient id="gMetal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4e7eb"/><stop offset="1" stop-color="#9aa5b1"/></linearGradient>
+<radialGradient id="gDot" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#2fa77c"/><stop offset="1" stop-color="#0a5c42"/></radialGradient>
+<radialGradient id="gDotW" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#e07a2c"/><stop offset="1" stop-color="#8f3806"/></radialGradient>
+<radialGradient id="gDotB" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#4b8cc0"/><stop offset="1" stop-color="#174a6e"/></radialGradient>
+<filter id="sh" x="-10%" y="-10%" width="125%" height="135%"><feGaussianBlur in="SourceAlpha" stdDeviation="2.5"/><feOffset dx="0" dy="3" result="o"/><feComponentTransfer><feFuncA type="linear" slope="0.22"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<text x="24" y="62" font-size="12" fill="#52606d">A generic unit with its parts pulled apart along the air path, left to right. Not a specific brand.</text>
+<rect x="60" y="90" width="70" height="150" rx="6" fill="url(#gCard)" stroke="#52606d" stroke-width="2"/>
+<line x1="70" y1="98" x2="70" y2="232" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="80" y1="98" x2="80" y2="232" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="90" y1="98" x2="90" y2="232" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="100" y1="98" x2="100" y2="232" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="110" y1="98" x2="110" y2="232" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="120" y1="98" x2="120" y2="232" stroke="#9aa5b1" stroke-width="1.5"/>
+<rect x="210" y="90" width="70" height="150" rx="6" fill="url(#gBlue)" stroke="#1f5f8b" stroke-width="2"/>
+<path d="M220,102 L270,111 L220,120 L270,129 L220,138 L270,147 L220,156 L270,165 L220,174 L270,183 L220,192 L270,201 L220,210 L270,219 L220,228" fill="none" stroke="#1f5f8b" stroke-width="1.5"/>
+<rect x="360" y="90" width="70" height="150" rx="6" fill="url(#gWarn)" stroke="#b54708" stroke-width="2"/>
+<path d="M370,102 L420,111 L370,120 L420,129 L370,138 L420,147 L370,156 L420,165 L370,174 L420,183 L370,192 L420,201 L370,210 L420,219 L370,228" fill="none" stroke="#b54708" stroke-width="1.5"/>
+<circle cx="545" cy="165.0" r="58" fill="url(#gCard)" stroke="#52606d" stroke-width="2"/>
+<ellipse cx="545" cy="135.0" rx="11" ry="24" fill="#cbd2d9" stroke="#52606d" stroke-width="1" transform="rotate(0 545 165.0)"/>
+<ellipse cx="545" cy="135.0" rx="11" ry="24" fill="#cbd2d9" stroke="#52606d" stroke-width="1" transform="rotate(72 545 165.0)"/>
+<ellipse cx="545" cy="135.0" rx="11" ry="24" fill="#cbd2d9" stroke="#52606d" stroke-width="1" transform="rotate(144 545 165.0)"/>
+<ellipse cx="545" cy="135.0" rx="11" ry="24" fill="#cbd2d9" stroke="#52606d" stroke-width="1" transform="rotate(216 545 165.0)"/>
+<ellipse cx="545" cy="135.0" rx="11" ry="24" fill="#cbd2d9" stroke="#52606d" stroke-width="1" transform="rotate(288 545 165.0)"/>
+<circle cx="545" cy="165.0" r="9" fill="#52606d"/>
+<rect x="660" y="90" width="70" height="150" rx="6" fill="url(#gCard)" stroke="#52606d" stroke-width="2"/>
+<line x1="668" y1="104" x2="722" y2="104" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="668" y1="118" x2="722" y2="118" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="668" y1="132" x2="722" y2="132" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="668" y1="146" x2="722" y2="146" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="668" y1="160" x2="722" y2="160" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="668" y1="174" x2="722" y2="174" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="668" y1="188" x2="722" y2="188" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="668" y1="202" x2="722" y2="202" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="668" y1="216" x2="722" y2="216" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="668" y1="230" x2="722" y2="230" stroke="#9aa5b1" stroke-width="1.5"/>
+<line x1="24" y1="165.0" x2="58" y2="165.0" stroke="#1f5f8b" stroke-width="3" marker-end="url(#arrowB)"/>
+<line x1="132" y1="165.0" x2="208" y2="165.0" stroke="#1f5f8b" stroke-width="3" marker-end="url(#arrowB)"/>
+<line x1="282" y1="165.0" x2="358" y2="165.0" stroke="#1f5f8b" stroke-width="3" marker-end="url(#arrowB)"/>
+<line x1="432" y1="165.0" x2="485" y2="165.0" stroke="#1f5f8b" stroke-width="3" marker-end="url(#arrowB)"/>
+<line x1="605" y1="165.0" x2="658" y2="165.0" stroke="#1f5f8b" stroke-width="3" marker-end="url(#arrowB)"/>
+<text x="95" y="266" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2933">1 Inlet and filter</text>
+<text x="95" y="284" font-size="12" text-anchor="middle" fill="#52606d">Room air drawn in;</text>
+<text x="95" y="300" font-size="12" text-anchor="middle" fill="#52606d">filter guards coils</text>
+<text x="245" y="266" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2933">2 Cold coil</text>
+<text x="245" y="284" font-size="12" text-anchor="middle" fill="#52606d">Air cools below its</text>
+<text x="245" y="300" font-size="12" text-anchor="middle" fill="#52606d">dew point; water</text>
+<text x="245" y="316" font-size="12" text-anchor="middle" fill="#52606d">condenses on fins</text>
+<text x="395" y="266" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2933">3 Warm coil</text>
+<text x="395" y="284" font-size="12" text-anchor="middle" fill="#52606d">Reheats the dried</text>
+<text x="395" y="300" font-size="12" text-anchor="middle" fill="#52606d">air before it</text>
+<text x="395" y="316" font-size="12" text-anchor="middle" fill="#52606d">leaves the unit</text>
+<text x="545" y="266" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2933">4 Fan</text>
+<text x="545" y="284" font-size="12" text-anchor="middle" fill="#52606d">Pulls air through</text>
+<text x="545" y="300" font-size="12" text-anchor="middle" fill="#52606d">the coils</text>
+<text x="695" y="266" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2933">5 Outlet</text>
+<text x="695" y="284" font-size="12" text-anchor="middle" fill="#52606d">Drier air goes</text>
+<text x="695" y="300" font-size="12" text-anchor="middle" fill="#52606d">back into the room</text>
+<rect x="24" y="340" width="236" height="96" rx="10" fill="url(#gBlue)" stroke="#1f5f8b" stroke-width="2" filter="url(#sh)"/>
+<text x="40" y="364" font-size="14" font-weight="700" fill="#1f2933">6 Condensate tray and pump</text>
+<text x="40" y="386" font-size="12" fill="#1f2933">Water from the cold coil drips</text>
+<text x="40" y="404" font-size="12" fill="#1f2933">into the tray; a pump or hose</text>
+<text x="40" y="422" font-size="12" fill="#1f2933">sends it to a drain.</text>
+<rect x="282" y="340" width="236" height="96" rx="10" fill="url(#gCard)" stroke="#52606d" stroke-width="2" filter="url(#sh)"/>
+<text x="298" y="364" font-size="14" font-weight="700" fill="#1f2933">7 Compressor</text>
+<text x="298" y="386" font-size="12" fill="#1f2933">Pumps refrigerant around the</text>
+<text x="298" y="404" font-size="12" fill="#1f2933">circuit, keeping one coil cold</text>
+<text x="298" y="422" font-size="12" fill="#1f2933">and the other warm.</text>
+<rect x="540" y="340" width="236" height="96" rx="10" fill="url(#gGreen)" stroke="#0b6e4f" stroke-width="2" filter="url(#sh)"/>
+<text x="556" y="364" font-size="14" font-weight="700" fill="#1f2933">8 Lead and plug, 230 V</text>
+<text x="556" y="386" font-size="12" fill="#1f2933">10 A plug; tested and tagged;</text>
+<text x="556" y="404" font-size="12" fill="#1f2933">run through an RCD. Read the</text>
+<text x="556" y="422" font-size="12" fill="#1f2933">rating plate for the amps.</text>
+<rect x="24" y="456" width="752" height="104" rx="10" fill="url(#gGreen)" stroke="#0b6e4f" stroke-width="2" filter="url(#sh)"/>
+<text x="40" y="480" font-size="14" font-weight="700" fill="#1f2933">What it does to the air (drying-equation lesson example; figures illustrative)</text>
+<text x="40" y="502" font-size="12" fill="#1f2933">Room air at about 16 g/kg is conditioned to about 8.4 g/kg: about 7.6 g/kg removed from each kilogram of air.</text>
+<text x="40" y="520" font-size="12" fill="#1f2933">On site: record inlet and outlet g/kg each visit; the outlet must read lower than the inlet.</text>
+<text x="40" y="538" font-size="12" fill="#1f2933">Power: an LGR dehumidifier drawing 4.5 A at 230 V in the equipment lesson example; read the rating plate.</text>
+<text x="776" y="588" font-size="12" text-anchor="end" fill="#52606d">CARSI · Water Restoration Practitioner · schematic, not to scale</text>
+</svg>

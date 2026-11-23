@@ -1,6 +1,6 @@
 # IICRC CEC-provider compliance
 
-CARSI is accredited as an **IICRC CEC (Continuing Education Credit) provider**. It is
+CARSI is an **IICRC Approved CEC Provider** (CEC: Continuing Education Credit). It is
 **not** the certifying body and does not grant IICRC certification. "Compliant" here means
 compliant with the **CE Provider Program**, which is a different registration from "IICRC
 Certified Firm" status, with different rights (notably logo rights — see below).

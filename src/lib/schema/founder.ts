@@ -42,7 +42,7 @@ export function buildFounderPersonSchema(): SchemaObject {
     '@id': CARSI_FOUNDER_ID,
     name: 'Phill McGurk',
     jobTitle: 'Founder & Lead Instructor',
-    description: 'IICRC-certified restoration practitioner and founder of CARSI.',
+    description: 'Restoration practitioner, Lead Instructor and founder of CARSI.',
     worksFor: { '@id': CARSI_ORG_ID },
     knowsAbout: CARSI_FOUNDER_KNOWS_ABOUT,
     sameAs: CARSI_FOUNDER_SAME_AS,

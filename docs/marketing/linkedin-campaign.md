@@ -206,7 +206,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 **Variation C — Franchise**
 
-> **Hook:** Franchise owners — certify your entire network with one training platform.
+> **Hook:** Franchise owners — train your entire network on one platform.
 >
 > **Body:** CARSI offers group licensing for cleaning franchises. IICRC CEC Accredited courses in carpet cleaning, mould remediation and water damage restoration. Track team progress, verify certificates, and demonstrate competence to clients.
 >

@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -41,7 +41,7 @@ jobs:
 
       - name: Upload verification report
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dependency-verification-report
           path: verify-output.log
@@ -63,7 +63,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -89,6 +89,11 @@ jobs:
       # learner progress), and the media workflow must refuse multi-line slug/limit inputs.
       - name: Seed and media-input guard tests
         run: npm run test:seed-guards
+
+      # node_modules must never be committed, not even as a symlink (beb27250 committed a
+      # self-referencing one; a `node_modules/` rule only matches directories).
+      - name: node_modules is not tracked
+        run: npm run test:node-modules-untracked
 
       # CARSI designation registry validity. This script existed but was run by NO workflow
       # (audited 2026-08-07) — a guard nothing invokes is not a guard. It validates that every
@@ -124,6 +129,15 @@ jobs:
       - name: Course visibility guard self-test
         run: npm run test:course-visibility
 
+      # Site-address guard (GP-756). getAppOrigin is the one rule for links, emails,
+      # certificates and the CSP; six hand-built origins had drifted, two falling back to
+      # http://localhost:3000 in production. The self-test proves the guard can fail.
+      - name: Site-address guard
+        run: npm run check:app-origin
+
+      - name: Site-address guard self-test
+        run: npm run test:app-origin
+
       - name: IICRC terminology guard self-test
         run: npm run test:iicrc-terminology
 
@@ -133,6 +147,12 @@ jobs:
       # symlinked path on planted violations and needs exit 1 from both.
       - name: Script entry-point helper self-test
         run: npm run test:entry-point
+
+      # GP-780 main rewrite detector (.github/workflows/main-rewrite-guard.yml). Plants a
+      # force-push rewrite in a throwaway repo and needs exit 1 with the lost PRs listed, and
+      # needs exit 0 for a plain fast-forward.
+      - name: Main rewrite detector self-test
+        run: npm run test:main-rewrite
 
       - name: Source-citation scorecard self-test
         run: npm run test:sources
@@ -160,6 +180,22 @@ jobs:
 
       - name: Quiz option balance guard
         run: npm run check:quiz-balance -- --enforce=psychrometry-building-science-for-drying,moisture-meters-readings-and-dry-standards
+
+      # GP-740: reads what draft courses say (data/courses/*/v1-draft): exposure-limit dates and
+      # jurisdictions, workplace limits used as home levels, unsourced health claims, copied
+      # standard text. Report only while the existing drafts' findings go to SME review; exits 2
+      # if it scans nothing.
+      - name: Draft course content check (report only)
+        run: npm run check:draft-content
+
+      # GP-678: applied Prisma migrations are frozen (Prisma checksums them; an edit makes
+      # `prisma migrate dev` demand a schema reset), and new ones must be whitespace-clean and
+      # pinned in prisma/migration-checksums.json. Exits 2 if it scans no migrations.
+      - name: Prisma migration guard
+        run: npm run check:migrations
+
+      - name: Prisma migration guard self-test
+        run: npm run test:migrations
 
       # Licence-critical backstop: scans all course-content + marketing surfaces
       # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC
@@ -195,6 +231,16 @@ jobs:
       - name: IICRC / CEC compliance guard self-test
         run: npm run test:iicrc-compliance
 
+      # GP-748 (founder, 21/11/2026): a course that is not CEC-approved in
+      # data/seed/cec-approvals.json may not name the IICRC, an IICRC standard or an IICRC
+      # certification on any learner-facing surface. BLOCKING. The self-test plants a hit on
+      # every surface and proves an approved course is left alone.
+      - name: IICRC scope guard (non-approved courses)
+        run: npm run check:iicrc-scope
+
+      - name: IICRC scope guard self-test
+        run: npm run test:iicrc-scope
+
       - name: Live buy-path guard self-test (GP-638)
         run: npm run test:live-buy-path
 
@@ -206,6 +252,12 @@ jobs:
       # must keep pointing at the licence and premium-visual rules, or agents work without them.
       - name: Agent rule entry-point self-test
         run: npm run test:agent-doc-paths
+
+      # GP-750: the consent proof's checks must not pass vacuously. A library request that
+      # failed (proxy refusal), a non-2xx or an empty body must not satisfy B1, and a run where
+      # the library never loaded must report BLOCKED (exit 3) instead of passing B4 and C1.
+      - name: Consent proof check self-test
+        run: npm run test:consent-proof
 
       # Licence-critical STRUCTURAL backstop (GP-498): scans the whole application (app/, src/)
       # for the leak class the copy scanner cannot see — any code that reads the RAW course CEC
@@ -287,11 +339,31 @@ jobs:
       - name: W0a evidence ledger check tests
         run: npm run test:evidence-ledger
 
+      # GP-719: every VERIFIED quote checked offline against what CI can read (repo: sources and
+      # committed open-licence snapshots under data/evidence-sources/), plus the licensed-standards
+      # rule (short reference only, needs_human_verification). BLOCKING; the findings on main when
+      # it landed are listed in data/evidence-sources/quote-findings-baseline.json and only shrink.
+      # The live fetch (npm run check:ledger-quotes:live) needs network and is opt-in, not here.
+      - name: GP-719 ledger quote check
+        run: npm run check:ledger-quotes
+
+      - name: GP-719 ledger quote check tests
+        run: npm run test:ledger-quotes
+
       - name: Course Standard depth audit
         run: npm run check:course-standard
 
       - name: Course Standard depth audit self-test
         run: npm run test:course-depth
+
+      # Course Standard v1 section 4.1 items 1-3 (GP-752): a cover, plus a raster lesson image and
+      # an SVG diagram in every teaching lesson. Today's gaps are frozen in
+      # scripts/course-visuals-baseline.json; a new gap, or a fixed gap still listed, fails.
+      - name: Course visuals check (cover, lesson image, diagram)
+        run: npm run check:course-visuals
+
+      - name: Course visuals check self-test
+        run: npm run test:course-visuals
 
       - name: Lint
         run: npm run lint
@@ -309,7 +381,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -336,7 +408,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -353,7 +425,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -366,7 +438,7 @@ jobs:
 
       - name: Upload build artifacts
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: build-output
           path: |
@@ -404,7 +476,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -508,6 +580,11 @@ jobs:
       - name: Course diagram check
         run: npm run check:course-diagrams
 
+      # GP-752: the water-course diagram wiring script still matches both catalogues (run it with
+      # --write after the GP-748 catalogue PR merges).
+      - name: Water course diagram wiring self-test
+        run: npm run test:wire-water-diagrams
+
       - name: Run E2E tests
         run: npm run test:e2e
         env:
@@ -538,7 +615,7 @@ jobs:
 
       - name: Upload Playwright report
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: playwright-report
           path: playwright-report/
@@ -546,7 +623,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-test-results
           path: test-results/
@@ -599,7 +676,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'

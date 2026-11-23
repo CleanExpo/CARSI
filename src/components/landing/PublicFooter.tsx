@@ -8,10 +8,12 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 import { PublicLogo } from '@/components/landing/PublicLogo';
+import { CookieSettingsButton } from '@/components/privacy/CookieSettingsButton';
 import { CARSI_ENTITY, postalAddressLine } from '@/lib/seo/carsi-entity';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { CARSI_SOCIAL_PROFILES } from '@/lib/brand/social-profiles';
 
+import { CARSI_PROVIDER_STATUS } from '@/lib/iicrc/approved-wording';
 /**
  * Shared public footer. Design-led site closure with full platform navigation.
  * Used in the (public) layout so every public page gets consistent footer content.
@@ -147,13 +149,12 @@ export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } 
               Australian restoration training
             </p>
             <Link href="/" aria-label="CARSI home" className="inline-block">
-              <PublicLogo variant="footer" />
+              <PublicLogo variant="footer" surface="chrome" />
             </Link>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-white/58">
               Cleaning and restoration training for Australian technicians.
               <br />
-              24/7 online. <AcronymTooltip term="IICRC" />
-              <span> CEC Accredited courses.</span>
+              24/7 online. {CARSI_PROVIDER_STATUS}
             </p>
           </div>
 
@@ -328,6 +329,8 @@ export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } 
               Support
             </Link>
             {' · '}
+            <CookieSettingsButton className="cursor-pointer font-medium text-white/65 underline-offset-2 transition-colors hover:text-white hover:underline" />
+            {' · '}
             <Link
               href="/admin"
               className="font-medium text-white/65 underline-offset-2 transition-colors hover:text-white hover:underline"
@@ -423,8 +426,7 @@ function LightFooter() {
             <p className="mt-5 max-w-md text-sm leading-relaxed text-slate-500">
               Cleaning and restoration training for Australian technicians.
               <br />
-              24/7 online. <AcronymTooltip term="IICRC" />
-              <span> CEC Accredited courses.</span>
+              24/7 online. {CARSI_PROVIDER_STATUS}
             </p>
           </div>
 
@@ -608,6 +610,8 @@ function LightFooter() {
             >
               Support
             </Link>
+            {' · '}
+            <CookieSettingsButton className="cursor-pointer font-medium text-slate-600 underline-offset-2 transition-colors hover:text-[#146fc2] hover:underline" />
             {' · '}
             <Link
               href="/admin"

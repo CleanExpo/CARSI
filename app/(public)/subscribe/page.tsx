@@ -14,8 +14,11 @@ import {
   MembershipLibrary,
   MembershipSteps,
 } from '@/components/membership/MembershipLanding';
+import { INDIVIDUAL_MEMBERSHIP, membershipAmountAud } from '@/lib/lms/membership-prices';
+
 import { SubscribeCta } from './SubscribeCta';
 
+import { APPROVED_FOR_IICRC_CECS } from '@/lib/iicrc/approved-wording';
 // `subscriptionsEnabled()` reads process.env at render time. Without this the
 // page is statically prerendered at BUILD time and served s-maxage=31536000,
 // so the flag's value is baked into the HTML and a run-time env var can never
@@ -31,15 +34,15 @@ export const metadata: Metadata = {
 
 const PLAN = {
   name: 'Yearly membership',
-  price: 795,
+  price: membershipAmountAud(INDIVIDUAL_MEMBERSHIP),
   suffix: 'AUD / year',
-  helper: 'That is about $66/month · GST included',
+  helper: `That is about $${Math.round(membershipAmountAud(INDIVIDUAL_MEMBERSHIP) / 12)}/month · GST included`,
 };
 
 export const PRO_FEATURES = [
   '100% access to all published CARSI courses',
   'Introductory and specialist courses',
-  'IICRC CEC Accredited courses where stated',
+  `Courses ${APPROVED_FOR_IICRC_CECS} where stated`,
   'CEC tracking for completed eligible courses',
   'Water damage restoration courses',
   'Structural drying courses',
@@ -49,7 +52,7 @@ export const PRO_FEATURES = [
   'Odour control courses',
   'PDF certificates for every course',
   'CEC tracking dashboard',
-  'Monthly activity recognition (anonymous by default) & streak tracker',
+  'Optional monthly activity recognition (off unless you opt in) & streak tracker',
   'Priority email support',
 ];
 

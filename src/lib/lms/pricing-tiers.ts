@@ -1,5 +1,7 @@
 /** Individual vs Teams pricing (Phase 2) — aligned with /pricing and EnrolButton. */
 
+import { annualPriceLabel, extraSeatLabel, INDIVIDUAL_MEMBERSHIP } from '@/lib/lms/membership-prices';
+
 export type IndividualTierId = 'per_course' | 'pro_annual';
 export type TeamBundleTierId = 'starter' | 'growth' | 'full_library';
 
@@ -62,7 +64,7 @@ export const INDIVIDUAL_TIERS: IndividualTier[] = [
     priceLabel: PER_COURSE_PRICE_FALLBACK_LABEL,
     priceCents: null,
     // Not every course carries IICRC CECs, so this must not call every per-course purchase
-    // "IICRC CEC Accredited". Only courses the IICRC has approved for CECs earn them.
+    // an IICRC Approved CEC Provider. Only courses the IICRC has approved for CECs earn them.
     description:
       'Pay once per course. CECs are tracked on completion, only for courses the IICRC has approved.',
     cta: 'Browse courses',
@@ -71,8 +73,8 @@ export const INDIVIDUAL_TIERS: IndividualTier[] = [
   {
     id: 'pro_annual',
     name: 'Yearly membership',
-    priceLabel: '$795 / year',
-    priceCents: 79500,
+    priceLabel: annualPriceLabel(INDIVIDUAL_MEMBERSHIP),
+    priceCents: INDIVIDUAL_MEMBERSHIP.amountCents,
     description: '100% access to all published CARSI courses for one learner for 12 months.',
     cta: 'Coming soon',
     href: '/subscribe',
@@ -87,7 +89,7 @@ export const TEAM_TIERS: TeamTier[] = [
     priceLabel: '$299 / year',
     priceCents: 29900,
     seatsIncluded: 5,
-    perSeatExpansionLabel: '+$49/seat',
+    perSeatExpansionLabel: extraSeatLabel(),
     description: 'Small restoration crews — core water & mould pathways.',
     features: ['5 seats included', 'Owner dashboard & invites', 'Progress across seats'],
     cta: 'Coming soon',
@@ -99,7 +101,7 @@ export const TEAM_TIERS: TeamTier[] = [
     priceLabel: '$799 / year',
     priceCents: 79900,
     seatsIncluded: 15,
-    perSeatExpansionLabel: '+$39/seat',
+    perSeatExpansionLabel: extraSeatLabel(),
     description: 'Growing businesses training multiple technicians.',
     features: ['15 seats included', 'All Starter features', 'Priority email support'],
     cta: 'Coming soon',
@@ -111,7 +113,7 @@ export const TEAM_TIERS: TeamTier[] = [
     priceLabel: '$2,499 / year',
     priceCents: 249900,
     seatsIncluded: 25,
-    perSeatExpansionLabel: '+$29/seat',
+    perSeatExpansionLabel: extraSeatLabel(),
     description: 'Enterprise-style access to the full published catalogue.',
     features: ['25 seats included', 'All Growth features', 'Dedicated onboarding call'],
     cta: 'Coming soon',

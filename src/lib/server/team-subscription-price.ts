@@ -9,13 +9,16 @@
  *  1. the tier's explicit env override (STRIPE_PRICE_TEAMS_STARTER, …) if set.
  *  2. otherwise look up by `lookup_key` at runtime, cached per process.
  *
- * The Prices do NOT exist until Rana creates them. Until then this resolver
- * returns `null` and the checkout route FAILS CLOSED with an honest "not yet
- * available" response — it never falls back to a wrong Price.
+ * GP-773: the checkout bills `unit_amount × seatsIncluded`, so the Price is read
+ * from Stripe and must bill exactly the tier total shown on /pricing (AUD,
+ * yearly, per-unit). A Price that would bill any other total resolves to `null`
+ * and the checkout route FAILS CLOSED with its honest "not yet available"
+ * response — it never charges an amount the page did not show.
  */
 
 import { getStripeClient } from '@/lib/api/stripe';
-import type { TeamBundleTierId } from '@/lib/lms/pricing-tiers';
+import { teamTierById, type TeamBundleTierId, type TeamTier } from '@/lib/lms/pricing-tiers';
+import { stripePriceMatches, type StripePriceLike } from '@/lib/server/membership-price-check';
 
 /** lookup_key + env override the runbook instructs Rana to set, per tier. */
 export const TEAMS_TIER_PRICE_CONFIG: Record<
@@ -38,18 +41,30 @@ export function __resetTeamSubscriptionPriceCache(): void {
 }
 
 /**
- * Returns the resolved Price id for a Teams tier, or `null` when it cannot be
- * resolved (env unset AND no active Price carries the lookup_key). Never throws
- * for a missing Price — a null return is the fail-closed signal for callers.
+ * True only when `quantity = seatsIncluded` on this Price bills exactly the tier's displayed
+ * yearly total in AUD. The shape rules (per-unit, no transform, currency, interval) belong to
+ * `stripePriceMatches`; this only derives the per-seat unit the tier total implies.
+ */
+export function teamTierPriceMatches(price: StripePriceLike | null | undefined, tier: TeamTier): boolean {
+  if (tier.seatsIncluded <= 0 || tier.priceCents % tier.seatsIncluded !== 0) return false;
+  return stripePriceMatches(price, {
+    amountCents: tier.priceCents / tier.seatsIncluded,
+    currency: 'aud',
+    interval: 'year',
+  });
+}
+
+/**
+ * Returns the verified Price id for a Teams tier, or `null` when it cannot be
+ * resolved or would bill a different total. Never throws — a null return is the
+ * fail-closed signal for callers.
  */
 export async function resolveTeamTierPriceId(
   tier: TeamBundleTierId,
 ): Promise<string | null> {
   const config = TEAMS_TIER_PRICE_CONFIG[tier];
-  if (!config) return null;
-
-  const envPrice = process.env[config.envVar]?.trim();
-  if (envPrice) return envPrice;
+  const tierConfig = teamTierById(tier);
+  if (!config || !tierConfig) return null;
 
   const cached = cache.get(tier);
   if (cached) return cached;
@@ -58,17 +73,28 @@ export async function resolveTeamTierPriceId(
 
   try {
     const stripe = getStripeClient();
-    const prices = await stripe.prices.list({
-      lookup_keys: [config.lookupKey],
-      active: true,
-      limit: 1,
-    });
-    const price = prices.data[0];
-    if (price?.id) {
-      cache.set(tier, price.id);
-      return price.id;
+    const envPrice = process.env[config.envVar]?.trim();
+    let price: StripePriceLike | undefined;
+    if (envPrice) {
+      price = (await stripe.prices.retrieve(envPrice)) as StripePriceLike;
+    } else {
+      const prices = await stripe.prices.list({
+        lookup_keys: [config.lookupKey],
+        active: true,
+        limit: 1,
+      });
+      price = prices.data[0] as StripePriceLike | undefined;
     }
-    return null;
+    if (!price?.id) return null;
+    if (!teamTierPriceMatches(price, tierConfig)) {
+      console.error(
+        `[team-subscription-price] Stripe Price ${price.id} would not bill the ${tier} total ` +
+          `(${tierConfig.priceCents} aud per year for ${tierConfig.seatsIncluded} seats); checkout refused.`
+      );
+      return null;
+    }
+    cache.set(tier, price.id);
+    return price.id;
   } catch (error) {
     console.error('[team-subscription-price] Stripe price lookup failed:', error);
     return null;

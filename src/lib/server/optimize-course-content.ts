@@ -9,6 +9,7 @@ import {
 } from '@/lib/admin/admin-courses-service';
 import type { OptimizedCourseDraft, OptimizedModuleDraft } from '@/lib/admin/optimize-course-draft';
 import { hasCurriculumPersistence } from '@/lib/admin/admin-course-curriculum-readback';
+import { AI_REWRITE_DENYLIST_SLUGS, isAiRewriteLocked } from '@/lib/courses/ai-rewrite-lock';
 import {
   CourseBuilderInputError,
   assertNoStandardText,
@@ -32,7 +33,6 @@ export class OptimizeCourseError extends Error {
 
 const META_KEY = 'optimizeDraft';
 export const OPTIMIZE_APPLIED_META_KEY = 'optimizeAppliedAt';
-export const OPTIMIZE_BEFORE_META_KEY = 'optimizeBefore';
 const MIN_MODULES = 7;
 const MAX_MODULES = 24;
 export const RECAP_MODULE_TITLE = 'What you learnt';
@@ -362,6 +362,17 @@ export function readOptimizeDraft(meta: unknown): OptimizedCourseDraft | null {
   };
 }
 
+/**
+ * True when `meta.optimizeDraft` holds anything at all, valid or not. The one rule for "a draft is
+ * waiting for review": cron selection, the cron pre-check and the conditional SQL write in
+ * `persistOptimizeDraft` all use it, so a malformed draft still blocks an overwrite.
+ */
+export function hasPendingOptimizeDraft(meta: unknown): boolean {
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return false;
+  const raw = (meta as Record<string, unknown>)[META_KEY];
+  return raw !== undefined && raw !== null;
+}
+
 export function hasOptimizeApplied(meta: unknown): boolean {
   if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return false;
   return typeof (meta as Record<string, unknown>)[OPTIMIZE_APPLIED_META_KEY] === 'string';
@@ -381,26 +392,8 @@ function appliedAtNeedsOptimize(updatedAt: Date, meta: unknown): boolean {
   return updatedAt.getTime() > appliedMs + 3_000;
 }
 
-/**
- * Courses the AI optimise cron must never rewrite. Their lessons are cited and fact-checked
- * against primary sources (see each course's source register), so an AI rewrite would break
- * the claim-to-source mapping. Held in code so a reseed or a lost DB marker cannot re-enable
- * the rewrite. A course can also opt out per-row with `meta.noAiRewrite: true`.
- */
-export const AI_REWRITE_DENYLIST_SLUGS: ReadonlySet<string> = new Set([
-  'ozone-and-hydroxyl-generators-what-the-evidence-says',
-]);
-
-export function isAiRewriteLocked(input: { slug?: string | null; meta: unknown }): boolean {
-  if (input.slug && AI_REWRITE_DENYLIST_SLUGS.has(input.slug)) return true;
-  const meta = input.meta;
-  return (
-    !!meta &&
-    typeof meta === 'object' &&
-    !Array.isArray(meta) &&
-    (meta as Record<string, unknown>).noAiRewrite === true
-  );
-}
+// The rewrite lock lives in a pure module so the weekly findings triage can read it too.
+export { AI_REWRITE_DENYLIST_SLUGS, isAiRewriteLocked };
 
 /** Paid courses only. Re-run only when never applied, or the course was edited after apply. */
 export function paidCourseNeedsOptimize(input: {
@@ -422,26 +415,6 @@ export function freeCourseNeedsOptimize(input: {
   return appliedAtNeedsOptimize(input.updatedAt, input.meta);
 }
 
-export async function snapshotCourseBeforeOptimize(
-  courseId: string,
-  existingMeta: unknown,
-  modules: Array<{ title: string; textContent: string }>
-): Promise<void> {
-  const next = metaObject(existingMeta);
-  next[OPTIMIZE_BEFORE_META_KEY] = {
-    snapshotAt: new Date().toISOString(),
-    moduleCount: modules.length,
-    modules: modules.map((m) => ({
-      title: m.title,
-      textContent: m.textContent.slice(0, 8_000),
-    })),
-  };
-  await prisma.lmsCourse.update({
-    where: { id: courseId },
-    data: { meta: JSON.parse(JSON.stringify(next)) as Prisma.InputJsonValue },
-  });
-}
-
 function metaObject(meta: unknown): Record<string, unknown> {
   if (meta && typeof meta === 'object' && !Array.isArray(meta)) {
     return { ...(meta as Record<string, unknown>) };
@@ -449,17 +422,46 @@ function metaObject(meta: unknown): Record<string, unknown> {
   return {};
 }
 
+/**
+ * Stores `draft` as `meta.optimizeDraft` in one SQL statement that merges only that key into the
+ * row's CURRENT meta, so keys written while the draft was being generated are kept (GP-758).
+ *
+ * `onlyIfNoPendingDraft` (the cron path) adds the conditions to the same statement: the write
+ * happens only when no draft is waiting (see `hasPendingOptimizeDraft`) and the course is not
+ * locked with `meta.noAiRewrite: true`. Returns false when no row was written: the course is gone,
+ * or (cron path) a draft or a lock appeared while this draft was generated.
+ */
 export async function persistOptimizeDraft(
   courseId: string,
-  existingMeta: unknown,
-  draft: OptimizedCourseDraft
-): Promise<void> {
-  const next = metaObject(existingMeta);
-  next[META_KEY] = JSON.parse(JSON.stringify(draft)) as OptimizedCourseDraft;
-  await prisma.lmsCourse.update({
-    where: { id: courseId },
-    data: { meta: next as Prisma.InputJsonValue },
-  });
+  draft: OptimizedCourseDraft,
+  opts?: { onlyIfNoPendingDraft?: boolean }
+): Promise<boolean> {
+  const json = JSON.stringify(draft);
+  const affected = opts?.onlyIfNoPendingDraft
+    ? await prisma.$executeRaw`
+        UPDATE lms_courses
+        SET meta = jsonb_set(
+              CASE WHEN jsonb_typeof(meta) = 'object' THEN meta ELSE '{}'::jsonb END,
+              '{optimizeDraft}', ${json}::jsonb, true),
+            updated_at = now()
+        WHERE id = ${courseId}::uuid
+          AND (
+            jsonb_typeof(meta) IS DISTINCT FROM 'object'
+            OR (
+              (meta -> 'optimizeDraft' IS NULL OR meta -> 'optimizeDraft' = 'null'::jsonb)
+              AND (meta -> 'noAiRewrite') IS DISTINCT FROM 'true'::jsonb
+            )
+          )
+      `
+    : await prisma.$executeRaw`
+        UPDATE lms_courses
+        SET meta = jsonb_set(
+              CASE WHEN jsonb_typeof(meta) = 'object' THEN meta ELSE '{}'::jsonb END,
+              '{optimizeDraft}', ${json}::jsonb, true),
+            updated_at = now()
+        WHERE id = ${courseId}::uuid
+      `;
+  return affected === 1;
 }
 
 export async function discardOptimizeDraft(courseId: string, existingMeta: unknown): Promise<void> {
@@ -518,7 +520,8 @@ export type OptimizeProgress = { step: string; message: string; percent: number 
 
 export async function generateOptimizedCourseDraft(
   courseId: string,
-  onProgress?: (p: OptimizeProgress) => void
+  onProgress?: (p: OptimizeProgress) => void,
+  opts?: { onlyIfNoPendingDraft?: boolean }
 ): Promise<OptimizedCourseDraft> {
   if (!resolveAnthropicConfig().configured) {
     throw new OptimizeCourseError('ANTHROPIC_API_KEY is not configured', 503);
@@ -662,7 +665,15 @@ export async function generateOptimizedCourseDraft(
     description: dto.description,
     modules,
   };
-  await persistOptimizeDraft(courseId, course.meta, draft);
+  const saved = await persistOptimizeDraft(courseId, draft, opts);
+  if (!saved) {
+    throw opts?.onlyIfNoPendingDraft
+      ? new OptimizeCourseError(
+          'A draft was saved or the course was locked while this draft was generated. Nothing was changed.',
+          409
+        )
+      : new OptimizeCourseError('Not found', 404);
+  }
   onProgress?.({ step: 'done', message: 'Draft ready to review.', percent: 100 });
   return draft;
 }
@@ -725,7 +736,17 @@ export async function applyOptimizedCourseDraft(
   return courseToAdminDto(updated);
 }
 
-export async function optimizeAndApplyCourse(
+/** Admin page where a stored optimisation draft is reviewed and applied by hand. */
+export function optimizeReviewPath(courseId: string): string {
+  return `/admin/courses/${courseId}/optimize`;
+}
+
+/**
+ * Batch (cron) path. Generates a rewrite and stores it as `meta.optimizeDraft` only. It never
+ * changes live course content: an admin reviews the draft and applies it by hand at
+ * `optimizeReviewPath`. A draft already waiting for review is never overwritten (GP-758).
+ */
+export async function draftCourseOptimizationForReview(
   courseId: string,
   opts?: { allowFree?: boolean }
 ): Promise<{
@@ -733,7 +754,7 @@ export async function optimizeAndApplyCourse(
   title: string;
   previousModuleCount: number;
   moduleCount: number;
-  summary: string;
+  reviewPath: string;
 }> {
   const existing = await adminGetCourse(courseId);
   if (!existing) throw new OptimizeCourseError('Not found', 404);
@@ -747,21 +768,20 @@ export async function optimizeAndApplyCourse(
   if (!dto.isFree && opts?.allowFree) {
     throw new OptimizeCourseError('Paid courses are not optimised by the free cron', 400);
   }
-  const previousModuleCount = dto.modules.length;
-  await snapshotCourseBeforeOptimize(
+  if (hasPendingOptimizeDraft(existing.meta)) {
+    throw new OptimizeCourseError('A draft is already waiting for review', 409);
+  }
+  // The pre-check above saves model spend; the conditional write is what enforces it.
+  const draft = await generateOptimizedCourseDraft(courseId, undefined, {
+    onlyIfNoPendingDraft: true,
+  });
+  return {
     courseId,
-    existing.meta,
-    dto.modules.map((m) => ({ title: m.title, textContent: m.textContent }))
-  );
-  const draft = await generateOptimizedCourseDraft(courseId);
-  const course = await applyOptimizedCourseDraft(courseId, draft.token);
-  const moduleCount = course.modules.length;
-  const added = Math.max(0, moduleCount - previousModuleCount);
-  const summary =
-    added > 0
-      ? `Rewrote ${previousModuleCount} modules and added ${added} (now ${moduleCount}), including a recap and job-site examples.`
-      : `Rewrote ${moduleCount} modules with practical scenarios and a recap.`;
-  return { courseId, title: course.title, previousModuleCount, moduleCount, summary };
+    title: dto.title,
+    previousModuleCount: dto.modules.length,
+    moduleCount: draft.modules.length,
+    reviewPath: optimizeReviewPath(courseId),
+  };
 }
 
 export { AnthropicAPIError };

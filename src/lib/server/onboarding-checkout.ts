@@ -1,9 +1,6 @@
 import { getStripeClient } from '@/lib/api/stripe';
-import {
-  formatOnboardingPrice,
-  parseOnboardingMeta,
-  resolveOnboardingAmountAud,
-} from '@/lib/onboarding/enterprise';
+import { BUSINESS_OWNER_PLAN } from '@/lib/lms/membership-prices';
+import { formatOnboardingPrice, parseOnboardingMeta } from '@/lib/onboarding/enterprise';
 
 export function buildOnboardingCheckoutUrls(origin: string, slug: string) {
   const base = origin.replace(/\/$/, '');
@@ -25,20 +22,15 @@ export async function createOnboardingStripeCheckout(params: {
   cancelUrl: string;
 }): Promise<{ checkout_url: string }> {
   const meta = parseOnboardingMeta(params.meta);
-  const amountAud = resolveOnboardingAmountAud(meta);
-  const unitAmount = Math.round(amountAud * 100);
-  if (!Number.isFinite(unitAmount) || unitAmount < 50) {
-    throw new Error('INVALID_AMOUNT');
-  }
-
-  const billingCycle = meta?.pricing?.billingCycle ?? 'monthly';
-  const isMonthly = billingCycle === 'monthly';
-  const priceLabel = formatOnboardingPrice(meta?.pricing ?? { amountAud, billingCycle: 'monthly', gst: 'exclusive', seats: 'unlimited' });
+  // GP-773: the business owner plan, A$1,295 per YEAR, from the one price source. Course meta
+  // (amount, monthly cycle) is not read: the catalogue record is stale and must not set the bill.
+  const unitAmount = BUSINESS_OWNER_PLAN.amountCents;
+  const priceLabel = formatOnboardingPrice(meta?.pricing ?? { seats: 'unlimited' });
 
   const stripe = getStripeClient();
 
   const session = await stripe.checkout.sessions.create({
-    mode: isMonthly ? 'subscription' : 'payment',
+    mode: 'subscription',
     customer_email: params.customerEmail,
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,
@@ -53,13 +45,9 @@ export async function createOnboardingStripeCheckout(params: {
       {
         quantity: 1,
         price_data: {
-          currency: 'aud',
+          currency: BUSINESS_OWNER_PLAN.currency,
           unit_amount: unitAmount,
-          ...(isMonthly
-            ? {
-                recurring: { interval: 'month' as const },
-              }
-            : {}),
+          recurring: { interval: BUSINESS_OWNER_PLAN.interval },
           product_data: {
             name: params.title,
             description:

@@ -1,5 +1,7 @@
 'use client';
 
+import { formatMembershipAud, INDIVIDUAL_MEMBERSHIP } from '@/lib/lms/membership-prices';
+
 type SubStatus = 'trialling' | 'active' | 'past_due' | 'cancelled' | 'unpaid' | null;
 
 interface SubscriptionStatusProps {
@@ -43,7 +45,7 @@ export function SubscriptionStatus({
             onClick={onSubscribe}
             className="rounded-sm bg-cyan-600 px-4 py-2 font-mono text-sm text-white transition-colors hover:bg-cyan-500"
           >
-            Start Membership — $795 AUD/year
+            Start Membership — {formatMembershipAud(INDIVIDUAL_MEMBERSHIP)} AUD/year
           </button>
         )}
       </div>

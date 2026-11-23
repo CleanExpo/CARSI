@@ -172,18 +172,18 @@ const REVIEWED_IICRC_SENTENCES = [
   'A course shows CEC hours only while it has an IICRC CEC approval in force.',
   'A reference map of the IICRC’s own certification disciplines.',
   'Approved IICRC CEC',
-  'CARSI is an IICRC CEC Accredited provider and issues its own credentials, the CARSI Southern Hemisphere Restoration Designations.',
+  'Approved for IICRC CECs (#)',
+  'CARSI is an IICRC Approved CEC Provider and issues its own credentials, the CARSI Southern Hemisphere Restoration Designations.',
   'How IICRC certification disciplines fit together',
   'IICRC',
   'IICRC CEC',
-  'IICRC CEC Accredited courses (#)',
   'IICRC certification is obtained only through IICRC-approved schools and examinations.',
   'IICRC certification is obtained through schools and examinations approved by the IICRC.',
   'IICRC context',
   'Interactive map of seven IICRC certification disciplines around a central IICRC hub',
   'Only those with an IICRC CEC approval in force: # at present, listed with their hours and expiry dates on the IICRC CEC courses page.',
   'Same cards as the homepage — price, duration, and CEC hours only when the IICRC has approved that course.',
-  'Study online with CARSI, an IICRC CEC Accredited provider.',
+  'Study online with CARSI, an IICRC Approved CEC Provider.',
   'These are CARSI-issued credentials, not IICRC certifications.',
   'These are certifications awarded by schools and examinations approved by the IICRC, not CARSI courses — CARSI courses carry CARSI Southern Hemisphere Restoration Designations.',
   'Which CARSI courses have IICRC CEC hours?',
@@ -200,23 +200,33 @@ const REVIEWED_IICRC_COUNTS: Record<string, number> = {
 // here until it is reviewed and these pins and the lists above are updated together: a component
 // can add copy under a state no render reaches, so its every branch is pinned as a file.
 const REVIEWED_SOURCE_SHA256: Record<string, string> = {
+  // GP-704 re-pin: the retired provider phrase is replaced by the approved-wording module
+  // ("Approved for IICRC CECs" link label, provider sentence). No other sentence changed.
   'app/(public)/courses/page.tsx':
-    '85ba8041bd6b994d2f881073cd37664b807fffc93dc2154a4e04a695ba429d4a',
+    '8d6281ac9f1506c1cb99c7be8129cefff9fee1dbacd12920bd568319d489b945',
   // BACKLOG #22 re-pin: adds the <CourseReferences> block only (import + one element). It adds no
   // IICRC, CEC, certification, accreditation or approval sentence: IICRC-naming sources are held
   // back from that block (src/lib/seo/course-references.ts NAMES_IICRC_RE) pending GP-639 review.
   // Row 19 (NZ) re-pin: `locale: 'en_AU'` → `...OG_LOCALE_FIELDS` (en_AU + alternate en_NZ) and its
   // import. Metadata only; no IICRC, CEC, certification, accreditation or approval sentence changed.
+  // GP-748 re-pin: the learning-outcome sentences moved to src/lib/courses/course-credential-copy.ts
+  // and now name the IICRC only for a CEC-approved course; the page passes `cecApproved` to the
+  // schema and detail components. No IICRC sentence was added; a non-approved course page names
+  // none (pinned by src/lib/courses/course-credential-copy.test.tsx). Re-pinned again after the
+  // #1205 review: the audience list now takes the same `cecApproved` flag (one argument added).
   'app/(public)/courses/[slug]/page.tsx':
-    'd944bbd59dfd53e62f5bcb85ff0d615a8e94aa9d7f69c04cd47d957cfb604b97',
+    'f72265818e4ea739166a6376e000b1d2d91d45a88ca6e4041ba249cd8139e437',
   // Row 19 (NZ) re-pin: `locale: 'en_AU'` → `...OG_LOCALE_FIELDS` (en_AU + alternate en_NZ) and its
   // import. Metadata only; no IICRC, CEC, certification, accreditation or approval sentence changed.
   'app/(public)/pathways/[slug]/page.tsx':
     'e254162212a4d11a365c5900c1e93019c71260af33852ca730b8790412acd35c',
   // GP-696 re-pin after GP-661 b3613864 (embedded preset: layout only; every IICRC, CEC,
   // certification, accreditation and approval line is byte-identical to the GP-639 review).
+  // Accessibility re-pin: the result count gains role="status", the search and filter icons
+  // gain aria-hidden, and one code comment is added. No visible text changed, and no IICRC, CEC,
+  // certification, accreditation or approval sentence was added or edited.
   'src/components/lms/CourseGrid.tsx':
-    '5e2ce9b348771667120c6ce2f6376bca3f48253b7676d1e7270c4f12500d77cc',
+    '97da1c0feb9581c663e52675996e21bbec1699e2ba9d72d0c76821761454e4ce',
   'src/components/lms/CourseSearchBar.tsx':
     'f6e00b2daabe277f1d7c887b1f5357b01ec994cf7d870f489a810b51e16f8e52',
   'src/lib/catalogue/discipline-param.ts':
@@ -277,8 +287,8 @@ describe('rendered /courses: every IICRC sentence is a reviewed one (GP-639)', (
   });
 
   it('rendered: the hero link renders when an approval is in force (the states are not vacuous)', async () => {
-    expect(await renderCourses(STATES[2][1])).toContain('IICRC CEC Accredited courses (1)');
-    expect(await renderCourses(STATES[0][1])).not.toContain('IICRC CEC Accredited courses');
+    expect(await renderCourses(STATES[2][1])).toContain('Approved for IICRC CECs (1)');
+    expect(await renderCourses(STATES[0][1])).not.toContain('Approved for IICRC CECs');
   });
 
   // Controls: encodings and placements a source scan reads differently from a browser

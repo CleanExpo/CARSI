@@ -118,7 +118,10 @@ const ACCESSOR_ALLOWLIST = [
   // through the accessor would compare the registry with itself and the guard could never
   // detect drift — a check that cannot fail. Same category as cec-remediation.ts above, which
   // is already listed for the same reason; this is its read-only sibling and writes nothing.
-  // It renders no surface: its only outputs are an exit code and a CI log.
+  // It renders no public surface. Its outputs are an exit code, a CI log, and the JSON body of
+  // the cron route app/api/cron/live-cec-check/route.ts, which requireCron authenticates
+  // (GP-570). It is imported only by that route and scripts/check-live-cec.ts, and
+  // check-cec-surfaces.test.mjs fails if a new importer appears.
   'src/lib/server/live-cec-check.ts',       // runLiveCecCheck — raw-vs-registry drift detection
 
   // Admin edit / write cluster. These are the founder's course-management surfaces: they read

@@ -10,7 +10,7 @@ import {
   createOnboardingStripeCheckout,
 } from '@/lib/server/onboarding-checkout';
 import { getOnboardingCourseBySlug } from '@/lib/server/onboarding-programs';
-import { resolveOrgMonthlyPriceId } from '@/lib/server/org-subscription-price';
+import { resolveOrgAnnualPriceId } from '@/lib/server/org-subscription-price';
 import { provisionOrgSubscriptionContainer } from '@/lib/server/org-subscription-provision';
 import {
   checkoutSessionIdempotencyKey,
@@ -73,7 +73,16 @@ export async function POST(request: NextRequest, ctx: Ctx) {
   ).slice(0, 200);
 
   if (teamSubscriptionsEnabled()) {
-    const priceId = await resolveOrgMonthlyPriceId();
+    const priceId = await resolveOrgAnnualPriceId();
+    if (!priceId) {
+      // GP-773: fail closed. A missing, unreadable or mismatched business owner Price (not
+      // A$1,295 AUD yearly) opens no checkout, rather than falling through to the inline
+      // purchase, which would sell the plan with no organisation record.
+      return NextResponse.json(
+        { detail: 'Organisation subscription purchasing is not yet available.' },
+        { status: 503 }
+      );
+    }
     if (priceId) {
       if (organisationName.length < 2) {
         return NextResponse.json({ detail: 'Organisation name is required.' }, { status: 400 });
@@ -147,7 +156,7 @@ export async function POST(request: NextRequest, ctx: Ctx) {
                 onboarding_slug: slug,
               },
             },
-            allow_promotion_codes: true,
+            // GP-773: no promotion codes on a membership (founder ruling: "no further discounts").
           },
           {
             idempotencyKey: checkoutSessionIdempotencyKey('onboarding', teamId, reservedAt),
@@ -180,10 +189,6 @@ export async function POST(request: NextRequest, ctx: Ctx) {
     });
     return NextResponse.json({ checkout_url });
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (msg === 'INVALID_AMOUNT') {
-      return NextResponse.json({ detail: 'Invalid program price configuration' }, { status: 400 });
-    }
     console.error('[onboarding/checkout]', e);
     return NextResponse.json({ detail: 'Could not start checkout' }, { status: 500 });
   }

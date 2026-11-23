@@ -45,9 +45,53 @@ describe('getAppOrigin', () => {
     expect(getAppOrigin()).toBe('https://frontend.example.com');
   });
 
-  it('uses non-local request origin when no env URL is set', () => {
-    expect(getAppOrigin(requestWithOrigin('https://preview.example.com'))).toBe(
-      'https://preview.example.com'
+  it('GP-700: never takes a foreign request host in production', () => {
+    vi.stubEnv('VERCEL_ENV', '');
+    vi.stubEnv('VERCEL_URL', '');
+    vi.stubEnv('VERCEL_BRANCH_URL', '');
+    for (const forged of [
+      'https://evil.example',
+      'https://carsi.com.au.evil.example',
+      'http://carsi.com.au',
+    ]) {
+      expect(getAppOrigin(requestWithOrigin(forged))).toBe('https://carsi.com.au');
+    }
+  });
+
+  it('GP-700: a configured address beats a forged request host', () => {
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://carsi.com.au');
+    expect(getAppOrigin(requestWithOrigin('https://evil.example'))).toBe('https://carsi.com.au');
+  });
+
+  it('GP-700: never reads the request host in production, even a CARSI host', () => {
+    vi.stubEnv('VERCEL_ENV', '');
+    for (const origin of [
+      'https://www.carsi.com.au',
+      'https://carsi.com.au:8443',
+      'https://www.carsi.com.au:8443',
+    ]) {
+      expect(getAppOrigin(requestWithOrigin(origin))).toBe('https://carsi.com.au');
+    }
+  });
+
+  it('GP-700: a production deployment ignores the platform preview address', () => {
+    vi.stubEnv('VERCEL_ENV', 'production');
+    vi.stubEnv('VERCEL_URL', 'carsi-abc123.vercel.app');
+    expect(getAppOrigin(requestWithOrigin('https://evil.example'))).toBe('https://carsi.com.au');
+  });
+
+  it('GP-700: a preview deployment uses the platform-set address, not the request', () => {
+    vi.stubEnv('VERCEL_ENV', 'preview');
+    vi.stubEnv('VERCEL_BRANCH_URL', 'carsi-git-feature.vercel.app');
+    expect(getAppOrigin(requestWithOrigin('https://evil.example'))).toBe(
+      'https://carsi-git-feature.vercel.app'
+    );
+  });
+
+  it('uses a non-local request origin in development', () => {
+    vi.stubEnv('NODE_ENV', 'development');
+    expect(getAppOrigin(requestWithOrigin('https://dev.example.com'))).toBe(
+      'https://dev.example.com'
     );
   });
 
@@ -76,6 +120,27 @@ describe('getCheckoutReturnUrl', () => {
   it('allows local return URLs during development', () => {
     vi.stubEnv('NODE_ENV', 'development');
     const value = 'http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}';
+    expect(getCheckoutReturnUrl(value, fallback)).toBe(value);
+  });
+
+  it('GP-700: keeps a return URL on the canonical origin, with the Stripe placeholder intact', () => {
+    const value = 'https://carsi.com.au/dashboard/student?session_id={CHECKOUT_SESSION_ID}';
+    expect(getCheckoutReturnUrl(value, fallback)).toBe(value);
+  });
+
+  it.each([
+    'https://evil.example/paid',
+    'https://carsi.com.au.evil.example/paid',
+    'http://carsi.com.au/paid',
+    'https://carsi.com.au:8443/paid',
+    'https://www.carsi.com.au:8443/paid',
+    'http://www.carsi.com.au/paid',
+  ])('GP-700: a production return URL off the canonical origin falls back (%s)', (value) => {
+    expect(getCheckoutReturnUrl(value, fallback)).toBe(fallback);
+  });
+
+  it("GP-700: keeps a return URL on CARSI's www host, where a www buyer's session cookie lives", () => {
+    const value = 'https://www.carsi.com.au/dashboard/student?session_id={CHECKOUT_SESSION_ID}';
     expect(getCheckoutReturnUrl(value, fallback)).toBe(value);
   });
 });

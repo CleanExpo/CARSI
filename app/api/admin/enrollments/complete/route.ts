@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { adminMarkEnrollmentsComplete } from '@/lib/admin/admin-enrollment-mutations';
+import {
+  AdminBulkCompletePartialError,
+  adminMarkEnrollmentsComplete,
+} from '@/lib/admin/admin-enrollment-mutations';
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 
 export async function POST(request: NextRequest) {
@@ -35,6 +38,25 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json({ ok: true, ...result });
   } catch (e) {
+    if (e instanceof AdminBulkCompletePartialError) {
+      // Part-way failure (GP-769): earlier rows are already completed and audited. Say which.
+      console.error('[admin/enrollments/complete] partial', e.failed.enrollmentId, e.failed.error);
+      const done = e.completed.length;
+      return NextResponse.json(
+        {
+          detail:
+            done > 0
+              ? `Marked ${done} course${done === 1 ? '' : 's'} complete, then one failed. ` +
+                `${e.notAttempted.length} not attempted.`
+              : `Could not mark the first course complete. ${e.notAttempted.length} not attempted.`,
+          partial: true,
+          completed: e.completed,
+          failed: { enrollmentId: e.failed.enrollmentId },
+          notAttempted: e.notAttempted,
+        },
+        { status: 500 },
+      );
+    }
     const msg = e instanceof Error ? e.message : String(e);
     if (msg === 'USER_NOT_FOUND') {
       return NextResponse.json({ detail: 'User not found' }, { status: 404 });

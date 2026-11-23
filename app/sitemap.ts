@@ -1,6 +1,6 @@
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { authorityPath } from '@/lib/marketing/authority';
-import { authoritySitemapPaths } from '@/lib/marketing/authority-pages';
+import { publishableAuthorityPaths } from '@/lib/server/authority-page-data';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 import { ROLE_GUIDES_HUB_PATH } from '@/lib/marketing/role-guides-path';
 import { startSmartBasePath, startSmartPages } from '@/lib/marketing/start-smart';
@@ -39,6 +39,7 @@ const staticPages = [
   { path: '/resources', priority: 0.7, changeFreq: 'weekly' as const },
   { path: '/news', priority: 0.68, changeFreq: 'weekly' as const },
   { path: '/jobs', priority: 0.66, changeFreq: 'weekly' as const },
+  { path: '/jobs/submit', priority: 0.5, changeFreq: 'monthly' as const },
   { path: '/podcast', priority: 0.64, changeFreq: 'weekly' as const },
   { path: '/youtube', priority: 0.64, changeFreq: 'weekly' as const },
   { path: '/ideas', priority: 0.62, changeFreq: 'monthly' as const },
@@ -49,16 +50,20 @@ const staticPages = [
   { path: '/testimonials', priority: 0.5, changeFreq: 'monthly' as const },
   { path: '/case-studies/ccw', priority: 0.55, changeFreq: 'monthly' as const },
   { path: '/pricing', priority: 0.7, changeFreq: 'monthly' as const },
+  { path: '/programs/owner-circle', priority: 0.7, changeFreq: 'monthly' as const },
+  { path: '/tools', priority: 0.55, changeFreq: 'monthly' as const },
   { path: '/restoration-training-cost-australia', priority: 0.65, changeFreq: 'monthly' as const },
   { path: '/privacy', priority: 0.25, changeFreq: 'yearly' as const },
   { path: '/terms', priority: 0.25, changeFreq: 'yearly' as const },
   { path: '/refund-policy', priority: 0.35, changeFreq: 'yearly' as const },
+  { path: '/review-policy', priority: 0.3, changeFreq: 'yearly' as const },
   { path: '/support', priority: 0.4, changeFreq: 'monthly' as const },
   { path: authorityPath, priority: 0.82, changeFreq: 'weekly' as const },
   { path: ROLE_GUIDES_HUB_PATH, priority: 0.74, changeFreq: 'weekly' as const },
   { path: ccwRoadshowPath, priority: 0.9, changeFreq: 'daily' as const },
   { path: '/ccw-melbourne', priority: 0.85, changeFreq: 'daily' as const },
   { path: '/ccw-sydney', priority: 0.85, changeFreq: 'daily' as const },
+  { path: '/ccw-brisbane', priority: 0.85, changeFreq: 'daily' as const },
   { path: startSmartBasePath, priority: 0.85, changeFreq: 'weekly' as const },
   ...startSmartPages.map((page) => ({
     path: `${startSmartBasePath}/${page.slug}`,
@@ -147,11 +152,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const basePages = directory.live ? [...staticPages, professionalDirectoryPage] : staticPages;
   // Published LMS catalogue (empty when the database is unavailable).
   const dbCourses = await getPublishedCourseSlugsFromDatabase();
-  // /for/* authority pages are listed only when publishable: approved and valid against the
-  // database catalogue. The remote API fallback below is not used for this decision.
+  // /for/* authority pages are listed only when publishable, decided by the same per-bundle
+  // course read the page and its metadata use (GP-695), never a newest-N catalogue window.
   const pages = [
     ...basePages,
-    ...authoritySitemapPaths(new Set(dbCourses.map((c) => c.slug))).map((path) => ({
+    ...(await publishableAuthorityPaths()).map((path) => ({
       path,
       priority: 0.6,
       changeFreq: 'monthly' as const,

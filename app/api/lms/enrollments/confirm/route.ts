@@ -11,6 +11,7 @@ import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase'
 import { isPrerequisiteNotMetError, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
 import { computeDiscountedAud, findActiveUserDiscount } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
+import { getAppOrigin } from '@/lib/server/app-url';
 
 /**
  * Finalise enrolment after Stripe Checkout (session_id) or confirm free enrolment
@@ -84,10 +85,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ detail: 'slug or session_id required' }, { status: 400 });
     }
 
-    let dbCourse: { id: string; priceAud: unknown; isFree: boolean };
+    let dbCourse: { id: string; priceAud: unknown; isFree: boolean; status: string | null; isPublished: boolean | null };
     try {
       dbCourse = await getOrCreateCourseBySlug(slug);
     } catch {
+      return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
+    }
+    // GP-776: without a paid Stripe session only a published course may be enrolled in. A draft
+    // has not passed review, approval and the publish gate. Status is the canonical published
+    // state (public-courses-list.ts); live rows with the legacy isPublished flag off stay enrollable.
+    if (dbCourse.status !== 'published') {
       return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
     }
 
@@ -136,7 +143,7 @@ export async function POST(request: NextRequest) {
       void sendEnrollmentWelcomeEmail({
         studentId: claims.sub,
         courseSlug: slug,
-        appOrigin: request.nextUrl.origin,
+        appOrigin: getAppOrigin(request),
       }).catch((e) => console.error('[enrollments/confirm] email', e));
 
       notifyCrmEnrollmentCreated({
