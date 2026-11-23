@@ -111,19 +111,79 @@ const BANNED = [
   {
     re: /\bIICRC[\s-]*Accredited\b/i,
     allow: /\bIICRC[\s-]+CEC[\s-]+Accredited\b/i,
-    message: 'Say "IICRC CEC Accredited", never bare "IICRC Accredited".',
+    message: 'Say "IICRC Approved CEC Provider" (GP-704); never call CARSI or a course accredited.',
   },
   {
     re: /\bIICRC[\s-]*accredited[\s-]+courses?\b/i,
     allow: null,
     message:
-      'Not "IICRC-accredited course(s)" — say "IICRC CEC Accredited course(s)" (even in a negated disclaimer, write "not IICRC CEC accredited").',
+      'Not an accredited course — a single approved class is "approved for IICRC CECs" (in a negated disclaimer, write "not approved for IICRC CECs").',
   },
   {
     re: /\bIICRC[\s-]+courses?[\s-]+accredit\w*\b/i,
     allow: null,
     message:
-      'Do not imply IICRC accredits CARSI\'s courses — say "IICRC CEC Accredited course(s)".',
+      'Do not imply the IICRC approves or endorses CARSI\'s courses — a single approved class is "approved for IICRC CECs".',
+  },
+  // GAP CLOSED (GP-753, 2026-11-21) — copy that implies CARSI delivers or grants IICRC
+  // certification, or that the IICRC approved the course. GP-525 fixed three such lines in
+  // docs/marketing by hand and this guard exited 0 on all three ("IICRC Cleaning Certification —
+  // Online", "IICRC board-approved — the same credential standard…", "Stand out … with IICRC
+  // certifications"). Third-person facts keep passing ("FSRT is an IICRC certification covering…",
+  // "IICRC certification is obtained only through IICRC-approved schools", a learner's own
+  // certification). `baselined`: lines already on main when the rules landed are pinned, NOT
+  // approved, in CERT_BASELINE_FILE by exact (file, text); see scanLine. The pin applies to the
+  // line scan only — course records (data/wordpress-export/) get no pin.
+  {
+    // GP-753 messages quote the provider wording from src/lib/iicrc/approved-wording.ts (GP-704):
+    // CARSI_PROVIDER_STATUS and FROM_IICRC_APPROVED_CEC_PROVIDER. Keep them in step with that file.
+    // An IICRC "<Discipline> Certification" named as a product or headline. Case-sensitive on
+    // purpose: Title Case words between "IICRC" and "Certification" are a product name; prose
+    // ("IICRC provides technician-level certifications") and acronyms ("IICRC WRT certification",
+    // a learner's own) are not matched. Holder framing ("your / existing IICRC …") is allowed.
+    re: /\bIICRC[\s-]+(?:[A-Z][a-z]+(?:[\s-]+|\s*&\s*)){1,5}Certifications?\b|\bIICRC[\s-]+[Cc]ertifications?\s*[—–:|-]\s*[Oo]nline\b|\b[Oo]nline\s+IICRC[\s-]+[Cc]ertifications?\b/,
+    allow: /\b(?:your|their|existing|current|hold(?:s|ing)?|held)\s+(?:\w+\s+){0,2}IICRC\b/i,
+    baselined: true,
+    message:
+      'Do not name an IICRC certification as a CARSI product or headline ("IICRC <discipline> Certification", "IICRC Certification — Online"). CARSI is an IICRC Approved CEC Provider; IICRC certification comes only from IICRC-approved schools and examinations.',
+  },
+  {
+    // "IICRC board-approved" (any order inside one sentence). The IICRC does not board-approve
+    // CARSI's courses; CARSI's standing is as a CEC provider.
+    re: /\bIICRC[\s-]+board[\s-]*approved\b|\bboard[\s-]*approved\b[^.!?\n]{0,40}\bIICRC\b|\bIICRC\b[^.!?\n]{0,40}\bboard[\s-]*approved\b/i,
+    allow: null,
+    baselined: true,
+    message:
+      'Do not say CARSI\'s courses are "IICRC board-approved". State the provider standing: "CARSI is an IICRC Approved CEC Provider."',
+  },
+  {
+    // IICRC certification sold as the benefit of CARSI training: "Stand out … with IICRC
+    // certifications", "Win More Contracts with IICRC Creds", "companies with IICRC certifications
+    // win 3x more". Holders earning CECs ("Technicians with IICRC certifications earn CECs") pass.
+    re: /\b(?:stand(?:s|ing)?\s+out|win\w*|compet\w*|grow\w*|boost\w*|reduc\w*|differentiat\w*|upskill\w*|equip\w*|level\s+up|get\s+ahead|unlock\w*|future[\s-]*proof\w*|elevat\w*)\b[^.!?\n|]{0,60}?\bwith\s+IICRC[\s-]+(?:certifications?|certificates?|certs?|creds?|credentials?|qualifications?)\b|\bwith\s+IICRC[\s-]+(?:certifications?|certificates?|certs?|creds?|credentials?|qualifications?)\s+(?:win|land|secure|stand|charge|command)\w*/i,
+    allow: null,
+    baselined: true,
+    message:
+      'Do not sell IICRC certification/credentials as what CARSI training gives ("… with IICRC certifications"). Say "verifiable CARSI credentials" and "from an IICRC Approved CEC Provider".',
+  },
+  {
+    // A grant verb on an IICRC credential: "Earn verifiable IICRC credentials", "add IICRC
+    // credentials to your business", "Get your IICRC certification". Denials ("does not / No CARSI
+    // course will get you …") and the third-person route through an IICRC-approved school pass.
+    re: /(?<!\b(?:not|never|no)\s+(?:\w+\s+){0,3})(?<!n['’]t\s+(?:\w+\s+){0,3})\b(?:earn(?:s|ing)?|add(?:s|ing)?|gain(?:s|ing)?|get(?:s|ting)?|receiv(?:e|es|ing))\s+(?:(?:your|verifiable|recognised|recognized|real|official|full|new|an?|the|more)\s+)*IICRC[\s-]+(?:certifications?|certificates?|certs?|creds?|credentials?|qualifications?)\b/i,
+    allow: /\bthrough\s+(?:an?\s+)?IICRC[\s-]*approved\s+(?:schools?|examinations?|exams?)\b/i,
+    baselined: true,
+    message:
+      'CARSI does not grant IICRC certification or credentials — do not tell learners to "earn / add / get IICRC credentials" from CARSI. Say "verifiable CARSI credentials".',
+  },
+  {
+    // Slang "IICRC certs / creds" in selling copy ("The 3 IICRC certs that unlock …"). A learner's
+    // own ("your IICRC certs") passes.
+    re: /(?<!\b(?:your|their|own|existing)\s+)\bIICRC[\s-]+(?:certs|creds?)\b/i,
+    allow: null,
+    baselined: true,
+    message:
+      'Do not sell "IICRC certs/creds" — CARSI does not deliver IICRC certification. Name the skill area or the CARSI credential.',
   },
   // GAP CLOSED — "IICRC-approved" as a CARSI offering. Legitimate uses (real IICRC schools /
   // exams / the CE-provider program / board-approval process) are allowed.
@@ -132,7 +192,7 @@ const BANNED = [
     allow:
       /\bIICRC[\s-]*approved\s+(school|examination|exam|instructor|course\s+of\s+study)|IICRC[\s-]*board[\s-]*approv|(CE|CEC)[\s-]*provider|IICRC[\s-]*approv\w*\s+CE\b/i,
     message:
-      'Bare "IICRC-approved" implies IICRC approves CARSI\'s courses/certifications — say "IICRC CEC Accredited".',
+      'Bare "IICRC-approved" implies IICRC approves CARSI\'s courses/certifications — say "IICRC Approved CEC Provider" for CARSI, or "approved for IICRC CECs" for a class in the register.',
   },
   // GAP CLOSED — "get / certified ... with CARSI" without IICRC adjacency.
   {
@@ -190,7 +250,9 @@ const BANNED = [
  *  tree it produced only false positives (learner CEC-tracking badges "10 CECs Earned" — a
  *  student's own tracking is explicitly allowed by CLAUDE.md; the CEC calculator's requirement
  *  math "21 CECs as a Master"; ticket refs "GP-498 CEC"; code comments "0 CEC"), and no true
- *  positive, so it over-reached. CARSI's authored copy always writes "IICRC …(CEC)" adjacent. */
+ *  positive, so it over-reached. CARSI's authored copy always writes "IICRC …(CEC)" adjacent.
+ *  2026-11-21: that limit is now closed for course content by CEC_BARE_NUMBER below, scoped to
+ *  exclude src/ (where those false positives live). */
 const CEC_NUMBER = {
   re: /\b\d+(?:\.\d+)?\s*IICRC\s+(?:CEC|Continuing[\s-]+Education[\s-]+Credit)|\((?:IICRC\s+)?CEC\)\s*:?\s*\d+(?:\.\d+)?\s*Hours?/i,
   // Marks this rule as gated by the exact-text allowlist (see scanLine) rather than a regex `allow`.
@@ -198,6 +260,67 @@ const CEC_NUMBER = {
   message:
     'Specific IICRC CEC-hour claim on a non-approved course. Every numbered "N IICRC CEC(s)" claim is blocked by default; it ships ONLY if a human adds the line\'s exact text to scripts/iicrc-cec-allowlist.json (approvedLines) after review, or the file sits under a founder-approved course slug (data/seed/cec-approvals.json). No pattern/auto-exemption — a near-miss still blocks. If this is a genuine IICRC program-requirement fact, add the exact line to the allowlist; if it is a course-award claim, remove the CEC number (fail-closed, CLAUDE.md).',
 };
+
+/** A specific CEC-hour / credit claim WITHOUT "IICRC" next to the number (2026-11-21 gap):
+ *  "This course earns 4 CEC hours", "3 CECs", "earns 2 CEC", "4 Continuing Education Credits",
+ *  "CEC hours: 4", "4 hours of CEC". CEC_NUMBER above only fires when "IICRC" sits between the
+ *  number and "CEC", so a bare claim planted in public/courses/<slug>/field-tools/*.md exited 0.
+ *
+ *  Same control as CEC_NUMBER: block-by-default, no regex exemption by wording. A line passes ONLY
+ *  if (a) the file sits under a founder-approved course slug (data/seed/cec-approvals.json), or
+ *  (b) its exact normalised text is in scripts/iicrc-cec-allowlist.json (human review), or
+ *  (c) it is pinned, as NOT approved, in the known-findings baseline
+ *  (scripts/iicrc-cec-bare-known-findings.json) — see classifyBareFindings.
+ *
+ *  Zero is never a claim ("0 CEC", "0.0 CECs"), and the number must stand alone (not the tail of a
+ *  UUID or ticket id). The ONLY span removed before matching is the IICRC unit-conversion rate
+ *  "1 CEC = 1 (contact) hour" / "1 CEC per (contact) hour", which states no course's hours; the
+ *  rest of that line is still tested, so "earns 4 CECs (1 CEC = 1 contact hour)" still blocks.
+ *
+ *  SCOPE (CEC_BARE_SCOPE): every SCANNED_DIRS entry except src/. src/ is application code whose
+ *  numbered-CEC strings are the learner's OWN tracking ("10 CECs Earned", "14 CECs remaining" —
+ *  allowed by CLAUDE.md), the renewal calculator's IICRC requirement maths, and unit tests of
+ *  them; on the 2026-11-21 tree every src/ hit (~44 lines) was one of those and none was a course
+ *  claim. That is why the 2026 CEC_NUMBER note above rejected a bare rule repo-wide. Course
+ *  content (data/courses incl. v1-draft, public/courses, data/seed, docs/content, docs/marketing,
+ *  app/, templates/, data/voice, data/video) is where a course claim lives, and there it is
+ *  enforced. KNOWN LIMIT: a claim split across lines, or placed in src/, is not matched here. */
+const NUM_WORD = 'one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty';
+// A positive number standing on its own: not preceded by a word char, dot or hyphen-joined id,
+// and not zero ("0", "0.0").
+const POS_NUM = String.raw`(?<![\w.\-])(?!0+(?:\.0+)?(?![\d.]))\d+(?:\.\d+)?`;
+const CEC_UNIT = String.raw`(?:CECs?\b|CEC[\s-]+(?:hours?|hrs?|credits?|points?|units?)\b|Continuing[\s-]+Education[\s-]+(?:Credits?|hours?|units?)\b)`;
+const CEC_QUAL = String.raw`(?:(?:approved|accredited|verified|recognised|recognized|eligible|IICRC)[\s-]+){0,2}`;
+const CEC_BARE_NUMBER = {
+  re: new RegExp(
+    [
+      // "4 CEC hours", "3 CECs", "earns 2 CEC", "4 approved CEC hours", "4-CEC course", "four CECs"
+      String.raw`(?:${POS_NUM}|\b(?:${NUM_WORD}))[\s -]+${CEC_QUAL}${CEC_UNIT}`,
+      // "CEC hours: 4", "CECs = 3", "Continuing Education Credits (CEC): 2"
+      String.raw`\b(?:CECs?(?:[\s-]+(?:hours?|credits?))?|Continuing[\s-]+Education[\s-]+Credits?(?:\s*\(CECs?\))?)\s*[:=]\s*(?!0+(?:\.0+)?(?![\d.]))\d`,
+      // "4 hours of CEC", "4 hours of IICRC continuing education"
+      String.raw`(?:${POS_NUM}|\b(?:${NUM_WORD}))[\s-]*(?:contact[\s-]+)?hours?\s+of\s+(?:IICRC\s+)?(?:CEC|continuing[\s-]+education)`,
+    ].join('|'),
+    'i'
+  ),
+  // "4CECs" (no separator): upper-case acronym only, case-SENSITIVE, so hex ids ("1cec") never match.
+  reCase: /(?<![\w.\-])(?!0+(?:\.0+)?(?![\d.]))\d+(?:\.\d+)?CECs?\b/,
+  // The IICRC unit-conversion rate, removed before matching (see above). Narrow on purpose.
+  strip: /\b1\s+CEC\s*(?:=|per|equals)\s*(?:1\s+|one\s+)?(?:contact\s+)?hour\b/gi,
+  message:
+    'Specific CEC-hour/credit claim (no "IICRC" next to the number) on a course that is not approved in data/seed/cec-approvals.json. A numbered CEC claim ships ONLY under a founder-approved course slug, or as an exact human-reviewed line in scripts/iicrc-cec-allowlist.json; otherwise remove the number (fail-closed, CLAUDE.md). "0 CEC" and wording without a number are fine.',
+};
+const CEC_BARE_SCOPE = [
+  'app/',
+  'templates/',
+  'docs/marketing/',
+  'docs/content/',
+  'data/seed/',
+  'data/voice/',
+  'data/video/',
+  'data/courses/',
+  'public/courses/',
+];
 
 /** Normalise a line for exact allowlist comparison: trim ends, collapse internal whitespace runs.
  *  Deliberately conservative — case and wording are preserved, so a near-miss variant does NOT
@@ -220,7 +343,9 @@ function loadAllowlist() {
 }
 const ALLOWLIST = loadAllowlist();
 
-const COPY_EXT = /\.(tsx?|jsx?|mdx?|html?|json)$/;
+// .svg (course infographics carry visible <text>) and .jsonl (course evidence ledgers) added
+// 2026-11-21: both sit in public/courses and data/courses and were never read.
+const COPY_EXT = /\.(tsx?|jsx?|mdx?|html?|jsonl?|svg)$/;
 // Authored, customer-facing surfaces, scanned line by line. data/wordpress-export/ is NOT in this
 // list: it is scanned RECORD by RECORD instead (RECORD_SCANNED_DIRS below), because each course's
 // description is a single physical JSON line and a line finding cannot name the course slug that
@@ -258,6 +383,8 @@ const EXEMPT = [
   'src/lib/course-kit/cec-guard.ts',
   'src/lib/seed/cec-hours.ts',
   'src/lib/seed/cec-hours.test.ts',
+  // GP-753: the licence-inventory gate's own test plants the GP-525 phrases to prove it blocks them.
+  'src/lib/marketing/licence-inventory.test.ts',
 ];
 
 // Files whose copy goes to learners of EVERY course, including courses with no IICRC link
@@ -292,7 +419,34 @@ function isExempt(f) {
   return EXEMPT.some((e) => n === e || n.endsWith('/' + e));
 }
 
-function scanLine(file, lineNo, content, findings, allowlist) {
+/** GP-753 known-findings baseline for the `baselined` certification-phrase rules. NOT an approval:
+ *  it pins, by exact (file, normalised text), the lines that were already on main when the rules
+ *  landed and that need the founder's wording decision. They are printed on every run. Anything
+ *  else blocks: a new line, a changed line, the same text in another file. A pinned entry whose
+ *  line is gone also blocks (stale), so the list can only shrink. Read from the SCANNED tree (cwd).
+ *  Fail-closed: a missing, unreadable or malformed file is an EMPTY baseline (every hit blocks). */
+export const CERT_BASELINE_FILE = 'scripts/iicrc-certification-known-findings.json';
+export function loadCertBaseline(path = CERT_BASELINE_FILE) {
+  try {
+    const parsed = JSON.parse(readFileSync(path, 'utf8'));
+    if (parsed?.issue !== 'GP-753' || !Array.isArray(parsed?.entries)) return [];
+    return parsed.entries.filter((e) => e && typeof e.file === 'string' && e.file && typeof e.text === 'string' && e.text.trim());
+  } catch {
+    return [];
+  }
+}
+const certKey = (file, text) => `${file.replace(/\\/g, '/')}\u0000${normaliseLine(text)}`;
+/** A scan context: the pinned entries, and the pinned lines actually seen (key → finding). */
+export function newCertificationContext(entries = loadCertBaseline()) {
+  return { pinned: new Map(entries.map((e) => [certKey(e.file, e.text), e])), known: new Map() };
+}
+/** Pinned entries the scan did not see: the line is gone or changed. Each one blocks. */
+export function staleCertificationEntries(ctx) {
+  return [...ctx.pinned].filter(([k]) => !ctx.known.has(k)).map(([, e]) => e);
+}
+const CERT_CTX = newCertificationContext();
+
+function scanLine(file, lineNo, content, findings, allowlist, certCtx = CERT_CTX) {
   // A specific CEC-hour claim is exempt ONLY when the file belongs to a founder-approved
   // course — i.e. its path contains a slug listed in CEC_APPROVED_SLUGS (empty = none approved).
   const nf = file.replace(/\\/g, '/');
@@ -309,6 +463,11 @@ function scanLine(file, lineNo, content, findings, allowlist) {
       // BANNED rules: line-wide, exempt-if-`allow`.
       flagged = !(rule.allow && rule.allow.test(content));
     }
+    // GP-753: a pinned pre-existing line is reported as a known finding instead of blocking.
+    if (flagged && rule.baselined && certCtx?.pinned.has(certKey(nf, content))) {
+      certCtx.known.set(certKey(nf, content), { file: nf, line: lineNo, text: normaliseLine(content) });
+      flagged = false;
+    }
     if (flagged) {
       findings.push(`  ${file}:${lineNo}: ${rule.message}\n    → ${content.trim().slice(0, 150)}`);
     }
@@ -318,12 +477,88 @@ function scanLine(file, lineNo, content, findings, allowlist) {
 /** Scan a single file's full text and return findings (one per offending line).
  *  Exported so the self-test can plant a bad line and assert the guard fires. `allowlist` is the
  *  set of normalised human-approved lines (defaults to the loaded allowlist; the self-test passes
- *  its own set to exercise the allowlisted-line PASS path). */
-export function evaluateContent(file, text, allowlist = ALLOWLIST) {
+ *  its own set to exercise the allowlisted-line PASS path). `certCtx` is the GP-753 baseline
+ *  context (newCertificationContext); the self-test passes its own. */
+export function evaluateContent(file, text, allowlist = ALLOWLIST, certCtx = CERT_CTX) {
   const findings = [];
   const lines = text.split('\n');
-  for (let i = 0; i < lines.length; i++) scanLine(file, i + 1, lines[i], findings, allowlist);
+  for (let i = 0; i < lines.length; i++) scanLine(file, i + 1, lines[i], findings, allowlist, certCtx);
   return findings;
+}
+
+function inBareScope(f) {
+  const n = f.replace(/\\/g, '/');
+  return CEC_BARE_SCOPE.some((d) => n.startsWith(d));
+}
+
+/** True when `line` carries a bare numbered CEC claim (after removing the conversion-rate span). */
+export function isBareCecClaim(line) {
+  const rest = line.replace(CEC_BARE_NUMBER.strip, ' ');
+  return CEC_BARE_NUMBER.re.test(rest) || CEC_BARE_NUMBER.reCase.test(rest);
+}
+
+/** Bare numbered-CEC findings for one file, as { file, line, text }. Empty when the file is out of
+ *  CEC_BARE_SCOPE, exempt, or under a founder-approved slug (same path rule as CEC_NUMBER). A line
+ *  that CEC_NUMBER already matches is left to CEC_NUMBER (one finding per claim). */
+export function evaluateBareCecClaims(file, text, allowlist = ALLOWLIST, approvedSlugs = CEC_APPROVED_SLUGS) {
+  const nf = file.replace(/\\/g, '/');
+  if (!inBareScope(nf) || isExempt(nf)) return [];
+  if (approvedSlugs.some((slug) => nf.includes(slug))) return [];
+  const out = [];
+  text.split('\n').forEach((line, i) => {
+    if (CEC_NUMBER.re.test(line)) return;
+    if (!isBareCecClaim(line)) return;
+    if (allowlist.has(normaliseLine(line))) return;
+    out.push({ file: nf, line: i + 1, text: normaliseLine(line) });
+  });
+  return out;
+}
+
+/** Known-findings baseline for the bare rule (2026-11-21). NOT an approval: it pins, by exact
+ *  (file, normalised text), the numbered-CEC lines that were already on main when the rule landed,
+ *  so they are reported every run for the founder while the rule is ENFORCED for everything else.
+ *  Anything not pinned blocks: a new line, a changed line (e.g. the number edited), the same text in
+ *  another file. A pinned entry whose line is gone also blocks, so the list can only shrink.
+ *  Fail-closed: a missing/unreadable/malformed file is an EMPTY baseline (every finding blocks). */
+const BARE_BASELINE_FILE = 'scripts/iicrc-cec-bare-known-findings.json';
+// Read from the SCANNED tree (cwd), as the GP-525 list is, so a scratch repo without the file
+// starts from an EMPTY baseline.
+export function loadBareBaseline(path = BARE_BASELINE_FILE) {
+  try {
+    const parsed = JSON.parse(readFileSync(path, 'utf8'));
+    const entries = Array.isArray(parsed?.entries) ? parsed.entries : [];
+    return entries.filter((e) => e && typeof e.file === 'string' && typeof e.text === 'string' && e.file && e.text);
+  } catch {
+    return [];
+  }
+}
+
+const bareKey = (e) => `${e.file}\u0000${normaliseLine(e.text)}`;
+
+/** Split bare findings into { blocking, known }. `blocking` also carries a stale-baseline finding
+ *  for each pinned entry no longer present. */
+export function classifyBareFindings(findings, baseline) {
+  const pinned = new Map(baseline.map((e) => [bareKey(e), e]));
+  const seen = new Set();
+  const blocking = [];
+  const known = [];
+  for (const f of findings) {
+    const k = bareKey(f);
+    if (pinned.has(k)) { known.push(f); seen.add(k); } else blocking.push(f);
+  }
+  for (const [k, e] of pinned) {
+    if (!seen.has(k)) {
+      blocking.push({ file: e.file, line: 0, text: e.text, stale: true });
+    }
+  }
+  return { blocking, known };
+}
+
+function formatBareFinding(f) {
+  if (f.stale) {
+    return `  ${f.file}: pinned in ${BARE_BASELINE_FILE} but the line is gone or changed — remove the entry (the baseline only shrinks)\n    → ${f.text.slice(0, 150)}`;
+  }
+  return `  ${f.file}:${f.line}: ${CEC_BARE_NUMBER.message}\n    → ${f.text.slice(0, 150)}`;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -1074,7 +1309,7 @@ function formatRecordFinding(f) {
 
 function inRecordScope(f) { const n = f.replace(/\\/g, '/'); return n.endsWith('.json') && RECORD_SCANNED_DIRS.some((d) => n.startsWith(d)); }
 
-export { BANNED, CEC_NUMBER, CEC_APPROVED_SLUGS, inScope, isExempt, normaliseLine, ALLOWLIST, IICRC_FREE_FILES };
+export { BANNED, CEC_NUMBER, CEC_BARE_NUMBER, CEC_BARE_SCOPE, SCANNED_DIRS, CEC_APPROVED_SLUGS, inScope, isExempt, normaliseLine, ALLOWLIST, IICRC_FREE_FILES };
 // The rendered-output layer on its own, so the self-test can prove each part works even where the
 // input gate would already block the same record.
 export { studentView, renderedProblems };
@@ -1091,6 +1326,7 @@ function main() {
     process.exit(1);
   }
   const findings = [];
+  const bareFindings = [];
   const files = list.split('\n').map((f) => f.trim()).filter(Boolean);
   for (const file of files.filter((f) => COPY_EXT.test(f) && inScope(f) && !isExempt(f))) {
     let text = '';
@@ -1100,6 +1336,18 @@ function main() {
       continue;
     }
     findings.push(...evaluateContent(file, text));
+    bareFindings.push(...evaluateBareCecClaims(file, text));
+  }
+  // 2026-11-21: bare numbered-CEC claims, enforced; pre-existing lines are pinned (not approved).
+  const bare = classifyBareFindings(bareFindings, loadBareBaseline());
+  findings.push(...bare.blocking.map(formatBareFinding));
+  if (bare.known.length > 0) {
+    console.error(
+      `\n⚠ KNOWN FINDINGS — NOT APPROVED: ${bare.known.length} bare numbered-CEC line(s) pinned in ${BARE_BASELINE_FILE} ` +
+      `pending the founder's decision (record the IICRC approval, add the exact line to scripts/iicrc-cec-allowlist.json after review, or remove the number). ` +
+      `Any new or changed line fails this guard.`
+    );
+    console.error(bare.known.map((f) => `  ${f.file}:${f.line} → ${f.text.slice(0, 140)}`).join('\n'));
   }
 
   // GP-527: course records, slug-aware. A listed record file that cannot be read is a failure.
@@ -1138,6 +1386,17 @@ function main() {
       continue;
     }
     findings.push(...evaluateIicrcFree(file, text));
+  }
+  // GP-753: pinned certification-phrase lines are reported (not approved); stale pins block.
+  for (const e of staleCertificationEntries(CERT_CTX)) {
+    findings.push(`  ${e.file}: pinned in ${CERT_BASELINE_FILE} but the line is gone or changed — remove the entry (the baseline only shrinks)\n    → ${normaliseLine(e.text).slice(0, 150)}`);
+  }
+  if (CERT_CTX.known.size > 0) {
+    console.error(
+      `\n⚠ KNOWN FINDINGS — NOT APPROVED (GP-753): ${CERT_CTX.known.size} certification-implying line(s) pinned in ${CERT_BASELINE_FILE} ` +
+      `pending the founder's wording decision. Any new or changed line fails this guard.`
+    );
+    console.error([...CERT_CTX.known.values()].map((f) => `  ${f.file}:${f.line} → ${f.text.slice(0, 140)}`).join('\n'));
   }
 
   if (findings.length > 0) {

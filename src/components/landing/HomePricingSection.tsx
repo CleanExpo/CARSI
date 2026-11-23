@@ -10,6 +10,7 @@ import {
   LANDING_LEAD_CLASS,
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
+import { formatMembershipAud, INDIVIDUAL_MEMBERSHIP } from '@/lib/lms/membership-prices';
 import { INDIVIDUAL_TIERS, PER_COURSE_PRICE_FALLBACK_LABEL } from '@/lib/lms/pricing-tiers';
 
 function buildHomeTiers(subscriptionsEnabled: boolean) {
@@ -94,7 +95,7 @@ export function HomePricingSection({
     },
     {
       name: yearly?.name ?? 'Yearly membership',
-      price: '$795',
+      price: formatMembershipAud(INDIVIDUAL_MEMBERSHIP),
       cadence: 'per year',
       description:
         yearly?.description ??

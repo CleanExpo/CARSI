@@ -1,0 +1,16 @@
+{
+  "_warning": "KNOWN FINDINGS - NOT APPROVAL. These lines were on main when GP-753 extended check:iicrc-compliance to block copy implying CARSI delivers or grants IICRC certification. Each is ambiguous and waits for the founder's wording decision: reword it (then delete the entry here) or confirm it as a third-person fact (then tighten the rule's allow-list and delete the entry here). check:iicrc-compliance prints every entry on every run and fails on any line not listed here exactly (new line, changed wording, same text in another file) and on a stale entry, so this list can only shrink. Never add an entry to make the guard pass.",
+  "issue": "GP-753",
+  "entries": [
+    {
+      "file": "docs/marketing/industry-icp-database.json",
+      "text": "\"Win insurance work with IICRC credentials\",",
+      "why": "ICP research file (cleaning segment value_propositions), not published copy. Reads as CARSI selling IICRC credentials; neighbouring entries make third-person claims about IICRC credentials that no rule covers."
+    },
+    {
+      "file": "docs/marketing/linkedin-campaign.md",
+      "text": "> **Hook:** Property managers with IICRC credentials win more management agreements.",
+      "why": "Same shape GP-525 reworded in Variation A of the cleaning campaign (\"companies with IICRC certifications win 3x more\"), but this property-manager hook is an unsourced outcome claim with no precedent wording; founder to choose the replacement."
+    }
+  ]
+}

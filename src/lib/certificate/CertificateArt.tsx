@@ -256,7 +256,7 @@ export function CertificateArt({ logoSrc, ...input }: CertificateArtInput & { lo
             padding: '14px 24px',
           }}
         >
-          <Text style={{ fontSize: 18, color: '#64748b' }}>carsi.com.au</Text>
+          <Text style={{ fontSize: 18, color: '#64748b' }}>{cecWording.footerLine}</Text>
         </div>
       </div>
     </div>

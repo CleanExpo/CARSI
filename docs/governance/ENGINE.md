@@ -32,6 +32,14 @@ That's it. The system does the rest and tells you what moved.
   tag. An idea is never lost and never hijacks a build day.
 - Research → the existing sources_watcher → wiki ingest pipeline; signals files feed BACKLOG
   Discoveries. New evidence changes the queue, not the goal.
+- **Findings→course mapping (BACKLOG #24), one step of the same weekly triage:** run
+  `npm run triage:findings-courses` (default: Discoveries dated in the last 7 days; `-- --all`,
+  `-- --since YYYY-MM-DD`, `-- --findings <file.md|file.json>`, `-- --json`). For each finding it
+  lists the catalogue courses and lessons it may affect, with the reason. It is a review report
+  only: it edits no course, uses no AI and calls no API. Courses marked `noAiRewrite` are shown as
+  report-only. "no findings" (exit 0) and "not run (reason)" (exit 2) are different answers; never
+  read one as the other. A course worth updating becomes a BACKLOG row, built under the
+  `carsi-course-production` rules.
 
 ## Autonomy envelope (how "autonomous" grows without risking the licence)
 | Level | What ships without asking | Status |

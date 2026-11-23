@@ -96,7 +96,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 >
 > **Body:** Most mining companies discover mould problems after they become safety incidents. CARSI offers IICRC CEC Accredited online training in mould assessment, water damage response and structural drying — designed for FIFO rosters with zero classroom time required.
 >
-> Train your site supervisors and maintenance crew. Earn verifiable IICRC credentials. Protect your workforce and your balance sheet.
+> Train your site supervisors and maintenance crew. Earn verifiable CARSI credentials. Protect your workforce and your balance sheet.
 >
 > **CTA:** Download the Free IICRC Certification Guide →
 
@@ -186,11 +186,11 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 **Variation A — Competitive Edge**
 
-> **Hook:** Cleaning companies with IICRC certifications win 3x more remediation contracts.
+> **Hook:** Credentialed cleaning crews stand out when remediation contracts go to tender.
 >
-> **Body:** IICRC credentials prove your team can handle mould remediation, water damage extraction and carpet cleaning to international standards. CARSI delivers 40+ approved online courses — your crew completes them between jobs.
+> **Body:** Verifiable CARSI credentials show your team has trained in mould remediation, water damage extraction and carpet cleaning. CARSI is an IICRC CEC Accredited provider — your crew completes online courses between jobs.
 >
-> Stand out in tenders. Win bigger contracts. Earn real CECs.
+> Stand out in tenders. Win bigger contracts. CEC hours are shown only on courses the IICRC has approved.
 >
 > **CTA:** View Cleaning Industry Courses →
 
@@ -206,7 +206,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 **Variation C — Franchise**
 
-> **Hook:** Franchise owners — certify your entire network with one training platform.
+> **Hook:** Franchise owners — train your entire network on one platform.
 >
 > **Body:** CARSI offers group licensing for cleaning franchises. IICRC CEC Accredited courses in carpet cleaning, mould remediation and water damage restoration. Track team progress, verify certificates, and demonstrate competence to clients.
 >

@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { getAppOrigin } from '@/lib/server/app-url';
 
 import { isUuidParam } from '@/lib/server/uuid-param';
 
@@ -104,10 +105,7 @@ export async function getPublicCredentialPdfBuffer(
   });
   if (!row) return { ok: false, reason: 'not_found' };
 
-  const origin =
-    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
-    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
-    'https://carsi.com.au';
+  const origin = getAppOrigin();
   const pdf = await buildCompletionCertificatePdf(
     completionCertificateDataFromEnrollment(
       {

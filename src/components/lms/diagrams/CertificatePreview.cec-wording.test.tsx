@@ -44,6 +44,7 @@ describe('on-screen certificate IICRC and CEC wording (GP-757)', () => {
     const hours = getApprovedCecHours(APPROVED_SLUG)!;
     const out = renderPreview(APPROVED_SLUG);
     expect(out).toContain('Course approved for IICRC CECs');
+    expect(out).toContain('IICRC Approved CEC Provider · carsi.com.au');
     expect(out).toContain(`${hours} IICRC CEC hour${hours === 1 ? '' : 's'}`);
   });
 

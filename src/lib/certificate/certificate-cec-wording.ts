@@ -1,10 +1,16 @@
 import { formatCecHoursForCertificate } from '@/lib/cec-display';
+import {
+  APPROVED_FOR_IICRC_CECS,
+  CARSI_PROVIDER_STATUS,
+  IICRC_APPROVED_CEC_PROVIDER,
+} from '@/lib/iicrc/approved-wording';
 
 /**
  * The owner of every IICRC and CEC line a CARSI certificate or credential card prints (GP-757).
  *
  * Founder rules GP-704 and GP-748:
- * - CARSI is never called accredited by the IICRC; no certificate says "Accredited".
+ * - CARSI is never called accredited by the IICRC; no certificate says "Accredited". Its standing
+ *   is "IICRC Approved CEC Provider", imported from src/lib/iicrc/approved-wording.ts (GP-704).
  * - "Course approved for IICRC CECs" appears only for a course the approvals register
  *   (data/seed/cec-approvals.json) lists as approved, with the hours from that register.
  * - A course not on the register shows no IICRC wording at all, not even a disclaimer.
@@ -24,9 +30,11 @@ export type CertificateCecWording = {
   cardLabel: string;
   /** "What this credential is" statement on the public verify page. */
   scopeStatement: string;
+  /** Footer line beside the seal: names CARSI's IICRC provider standing only for an approved course. */
+  footerLine: string;
 };
 
-export const COURSE_APPROVED_FOR_IICRC_CECS = 'Course approved for IICRC CECs';
+export const COURSE_APPROVED_FOR_IICRC_CECS = `Course ${APPROVED_FOR_IICRC_CECS}`;
 
 /**
  * Wording for `approvedHours`, which must come from the approvals register (null when the course
@@ -45,8 +53,8 @@ export function certificateCecWording(
       cecCreditsValue: null,
       recordLine: 'Issued by CARSI. Retain this certificate with your training records.',
       cardLabel: 'CARSI certificate',
-      scopeStatement:
-        'A CARSI-issued credential for a CARSI course. It is not a trade licence.',
+      scopeStatement: 'A CARSI-issued credential for a CARSI course. It is not a trade licence.',
+      footerLine: 'carsi.com.au',
     };
   }
   return {
@@ -55,8 +63,10 @@ export function certificateCecWording(
     recordLine: `${COURSE_APPROVED_FOR_IICRC_CECS}. Retain this certificate with your renewal records.`,
     cardLabel: COURSE_APPROVED_FOR_IICRC_CECS,
     scopeStatement:
-      `A CARSI-issued credential, not an IICRC certification. ${COURSE_APPROVED_FOR_IICRC_CECS}. ` +
+      `A CARSI-issued credential, not an IICRC certification. ${CARSI_PROVIDER_STATUS} ` +
+      `${COURSE_APPROVED_FOR_IICRC_CECS}. ` +
       'IICRC certification itself is obtained through a school and examination approved by the IICRC.',
+    footerLine: `${IICRC_APPROVED_CEC_PROVIDER} · carsi.com.au`,
   };
 }
 

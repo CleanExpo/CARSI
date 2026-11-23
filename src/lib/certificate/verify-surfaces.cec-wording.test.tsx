@@ -16,7 +16,7 @@ import type { PublicCredentialJson } from '@/lib/server/credential-public';
 /**
  * GP-757, review round 1 (discovery): the certificate art was fixed, but the rest of the verify
  * surfaces still printed IICRC and CEC copy unconditionally: the "What this credential is"
- * statement on /verify/credential (which said "IICRC CEC Accredited provider") and the per-course
+ * statement on /verify/credential (which used the retired provider phrase) and the per-course
  * "0 CEC" line on the shared training record (/verify/training-record and its PDF). Every IICRC or
  * CEC line on these surfaces now comes from the certificate wording owner.
  */
@@ -74,7 +74,9 @@ describe('public credential verify page (GP-757)', () => {
   });
 
   it('a credential for a registry-approved course renders "Course approved for IICRC CECs"', () => {
-    expect(renderVerifyPage(APPROVED_SLUG)).toContain('Course approved for IICRC CECs');
+    const out = renderVerifyPage(APPROVED_SLUG);
+    expect(out).toContain('Course approved for IICRC CECs');
+    expect(out).toContain('CARSI is an IICRC Approved CEC Provider.');
   });
 
   it('a sent IICRC submission row on a course not on the register shows no "submitted to IICRC" banner', () => {
@@ -101,13 +103,21 @@ describe('public credential verify page (GP-757)', () => {
 
 describe('shared training record (GP-757)', () => {
   it('a course not on the approvals register gets no CEC or discipline-code line', () => {
-    const meta = trainingRecordCourseMeta({ iicrc_discipline: 'WRT', cec_hours: 0, issued_date: '2026-03-01' });
+    const meta = trainingRecordCourseMeta({
+      iicrc_discipline: 'WRT',
+      cec_hours: 0,
+      issued_date: '2026-03-01',
+    });
     expect(meta).toBe('issued 2026-03-01');
   });
 
   it('a registry-approved course carries its register hours', () => {
     const hours = getApprovedCecHours(APPROVED_SLUG)!;
-    const meta = trainingRecordCourseMeta({ iicrc_discipline: 'WRT', cec_hours: hours, issued_date: '2026-03-01' });
+    const meta = trainingRecordCourseMeta({
+      iicrc_discipline: 'WRT',
+      cec_hours: hours,
+      issued_date: '2026-03-01',
+    });
     expect(meta).toContain(`${hours} IICRC CEC hour${hours === 1 ? '' : 's'}`);
   });
 
@@ -119,7 +129,10 @@ describe('shared training record (GP-757)', () => {
 
   it('the training-record page and PDF print no CEC line except through the wording owner', () => {
     const root = process.cwd();
-    for (const rel of ['app/(public)/verify/training-record/page.tsx', 'src/lib/server/proof-pack-pdf.ts']) {
+    for (const rel of [
+      'app/(public)/verify/training-record/page.tsx',
+      'src/lib/server/proof-pack-pdf.ts',
+    ]) {
       const src = readFileSync(path.join(root, rel), 'utf8');
       expect(src, rel).toContain('trainingRecordCourseMeta');
       expect(src, rel).not.toMatch(/IICRC|\bCECs?\b/);

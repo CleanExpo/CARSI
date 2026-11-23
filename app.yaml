@@ -10,7 +10,10 @@ services:
     github:
       repo: CleanExpo/CARSI
       branch: main
-      deploy_on_push: true
+      # Off on purpose (Phill, 22/11/2026: "Wait for green"). A push to main must not go
+      # live before CI finishes; .github/workflows/deploy-production.yml deploys main only
+      # after every required check on that commit has passed.
+      deploy_on_push: false
 
     dockerfile_path: deploy/Dockerfile
     http_port: 8080
@@ -29,6 +32,11 @@ services:
     envs:
       - key: NODE_ENV
         value: production
+        scope: RUN_TIME
+      # The commit DigitalOcean built; /api/health reports it as build.commit
+      # (src/lib/server/build-identity.ts). Only the running app needs it.
+      - key: CARSI_BUILD_SHA
+        value: ${_self.COMMIT_HASH}
         scope: RUN_TIME
       - key: PORT
         value: '8080'
@@ -95,8 +103,9 @@ services:
       - key: OPENROUTER_MODEL
         scope: RUN_TIME
 
-      # Course-content optimiser (admin + DigitalOcean scheduled job).
-      # Job hits GET /api/cron/optimize-course-content with Bearer CRON_SECRET.
+      # Course-content optimiser (admin review page + manual cron route, no schedule).
+      # GET /api/cron/optimize-course-content with Bearer CRON_SECRET stores review
+      # drafts only; an admin applies each draft by hand (GP-758).
       - key: ANTHROPIC_API_KEY
         scope: RUN_TIME
       - key: ANTHROPIC_OPTIMIZE_MODEL
@@ -135,6 +144,8 @@ services:
         scope: RUN_TIME
 
 # No scheduled job. Curl returns in seconds (202). Work + email continue on the app.
+# The run only stores review drafts (meta.optimizeDraft). Live courses change only when
+# an admin applies a draft at /admin/courses/<id>/optimize (GP-758).
 # Paid:
 # curl -S -H "Authorization: Bearer $CRON_SECRET" \
 #   "$NEXT_PUBLIC_APP_URL/api/cron/optimize-course-content"

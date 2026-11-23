@@ -2,12 +2,14 @@
 
 import { Download } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
 import type { LessonPosition } from '@/lib/lms/lesson-checkpoint';
+import { findScrollRoot, scrollLessonToTop } from '@/lib/lms/lesson-scroll';
 
 import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { DriveFileViewer } from '@/components/lms/DriveFileViewer';
 import { FlashcardDeck } from '@/components/lms/FlashcardDeck';
+import { InteractiveExperiencePlayer } from '@/components/lms/interactive/InteractiveExperiencePlayer';
 import { SlideDeckViewer } from '@/components/lms/SlideDeckViewer';
 import { EnterpriseLessonContent } from '@/components/onboarding/EnterpriseLessonContent';
 import { EnterpriseLessonHeader } from '@/components/onboarding/EnterpriseLessonHeader';
@@ -16,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { dash } from '@/lib/dashboard-light-ui';
 import {
   isFlashcardResource,
+  isInteractiveLessonResource,
   isSlidesResource,
   type LessonResource,
 } from '@/lib/lms/lesson-resources';
@@ -47,6 +50,12 @@ interface LessonPlayerProps {
   courseProgressPercent?: number | null;
   initialPosition?: LessonPosition;
   onPositionChange?: (position: LessonPosition) => void;
+  /**
+   * The learner is enrolled in this course (GP-627). "Preview" tells a prospective learner the
+   * lesson is free to sample; once enrolled it is noise, so the badge is hidden.
+   */
+  enrolled?: boolean;
+  onInteractivePilotComplete?: () => void;
 }
 
 export function LessonPlayer({
@@ -63,18 +72,33 @@ export function LessonPlayer({
   courseProgressPercent,
   initialPosition,
   onPositionChange,
+  enrolled = false,
+  onInteractivePilotComplete,
 }: LessonPlayerProps) {
+  const showPreviewBadge = lesson.is_preview && !enrolled;
+  const rootRef = useRef<HTMLDivElement>(null);
+  const restoresReading = initialPosition?.kind === 'reading' && initialPosition.value > 0;
+  const restoresReadingRef = useRef(restoresReading);
+  // GP-627: a new lesson opens at its top. A saved reading position still wins; that restore
+  // runs in bindReadingPosition on the next frame.
+  useLayoutEffect(() => {
+    if (!restoresReadingRef.current) scrollLessonToTop(rootRef.current);
+  }, [lesson.id]);
   const flashcardDecks = resources.filter(isFlashcardResource);
   const slideResources = resources.filter(isSlidesResource);
+  const interactiveExperiences = resources.filter(isInteractiveLessonResource);
   const downloads = resources.filter(
     (r): r is { label?: string; url?: string } =>
-      !isFlashcardResource(r) && !isSlidesResource(r) && Boolean(r.url && r.label)
+      !isFlashcardResource(r) &&
+      !isSlidesResource(r) &&
+      !isInteractiveLessonResource(r) &&
+      Boolean(r.url && r.label)
   );
   const enterprise = variant === 'enterprise';
 
   if (enterprise) {
     return (
-      <div className="space-y-8">
+      <div ref={rootRef} className="space-y-8">
         <EnterpriseLessonHeader
           title={lesson.title}
           moduleTitle={moduleTitle}
@@ -84,7 +108,7 @@ export function LessonPlayer({
           moduleLessonTotal={moduleLessonTotal}
           durationMinutes={lesson.duration_minutes}
           completed={completed}
-          isPreview={lesson.is_preview}
+          isPreview={showPreviewBadge}
           courseProgressPercent={courseProgressPercent}
         />
 
@@ -115,6 +139,17 @@ export function LessonPlayer({
                 enterprise
               />
             ))}
+            {interactiveExperiences.map((exp, i) => (
+              <InteractiveExperiencePlayer
+                key={`interactive-${i}`}
+                label={exp.label}
+                experience={exp.experience}
+                progressKey={lesson.id}
+                enterprise
+                lessonCompleted={completed}
+                onAllComplete={onInteractivePilotComplete}
+              />
+            ))}
             {downloads.length > 0 ? <DownloadsPanel downloads={downloads} enterprise /> : null}
           </div>
           <aside className="xl:sticky xl:top-6">
@@ -131,7 +166,7 @@ export function LessonPlayer({
   }
 
   return (
-    <div className="space-y-4">
+    <div ref={rootRef} className="space-y-4">
       {lessonNumber && totalLessons ? (
         <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
           Lesson {lessonNumber} of {totalLessons}
@@ -140,7 +175,7 @@ export function LessonPlayer({
       <div className="flex items-start gap-3">
         <h1 className="flex-1 text-2xl font-bold text-slate-900">{lesson.title}</h1>
         <div className="flex shrink-0 gap-2">
-          {lesson.is_preview && (
+          {showPreviewBadge && (
             <Badge variant="outline" className="border-slate-300 text-slate-600">
               Preview
             </Badge>
@@ -163,6 +198,16 @@ export function LessonPlayer({
       {flashcardDecks.map((deck, i) => (
         <FlashcardDeck key={`flashcards-${i}`} label={deck.label} cards={deck.cards} />
       ))}
+      {interactiveExperiences.map((exp, i) => (
+        <InteractiveExperiencePlayer
+          key={`interactive-${i}`}
+          label={exp.label}
+          experience={exp.experience}
+          progressKey={lesson.id}
+          lessonCompleted={completed}
+          onAllComplete={onInteractivePilotComplete}
+        />
+      ))}
       {downloads.length > 0 ? <DownloadsPanel downloads={downloads} /> : null}
       {footer}
     </div>
@@ -170,12 +215,7 @@ export function LessonPlayer({
 }
 
 export function bindReadingPosition(element: HTMLElement, initialValue: number, onPosition: (value: number) => void) {
-  let scrollRoot = element.parentElement;
-  while (scrollRoot && scrollRoot !== element.ownerDocument.body && scrollRoot !== element.ownerDocument.documentElement) {
-    if (/^(auto|scroll|overlay)$/.test(window.getComputedStyle(scrollRoot).overflowY) && scrollRoot.clientHeight > 0) break;
-    scrollRoot = scrollRoot.parentElement;
-  }
-  if (scrollRoot === element.ownerDocument.body || scrollRoot === element.ownerDocument.documentElement) scrollRoot = null;
+  const scrollRoot = findScrollRoot(element);
   const target = scrollRoot ?? window;
   const geometry = () => {
     const viewportTop = scrollRoot ? scrollRoot.getBoundingClientRect().top + scrollRoot.clientTop : 0;

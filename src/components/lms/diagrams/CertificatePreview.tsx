@@ -237,7 +237,7 @@ export function CertificatePreview({
                 </div>
               </div>
               <p className="mt-2 max-w-[9rem] text-center text-[7px] leading-snug text-slate-400 sm:text-[8px]">
-                carsi.com.au
+                {cecWording.footerLine}
               </p>
             </div>
 

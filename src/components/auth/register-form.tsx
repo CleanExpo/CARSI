@@ -29,7 +29,7 @@ import {
 } from '@/lib/membership-signup-path';
 import { confirmFreeEnrolment } from '@/lib/lms/confirm-free-enrolment';
 import { useToast } from '@/hooks/use-toast';
-import { purchaseSurveyCheckoutField } from '@/lib/marketing/purchase-survey-key';
+import { purchaseSurveyCheckoutField, rememberPurchaseSurveyKey } from '@/lib/marketing/purchase-survey-key';
 
 export const formSchema = z
   .object({
@@ -109,12 +109,15 @@ export function RegisterForm() {
         const slug = decodeURIComponent(courseMatch[1]);
         try {
           const { success_url, cancel_url } = buildCourseCheckoutUrls(window.location.origin, slug);
+          const surveyField = purchaseSurveyCheckoutField();
           const checkout = await apiClient.post<{ enrolled?: boolean; checkout_url?: string }>(
             '/api/lms/checkout',
-            { slug, success_url, cancel_url, customer_email: values.email, ...purchaseSurveyCheckoutField() }
+            { slug, success_url, cancel_url, customer_email: values.email, ...surveyField }
           );
           const checkoutUrl = checkout.checkout_url;
           if (checkoutUrl) {
+            // Only a checkout that reached Stripe keeps its survey key (GP-694).
+            rememberPurchaseSurveyKey(surveyField.survey_key);
             toast({ title: 'Redirecting to checkout…' });
             window.setTimeout(() => {
               window.location.href = checkoutUrl;
@@ -204,7 +207,7 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Full Name</FormLabel>
               <FormControl>
-                <Input placeholder="John Smith" {...field} />
+                <Input placeholder="John Smith" autoComplete="name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -217,7 +220,7 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="name@example.com" {...field} />
+                <Input placeholder="name@example.com" autoComplete="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -266,7 +269,7 @@ export function RegisterForm() {
           )}
         />
         {error && (
-          <p className="text-destructive text-sm">
+          <p className="text-destructive text-sm" role="alert">
             {error}
             {error.includes('already exists') && (
               <>

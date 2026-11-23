@@ -13,6 +13,7 @@ import {
 import { BreadcrumbSchema, NewsArticleSchema } from '@/components/seo';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { OG_IMAGES } from '@/lib/seo/og-image';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 const siteUrl = getPublicSiteUrl();
 
@@ -30,6 +31,7 @@ export const metadata: Metadata = {
     'disaster recovery Australia',
   ],
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     images: OG_IMAGES,
     title: 'Industry News | CARSI Hub',
     description:
