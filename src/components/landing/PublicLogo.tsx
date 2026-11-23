@@ -1,5 +1,7 @@
 import Image from 'next/image';
 
+import { CARSI_LOGO_SRC } from './carsi-logo';
+
 type PublicLogoProps = {
   variant: 'nav' | 'footer' | 'auth';
   /**
@@ -11,11 +13,6 @@ type PublicLogoProps = {
    */
   surface?: 'chrome' | 'light';
 };
-
-const LOGO_SRC = {
-  light: '/logo/logo1.png',
-  chrome: '/logo/dark-logo.png',
-} as const;
 
 const logoConfig = {
   nav: {
@@ -47,7 +44,7 @@ export function PublicLogo({ variant, surface = 'light' }: PublicLogoProps) {
 
   return (
     <Image
-      src={LOGO_SRC[surface]}
+      src={CARSI_LOGO_SRC[surface]}
       alt="CARSI"
       width={config.width}
       height={config.height}
