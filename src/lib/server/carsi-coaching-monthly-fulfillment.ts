@@ -1,7 +1,7 @@
 import type Stripe from 'stripe';
 
 import { getStripeClient } from '@/lib/api/stripe';
-import { taxInvoiceBuyerFromCheckout, tryBuildTaxInvoice } from '@/lib/billing/tax-invoice';
+import { tryBuildTaxInvoice } from '@/lib/billing/tax-invoice';
 import {
   carsiCoachingMonthlyPath,
   carsiCoachingMonthlyPriceCents,
@@ -209,9 +209,6 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
     });
     contactName = user?.fullName?.trim() ?? '';
   }
-  // The tax invoice takes the real name only, captured before the greeting
-  // fallback below (an email local part is not a buyer identity).
-  const buyerName = contactName;
   if (!contactName) contactName = email.split('@')[0] ?? 'Customer';
 
   const contactPhone =
@@ -244,7 +241,6 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
       item: `${carsiCoachingProductName} (monthly)`,
       checkout: session,
       issuedAt: new Date(),
-      buyer: { ...taxInvoiceBuyerFromCheckout(session.customer_details), name: buyerName },
     }),
   });
 

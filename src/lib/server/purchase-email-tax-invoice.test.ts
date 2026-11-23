@@ -42,7 +42,6 @@ const taxInvoice = buildTaxInvoice(
     item: 'Paid item',
     checkout: { payment_status: 'paid', amount_total: 2900 },
     issuedAt: new Date('2026-11-21T22:30:00.000Z'),
-    buyer: { name: null, businessName: null, abn: null },
   },
   { [CARSI_ABN_ENV]: '10000000000' } as NodeJS.ProcessEnv
 );
@@ -157,7 +156,6 @@ describe('sendEnrollmentWelcomeEmail adds the tax invoice only for a charge (GP-
       appOrigin: 'https://carsi.example',
       payment: {
         checkout: { payment_status: 'paid', amount_total: 2900 },
-        buyer: { name: null, businessName: null, abn: null },
       },
     });
     const body = sentBody();
@@ -184,7 +182,6 @@ describe('sendEnrollmentWelcomeEmail adds the tax invoice only for a charge (GP-
       appOrigin: 'https://carsi.example',
       payment: {
         checkout: { payment_status: 'paid', amount_total: 2900 },
-        buyer: { name: null, businessName: null, abn: null },
       },
     });
     expect(result).toEqual({ sent: true });
@@ -202,9 +199,12 @@ describe('sendEnrollmentWelcomeEmail adds the tax invoice only for a charge (GP-
       courseSlug: 'paid-item',
       appOrigin: 'https://carsi.example',
       payment: {
-        checkout: { payment_status: 'paid', amount_total: 101500 },
+        checkout: {
+          payment_status: 'paid',
+          amount_total: 101500,
+          customer_details: { name: 'Sam Lee' },
+        },
         seatCount: 35,
-        buyer: { name: 'Sam Lee', businessName: null, abn: null },
       },
     });
     const body = sentBody();
@@ -214,7 +214,11 @@ describe('sendEnrollmentWelcomeEmail adds the tax invoice only for a charge (GP-
     expect(body).toContain('Buyer: Sam Lee');
   });
 
-  it('a team order at exactly $1,000.00 with no Stripe name falls back to the stored full name', async () => {
+  // GP-761 review round 4 (founder ruling 23/11/2026): the Buyer is the Checkout payer
+  // only, so with no Checkout name the learner's stored name is NOT used, and a sale of
+  // $1,000 or more is sent without an invoice (logged NOT ISSUED).
+  it('a team order at exactly $1,000.00 with no Stripe name does not use the stored full name', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
     mocks.findUser.mockResolvedValue({ ...storedLearner, fullName: 'Alex Chen' });
     await sendEnrollmentWelcomeEmail({
       studentId: 'u1',
@@ -223,10 +227,12 @@ describe('sendEnrollmentWelcomeEmail adds the tax invoice only for a charge (GP-
       payment: {
         checkout: { payment_status: 'paid', amount_total: 100000 },
         seatCount: 20,
-        buyer: { name: null, businessName: null, abn: null },
       },
     });
-    expect(sentBody()).toContain('Buyer: Alex Chen');
+    // The greeting still uses the learner's name; only the invoice Buyer must not.
+    expect(sentBody()).not.toContain('Buyer');
+    expect(sentBody()).not.toContain('Tax invoice');
+    expect(err).toHaveBeenCalledWith(expect.stringContaining('NOT ISSUED'));
   });
 
   it('a team order of $1,000 or more with no buyer identity sends without an invoice and logs NOT ISSUED', async () => {
@@ -239,7 +245,6 @@ describe('sendEnrollmentWelcomeEmail adds the tax invoice only for a charge (GP-
       payment: {
         checkout: { payment_status: 'paid', amount_total: 101500 },
         seatCount: 35,
-        buyer: { name: null, businessName: null, abn: null },
       },
     });
     expect(result).toEqual({ sent: true });
@@ -257,9 +262,9 @@ describe('paid purchase emails carry a tax invoice only for a paid session (GP-7
     const call = mocks.sendEmail.mock.calls.at(-1)?.[0] as { html: string; text: string };
     return `${call.html}\n${call.text}`;
   };
-  const buyer = { name: 'Sam Lee', businessName: null, abn: null };
-  const paidSession = { payment_status: 'paid', amount_total: 2900 };
-  const unpaidSession = { payment_status: 'unpaid', amount_total: 2900 };
+  const customer_details = { name: 'Sam Lee' };
+  const paidSession = { payment_status: 'paid', amount_total: 2900, customer_details };
+  const unpaidSession = { payment_status: 'unpaid', amount_total: 2900, customer_details };
 
   const roadshow = (checkout: typeof paidSession) =>
     sendCcwRoadshowBookingConfirmationEmail({
@@ -275,7 +280,6 @@ describe('paid purchase emails carry a tax invoice only for a paid session (GP-7
       seatCount: 1,
       amountLabel: '$29',
       checkout,
-      buyer,
       appOrigin: 'https://carsi.example',
     } as Parameters<typeof sendCcwRoadshowBookingConfirmationEmail>[0]);
 
@@ -300,7 +304,6 @@ describe('paid purchase emails carry a tax invoice only for a paid session (GP-7
       seatCount: 1,
       amountLabel: '$29',
       checkout,
-      buyer,
       registrationStatus: 'confirmed',
       appOrigin: 'https://carsi.example',
     } as Parameters<typeof sendBusinessCoachingConfirmationEmail>[0]);
@@ -310,7 +313,7 @@ describe('paid purchase emails carry a tax invoice only for a paid session (GP-7
       studentId: 'u1',
       courseSlug: 'paid-item',
       appOrigin: 'https://carsi.example',
-      payment: { checkout, buyer },
+      payment: { checkout },
     } as Parameters<typeof sendEnrollmentWelcomeEmail>[0]);
 
   const families = { 'course purchase': course, roadshow, 'Owner Circle': ownerCircle };

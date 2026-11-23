@@ -1,7 +1,6 @@
 import type Stripe from 'stripe';
 
 import { getStripeClient } from '@/lib/api/stripe';
-import { taxInvoiceBuyerFromCheckout } from '@/lib/billing/tax-invoice';
 import { getAppOrigin } from '@/lib/server/app-url';
 import {
   formatAudFromCents,
@@ -88,11 +87,6 @@ export async function processCcwRoadshowBookingConfirmation(
     seatCount: ticketPackage.attendeeCount,
     amountLabel,
     checkout: session,
-    buyer: {
-      name: session.metadata?.attendee_name || session.customer_details?.name,
-      businessName: businessName || session.customer_details?.business_name,
-      abn: taxInvoiceBuyerFromCheckout(session.customer_details).abn,
-    },
     businessName,
     phone,
     appOrigin,

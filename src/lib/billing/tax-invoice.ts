@@ -105,9 +105,10 @@ export function readCarsiAbn(env: NodeJS.ProcessEnv = process.env): string | nul
 }
 
 /**
- * The best identity a caller has for the person or business that paid. Callers pass
- * raw values (blank is fine; this file trims them). Never pass a greeting fallback
- * such as "there" or an email local part: those are not an identity.
+ * The person or business that paid, as Stripe Checkout recorded them. Only
+ * `taxInvoiceBuyerFromCheckout` makes one, and only `buildTaxInvoice` calls it: no
+ * caller supplies a buyer, so an attendee, a booking-form contact or business name,
+ * or a learner's account name can never be shown as Buyer (GP-761).
  */
 export type TaxInvoiceBuyer = {
   /** The buyer's full name (e.g. Stripe `customer_details.name`). */
@@ -132,24 +133,6 @@ export type TaxInvoice = {
   gstCents: number;
 };
 
-/**
- * The Stripe Checkout session the sale was paid through (structural subset of
- * `Stripe.Checkout.Session`; pass the session object itself). The invoice total is
- * its `amount_total`, the GST-inclusive amount charged, in cents.
- */
-export type TaxInvoiceCheckout = {
-  payment_status?: string | null;
-  amount_total?: number | null;
-};
-
-export type TaxInvoiceInput = {
-  item: string;
-  /** Proof of payment: issued only when `payment_status` is 'paid'. */
-  checkout: TaxInvoiceCheckout;
-  issuedAt: Date;
-  buyer: TaxInvoiceBuyer;
-};
-
 /** Structural subset of Stripe `Checkout.Session.customer_details`. */
 type CheckoutCustomerDetails =
   | {
@@ -160,7 +143,31 @@ type CheckoutCustomerDetails =
   | null
   | undefined;
 
-/** The buyer as Stripe Checkout recorded it: name, business name and any AU ABN. */
+/**
+ * The Stripe Checkout session the sale was paid through (structural subset of
+ * `Stripe.Checkout.Session`; pass the session object itself). The invoice total is
+ * its `amount_total`, the GST-inclusive amount charged, in cents, and the Buyer is
+ * its `customer_details`: the person who paid.
+ */
+export type TaxInvoiceCheckout = {
+  payment_status?: string | null;
+  amount_total?: number | null;
+  customer_details?: CheckoutCustomerDetails;
+};
+
+/** There is deliberately no `buyer` field: the Buyer comes from `checkout` only. */
+export type TaxInvoiceInput = {
+  item: string;
+  /** Proof of payment (issued only when `payment_status` is 'paid'), total and Buyer. */
+  checkout: TaxInvoiceCheckout;
+  issuedAt: Date;
+};
+
+/**
+ * The one owner of who the Buyer is: the payer as Stripe Checkout recorded them
+ * (name, business name and any AU ABN), and nothing else. With no Checkout name the
+ * invoice has no Buyer row, and one of $1,000 or more is refused.
+ */
 export function taxInvoiceBuyerFromCheckout(details: CheckoutCustomerDetails): TaxInvoiceBuyer {
   return {
     name: details?.name ?? null,
@@ -226,8 +233,9 @@ export function buildTaxInvoice(
   if (typeof totalCents !== 'number' || !Number.isInteger(totalCents) || totalCents <= 0) {
     throw new RangeError(`A tax invoice needs a positive charge in cents; got ${totalCents}`);
   }
-  const buyerIdentity = clean(input.buyer.businessName) ?? clean(input.buyer.name);
-  const buyerAbn = isValidAbn(input.buyer.abn) ? formatAbn(input.buyer.abn!) : null;
+  const buyer = taxInvoiceBuyerFromCheckout(input.checkout.customer_details);
+  const buyerIdentity = clean(buyer.businessName) ?? clean(buyer.name);
+  const buyerAbn = isValidAbn(buyer.abn) ? formatAbn(buyer.abn!) : null;
   if (!taxInvoiceBuyerRuleMet({ totalCents, buyerIdentity, buyerAbn })) {
     throw new TaxInvoiceBuyerIdentityError(
       `a tax invoice of ${formatAudCents(TAX_INVOICE_BUYER_IDENTITY_THRESHOLD_CENTS)} or more needs the buyer's name, business name or ABN, and none was given`

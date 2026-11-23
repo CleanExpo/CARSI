@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getStripeClient } from '@/lib/api/stripe';
-import {
-  taxInvoiceBuyerFromCheckout,
-  type TaxInvoiceBuyer,
-  type TaxInvoiceCheckout,
-} from '@/lib/billing/tax-invoice';
+import type { TaxInvoiceCheckout } from '@/lib/billing/tax-invoice';
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { confirmEmailOwnershipOk, resolveAccountEmail } from '@/lib/server/enrollment-confirm-guard';
@@ -50,8 +46,6 @@ export async function POST(request: NextRequest) {
   let teamSeatCount: number | undefined;
   /** The retrieved Checkout session; the tax-invoice owner reads its paid status and amount (GP-761). */
   let paidCheckout: TaxInvoiceCheckout | null = null;
-  /** The payer as Checkout recorded them, for the tax invoice buyer row (GP-761). */
-  let paidBuyer: TaxInvoiceBuyer = { name: null, businessName: null, abn: null };
 
   if (sessionId) {
     if (!process.env.STRIPE_SECRET_KEY?.trim()) {
@@ -89,7 +83,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ detail: 'Session email does not match account' }, { status: 403 });
       }
       paidCheckout = session;
-      paidBuyer = taxInvoiceBuyerFromCheckout(session.customer_details);
     } catch (e) {
       console.error('[enrollments/confirm] stripe', e);
       void captureServerError(e, { route: '/api/lms/enrollments/confirm' });
@@ -168,7 +161,6 @@ export async function POST(request: NextRequest) {
           ? {
               checkout: paidCheckout,
               seatCount: purchaseMode === 'team' ? teamSeatCount : undefined,
-              buyer: paidBuyer,
             }
           : undefined,
       }).catch((e) => console.error('[enrollments/confirm] email', e));
