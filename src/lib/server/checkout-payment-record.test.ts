@@ -232,6 +232,28 @@ describe('GP-764: the amount paid is recorded at fulfilment', () => {
     expect(payments()).toEqual([]);
   });
 
+  it('a refunded session is not recorded even when the buyer already holds the course through another payment', async () => {
+    // The enrolment step issues nothing here ('already_enrolled'), so it never reaches the
+    // reversal check; the payment record must make that check itself (GP-759 reversal rule
+    // from main, kept through the restored-main merge).
+    db.tables.lmsEnrollment.push({
+      id: 'e-old',
+      studentId: 'buyer',
+      courseId: 'course-1',
+      paymentReference: 'cs_test_old',
+      status: 'active',
+    });
+    db.tables.stripeWebhookEvent.push({
+      id: 'payment-reversed:cs_test_refunded_held',
+      type: 'payment_reversed:refunded',
+    });
+
+    const self = await fulfil('cs_test_refunded_held');
+
+    expect(self.alreadyEnrolled).toBe(true);
+    expect(payments()).toEqual([]);
+  });
+
   it('a grant that is not a Stripe checkout (free, discount) records nothing', async () => {
     await fulfil('free', { amountPaid: null });
     await fulfil('discount:d-1', { courseSlug: 'mould', amountPaid: null });
