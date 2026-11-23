@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 
 import { isUuid, resolveMarketingImageUrl } from './admin-marketing-email';
 import { formatMarketingBodyAsHtml, renderAdminMarketingEmail } from './email-templates';
@@ -52,7 +53,7 @@ describe('admin marketing email helpers', () => {
     expect(html).toContain('/unsubscribe?token=abc');
     expect(html).toContain('Hi Sam,');
     expect(html).toContain('Phill McGurk');
-    expect(html).toContain('IICRC CEC Accredited');
+    expect(html).toContain(IICRC_APPROVED_CEC_PROVIDER);
     expect(text).toContain('Founder | CARSI');
     expect(text).toContain('Unsubscribe:');
   });

@@ -1,10 +1,13 @@
 import { PUBLIC_TOPIC_LIST } from '@/lib/server/public-catalogue-facts';
 
+import { FROM_IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 /** Homepage FAQ copy — GP-654: plain-English topics, never an IICRC discipline count. */
 export function buildHomeFaqs(facts: { publishedCourseCount: number }) {
   const n = facts.publishedCourseCount;
   const coursePhrase =
-    n > 0 ? `${n} published course${n === 1 ? '' : 's'}` : 'IICRC CEC Accredited courses';
+    n > 0
+      ? `${n} published course${n === 1 ? '' : 's'}`
+      : `courses ${FROM_IICRC_APPROVED_CEC_PROVIDER}`;
 
   return [
     {

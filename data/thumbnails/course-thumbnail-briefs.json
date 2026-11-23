@@ -433,7 +433,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces, no live birds, no distressed animals, no gore",
-      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as approved for IICRC CECs (registry-gated)."
     },
     {
       "slug": "ccw-carsi-truckmount-operations",
@@ -451,7 +451,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
-      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as approved for IICRC CECs (registry-gated)."
     },
     {
       "slug": "water-damage-restoration-fundamentals",
@@ -469,7 +469,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
-      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as approved for IICRC CECs (registry-gated)."
     },
     {
       "slug": "mould-remediation-fundamentals",
@@ -487,7 +487,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
-      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as approved for IICRC CECs (registry-gated)."
     },
     {
       "slug": "structural-drying-fundamentals",
@@ -505,7 +505,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
-      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as approved for IICRC CECs (registry-gated)."
     },
     {
       "slug": "category-3-sewage-black-water-remediation",
@@ -523,7 +523,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces, no gore, no graphic filth, no distressing imagery",
-      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as approved for IICRC CECs (registry-gated)."
     },
     {
       "slug": "asbestos-awareness-for-restoration-technicians",
@@ -541,7 +541,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
-      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as approved for IICRC CECs (registry-gated)."
     },
     {
       "slug": "psychrometry-building-science-for-drying",
@@ -559,7 +559,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
-      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as approved for IICRC CECs (registry-gated)."
     },
     {
       "slug": "fire-smoke-damage-restoration-fundamentals",
@@ -577,7 +577,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
-      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as approved for IICRC CECs (registry-gated)."
     },
     {
       "slug": "trauma-crime-scene-decontamination-fundamentals",
@@ -595,7 +595,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces, no blood, no bodies, no injuries, no crime-scene imagery, no distressing or graphic content, no people",
-      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as approved for IICRC CECs (registry-gated)."
     },
     {
       "slug": "carpet-cleaning-fundamentals",
@@ -613,7 +613,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
-      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as approved for IICRC CECs (registry-gated)."
     },
     {
       "slug": "timber-floor-assessment-restoration",
@@ -631,7 +631,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
-      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as approved for IICRC CECs (registry-gated)."
     },
     {
       "slug": "assessing-indoor-environment-conditions",
@@ -649,7 +649,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
-      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as approved for IICRC CECs (registry-gated)."
     },
     {
       "slug": "whs-fundamentals-for-restoration-and-cleaning-professionals",
@@ -667,7 +667,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the main subject toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces",
-      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as IICRC CEC accredited (registry-gated)."
+      "authorNote": "Australian-produced CARSI course; photoreal scene, no faces or branding. Not styled as approved for IICRC CECs (registry-gated)."
     },
     {
       "slug": "ozone-and-hydroxyl-generators-what-the-evidence-says",
