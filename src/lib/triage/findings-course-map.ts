@@ -21,6 +21,7 @@
  * is never reported as "no findings" (the input was read and held nothing new; exit 0).
  */
 import { isAiRewriteLocked } from '@/lib/courses/ai-rewrite-lock';
+import { isPublishedCourseStatus } from '@/lib/courses/course-status';
 import type { CatalogCourse } from '@/lib/seed/courses-catalog-types';
 
 export const DEFAULT_FINDINGS_PATH = 'docs/governance/BACKLOG.md';
@@ -392,7 +393,7 @@ export function mapFindingsToCourses(
       matches.push({
         slug: course.slug,
         title: decodeEntities(course.title),
-        isPublished: course.isPublished === true,
+        isPublished: isPublishedCourseStatus(course.status),
         strength: strong ? 'strong' : 'lesson',
         score,
         reasons,

@@ -140,6 +140,20 @@ describe('mapFindingsToCourses', () => {
     );
   });
 
+  it('reads publication from status, not the legacy isPublished column (#137)', () => {
+    const catalogue = [
+      course('mould-status', 'Mould Status', {
+        tags: ['mould'],
+        status: 'published',
+        isPublished: false,
+      }),
+      course('mould-draft', 'Mould Draft', { tags: ['mould'], status: 'draft', isPublished: true }),
+    ];
+    const [result] = mapFindingsToCourses([finding('f9', 'New mould guidance')], catalogue);
+    const bySlug = Object.fromEntries(result.matches.map((m) => [m.slug, m.isPublished]));
+    expect(bySlug).toEqual({ 'mould-status': true, 'mould-draft': false });
+  });
+
   it('maps an unrelated finding to no course', () => {
     const [result] = mapFindingsToCourses(
       [
