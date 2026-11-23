@@ -7,25 +7,45 @@ export function completionColor(completionPct: number) {
   return '#fb923c';
 }
 
-export function formatAdminDateTime(iso: string | null | undefined): string {
+/**
+ * Admin dates render on the server and again during hydration, so they must not depend on
+ * the runtime's default locale or timezone. GP-768: the server (UTC) and the viewer's browser
+ * produced different text and React threw #418. Both are pinned to en-AU / Australia/Sydney.
+ */
+export const ADMIN_LOCALE = 'en-AU';
+export const ADMIN_TIME_ZONE = 'Australia/Sydney';
+
+const adminDateTimeFormat = new Intl.DateTimeFormat(ADMIN_LOCALE, {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+  timeZone: ADMIN_TIME_ZONE,
+});
+
+const adminDateFormat = new Intl.DateTimeFormat(ADMIN_LOCALE, {
+  dateStyle: 'medium',
+  timeZone: ADMIN_TIME_ZONE,
+});
+
+const adminCountFormat = new Intl.NumberFormat(ADMIN_LOCALE);
+
+function formatIso(format: Intl.DateTimeFormat, iso: string | null | undefined): string {
   if (!iso) return '—';
-  try {
-    return new Date(iso).toLocaleString(undefined, {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    });
-  } catch {
-    return '—';
-  }
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '—';
+  return format.format(date);
+}
+
+export function formatAdminDateTime(iso: string | null | undefined): string {
+  return formatIso(adminDateTimeFormat, iso);
 }
 
 export function formatAdminDate(iso: string | null | undefined): string {
-  if (!iso) return '—';
-  try {
-    return new Date(iso).toLocaleDateString(undefined, { dateStyle: 'medium' });
-  } catch {
-    return '—';
-  }
+  return formatIso(adminDateFormat, iso);
+}
+
+/** Counts with a fixed locale, so server and client group digits the same way. */
+export function formatAdminCount(n: number): string {
+  return adminCountFormat.format(n);
 }
 
 export const adminGlassCard = cn(
