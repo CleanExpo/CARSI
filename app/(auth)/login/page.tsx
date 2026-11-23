@@ -3,6 +3,7 @@ import Link from 'next/link';
 
 import { registerPathWithNext } from '@/lib/membership-signup-path';
 
+import { FROM_IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export default async function LoginPage({
   searchParams,
 }: {
@@ -23,7 +24,7 @@ export default async function LoginPage({
           Enter your email and password to access your account
         </p>
         <p className="text-xs font-semibold tracking-wide text-[#146fc2]">
-          Restoration training from an IICRC CEC Accredited provider
+          Restoration training {FROM_IICRC_APPROVED_CEC_PROVIDER}
         </p>
       </div>
 

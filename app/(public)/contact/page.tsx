@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { ContactForm, type ContactLeadContext } from '@/components/contact/ContactForm';
 import { CARSI_SOCIAL_PROFILES } from '@/lib/brand/social-profiles';
 import { resolveCcwInterestPageUrl } from '@/lib/marketing/ccw-roadshow';
+import { APPROVED_FOR_IICRC_CECS } from '@/lib/iicrc/approved-wording';
 
 type ContactPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -89,7 +90,7 @@ export async function generateMetadata({
   return {
     title: 'Contact — Cleaning and Restoration Science Institute',
     description:
-      'Get in touch with CARSI for course enquiries, membership support, or questions about IICRC CEC Accredited courses.',
+      `Get in touch with CARSI for course enquiries, membership support, or questions about courses ${APPROVED_FOR_IICRC_CECS}.`,
   };
 }
 

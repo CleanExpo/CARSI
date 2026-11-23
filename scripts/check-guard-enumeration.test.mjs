@@ -57,6 +57,12 @@ const CASES = [
     content: 'export function f(course: any) { const { cecHours: raw } = course; return raw; }\n',
   },
   {
+    script: 'check:iicrc-scope',
+    probe: 'data/seed/assessment-drafts/__guard_probe__.json',
+    // from check-iicrc-scope.test.mjs: a non-approved course naming an IICRC standard
+    content: JSON.stringify({ courseSlug: '__guard_probe__', disclaimer: 'Aligned to ANSI/IICRC S500.' }) + '\n',
+  },
+  {
     script: 'check:au-english',
     probe: 'data/seed/assessment-drafts/__guard_probe__.json',
     // three separate AU rules at once: US spelling x2 and US voltage

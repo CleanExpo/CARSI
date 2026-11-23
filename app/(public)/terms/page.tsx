@@ -6,6 +6,7 @@ import {
   marketingTextStrong,
 } from '@/components/marketing/LegalDocumentShell';
 
+import { APPROVED_FOR_IICRC_CECS, CARSI_PROVIDER_STATUS } from '@/lib/iicrc/approved-wording';
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description: 'Terms of Service for CARSI Learning Management System',
@@ -27,8 +28,8 @@ export default function TermsPage() {
         <h2 className={marketingLegalH2}>2. Description of Service</h2>
         <p>
           CARSI provides online education and training courses primarily for the restoration and
-          cleaning industry. Our courses include IICRC CEC Accredited courses (Continuing
-          Education Credit) and general professional development content.
+          cleaning industry. {CARSI_PROVIDER_STATUS} Our courses include courses {APPROVED_FOR_IICRC_CECS}
+          (Continuing Education Credits) and general professional development content.
         </p>
         <p>
           CARSI is a private company and is not a Registered Training Organisation (RTO). We do not
