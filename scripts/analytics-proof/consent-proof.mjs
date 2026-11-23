@@ -8,19 +8,22 @@
  * Collection requests are recorded and then aborted in the browser, so no hit reaches the live
  * property; the library file itself is fetched for real.
  *
- * Checks, per viewport (exit 1 when any fails, exit 2 when the proof could not run):
+ * Checks, per viewport (exit 1 when any fails, exit 2 when the proof could not run, exit 3
+ * "BLOCKED: library did not load" when gtag.js never arrived with a 2xx response and a body;
+ * then B2-B4, C and D are reported as skipped, not passed, because nothing could be sent):
  *   A. first load with an email, a token and a campaign tag in the address: banner visible,
  *      zero Google Analytics / Tag Manager requests;
- *   B. "Accept analytics": the library loads and a page_view leaves whose address is the page
- *      plus the campaign tag only (no email, no token);
+ *   B. "Accept analytics": the library loads (2xx with a body) and a page_view leaves whose
+ *      address is the page plus the campaign tag only (no email, no token);
  *   C. a private page (/login) after accepting: no collection request about it;
  *   D. "Cookie settings" then "Reject optional": no Google request after the choice, and the
  *      _ga cookies are gone;
  *   E. a fresh visitor who presses "Reject optional" first: zero Google requests across two pages.
  *
  * Writes report.json and screenshots to PROOF_OUT (default: ../carsi-ga4-consent-proof beside the
- * repository). Refuses to run when any .env file other than .env.example exists, so the build
- * never reads real secrets.
+ * repository). Runs `prisma generate` before the build and stops with exit 2 if it fails or writes
+ * no client. Refuses to run when any .env file other than .env.example exists, so the build never
+ * reads real secrets.
  */
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
@@ -35,12 +38,15 @@ import {
   evaluatePrivatePage,
   isGoogle,
   isLibrary,
+  prismaPreflight,
+  skipped,
   verdict,
 } from './consent-checks.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const OUT = resolve(process.env.PROOF_OUT || join(ROOT, '..', 'carsi-ga4-consent-proof'));
 const NEXT_BIN = join(ROOT, 'node_modules', 'next', 'dist', 'bin', 'next');
+const PRISMA_BIN = join(ROOT, 'node_modules', 'prisma', 'build', 'index.js');
 
 const LANDING =
   '/about?email=jane.proof%40example.invalid&token=proof-token-abc123&utm_source=proofcampaign';
@@ -90,6 +96,20 @@ function build() {
     console.log('build: skipped (PROOF_SKIP_BUILD=1, existing .next)');
     return;
   }
+  // The build imports the generated Prisma client; without it `next build` fails deep in its
+  // output. Generate it first, with the same pinned environment, and stop with a plain message.
+  console.log('build: prisma generate ...');
+  const pre = prismaPreflight(ROOT, () =>
+    spawnSync(process.execPath, [PRISMA_BIN, 'generate'], {
+      cwd: ROOT,
+      stdio: ['ignore', 'inherit', 'inherit'],
+      env: pinnedEnv(),
+    })
+  );
+  if (!pre.ok) {
+    console.error(`PROOF COULD NOT RUN: ${pre.message}`);
+    process.exit(2);
+  }
   console.log('build: next build ...');
   const res = spawnSync(process.execPath, [NEXT_BIN, 'build'], {
     cwd: ROOT,
@@ -128,10 +148,12 @@ function pinnedEnv() {
 
 async function runViewport(browser, base, vp) {
   const checks = [];
-  const check = (id, pass, detail) => {
-    checks.push({ id, pass: Boolean(pass), detail });
-    console.log(`${pass ? 'PASS' : 'FAIL'} [${vp.name}] ${id}: ${detail}`);
+  const record = (c) => {
+    checks.push(c);
+    console.log(`${c.status.toUpperCase()} [${vp.name}] ${c.id}: ${c.detail}`);
   };
+  const check = (id, pass, detail) =>
+    record({ id, status: pass ? 'pass' : 'fail', pass: Boolean(pass), detail });
   const shots = {};
   const shot = async (page, key) => {
     const file = join(OUT, `${vp.name}-${key}.png`);
@@ -142,16 +164,35 @@ async function runViewport(browser, base, vp) {
   // ---- Visitor 1: lands, accepts, visits a private page, then withdraws.
   const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height } });
   const log = [];
+  const entryOf = new Map();
+  const pending = new Set();
   let phase = 'before-choice';
   ctx.on('request', (req) => {
     if (isGoogle(req.url())) {
-      log.push({
+      const entry = {
         phase,
         url: req.url(),
         body: req.postData() ?? '',
         library: isLibrary(req.url()),
-      });
+      };
+      entryOf.set(req, entry);
+      log.push(entry);
     }
+  });
+  // B1 needs to know whether the library actually arrived, not only that it was asked for.
+  ctx.on('requestfailed', (req) => {
+    const entry = entryOf.get(req);
+    if (entry) entry.failure = req.failure()?.errorText ?? 'request failed';
+  });
+  ctx.on('requestfinished', (req) => {
+    const entry = entryOf.get(req);
+    if (!entry?.library) return;
+    const task = (async () => {
+      const res = await req.response();
+      entry.status = res?.status();
+      entry.bodyBytes = res ? (await res.body().catch(() => Buffer.alloc(0))).length : 0;
+    })().finally(() => pending.delete(task));
+    pending.add(task);
   });
   await ctx.route(
     (url) => isGoogle(url.href) && !isLibrary(url.href),
@@ -183,43 +224,61 @@ async function runViewport(browser, base, vp) {
     .catch(() => null);
   await page.waitForTimeout(2000);
   await shot(page, '2-after-accept');
+  await Promise.all([...pending]);
   const accepted = log.filter((r) => r.phase === 'after-accept');
-  for (const c of evaluateAccept(accepted, `${base}/about?utm_source=proofcampaign`)) {
-    check(c.id, c.pass, c.detail);
+  const acceptChecks = evaluateAccept(accepted, `${base}/about?utm_source=proofcampaign`);
+  acceptChecks.forEach(record);
+  const libraryOk = acceptChecks[0].status === 'pass';
+
+  if (libraryOk) {
+    await withdrawFlow();
+  } else {
+    // Nothing could be sent without the library, so C and D would pass (or fail) vacuously.
+    ['C1-no-hit-about-private-page', 'D1-zero-google-after-withdraw', 'D2-ga-cookies-deleted']
+      .map(skipped)
+      .forEach(record);
   }
-
-  phase = 'private-page';
-  await page.goto(`${base}/login?email=jane.proof%40example.invalid`, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(3000);
-  const c1 = evaluatePrivatePage(log.filter((r) => r.phase === 'private-page'));
-  check(c1.id, c1.pass, c1.detail);
-  const cookiesBefore = (await ctx.cookies()).filter(
-    (c) => c.name === '_ga' || c.name.startsWith('_ga_')
-  );
-
-  await page.goto(`${base}/privacy`, { waitUntil: 'networkidle' });
-  await page.getByRole('button', { name: 'Cookie settings' }).first().click();
-  await shot(page, '3-cookie-settings-reopened');
-  phase = 'after-withdraw';
-  await page.getByRole('button', { name: 'Reject optional' }).click();
-  const withdrawAt = log.length;
-  await page.goto(`${base}/about?utm_source=proofcampaign`, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(3000);
-  const afterWithdraw = log.slice(withdrawAt);
-  check(
-    'D1-zero-google-after-withdraw',
-    afterWithdraw.length === 0,
-    `${afterWithdraw.length} Google request(s) after "Reject optional"`
-  );
-  const cookiesAfter = (await ctx.cookies()).filter(
-    (c) => c.name === '_ga' || c.name.startsWith('_ga_')
-  );
-  check(
-    'D2-ga-cookies-deleted',
-    cookiesBefore.length > 0 && cookiesAfter.length === 0,
-    `_ga cookies before withdraw: ${cookiesBefore.length}, after: ${cookiesAfter.length}`
-  );
   await ctx.close();
+
+  async function withdrawFlow() {
+    phase = 'private-page';
+    await page.goto(`${base}/login?email=jane.proof%40example.invalid`, {
+      waitUntil: 'networkidle',
+    });
+    await page.waitForTimeout(3000);
+    record(
+      evaluatePrivatePage(
+        log.filter((r) => r.phase === 'private-page'),
+        { libraryLoaded: true }
+      )
+    );
+    const cookiesBefore = (await ctx.cookies()).filter(
+      (c) => c.name === '_ga' || c.name.startsWith('_ga_')
+    );
+
+    await page.goto(`${base}/privacy`, { waitUntil: 'networkidle' });
+    await page.getByRole('button', { name: 'Cookie settings' }).first().click();
+    await shot(page, '3-cookie-settings-reopened');
+    phase = 'after-withdraw';
+    await page.getByRole('button', { name: 'Reject optional' }).click();
+    const withdrawAt = log.length;
+    await page.goto(`${base}/about?utm_source=proofcampaign`, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(3000);
+    const afterWithdraw = log.slice(withdrawAt);
+    check(
+      'D1-zero-google-after-withdraw',
+      afterWithdraw.length === 0,
+      `${afterWithdraw.length} Google request(s) after "Reject optional"`
+    );
+    const cookiesAfter = (await ctx.cookies()).filter(
+      (c) => c.name === '_ga' || c.name.startsWith('_ga_')
+    );
+    check(
+      'D2-ga-cookies-deleted',
+      cookiesBefore.length > 0 && cookiesAfter.length === 0,
+      `_ga cookies before withdraw: ${cookiesBefore.length}, after: ${cookiesAfter.length}`
+    );
+  }
 
   // ---- Visitor 2: rejects straight away.
   const ctx2 = await browser.newContext({ viewport: { width: vp.width, height: vp.height } });
