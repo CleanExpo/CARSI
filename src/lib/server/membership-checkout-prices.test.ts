@@ -8,7 +8,7 @@
  * - individual: only a A$795 per year Price reaches checkout;
  * - business owner (org checkout and the onboarding org path): only a A$1,295 per YEAR Price;
  *   the old monthly env var is no longer read;
- * - onboarding fallback (inline price): A$1,295 billed yearly, whatever the course meta says;
+ * - onboarding with Teams off: the same verified A$1,295 yearly Price, or no checkout (no inline price);
  * - extra staff seats: refused unless the subscription's seat Price is A$695 per year;
  * - no membership checkout accepts promotion codes ("no further discounts").
  */
@@ -254,25 +254,48 @@ describe('onboarding checkout (the same business owner plan)', () => {
     });
   }
 
-  it('inline fallback: A$1,295 billed yearly as a subscription, whatever the course meta says', async () => {
-    await createOnboardingStripeCheckout({
-      slug: 'floor-care',
-      title: 'Test onboarding',
-      meta: { pricing: { amountAud: 999, billingCycle: 'monthly', gst: 'exclusive' } },
-      customerEmail: 'owner@example.test',
-      studentId: 'user-1',
-      successUrl: 'https://carsi.example.test/ok',
-      cancelUrl: 'https://carsi.example.test/cancel',
-    });
-    const args = lastSessionArgs() as {
-      mode: string;
-      line_items: Array<{ price_data: { unit_amount: number; currency: string; recurring?: { interval: string } } }>;
-    };
+  // GP-773 round 2 (Codex P1 on 177c2c0d): with Teams off the onboarding route used to build an
+  // inline A$1,295 yearly price that no Stripe Price backed. It must now charge only the
+  // verified business owner Price, and open nothing when there is none.
+  it('Teams off: charges the verified A$1,295 yearly Price, never an inline price', async () => {
+    vi.stubEnv('TEAMS_SUBSCRIPTIONS_ENABLED', 'false');
+    const res = await onboarding(request({ organisation_name: 'Acme Restoration' }), onboardingCtx);
+    expect(res.status).toBe(200);
+    const args = lastSessionArgs() as { mode: string; line_items: unknown[] };
     expect(args.mode).toBe('subscription');
-    expect(args.line_items[0].price_data.unit_amount).toBe(129_500);
-    expect(args.line_items[0].price_data.currency).toBe('aud');
-    expect(args.line_items[0].price_data.recurring).toEqual({ interval: 'year' });
+    expect(args.line_items).toEqual([{ price: 'price_owner', quantity: 1 }]);
+    expect(JSON.stringify(args)).not.toContain('price_data');
     expect(args).not.toHaveProperty('allow_promotion_codes');
+  });
+
+  for (const [label, setUp] of [
+    ['a monthly A$1,295 Price', () => (catalogue.price_owner = price('price_owner', 129_500, 'month'))],
+    ['a A$795 Price', () => (catalogue.price_owner = price('price_owner', 79_500))],
+    ['no Price at all', () => vi.stubEnv('STRIPE_PRICE_ORG_ANNUAL', '')],
+  ] as const) {
+    it(`Teams off with ${label}: refuses (503) and opens no checkout`, async () => {
+      vi.stubEnv('TEAMS_SUBSCRIPTIONS_ENABLED', 'false');
+      setUp();
+      const res = await onboarding(request({ organisation_name: 'Acme Restoration' }), onboardingCtx);
+      expect(res.status).toBe(503);
+      expect(mocks.sessionsCreate).not.toHaveBeenCalled();
+    });
+  }
+
+  it('the onboarding checkout helper refuses to run without a verified Price id', async () => {
+    await expect(
+      createOnboardingStripeCheckout({
+        slug: 'floor-care',
+        title: 'Test onboarding',
+        meta: { pricing: { amountAud: 999, billingCycle: 'monthly', gst: 'exclusive' } },
+        customerEmail: 'owner@example.test',
+        studentId: 'user-1',
+        successUrl: 'https://carsi.example.test/ok',
+        cancelUrl: 'https://carsi.example.test/cancel',
+        priceId: '',
+      })
+    ).rejects.toThrow('NO_VERIFIED_PRICE');
+    expect(mocks.sessionsCreate).not.toHaveBeenCalled();
   });
 });
 

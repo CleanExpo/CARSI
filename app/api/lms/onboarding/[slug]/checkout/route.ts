@@ -176,8 +176,20 @@ export async function POST(request: NextRequest, ctx: Ctx) {
     }
   }
 
+  // GP-773: with Teams off there is no organisation container, but the plan is still the
+  // business owner plan, so it is charged only through the verified Stripe Price (A$1,295 AUD
+  // yearly). No verified Price, no checkout: the inline price this path used to build is gone.
+  const inlinePriceId = await resolveOrgAnnualPriceId();
+  if (!inlinePriceId) {
+    return NextResponse.json(
+      { detail: 'Organisation subscription purchasing is not yet available.' },
+      { status: 503 }
+    );
+  }
+
   try {
     const { checkout_url } = await createOnboardingStripeCheckout({
+      priceId: inlinePriceId,
       slug,
       title: course.title,
       shortDescription: course.shortDescription,

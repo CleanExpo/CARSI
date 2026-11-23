@@ -16,6 +16,7 @@ const mocks = vi.hoisted(() => ({
   oneOffCheckout: vi.fn(),
   orgEntitlements: vi.fn(),
   enrol: vi.fn(),
+  resolvePrice: vi.fn(),
 }));
 
 vi.mock('@/lib/server/auth-from-request', () => ({
@@ -34,7 +35,7 @@ vi.mock('@/lib/prisma', () => ({
   prisma: { lmsEnrollment: { findUnique: vi.fn(async () => null) } },
 }));
 vi.mock('@/lib/server/org-subscription-price', () => ({
-  resolveOrgAnnualPriceId: vi.fn(async () => 'price_org_monthly'),
+  resolveOrgAnnualPriceId: mocks.resolvePrice,
 }));
 vi.mock('@/lib/server/org-subscription-provision', () => ({
   provisionOrgSubscriptionContainer: mocks.provision,
@@ -88,6 +89,7 @@ beforeEach(() => {
     teamId: 'team-1',
   });
   mocks.enrol.mockResolvedValue('enrolled');
+  mocks.resolvePrice.mockResolvedValue('price_org_annual');
   process.env.STRIPE_SECRET_KEY = 'sk_test_synthetic';
   process.env.DATABASE_URL = 'postgres://configured';
 });
@@ -126,7 +128,21 @@ describe('onboarding checkout: org subscription needs BOTH flags', () => {
         expect(mocks.provision).not.toHaveBeenCalled();
         expect(mocks.sessionCreate).not.toHaveBeenCalled();
         expect(mocks.oneOffCheckout).toHaveBeenCalledTimes(1);
+        // GP-773: the Teams-off path charges the verified business owner Price.
+        expect(mocks.oneOffCheckout).toHaveBeenCalledWith(
+          expect.objectContaining({ priceId: 'price_org_annual' })
+        );
       }
+    });
+
+    it(`SUBSCRIPTIONS_ENABLED=${String(c.subs)} TEAMS=${String(c.teams)} with no verified Price: 503, no checkout`, async () => {
+      setFlags(c.subs, c.teams);
+      mocks.resolvePrice.mockResolvedValue(null);
+      const res = await checkout(post('/api/lms/onboarding/acme-cleaning/checkout'), ctx);
+      expect(res.status).toBe(503);
+      expect(mocks.provision).not.toHaveBeenCalled();
+      expect(mocks.sessionCreate).not.toHaveBeenCalled();
+      expect(mocks.oneOffCheckout).not.toHaveBeenCalled();
     });
   }
 });
