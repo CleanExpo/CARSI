@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import { resolveTitle } from 'next/dist/lib/metadata/resolvers/resolve-title';
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('next/font/google', () => ({
-  Outfit: () => ({ variable: 'font-display' }),
-  Plus_Jakarta_Sans: () => ({ variable: 'font-sans' }),
+vi.mock('@/lib/brand/fonts', () => ({
+  fontDisplay: { variable: '--font-display' },
+  fontSans: { variable: '--font-sans' },
+  fontMono: { variable: '--font-mono' },
 }));
 
 vi.mock('@/lib/server/public-catalogue-facts', () => ({

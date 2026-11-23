@@ -494,6 +494,10 @@ describe('personal data never reaches analytics, whatever shape it takes (GP-731
     expect(isValidCarsiContext('not-allowed@host')).toBe(false);
     expect(isAllowedTextParam('carsi_context', 'role-guide:nsw-builders:start-1')).toBe(true);
     expect(isAllowedTextParam('carsi_context', 'role-guide:nsw-builders')).toBe(true);
+    expect(isAllowedTextParam('carsi_context', 'catalogue:water-damage-restoration-fundamentals')).toBe(
+      true
+    );
+    expect(isValidCarsiContext('catalogue:floor-care-onboarding-operational-readiness')).toBe(true);
     expect(isAllowedTextParam('carsi_context', 'jane@example.com')).toBe(false);
     expect(isAllowedTextParam('link_path', '/courses/:slug')).toBe(true);
     expect(isAllowedTextParam('link_path', '/dashboard')).toBe(false);

@@ -1,5 +1,7 @@
 # Recommended Skill Map — Per Agent Role
 
+> **Implemented catalogue:** use `.agents/skills/README.md` (44 CARSI domain skills + shared references). This document is a legacy role map for senior-agent orchestration experiments; new work should invoke `.agents/skills/**` directly.
+
 Each Senior Agent maintains 6–8 maximum active skills. Skills are loaded only when relevant — not all at once.
 
 ---

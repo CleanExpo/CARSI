@@ -7,24 +7,13 @@ import { CookieConsentBanner } from '@/components/privacy/CookieConsentBanner';
 import { OrganizationSchema, WebsiteSchema } from '@/components/seo';
 import { AppToastProvider } from '@/hooks/use-toast';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
+import { fontDisplay, fontMono, fontSans } from '@/lib/brand/fonts';
 import type { Metadata, Viewport } from 'next';
-import { Outfit, Plus_Jakarta_Sans } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 import { OG_LOCALE_FIELDS, SITE_LANG } from '@/lib/seo/locale';
 
 import { FROM_IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
-const outfit = Outfit({
-  subsets: ['latin'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  variable: '--font-sans',
-  display: 'swap',
-});
 
 const siteUrl = getPublicSiteUrl();
 
@@ -131,7 +120,7 @@ export default function RootLayout({
         <Script src="/theme-init.js" strategy="beforeInteractive" />
       </head>
       <body
-        className={`${outfit.variable} ${plusJakarta.variable} font-sans`}
+        className={`${fontDisplay.variable} ${fontSans.variable} ${fontMono.variable} font-sans`}
         suppressHydrationWarning
       >
         <AuthProvider>
