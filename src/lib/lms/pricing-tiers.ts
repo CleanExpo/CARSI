@@ -62,7 +62,7 @@ export const INDIVIDUAL_TIERS: IndividualTier[] = [
     priceLabel: PER_COURSE_PRICE_FALLBACK_LABEL,
     priceCents: null,
     // Not every course carries IICRC CECs, so this must not call every per-course purchase
-    // "IICRC CEC Accredited". Only courses the IICRC has approved for CECs earn them.
+    // an IICRC Approved CEC Provider. Only courses the IICRC has approved for CECs earn them.
     description:
       'Pay once per course. CECs are tracked on completion, only for courses the IICRC has approved.',
     cta: 'Browse courses',

@@ -12,6 +12,7 @@
 import DOMPurify from 'isomorphic-dompurify';
 import { marked } from 'marked';
 
+import { CARSI_PROVIDER_STATUS } from '@/lib/iicrc/approved-wording';
 export const WORKSHOP_MANUAL_PARTNER_CREDIT =
   'Delivered on the CARSI roadshow with partner venue Carpet Cleaners Warehouse (CCW).';
 
@@ -91,7 +92,7 @@ function documentShell(opts: {
 ${opts.body}
 <footer>
   <p>&copy; CARSI. ${escapeHtml(WORKSHOP_MANUAL_PARTNER_CREDIT)}</p>
-  <p>CARSI is an IICRC CEC Accredited provider. This workshop carries no IICRC CECs; attending both days earns a CARSI certificate of attendance.</p>
+  <p>${CARSI_PROVIDER_STATUS} This workshop carries no IICRC CECs; attending both days earns a CARSI certificate of attendance.</p>
 </footer>
 </body>
 </html>`;

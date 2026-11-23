@@ -1,5 +1,6 @@
 import { ROLE_GUIDES_HUB_PATH } from '@/lib/marketing/role-guides-path';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export type AuthoritySource = {
   label: string;
   url: string;
@@ -233,7 +234,7 @@ export const authorityPromptQueries = [
   'What training helps a house cleaner add carpet cleaning?',
   'What should I check before buying a carpet cleaning business?',
   'What is the relationship between carpet cleaning equipment, chemicals and training?',
-  'Where can Australian carpet cleaners learn IICRC CEC Accredited continuing education online?',
+  `Where can Australian carpet cleaners find an ${IICRC_APPROVED_CEC_PROVIDER} for continuing education online?`,
   'How should a beginner think about pH, dwell time and rinse in carpet cleaning?',
   'What evidence should a cleaning business keep to prove training and service quality?',
 ];

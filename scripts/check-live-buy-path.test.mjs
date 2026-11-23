@@ -284,6 +284,122 @@ check('URL-like text in script and CSS comments is not a link (GP-686 item 2)', 
   assert.deepEqual(findLocalOrigins('//127.1:8080/login'), ['//127.1:8080']);
   assert.deepEqual(findLocalOrigins('//localhost/login'), ['//localhost']);
 });
+check('a comma or quote inside a comment does not make //host a URL (GP-691)', () => {
+  // Negative controls: both raised a false LOCALHOST before GP-691.
+  assert.deepEqual(findLocalOrigins('<style>/* old, //127.1:8080 dev */</style>'), []);
+  assert.deepEqual(findLocalOrigins('<script>// "//127.1:8080" dev</script>'), []);
+  assert.deepEqual(
+    findLocalOrigins('<script type="module">\n  // \'//localhost:3000/x\' old\n</script>'),
+    []
+  );
+  assert.deepEqual(
+    findLocalOrigins('<script>go();\r\n// `//10.0.0.1:8080` staging\r\nrun();</script>'),
+    []
+  );
+  // Positive controls: every later srcset candidate still fires, with or without descriptors.
+  for (const html of [
+    '<img srcset="a.png, //127.1:8080/b.png 2x">',
+    "<img srcset='a.png 1x,//127.1:8080/b.png 2x'>",
+    '<img srcset=a.png,//127.1:8080/b.png>',
+    '<link rel="preload" imagesrcset="a.png 1x, //127.1:8080/b.png 2x">',
+    '{"srcSet":"/a.png 640w, //127.1:8080/b.png 1080w"}',
+    '<div data-i="{&quot;srcSet&quot;:&quot;/a.png 1.5x , //127.1:8080/b.png 2x&quot;}">',
+  ]) {
+    assert.deepEqual(findLocalOrigins(html), ['//127.1:8080'], html);
+  }
+  // Positive controls: a working string after the comment line, whatever ends that line.
+  for (const end of ['\n', '\r', ' ', ' ']) {
+    const html = `<script>// note "x"${end}fetch("//127.1:8080/x")</script>`;
+    assert.deepEqual(findLocalOrigins(html), ['//127.1:8080'], JSON.stringify(html));
+  }
+  // Positive controls: a comment after code, a comment outside a script, an attribute.
+  assert.deepEqual(findLocalOrigins('<script>go(); // "//127.1:8080"</script>'), ['//127.1:8080']);
+  assert.deepEqual(findLocalOrigins('<script>u = "//a" + "//127.1:8080/x"</script>'), [
+    '//127.1:8080',
+  ]);
+  assert.deepEqual(findLocalOrigins('<p>\n// "//127.1:8080"</p>'), ['//127.1:8080']);
+  assert.deepEqual(findLocalOrigins('<script\n// src="//127.1:8080/x.js"></script>'), [
+    '//127.1:8080',
+  ]);
+  assert.deepEqual(findLocalOrigins('<script>x</script>\n// "//127.1:8080"'), ['//127.1:8080']);
+});
+check('a script line is suppressed only when a JS lexer confirms the comment (#1192)', () => {
+  // Positive controls: each `//` looks like a whole-line comment but is not one, so the URL
+  // after it is live code. Before this fix the first returned [] (a false green).
+  for (const html of [
+    '<script>/*\n// */ fetch("//localhost:3000/api")\n</script>',
+    '<script>/* a\n b\n// */ fetch("//localhost:3000/api")</script>',
+    '<script>const t = `\n// ${x}`; fetch("//localhost:3000/api")</script>',
+    '<script>const t = `\n// "//localhost:3000/api"`;</script>',
+    '<script>const t = `${`\n// "//localhost:3000/api"`}`;</script>',
+    '<script>const s = \'a\\\n// "//localhost:3000/api"\';</script>',
+    '<script>if (a) /[/*]/.test(b);\n// */ fetch("//localhost:3000/api")</script>',
+    '<script>if (a) /\'/.test(b);\n// "//localhost:3000/api"</script>',
+    '<script>/* never closed\n// "//localhost:3000/api"</script>',
+    // CodeRabbit on #1192: a `/` after an expression end is division, not a regex start.
+    '<script>\nlet x = 2; x++ / 2 /*\n// */ fetch("//localhost:3000/api")\n</script>',
+    '<script>let x = 2; x-- / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
+    '<script>a[0] / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
+    '<script>f() / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
+    // A keyword used as a property name is an operand, so the `/` after it is division.
+    '<script>\nlet obj = { return: 2 }; obj.return / 2 /*\n// */ fetch("//localhost:3000/api")\n</script>',
+    '<script>o?.typeof / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
+    // `of` / `yield` / `await` may be identifiers, so a `/` after one is not trusted as a regex.
+    '<script>\nlet of = 2; of / 2 /*\n// */ fetch("//localhost:3000/api")\n</script>',
+    '<script>var yield = 4; yield / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
+    '<script>var await = 4; await / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
+    // A private field named like a keyword is an operand too.
+    '<script>\nclass C {\n  #return = 2;\n  m() {\n    this.#return / 2 /*\n    // */ fetch("//localhost:3000/api");\n  }\n}\nnew C().m();\n</script>',
+  ]) {
+    assert.deepEqual(findLocalOrigins(html), ['//localhost:3000'], JSON.stringify(html));
+  }
+  // Negative controls: confirmed line comments stay suppressed after code the lexer can read.
+  for (const html of [
+    '<script>/* a */\n// "//localhost:3000/api" old</script>',
+    '<script>const t = `a ${b ? "x" : `y`} c`;\n// "//localhost:3000/api" old</script>',
+    '<script>const r = /"\\//g; const q = "it\'s";\n// "//localhost:3000/api" old</script>',
+    '<script>return /a/.test(b) && c / 2;\n// "//localhost:3000/api" old</script>',
+    '<script>const d = a / b;\n// "//localhost:3000/api" old</script>',
+    '<script>x = /[/*]/;\n// */ "//localhost:3000/api" old</script>',
+  ]) {
+    assert.deepEqual(findLocalOrigins(html), [], JSON.stringify(html));
+  }
+});
+check('srcset spans come from real HTML attributes, not script text (#1192)', () => {
+  // Positive controls: before this fix the script string swallowed the real attribute.
+  for (const html of [
+    '<script>const note=\'srcset="\';</script><img srcset="a.png, //localhost:3000/b.png 2x">',
+    '<style>/* srcset="x */</style><img srcset="a.png, //localhost:3000/b.png 2x">',
+    '<!-- srcset=" --><img srcset="a.png, //localhost:3000/b.png 2x">',
+    '<img alt=\'srcset="\' srcset="a.png, //localhost:3000/b.png 2x">',
+    '<img srcset=a.png,//localhost:3000/b.png>',
+    '<link rel="preload" IMAGESRCSET=\'a.png, //localhost:3000/b.png 2x\'>',
+  ]) {
+    assert.deepEqual(findLocalOrigins(html), ['//localhost:3000'], html);
+  }
+  // Negative controls: srcset-looking text inside a script or style opens no srcset span.
+  assert.deepEqual(
+    findLocalOrigins('<script>const n = \'srcset="a, //127.1:8080 b"\';</script>'),
+    []
+  );
+  assert.deepEqual(findLocalOrigins('<style>/* srcset=a.png, //127.1:8080 dev */</style>'), []);
+});
+check('a serialized srcSet value counts a descriptor-free first candidate (#1192)', () => {
+  for (const html of [
+    '{"srcSet":"a.png, //localhost:3000/b.png 2x"}',
+    '{"imageSrcSet":"a.png,//localhost:3000/b.png"}',
+    'self.__next_f.push([1,"{\\"srcSet\\":\\"a.png, //localhost:3000/b.png 2x\\"}"])',
+    '<div data-i="{&quot;srcSet&quot;:&quot;a.png, //localhost:3000/b.png 2x&quot;}">',
+  ]) {
+    assert.deepEqual(findLocalOrigins(html), ['//localhost:3000'], html);
+  }
+  // Negative controls: a comma outside any srcset value is still not a link.
+  assert.deepEqual(findLocalOrigins('<style>/* old, //127.1:8080 dev */</style>'), []);
+  assert.deepEqual(
+    findLocalOrigins('{"srcSet":"a.png 1x"}<style>/* old, //127.1:8080 dev */</style>'),
+    []
+  );
+});
 check('an attribute value is found after any run of padding spaces (GP-686 item 3)', () => {
   // CodeRabbit on #1033 (round 3): the look-back was a fixed 16 characters.
   const pad = ' '.repeat(40);
@@ -297,6 +413,14 @@ check('the parsed pass stays linear on a long run of spaces', () => {
   const big = '<a href="' + ' '.repeat(200000) + '//2130706433">x</a>' + ' //1'.repeat(50000);
   const t0 = Date.now();
   assert.deepEqual(findLocalOrigins(big), ['//2130706433']);
+  assert.ok(Date.now() - t0 < 2000, `took ${Date.now() - t0} ms`);
+});
+check('the comma and comment look-ups stay fast on many srcsets and comments (GP-691)', () => {
+  const big =
+    '<img srcset="a.png 1x, //cdn.example/b.png 2x">'.repeat(20000) +
+    `<script>${'\n// "//1"'.repeat(20000)}</script>`;
+  const t0 = Date.now();
+  assert.deepEqual(findLocalOrigins(big), []);
   assert.ok(Date.now() - t0 < 2000, `took ${Date.now() - t0} ms`);
 });
 check('the quick-enrol card selector is the data attribute on the card (GP-674)', () => {

@@ -15,6 +15,7 @@ import { cecCourseFaqs } from '@/lib/seo/answer-engine';
 import { hasPublicCoursePage } from '@/lib/seo/public-course-page';
 import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
 
+import { APPROVED_FOR_IICRC_CECS, IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 /**
  * `/iicrc-cec-courses` — every published course with an IICRC CEC approval in force
  * today, read from the approvals registry (`data/seed/cec-approvals.json`) and the live
@@ -31,7 +32,7 @@ export const dynamic = 'force-dynamic';
 const PAGE_PATH = '/iicrc-cec-courses';
 
 export const metadata: Metadata = {
-  title: 'IICRC CEC Accredited Courses Online',
+  title: `Courses ${APPROVED_FOR_IICRC_CECS}, online`,
   description:
     'CARSI courses with a current IICRC approval for Continuing Education Credit (CEC) hours: price, CEC hours and approval expiry for each, all self-paced online.',
   alternates: { canonical: PAGE_PATH },
@@ -106,7 +107,7 @@ export default async function IicrcCecCoursesPage() {
           never emitted at all. */}
       {catalogue.available && rows.length > 0 ? (
         <ItemListSchema
-          name="IICRC CEC Accredited courses from CARSI"
+          name={`Courses ${APPROVED_FOR_IICRC_CECS} from CARSI`}
           description="CARSI courses with a current IICRC approval for Continuing Education Credit hours."
           itemType="Course"
           items={rows.map(({ course }) => {
@@ -127,10 +128,10 @@ export default async function IicrcCecCoursesPage() {
         <div className={`${PUBLIC_SHELL_INNER_CLASS} py-16 md:py-20`}>
           <p className={LANDING_EYEBROW_CLASS}>IICRC Continuing Education Credits</p>
           <h1 className="mt-3 max-w-3xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3rem]">
-            IICRC CEC Accredited courses
+            Courses {APPROVED_FOR_IICRC_CECS}
           </h1>
           <p className={`mt-5 max-w-2xl text-pretty ${LANDING_LEAD_CLASS}`}>
-            CARSI is an IICRC CEC Accredited provider. Each course below has a current IICRC
+            CARSI is an {IICRC_APPROVED_CEC_PROVIDER}. Each course below has a current IICRC
             approval for the CEC hours shown, up to the expiry date listed. CECs count toward
             maintaining an IICRC certification you already hold; they are not an IICRC
             certification. Completed courses are recorded in your CARSI dashboard.
