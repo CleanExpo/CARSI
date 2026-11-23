@@ -69,6 +69,11 @@ const STEPS = [
       'src/lib/coaching-portal/partner-demo-page.test.tsx',
       'src/lib/coaching-portal/onboarding-coach-brief.test.ts',
       'src/lib/coaching-portal/trade-hall-passport.test.ts',
+      'src/lib/coaching-portal/coaching-chapters.test.ts',
+      'src/lib/coaching-portal/trade-hall-seminar.test.ts',
+      'src/components/admin/AdminCoachingChaptersClient.test.tsx',
+      'src/lib/server/carsi-coaching-member-workspace.test.ts',
+      'src/components/admin/AdminCoachingMemberWorkspaceClient.test.tsx',
     ],
   },
   {
