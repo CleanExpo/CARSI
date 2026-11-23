@@ -12,6 +12,7 @@ import {
 } from '@/components/landing/public-shell-width';
 import { formatMembershipAud, INDIVIDUAL_MEMBERSHIP } from '@/lib/lms/membership-prices';
 import { INDIVIDUAL_TIERS, PER_COURSE_PRICE_FALLBACK_LABEL } from '@/lib/lms/pricing-tiers';
+import { FREE_OFFER } from '@/lib/pricing/free-offer';
 
 function buildHomeTiers(subscriptionsEnabled: boolean) {
   const perCourse = INDIVIDUAL_TIERS.find((t) => t.id === 'per_course');
@@ -71,14 +72,14 @@ export function HomePricingSection({
 
   const tiers: HomeTier[] = [
     {
-      name: 'Free Library',
+      // GP-574: the free tier's wording has one owner, shared with the pricing page.
+      name: FREE_OFFER.title,
       price: '$0',
-      cadence: 'no card required',
-      description:
-        'Start tonight with the Free Library. Real courses, real certificates, and progress tracking at no cost.',
-      features: ['Real courses, not samples', 'Certificates included', 'Progress tracking'],
-      cta: 'Start free',
-      href: '/courses',
+      cadence: FREE_OFFER.priceSuffix.toLowerCase(),
+      description: FREE_OFFER.home.description,
+      features: [...FREE_OFFER.home.features],
+      cta: FREE_OFFER.cta,
+      href: FREE_OFFER.href,
       featured: false,
     },
     {

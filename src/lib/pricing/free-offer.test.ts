@@ -74,3 +74,44 @@ describe('pricing page free offer (GP-574)', () => {
     expect(PRICING_PAGE).not.toMatch(/['"`]\/(free-)?library\b/);
   });
 });
+
+/**
+ * The homepage pricing section carried the same false promise in a second copy: a "Free Library"
+ * tier, "real certificates" and "Certificates included" with no condition, linking the whole
+ * catalogue rather than its Free tab. A certificate is issued only once every lesson and required
+ * assessment is complete (app/api/lms/enrollments/[enrollmentId]/certificate/route.ts), so the
+ * wording must say so. The homepage reads its free tier from FREE_OFFER so the two cannot drift.
+ */
+describe('homepage free tier (GP-574)', () => {
+  const HOME = readFileSync(join(ROOT, 'src/components/landing/HomePricingSection.tsx'), 'utf8');
+
+  it('reads its free tier from FREE_OFFER', () => {
+    expect(HOME).toContain("from '@/lib/pricing/free-offer'");
+    for (const field of [
+      'FREE_OFFER.title',
+      'FREE_OFFER.href',
+      'FREE_OFFER.cta',
+      'FREE_OFFER.home.description',
+      'FREE_OFFER.home.features',
+    ]) {
+      expect(HOME, field).toContain(field);
+    }
+  });
+
+  it('names no "Free Library" and makes no unconditional certificate promise', async () => {
+    const { FREE_OFFER } = await import('./free-offer');
+    const wording = [HOME, JSON.stringify(FREE_OFFER)];
+    for (const text of wording) {
+      expect(text).not.toMatch(/free library/i);
+      expect(text).not.toMatch(/certificates included|real certificates/i);
+    }
+    const certificateLines = FREE_OFFER.home.features.filter((f) => /certificate/i.test(f));
+    for (const line of certificateLines) expect(line).toMatch(/when you (finish|complete)/i);
+  });
+
+  it('keeps every homepage free-tier line short enough for the ticket card', async () => {
+    const { FREE_OFFER } = await import('./free-offer');
+    expect(FREE_OFFER.home.features.length).toBe(3);
+    for (const line of FREE_OFFER.home.features) expect(line.length, line).toBeLessThanOrEqual(40);
+  });
+});

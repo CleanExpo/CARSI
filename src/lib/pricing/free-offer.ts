@@ -18,4 +18,19 @@ export const FREE_OFFER = {
   /** Opens /courses on its Free tab (resolveDisciplineParam('free') === 'Free'). */
   href: '/courses?discipline=free',
   resourcesHref: '/resources',
+  /**
+   * The shorter wording for the homepage pricing ticket (src/components/landing/HomePricingSection.tsx).
+   * A certificate of completion is issued for any finished course, free ones included, but only
+   * once every lesson and required assessment is done (app/api/lms/enrollments/[enrollmentId]/
+   * certificate/route.ts), so the certificate line names that condition.
+   */
+  home: {
+    description:
+      'Courses marked Free in the catalogue, with a free account and no payment step, plus open-licence guides on the Free Resources page.',
+    features: [
+      'Courses marked Free, no card',
+      'Free Resources guides, no account',
+      'Certificate when you finish',
+    ],
+  },
 } as const;
