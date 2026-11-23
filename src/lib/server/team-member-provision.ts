@@ -1,13 +1,18 @@
 import { randomUUID } from 'node:crypto';
 
 import { prisma } from '@/lib/prisma';
-import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
 import { hashPassword, sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { generateMemberTempPassword } from '@/lib/server/member-temp-password';
 import { sendTeamMemberAddedEmail } from '@/lib/server/transactional-email';
 import { assertCourseSeatsAvailable } from '@/lib/server/team-course-seats';
 import { listTeamCoursePurchaseSlugs } from '@/lib/server/team-course-purchase-db';
 import { readTeamCourseSlug } from '@/lib/server/team-course-slug-db';
+import {
+  issueTeamMemberSeat,
+  prepareTeamMemberSeat,
+  runSeatStateStep,
+  type TeamMemberSeat,
+} from '@/lib/server/seat-state';
 import { repairAndGetTeamForUser } from '@/lib/server/teams';
 
 /**
@@ -122,31 +127,41 @@ export async function addCourseTeamMemberByEmail(params: {
     accountCreated = true;
   }
 
-  await prisma.lmsTeamMember.upsert({
-    where: { teamId_userId: { teamId: team.id, userId: user.id } },
-    create: { teamId: team.id, userId: user.id, role: 'member' },
-    update: {},
-  });
-
   const memberClaims = await sessionClaimsForUserId(user.id);
   if (!memberClaims) {
     throw new Error('USER_INACTIVE');
   }
 
+  // Reading half of each seat before the step (the step may be retried).
+  const seats: TeamMemberSeat[] = [];
   for (const slug of enrollSlugs) {
     try {
-      // A member without the course prerequisite still gets their seat, issued LOCKED
-      // (prerequisiteGated) until they complete it — founder decision 02/11/2026.
-      await enrollStudentInCourse(memberClaims, slug, `team:${team.id}`, {
-        onPrerequisiteNotMet: 'lock',
-      });
+      const seat = await prepareTeamMemberSeat(user.id, team.id, slug);
+      if (seat) seats.push(seat);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      if (msg !== 'COURSE_NOT_FOUND') {
-        console.error('[team-member-provision] enrol', slug, e);
-      }
+      console.error('[team-member-provision] enrol', slug, e);
     }
   }
+
+  // GP-759 (Phill, 23/11/2026): the paid-seat checks, the member row and the seats are written
+  // together in the one seat step (seat-state.ts), so two invites at the last seat cannot both
+  // take it. The check above is only an early answer; this one decides. A member with no paid
+  // seat left is not added (COURSE_SEATS_FULL), and no email is sent.
+  const memberUserId = user.id;
+  await runSeatStateStep(async (tx) => {
+    for (const seat of seats) {
+      // A member without the course prerequisite still gets their seat, issued LOCKED
+      // (prerequisiteGated) until they complete it - founder decision 02/11/2026.
+      if ((await issueTeamMemberSeat(tx, seat)) === 'no_seat') {
+        throw new Error('COURSE_SEATS_FULL');
+      }
+    }
+    await tx.lmsTeamMember.upsert({
+      where: { teamId_userId: { teamId: team.id, userId: memberUserId } },
+      create: { teamId: team.id, userId: memberUserId, role: 'member' },
+      update: {},
+    });
+  });
 
   const memberName = user.fullName?.trim() || email.split('@')[0] || 'there';
 

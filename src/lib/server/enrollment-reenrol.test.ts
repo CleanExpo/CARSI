@@ -38,7 +38,18 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-const { enrollStudentInCourse } = await import('./enrollment-service');
+const enrolmentService = await import('./enrollment-service');
+const { prisma: prismaForSeatWrites } = await import('@/lib/prisma');
+// GP-759: `cs_*` and `team:*` enrolments are issued only inside the seat step (seat-state.ts).
+// These tests check the shared writer's row rules, so for those references they call its two
+// halves (prepare, then issue on a client) the way the step does; other references go through
+// enrollStudentInCourse as production does.
+const enrollStudentInCourse: typeof enrolmentService.enrollStudentInCourse = (claims, slug, ref, options) =>
+  enrolmentService.isSeatStatePaymentReference(ref)
+    ? enrolmentService
+        .prepareEnrolment(claims, slug, ref, options)
+        .then((prepared) => enrolmentService.issuePreparedEnrolment(prismaForSeatWrites as never, prepared))
+    : enrolmentService.enrollStudentInCourse(claims, slug, ref, options);
 
 const claims: SessionClaims = { sub: 'stu', email: 'a@b.c', full_name: 'A', role: 'student' };
 

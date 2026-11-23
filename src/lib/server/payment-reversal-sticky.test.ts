@@ -56,8 +56,11 @@ vi.mock('@/lib/api/stripe', () => ({
   }),
 }));
 
-vi.mock('@/lib/prisma', () => ({
-  prisma: {
+vi.mock('@/lib/prisma', () => {
+  const client: Record<string, unknown> = {
+    // GP-759: fulfilment runs in the seat step (one transaction over this same fake).
+    $transaction: vi.fn(async (fn: (tx: unknown) => unknown) => fn(client)),
+    lmsTeam: { findUnique: vi.fn(async () => null) },
     lmsUser: { findUnique: vi.fn(async () => ({ email: BUYER.email })) },
     lmsEnrollment: {
       findUnique: vi.fn(async () => state.enrollment),
@@ -77,8 +80,9 @@ vi.mock('@/lib/prisma', () => ({
       ),
       updateMany: vi.fn(async () => ({ count: 0 })),
     },
-  },
-}));
+  };
+  return { prisma: client };
+});
 
 vi.mock('@/lib/server/auth-from-request', () => ({
   getSessionClaimsFromRequest: vi.fn(async () => BUYER),

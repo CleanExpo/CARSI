@@ -1,16 +1,11 @@
-import { Prisma } from '@/generated/prisma/client';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { prisma } from '@/lib/prisma';
-import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
-import { isStripeCheckoutPaymentReference } from '@/lib/lms/course-prerequisites';
-import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import {
-  isCheckoutPaymentReversed,
-  PAYMENT_REVERSED,
-} from '@/lib/server/payment-integrity-ledger';
+  fulfilCheckoutInStep,
+  prepareCheckoutEnrolment,
+  type TeamSeatBlock,
+} from '@/lib/server/seat-state';
 import { createUniqueTeamSlug } from '@/lib/server/teams';
-
-const COURSE_BUNDLE_TIER = 'course_purchase';
 
 export function buildTeamDashboardUrl(
   origin: string,
@@ -23,148 +18,6 @@ export function buildTeamDashboardUrl(
     seats: String(params.seats),
   });
   return `${base}/dashboard/team?${q.toString()}`;
-}
-
-async function writeTeamCourseSlugTx(
-  tx: Prisma.TransactionClient,
-  teamId: string,
-  courseSlug: string,
-): Promise<void> {
-  const slug = courseSlug.trim().toLowerCase();
-  try {
-    await tx.lmsTeam.update({
-      where: { id: teamId },
-      data: { courseSlug: slug },
-    });
-  } catch {
-    await tx.$executeRaw`
-      UPDATE lms_teams SET course_slug = ${slug} WHERE id = ${teamId}::uuid
-    `;
-  }
-}
-
-async function insertTeamCoursePurchaseTx(
-  tx: Prisma.TransactionClient,
-  params: {
-    teamId: string;
-    courseSlug: string;
-    seatLimit: number;
-    paymentReference?: string;
-  },
-): Promise<boolean> {
-  const slug = params.courseSlug.trim().toLowerCase();
-  const ref = params.paymentReference?.trim() || null;
-
-  if (ref) {
-    const existing = await tx.lmsTeamCoursePurchase.findFirst({
-      where: { paymentReference: ref },
-    });
-    if (existing) return false;
-  } else {
-    console.warn(
-      '[team-purchase] provisioning a team seat block without a payment reference — duplicate deliveries cannot be de-duplicated for this row',
-    );
-  }
-
-  await tx.lmsTeamCoursePurchase.create({
-    data: {
-      teamId: params.teamId,
-      courseSlug: slug,
-      seatLimit: params.seatLimit,
-      paymentReference: ref,
-    },
-  });
-  return true;
-}
-
-async function sumTeamCoursePurchaseSeatsTx(
-  tx: Prisma.TransactionClient,
-  teamId: string,
-): Promise<number> {
-  const total = await tx.lmsTeamCoursePurchase.aggregate({
-    where: { teamId },
-    _sum: { seatLimit: true },
-  });
-  return total._sum.seatLimit ?? 0;
-}
-
-/**
- * After a multi-seat course purchase: enrol the buyer and provision a team with seat_limit = seats.
- */
-export async function provisionTeamCoursePurchase(params: {
-  ownerId: string;
-  ownerEmail: string;
-  ownerName: string | null;
-  courseSlug: string;
-  seatCount: number;
-  paymentReference: string;
-}): Promise<{ teamId: string; teamSlug: string }> {
-  const { ownerId, courseSlug, seatCount, paymentReference } = params;
-
-  return prisma.$transaction(async (tx) => {
-    const existingMembership = await tx.lmsTeamMember.findFirst({
-      where: { userId: ownerId },
-      include: { team: true },
-    });
-
-    if (existingMembership) {
-      const team = existingMembership.team;
-      if (team.ownerId !== ownerId) {
-        throw new Error('ALREADY_ON_TEAM');
-      }
-
-      const inserted = await insertTeamCoursePurchaseTx(tx, {
-        teamId: team.id,
-        courseSlug,
-        seatLimit: seatCount,
-        paymentReference,
-      });
-      // A replayed fulfilment of a session already on record changes nothing. Recomputing here
-      // used to fall back to `seatCount` when the blocks summed to 0, which put the seats of a
-      // refunded block (zeroed by team-seat-refund.ts) straight back (GP-759).
-      if (!inserted) {
-        return { teamId: team.id, teamSlug: team.slug };
-      }
-
-      const totalSeats = await sumTeamCoursePurchaseSeatsTx(tx, team.id);
-      await tx.lmsTeam.update({
-        where: { id: team.id },
-        data: {
-          seatLimit: totalSeats > 0 ? totalSeats : seatCount,
-          bundleTier: COURSE_BUNDLE_TIER,
-        },
-      });
-      await writeTeamCourseSlugTx(tx, team.id, courseSlug);
-      return { teamId: team.id, teamSlug: team.slug };
-    }
-
-    const name = 'My team';
-    const slug = await createUniqueTeamSlug(name);
-
-    const team = await tx.lmsTeam.create({
-      data: {
-        name,
-        slug,
-        ownerId,
-        bundleTier: COURSE_BUNDLE_TIER,
-        seatLimit: seatCount,
-        members: {
-          create: { userId: ownerId, role: 'owner' },
-        },
-      },
-      select: { id: true, slug: true },
-    });
-
-    await writeTeamCourseSlugTx(tx, team.id, courseSlug);
-    await insertTeamCoursePurchaseTx(tx, {
-      teamId: team.id,
-      courseSlug,
-      seatLimit: seatCount,
-      paymentReference,
-    });
-
-    return { teamId: team.id, teamSlug: team.slug };
-  });
 }
 
 export async function fulfillCourseCheckoutForUser(params: {
@@ -182,15 +35,32 @@ export async function fulfillCourseCheckoutForUser(params: {
   alreadyEnrolled: boolean;
 }> {
   const { claims, courseSlug, paymentReference, purchaseMode, teamSeatCount } = params;
+  const isTeam = purchaseMode === 'team' && !!teamSeatCount && teamSeatCount >= 2;
 
-  // A team buyer need not hold the course prerequisite (founder decision 02/11/2026): their
-  // own seat is issued LOCKED (prerequisiteGated) until they complete it, like any seat.
-  const result = await enrollStudentInCourse(claims, courseSlug, paymentReference, {
-    onPrerequisiteNotMet: purchaseMode === 'team' ? 'lock' : 'refuse',
-  });
+  // GP-759: reads and slow work first; then the buyer's enrolment and the seat block are written
+  // in the one seat step, which checks the session was not refunded or charged back.
+  const enrolment = await prepareCheckoutEnrolment(claims, courseSlug, paymentReference, purchaseMode);
+  let block: TeamSeatBlock | null = null;
+  if (isTeam) {
+    const user = await prisma.lmsUser.findUnique({
+      where: { id: claims.sub },
+      select: { email: true },
+    });
+    if (!user) throw new Error('USER_NOT_FOUND');
+    block = {
+      ownerId: claims.sub,
+      courseSlug,
+      seatCount: teamSeatCount,
+      paymentReference,
+      newTeamSlug: await createUniqueTeamSlug('My team'),
+    };
+  }
+
+  const { result, team } = await fulfilCheckoutInStep(enrolment, block);
   const alreadyEnrolled = result === 'already_enrolled';
+  if (team === 'already_on_team') throw new Error('ALREADY_ON_TEAM');
 
-  if (purchaseMode !== 'team' || !teamSeatCount || teamSeatCount < 2) {
+  if (!team) {
     const { getFirstLessonLearnPath } = await import('@/lib/server/first-lesson');
     const learnPath = (await getFirstLessonLearnPath(courseSlug)) ?? '/dashboard/student';
     return {
@@ -202,66 +72,15 @@ export async function fulfillCourseCheckoutForUser(params: {
     };
   }
 
-  // GP-759: the buyer may already hold the course through another payment ('already_enrolled'
-  // skips the enrolment writer's reversal check), so check again before provisioning seats.
-  if (
-    isStripeCheckoutPaymentReference(paymentReference) &&
-    (await isCheckoutPaymentReversed(paymentReference))
-  ) {
-    throw new Error(PAYMENT_REVERSED);
-  }
-
-  const user = await prisma.lmsUser.findUnique({
-    where: { id: claims.sub },
-    select: { email: true, fullName: true },
-  });
-  if (!user) throw new Error('USER_NOT_FOUND');
-
-  const { teamSlug } = await provisionTeamCoursePurchase({
-    ownerId: claims.sub,
-    ownerEmail: user.email,
-    ownerName: user.fullName,
-    courseSlug,
-    seatCount: teamSeatCount,
-    paymentReference,
-  });
-
   return {
     kind: 'team',
     alreadyEnrolled,
-    teamSlug,
+    teamSlug: team.teamSlug,
     enrollmentId: alreadyEnrolled ? undefined : result.enrollmentId,
     courseId: alreadyEnrolled ? undefined : result.courseId,
     redirectPath: `/dashboard/team?from_purchase=1&course=${encodeURIComponent(courseSlug)}&seats=${teamSeatCount}`,
   };
 }
 
-/** Enrol a team member in the team's purchased course when they accept an invite. */
-export async function enrollTeamMemberInPurchasedCourse(
-  userId: string,
-  teamId: string,
-): Promise<void> {
-  const { readTeamCourseSlug } = await import('@/lib/server/team-course-slug-db');
-  const slug = await readTeamCourseSlug(teamId);
-  if (!slug) return;
-
-  const claims = await sessionClaimsForUserId(userId);
-  if (!claims) return;
-
-  // GP-759: membership survives a seat refund, so check for a paid seat before issuing one.
-  const { teamCourseSeatIsFree } = await import('@/lib/server/team-seat-refund');
-  if (!(await teamCourseSeatIsFree(teamId, slug, userId))) {
-    console.warn('[team-course-purchase] no paid seat left for member', { teamId, userId });
-    return;
-  }
-
-  try {
-    // Without the prerequisite the seat is issued LOCKED, not skipped (02/11/2026).
-    await enrollStudentInCourse(claims, slug, `team:${teamId}`, { onPrerequisiteNotMet: 'lock' });
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (msg !== 'COURSE_NOT_FOUND') {
-      console.error('[team-course-purchase] member enrol', e);
-    }
-  }
-}
+/** Enrol a team member in the team's purchased course (through the seat step). */
+export { enrollTeamMemberInPurchasedCourse } from '@/lib/server/seat-state';

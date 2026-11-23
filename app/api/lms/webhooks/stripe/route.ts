@@ -32,20 +32,14 @@ import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { markOrgSubscriptionStatusBySubscriptionId } from '@/lib/server/org-subscription-store';
 import {
-  clearDisputedCheckoutReversal,
   PAYMENT_REVERSED,
-  recordCheckoutPaymentReversed,
   recordUnfulfilledPayment,
   resolveUnfulfilledPayment,
 } from '@/lib/server/payment-integrity-ledger';
 import { recordPartnerReferralSale } from '@/lib/server/partner-referral-sales';
 import { captureServerError } from '@/lib/server/sentry';
 import { resolveStripePaymentReference } from '@/lib/server/stripe-payment-reference';
-import {
-  isDisputeWon,
-  reactivateDisputeWonEnrollmentsByPaymentReference,
-  revokeEnrollmentsByPaymentReference,
-} from '@/lib/server/stripe-revocation';
+import { isDisputeWon } from '@/lib/server/stripe-revocation';
 import {
   readInvoiceIdFromPaymentIntent,
   readSubscriptionIdFromPaymentIntent,
@@ -63,7 +57,7 @@ import {
 import { markSubscriptionStatusBySubscriptionId } from '@/lib/server/subscription-store';
 import { handleSubscriptionEvent, isSubscriptionEvent } from '@/lib/server/subscription-webhook';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
-import { revokeTeamSeatBlocksForRefund } from '@/lib/server/team-seat-refund';
+import { applyCheckoutPaymentReversal, applyDisputeWon } from '@/lib/server/seat-state';
 import { markTeamSubscriptionStatusBySubscriptionId } from '@/lib/server/team-subscription-store';
 
 /**
@@ -201,16 +195,11 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
         currency: reversalCurrency,
       });
     }
+    // GP-759: the reversal marker, the enrolments the session paid for and (full refunds) its
+    // team seats are reversed together in the one seat step (seat-state.ts), so a fulfilment
+    // racing this refund either sees the marker or has its seats taken back.
     if (revokeEntitlement) {
-      // GP-759: record the reversal first, so the success page can never re-grant access
-      // from this session, even when no enrolment row exists yet.
-      await recordCheckoutPaymentReversed(ref, reason, eventTimestamp);
-      // A full refund also takes the session off the unfulfilled list, in the same transaction.
-      await revokeEnrollmentsByPaymentReference(ref, reason, eventTimestamp);
-    }
-    // GP-759 (c): a refunded team seat checkout also takes its seats back.
-    if (revokeEntitlement && reason === 'refunded') {
-      await revokeTeamSeatBlocksForRefund(ref, eventTimestamp);
+      await applyCheckoutPaymentReversal(ref, reason, eventTimestamp);
     }
   }
 }
@@ -290,8 +279,7 @@ async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
         currency: dispute.currency,
       });
     }
-    await clearDisputedCheckoutReversal(ref, eventTimestamp);
-    await reactivateDisputeWonEnrollmentsByPaymentReference(ref, eventTimestamp);
+    await applyDisputeWon(ref, eventTimestamp);
   }
 }
 

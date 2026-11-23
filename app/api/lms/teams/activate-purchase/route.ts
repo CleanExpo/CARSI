@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { serializeTeamForClient } from '@/lib/server/team-api-serialize';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
+import { PAYMENT_REVERSED, PAYMENT_REVERSED_BODY } from '@/lib/server/payment-integrity-ledger';
 import { repairAndGetTeamForUser } from '@/lib/server/teams';
 
 async function findTeamStripeCheckoutSessionForUser(userId: string): Promise<string | null> {
@@ -133,6 +134,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    if (msg === PAYMENT_REVERSED) {
+      // GP-759: Stripe still reports a refunded or charged-back session as paid.
+      return NextResponse.json(PAYMENT_REVERSED_BODY, { status: 403 });
+    }
     if (msg === 'ALREADY_ON_TEAM') {
       return NextResponse.json(
         { detail: 'You already belong to another team as a member.' },
