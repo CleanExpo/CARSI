@@ -106,7 +106,7 @@
   },
   {
     "file": "app/(public)/industries/healthcare/page.tsx",
-    "line": 82,
+    "line": 83,
     "contains": "question: 'Does CARSI deliver IICRC certification for hospital work?'",
     "terms": ["certif"],
     "class": "legitimate",
@@ -114,7 +114,7 @@
   },
   {
     "file": "src/lib/marketing/industry-track2.ts",
-    "line": 55,
+    "line": 56,
     "contains": "question: 'Does CARSI deliver IICRC certification for those contracts?'",
     "terms": ["certif"],
     "class": "legitimate",

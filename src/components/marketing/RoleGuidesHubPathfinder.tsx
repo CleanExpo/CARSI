@@ -11,7 +11,8 @@ const PATHS = [
   {
     id: 'courses',
     title: 'Enrol in a live course',
-    detail: 'Browse CARSI courses, including IICRC CEC Accredited courses, and start learning today.',
+    detail:
+      'Browse CARSI courses, including courses approved for IICRC CECs, and start learning today.',
     href: '/courses',
     event: COURSE_CTA_EVENT,
     context: 'hub:pathfinder:courses',
@@ -61,7 +62,7 @@ export function RoleGuidesHubPathfinder() {
                   href={path.href}
                   data-carsi-event={path.event}
                   data-carsi-context={path.context}
-                  className="group flex h-full flex-col rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-5 shadow-sm transition duration-200 hover:border-[#2490ed]/40 hover:bg-white hover:shadow-[0_16px_40px_-24px_rgba(20,111,194,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:ring-offset-2"
+                  className="group flex h-full flex-col rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-5 shadow-sm transition duration-200 hover:border-[#2490ed]/40 hover:bg-white hover:shadow-[0_16px_40px_-24px_rgba(20,111,194,0.4)] focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:ring-offset-2 focus-visible:outline-none"
                 >
                   <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#146fc2]/10 text-[#146fc2] ring-1 ring-[#2490ed]/15">
                     <Icon className="h-5 w-5" aria-hidden />
@@ -69,7 +70,9 @@ export function RoleGuidesHubPathfinder() {
                   <p className="mt-4 font-semibold text-slate-950 group-hover:text-[#146fc2]">
                     {path.title}
                   </p>
-                  <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{path.detail}</p>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">
+                    {path.detail}
+                  </p>
                   <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#146fc2]">
                     Continue
                     <ArrowRight

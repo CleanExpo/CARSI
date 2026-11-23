@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { APPROVED_FOR_IICRC_CECS } from '@/lib/iicrc/approved-wording';
 
 // The page module reads cookies and the entitlement store at request time; none of that is
 // under test here, and none of it may reach a database from a unit test.
@@ -46,8 +47,8 @@ describe('yearly membership inclusions copy', () => {
     }
   });
 
-  it('CEC selling copy uses the accredited-provider form, never a course-level IICRC claim', () => {
-    expect(PRO_FEATURES).toContain('IICRC CEC Accredited courses where stated');
+  it('CEC selling copy names approved classes only, never a course-level IICRC claim', () => {
+    expect(PRO_FEATURES).toContain(`Courses ${APPROVED_FOR_IICRC_CECS} where stated`);
     expect(PRO_FEATURES).toContain('CEC tracking dashboard');
     expect(PRO_FEATURES.join('\n')).not.toMatch(/IICRC CEC courses\b/);
     expect(PRO_FEATURES).not.toContain('IICRC CEC tracking dashboard');

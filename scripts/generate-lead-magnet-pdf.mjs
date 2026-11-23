@@ -232,7 +232,7 @@ function buildDocument(bodyHtml) {
 <body>
   <div class="cover">
     <div class="brand">CARSI</div>
-    <div class="brand-sub">Cleaning &amp; Restoration Sciences Institute &middot; IICRC CEC Accredited provider</div>
+    <div class="brand-sub">Cleaning &amp; Restoration Sciences Institute &middot; IICRC Approved CEC Provider</div>
     <h1>How to Get on Government Restoration Panels</h1>
     <p class="subtitle">A practical guide for Australian restoration contractors</p>
   </div>
