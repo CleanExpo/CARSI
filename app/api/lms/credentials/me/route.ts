@@ -4,6 +4,7 @@ import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 import { prisma } from '@/lib/prisma';
+import { getAppOrigin } from '@/lib/server/app-url';
 
 /**
  * GET /api/lms/credentials/me — list credentials for the signed-in learner.
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
     orderBy: { completedAt: 'desc' },
   });
 
-  const origin = request.nextUrl.origin;
+  const origin = getAppOrigin(request);
 
   const out = rows.map((e) => ({
     credential_id: e.id,

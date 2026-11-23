@@ -1,7 +1,9 @@
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { CarsiProductEventCollector } from '@/components/analytics/CarsiProductEventCollector';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { AuthProvider } from '@/components/auth/auth-provider';
 import { ServiceWorkerRegistration } from '@/components/lms/ServiceWorkerRegistration';
+import { CookieConsentBanner } from '@/components/privacy/CookieConsentBanner';
 import { OrganizationSchema, WebsiteSchema } from '@/components/seo';
 import { AppToastProvider } from '@/hooks/use-toast';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
@@ -11,6 +13,7 @@ import Script from 'next/script';
 import './globals.css';
 import { OG_LOCALE_FIELDS, SITE_LANG } from '@/lib/seo/locale';
 
+import { FROM_IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 const outfit = Outfit({
   subsets: ['latin'],
   variable: '--font-display',
@@ -31,8 +34,7 @@ export const metadata: Metadata = {
     default: 'CARSI | Restoration Training, IICRC CEC Platform',
     template: '%s | CARSI',
   },
-  description:
-    'IICRC CEC Accredited courses for cleaning and restoration professionals in Australia. Earn CECs on courses the IICRC has approved, track your progress, and receive CARSI completion certificates.',
+  description: `Courses for cleaning and restoration professionals in Australia, ${FROM_IICRC_APPROVED_CEC_PROVIDER}. Earn CECs on courses the IICRC has approved, track your progress, and receive CARSI completion certificates.`,
   keywords: [
     'restoration training',
     'IICRC CECs',
@@ -78,8 +80,7 @@ export const metadata: Metadata = {
     url: './',
     siteName: 'CARSI',
     title: 'CARSI | Restoration Training, IICRC CEC Platform',
-    description:
-      'IICRC CEC Accredited courses for cleaning and restoration professionals in Australia. Earn CECs on courses the IICRC has approved and track your progress.',
+    description: `Courses for cleaning and restoration professionals in Australia, ${FROM_IICRC_APPROVED_CEC_PROVIDER}. Earn CECs on courses the IICRC has approved and track your progress.`,
     images: [
       {
         url: `${siteUrl}/og-image.png`,
@@ -92,8 +93,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'CARSI | Restoration Training, IICRC CEC Platform',
-    description:
-      'IICRC CEC Accredited courses for cleaning and restoration professionals in Australia.',
+    description: `Courses for cleaning and restoration professionals in Australia, ${FROM_IICRC_APPROVED_CEC_PROVIDER}.`,
     images: [`${siteUrl}/og-image.png`],
   },
   // Every route without its own canonical inherits this. An absolute site URL here made
@@ -146,7 +146,10 @@ export default function RootLayout({
             <AppToastProvider>{children}</AppToastProvider>
           </ThemeProvider>
         </AuthProvider>
+        {/* Analytics loads only after the visitor accepts in this banner (GP-731). */}
+        <CookieConsentBanner />
         <GoogleAnalytics />
+        <CarsiProductEventCollector />
       </body>
     </html>
   );

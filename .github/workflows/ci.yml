@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -41,7 +41,7 @@ jobs:
 
       - name: Upload verification report
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dependency-verification-report
           path: verify-output.log
@@ -63,7 +63,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -161,6 +161,13 @@ jobs:
       - name: Quiz option balance guard
         run: npm run check:quiz-balance -- --enforce=psychrometry-building-science-for-drying,moisture-meters-readings-and-dry-standards
 
+      # GP-740: reads what draft courses say (data/courses/*/v1-draft): exposure-limit dates and
+      # jurisdictions, workplace limits used as home levels, unsourced health claims, copied
+      # standard text. Report only while the existing drafts' findings go to SME review; exits 2
+      # if it scans nothing.
+      - name: Draft course content check (report only)
+        run: npm run check:draft-content
+
       # Licence-critical backstop: scans all course-content + marketing surfaces
       # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC
       # placements, banned "IICRC-approved"/"certified with CARSI" phrasing, and
@@ -194,6 +201,16 @@ jobs:
       # legitimate recert-cadence facts and generic no-number framing. An inert rule turns this red.
       - name: IICRC / CEC compliance guard self-test
         run: npm run test:iicrc-compliance
+
+      # GP-748 (founder, 21/11/2026): a course that is not CEC-approved in
+      # data/seed/cec-approvals.json may not name the IICRC, an IICRC standard or an IICRC
+      # certification on any learner-facing surface. BLOCKING. The self-test plants a hit on
+      # every surface and proves an approved course is left alone.
+      - name: IICRC scope guard (non-approved courses)
+        run: npm run check:iicrc-scope
+
+      - name: IICRC scope guard self-test
+        run: npm run test:iicrc-scope
 
       - name: Live buy-path guard self-test (GP-638)
         run: npm run test:live-buy-path
@@ -304,6 +321,15 @@ jobs:
       - name: Course Standard depth audit self-test
         run: npm run test:course-depth
 
+      # Course Standard v1 section 4.1 items 1-3 (GP-752): a cover, plus a raster lesson image and
+      # an SVG diagram in every teaching lesson. Today's gaps are frozen in
+      # scripts/course-visuals-baseline.json; a new gap, or a fixed gap still listed, fails.
+      - name: Course visuals check (cover, lesson image, diagram)
+        run: npm run check:course-visuals
+
+      - name: Course visuals check self-test
+        run: npm run test:course-visuals
+
       - name: Lint
         run: npm run lint
 
@@ -320,7 +346,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -347,7 +373,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -364,7 +390,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -377,7 +403,7 @@ jobs:
 
       - name: Upload build artifacts
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: build-output
           path: |
@@ -415,7 +441,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -519,6 +545,11 @@ jobs:
       - name: Course diagram check
         run: npm run check:course-diagrams
 
+      # GP-752: the water-course diagram wiring script still matches both catalogues (run it with
+      # --write after the GP-748 catalogue PR merges).
+      - name: Water course diagram wiring self-test
+        run: npm run test:wire-water-diagrams
+
       - name: Run E2E tests
         run: npm run test:e2e
         env:
@@ -549,7 +580,7 @@ jobs:
 
       - name: Upload Playwright report
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: playwright-report
           path: playwright-report/
@@ -557,7 +588,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-test-results
           path: test-results/
@@ -610,7 +641,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'

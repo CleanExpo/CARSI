@@ -26,6 +26,11 @@ export const PLATFORM_RELATED_BY_HREF: Record<string, PlatformRelatedLink[]> = {
       detail: 'Two days hands-on on the tools',
     },
     {
+      href: '/ccw-training/partner-demo',
+      label: 'Partner demo',
+      detail: 'Ten-minute walkthrough including marketing pack (A7)',
+    },
+    {
       href: '/events/ccw-roadshow',
       label: 'Business Growth Days',
       detail: 'Live events when scheduled',

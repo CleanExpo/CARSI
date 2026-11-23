@@ -1,5 +1,7 @@
 import type { Page } from '@playwright/test';
 
+import { CONSENT_NOTICE_VERSION, CONSENT_STORAGE_KEY } from '../src/lib/analytics/consent';
+
 /**
  * Shared by the membership funnel specs. Replaces window.gtag with a recorder before any page
  * script runs, so an event only counts if the page itself sends it, and records every gtag call
@@ -35,6 +37,25 @@ export async function recordGtag(page: Page): Promise<GtagCall[]> {
     });
   });
   return calls;
+}
+
+/**
+ * The visitor's explicit "Accept analytics" (GP-731): stores the yes before any page script runs,
+ * as the banner's button does, so GA4 is allowed to configure and send. Every other spec starts
+ * with "Reject optional" stored (config/playwright.config.ts). Call before the first navigation.
+ */
+export async function acceptAnalytics(page: Page): Promise<void> {
+  const choice = JSON.stringify({
+    version: CONSENT_NOTICE_VERSION,
+    analytics: true,
+    timestamp: '2026-11-21T00:00:00.000Z',
+  });
+  await page.addInitScript(
+    ([key, value]) => {
+      window.localStorage.setItem(key, value);
+    },
+    [CONSENT_STORAGE_KEY, choice] as const
+  );
 }
 
 export const events = (calls: GtagCall[], name: string) =>

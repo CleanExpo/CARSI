@@ -21,11 +21,11 @@ import {
 import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
 import { getAggregateRating } from '@/lib/server/course-reviews';
 import { getCourseAudienceItems } from '@/lib/lms/course-audience';
-import { withCurrentCecHoursOnly } from '@/lib/seed/cec-approvals';
+import { isCecApprovedCourse, withCurrentCecHoursOnly } from '@/lib/seed/cec-approvals';
+import { getCourseLearningOutcomes } from '@/lib/courses/course-credential-copy';
 import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-courses-list';
 import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
-import { formatCecHoursForDisplay } from '@/lib/cec-display';
 import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 // ISR: render each course detail on demand and cache for 5 minutes (issue #129).
@@ -226,38 +226,6 @@ export async function generateMetadata({
  * Helpers
  * --------------------------------------------------------------------------- */
 
-function getLearningOutcomes(
-  course: CourseDetail,
-  designation: DesignationDefinition | null
-): string[] {
-  const outcomes: string[] = [];
-
-  if (designation) {
-    outcomes.push(
-      `Work to the CARSI ${designation.disciplineTopic} standard, built for Southern-Hemisphere conditions`
-    );
-  }
-
-  const cecHoursLabel = formatCecHoursForDisplay(course.cec_hours);
-  if (cecHoursLabel) {
-    const plural = cecHoursLabel === '1' ? '' : 's';
-    outcomes.push(
-      `Earn ${cecHoursLabel} IICRC Continuing Education Credit${plural} (CEC${plural}) toward maintaining an existing IICRC certification`
-    );
-  }
-
-  outcomes.push(
-    'Apply current Australian and New Zealand methods to real-world restoration jobs',
-    'Build competency in training the IICRC does not offer locally — a CARSI-issued credential, not an IICRC certification',
-    'Receive a verifiable digital credential for your professional portfolio'
-  );
-
-  if (designation) {
-    outcomes.push(`Complete a required step toward the ${designation.name} designation`);
-  }
-
-  return outcomes;
-}
 
 export default async function CourseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -273,14 +241,15 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
   const price = course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)}`;
   const designation = getDesignationForCourseSlug(course.slug);
   const thumbnailUrl = resolveAssetUrl(course.thumbnail_url);
-  const learningOutcomes = getLearningOutcomes(course, designation);
+  const cecApproved = isCecApprovedCourse(course.slug);
+  const learningOutcomes = getCourseLearningOutcomes(course, designation, cecApproved);
 
   // First preview lesson that actually carries a body. The server has already nulled
   // preview_body on every non-preview lesson, so this only ever selects permitted content.
   const previewLesson = course.syllabus
     ?.flatMap((m) => m.lessons)
     .find((l) => l.is_preview && l.preview_body);
-  const audienceItems = getCourseAudienceItems(course, designation);
+  const audienceItems = getCourseAudienceItems(course, designation, cecApproved);
 
   const breadcrumbs = [
     { name: 'Home', url: siteUrl },
@@ -309,6 +278,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         aggregateRating={aggregateRating ?? undefined}
         credentialAwarded={designation?.name}
         authoredCourseJsonLd={resolvedMarketing?.courseJsonLd}
+        cecApproved={cecApproved}
       />
       {course.intro_video_url ? (
         <VideoObjectSchema
@@ -354,6 +324,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
             : null
         }
         aggregateRating={aggregateRating}
+        cecApproved={cecApproved}
       />
       {/* BACKLOG #22: only the sources the lessons themselves cite; nothing when there are none. */}
       <CourseReferences references={getCourseReferences(course.slug)} />
