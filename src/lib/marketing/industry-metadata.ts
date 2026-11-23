@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { getPublicSiteUrl } from '@/lib/env/public-url';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 export function buildIndustryMetadata(
   slug: string,
@@ -17,6 +18,7 @@ export function buildIndustryMetadata(
     keywords,
     alternates: { canonical: `${siteUrl}${path}` },
     openGraph: {
+      ...OG_LOCALE_FIELDS,
       title,
       description,
       type: 'website',

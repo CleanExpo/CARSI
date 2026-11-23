@@ -5,8 +5,8 @@
  * duplicate page instead of a 308. Every static sitemap path must resolve to a page file that
  * renders content, and must not be the source of a next.config redirect.
  */
-import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { dirname, join, relative, sep } from 'node:path';
 
 import { describe, expect, it, vi } from 'vitest';
 import { getRedirectStatus, modifyRouteRegex } from 'next/dist/lib/redirect-status';
@@ -126,6 +126,31 @@ describe('sitemap lists only real pages', () => {
   it('lists the live /resources library page', async () => {
     expect(await sitemapPaths()).toContain('/resources');
   });
+
+  /**
+   * GP-741: five pages were live on 21/11/2026 (200, "index, follow") but missing from the
+   * sitemap. Each must be listed, and each must stay indexable: no noindex in its page file
+   * or in any layout above it.
+   */
+  it.each(['/ccw-brisbane', '/review-policy', '/programs/owner-circle', '/tools', '/jobs/submit'])(
+    'lists the live indexable page %s',
+    async (path) => {
+      expect(await sitemapPaths()).toContain(path);
+      const page = resolvePage(path, pageRoutes());
+      expect(page, `${path} has no page file`).toBeDefined();
+      const chain = [page!.file];
+      for (let dir = dirname(page!.file); dir.startsWith(APP); dir = dirname(dir)) {
+        for (const name of ['layout.tsx', 'layout.ts']) {
+          if (existsSync(join(dir, name))) chain.push(join(dir, name));
+        }
+        if (dir === APP) break;
+      }
+      const noindex = chain.filter((file) =>
+        /index:\s*false|['"]noindex/.test(readFileSync(file, 'utf8'))
+      );
+      expect(noindex).toEqual([]);
+    }
+  );
 
   it('every static sitemap path resolves to a page that renders content', async () => {
     const routes = pageRoutes();

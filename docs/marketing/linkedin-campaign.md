@@ -96,7 +96,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 >
 > **Body:** Most mining companies discover mould problems after they become safety incidents. CARSI offers IICRC CEC Accredited online training in mould assessment, water damage response and structural drying — designed for FIFO rosters with zero classroom time required.
 >
-> Train your site supervisors and maintenance crew. Earn verifiable IICRC credentials. Protect your workforce and your balance sheet.
+> Train your site supervisors and maintenance crew. Earn verifiable CARSI credentials. Protect your workforce and your balance sheet.
 >
 > **CTA:** Download the Free IICRC Certification Guide →
 

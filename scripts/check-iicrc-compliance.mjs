@@ -125,6 +125,69 @@ const BANNED = [
     message:
       'Do not imply the IICRC approves or endorses CARSI\'s courses — a single approved class is "approved for IICRC CECs".',
   },
+  // GAP CLOSED (GP-753, 2026-11-21) — copy that implies CARSI delivers or grants IICRC
+  // certification, or that the IICRC approved the course. GP-525 fixed three such lines in
+  // docs/marketing by hand and this guard exited 0 on all three ("IICRC Cleaning Certification —
+  // Online", "IICRC board-approved — the same credential standard…", "Stand out … with IICRC
+  // certifications"). Third-person facts keep passing ("FSRT is an IICRC certification covering…",
+  // "IICRC certification is obtained only through IICRC-approved schools", a learner's own
+  // certification). `baselined`: lines already on main when the rules landed are pinned, NOT
+  // approved, in CERT_BASELINE_FILE by exact (file, text); see scanLine. The pin applies to the
+  // line scan only — course records (data/wordpress-export/) get no pin.
+  {
+    // GP-753 messages quote the provider wording from src/lib/iicrc/approved-wording.ts (GP-704):
+    // CARSI_PROVIDER_STATUS and FROM_IICRC_APPROVED_CEC_PROVIDER. Keep them in step with that file.
+    // An IICRC "<Discipline> Certification" named as a product or headline. Case-sensitive on
+    // purpose: Title Case words between "IICRC" and "Certification" are a product name; prose
+    // ("IICRC provides technician-level certifications") and acronyms ("IICRC WRT certification",
+    // a learner's own) are not matched. Holder framing ("your / existing IICRC …") is allowed.
+    re: /\bIICRC[\s-]+(?:[A-Z][a-z]+(?:[\s-]+|\s*&\s*)){1,5}Certifications?\b|\bIICRC[\s-]+[Cc]ertifications?\s*[—–:|-]\s*[Oo]nline\b|\b[Oo]nline\s+IICRC[\s-]+[Cc]ertifications?\b/,
+    allow: /\b(?:your|their|existing|current|hold(?:s|ing)?|held)\s+(?:\w+\s+){0,2}IICRC\b/i,
+    baselined: true,
+    message:
+      'Do not name an IICRC certification as a CARSI product or headline ("IICRC <discipline> Certification", "IICRC Certification — Online"). CARSI is an IICRC Approved CEC Provider; IICRC certification comes only from IICRC-approved schools and examinations.',
+  },
+  {
+    // "IICRC board-approved" (any order inside one sentence). The IICRC does not board-approve
+    // CARSI's courses; CARSI's standing is as a CEC provider.
+    re: /\bIICRC[\s-]+board[\s-]*approved\b|\bboard[\s-]*approved\b[^.!?\n]{0,40}\bIICRC\b|\bIICRC\b[^.!?\n]{0,40}\bboard[\s-]*approved\b/i,
+    allow: null,
+    baselined: true,
+    message:
+      'Do not say CARSI\'s courses are "IICRC board-approved". State the provider standing: "CARSI is an IICRC Approved CEC Provider."',
+  },
+  {
+    // IICRC certification sold as the benefit of CARSI training: "Stand out … with IICRC
+    // certifications", "Win More Contracts with IICRC Creds", "companies with IICRC certifications
+    // win 3x more". Holders earning CECs ("Technicians with IICRC certifications earn CECs") pass.
+    re: /\b(?:stand(?:s|ing)?\s+out|win\w*|compet\w*|grow\w*|boost\w*|reduc\w*|differentiat\w*|upskill\w*|equip\w*|level\s+up|get\s+ahead|unlock\w*|future[\s-]*proof\w*|elevat\w*)\b[^.!?\n|]{0,60}?\bwith\s+IICRC[\s-]+(?:certifications?|certificates?|certs?|creds?|credentials?|qualifications?)\b|\bwith\s+IICRC[\s-]+(?:certifications?|certificates?|certs?|creds?|credentials?|qualifications?)\s+(?:win|land|secure|stand|charge|command)\w*/i,
+    allow: null,
+    baselined: true,
+    message:
+      'Do not sell IICRC certification/credentials as what CARSI training gives ("… with IICRC certifications"). Say "verifiable CARSI credentials" and "from an IICRC Approved CEC Provider".',
+  },
+  {
+    // A grant verb on an IICRC credential: "Earn verifiable IICRC credentials", "add IICRC
+    // credentials to your business", "Get your IICRC certification". Denials ("does not / No CARSI
+    // course will get you …") and the third-person route through an IICRC-approved school pass.
+    re: /(?<!\b(?:not|never|no)\s+(?:\w+\s+){0,3})(?<!n['’]t\s+(?:\w+\s+){0,3})\b(?:earn(?:s|ing)?|add(?:s|ing)?|gain(?:s|ing)?|get(?:s|ting)?|receiv(?:e|es|ing))\s+(?:(?:your|verifiable|recognised|recognized|real|official|full|new|an?|the|more)\s+)*IICRC[\s-]+(?:certifications?|certificates?|certs?|creds?|credentials?|qualifications?)\b/i,
+    // Anchored to the credential noun (GP-584 per-occurrence matching): the allow must overlap the
+    // ban, so "IICRC certification through an IICRC-approved school" passes but a school phrase
+    // elsewhere on the line does not excuse an unrelated grant claim.
+    allow: /\bIICRC[\s-]+(?:certifications?|certificates?|certs?|creds?|credentials?|qualifications?)\s+(?:only\s+)?through\s+(?:an?\s+)?IICRC[\s-]*approved\s+(?:schools?|examinations?|exams?)\b/i,
+    baselined: true,
+    message:
+      'CARSI does not grant IICRC certification or credentials — do not tell learners to "earn / add / get IICRC credentials" from CARSI. Say "verifiable CARSI credentials".',
+  },
+  {
+    // Slang "IICRC certs / creds" in selling copy ("The 3 IICRC certs that unlock …"). A learner's
+    // own ("your IICRC certs") passes.
+    re: /(?<!\b(?:your|their|own|existing)\s+)\bIICRC[\s-]+(?:certs|creds?)\b/i,
+    allow: null,
+    baselined: true,
+    message:
+      'Do not sell "IICRC certs/creds" — CARSI does not deliver IICRC certification. Name the skill area or the CARSI credential.',
+  },
   // GAP CLOSED — "IICRC-approved" as a CARSI offering. Legitimate uses (real IICRC schools /
   // exams / the CE-provider program / board-approval process) are allowed.
   {
@@ -323,6 +386,8 @@ const EXEMPT = [
   'src/lib/course-kit/cec-guard.ts',
   'src/lib/seed/cec-hours.ts',
   'src/lib/seed/cec-hours.test.ts',
+  // GP-753: the licence-inventory gate's own test plants the GP-525 phrases to prove it blocks them.
+  'src/lib/marketing/licence-inventory.test.ts',
 ];
 
 // Files whose copy goes to learners of EVERY course, including courses with no IICRC link
@@ -376,7 +441,34 @@ export function hasUnexcusedBan(rule, content) {
   return bans.some(([s, e]) => !allows.some(([as, ae]) => as < e && s < ae));
 }
 
-function scanLine(file, lineNo, content, findings, allowlist) {
+/** GP-753 known-findings baseline for the `baselined` certification-phrase rules. NOT an approval:
+ *  it pins, by exact (file, normalised text), the lines that were already on main when the rules
+ *  landed and that need the founder's wording decision. They are printed on every run. Anything
+ *  else blocks: a new line, a changed line, the same text in another file. A pinned entry whose
+ *  line is gone also blocks (stale), so the list can only shrink. Read from the SCANNED tree (cwd).
+ *  Fail-closed: a missing, unreadable or malformed file is an EMPTY baseline (every hit blocks). */
+export const CERT_BASELINE_FILE = 'scripts/iicrc-certification-known-findings.json';
+export function loadCertBaseline(path = CERT_BASELINE_FILE) {
+  try {
+    const parsed = JSON.parse(readFileSync(path, 'utf8'));
+    if (parsed?.issue !== 'GP-753' || !Array.isArray(parsed?.entries)) return [];
+    return parsed.entries.filter((e) => e && typeof e.file === 'string' && e.file && typeof e.text === 'string' && e.text.trim());
+  } catch {
+    return [];
+  }
+}
+const certKey = (file, text) => `${file.replace(/\\/g, '/')}\u0000${normaliseLine(text)}`;
+/** A scan context: the pinned entries, and the pinned lines actually seen (key → finding). */
+export function newCertificationContext(entries = loadCertBaseline()) {
+  return { pinned: new Map(entries.map((e) => [certKey(e.file, e.text), e])), known: new Map() };
+}
+/** Pinned entries the scan did not see: the line is gone or changed. Each one blocks. */
+export function staleCertificationEntries(ctx) {
+  return [...ctx.pinned].filter(([k]) => !ctx.known.has(k)).map(([, e]) => e);
+}
+const CERT_CTX = newCertificationContext();
+
+function scanLine(file, lineNo, content, findings, allowlist, certCtx = CERT_CTX) {
   // A specific CEC-hour claim is exempt ONLY when the file belongs to a founder-approved
   // course — i.e. its path contains a slug listed in CEC_APPROVED_SLUGS (empty = none approved).
   const nf = file.replace(/\\/g, '/');
@@ -395,6 +487,11 @@ function scanLine(file, lineNo, content, findings, allowlist) {
       // "Buy our IICRC courses today. We are an IICRC CEC provider." blocks.
       flagged = hasUnexcusedBan(rule, content);
     }
+    // GP-753: a pinned pre-existing line is reported as a known finding instead of blocking.
+    if (flagged && rule.baselined && certCtx?.pinned.has(certKey(nf, content))) {
+      certCtx.known.set(certKey(nf, content), { file: nf, line: lineNo, text: normaliseLine(content) });
+      flagged = false;
+    }
     if (flagged) {
       findings.push(`  ${file}:${lineNo}: ${rule.message}\n    → ${content.trim().slice(0, 150)}`);
     }
@@ -404,11 +501,12 @@ function scanLine(file, lineNo, content, findings, allowlist) {
 /** Scan a single file's full text and return findings (one per offending line).
  *  Exported so the self-test can plant a bad line and assert the guard fires. `allowlist` is the
  *  set of normalised human-approved lines (defaults to the loaded allowlist; the self-test passes
- *  its own set to exercise the allowlisted-line PASS path). */
-export function evaluateContent(file, text, allowlist = ALLOWLIST) {
+ *  its own set to exercise the allowlisted-line PASS path). `certCtx` is the GP-753 baseline
+ *  context (newCertificationContext); the self-test passes its own. */
+export function evaluateContent(file, text, allowlist = ALLOWLIST, certCtx = CERT_CTX) {
   const findings = [];
   const lines = text.split('\n');
-  for (let i = 0; i < lines.length; i++) scanLine(file, i + 1, lines[i], findings, allowlist);
+  for (let i = 0; i < lines.length; i++) scanLine(file, i + 1, lines[i], findings, allowlist, certCtx);
   return findings;
 }
 
@@ -1312,6 +1410,17 @@ function main() {
       continue;
     }
     findings.push(...evaluateIicrcFree(file, text));
+  }
+  // GP-753: pinned certification-phrase lines are reported (not approved); stale pins block.
+  for (const e of staleCertificationEntries(CERT_CTX)) {
+    findings.push(`  ${e.file}: pinned in ${CERT_BASELINE_FILE} but the line is gone or changed — remove the entry (the baseline only shrinks)\n    → ${normaliseLine(e.text).slice(0, 150)}`);
+  }
+  if (CERT_CTX.known.size > 0) {
+    console.error(
+      `\n⚠ KNOWN FINDINGS — NOT APPROVED (GP-753): ${CERT_CTX.known.size} certification-implying line(s) pinned in ${CERT_BASELINE_FILE} ` +
+      `pending the founder's wording decision. Any new or changed line fails this guard.`
+    );
+    console.error([...CERT_CTX.known.values()].map((f) => `  ${f.file}:${f.line} → ${f.text.slice(0, 140)}`).join('\n'));
   }
 
   if (findings.length > 0) {

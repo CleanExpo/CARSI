@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { loadAdminCatalogSource } from '@/lib/admin/admin-catalog-source';
 import { summariseOpsPeriod, type AdminOpsPeriodKpis } from '@/lib/admin/admin-ops-metrics';
 import {
+  enrollmentIsStripeBought,
   enrollmentLooksPaid,
   fetchCompletedLessonCounts,
   fetchEnrollmentsForUsers,
@@ -316,7 +317,13 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
     const email = owner?.email ?? '';
     const status = normalizeEnrollmentStatus(e.status);
     const done = completedLessonCounts.get(`${e.studentId}-${e.courseId}`) ?? 0;
-    if (status === 'active' && done <= 0 && enrollmentLooksPaid(e) && neverStarted.length < 8) {
+    // "Bought, not started" card: Stripe-bought seats only, as in the users filter (GP-766).
+    if (
+      status === 'active' &&
+      done <= 0 &&
+      enrollmentIsStripeBought(e) &&
+      neverStarted.length < 8
+    ) {
       neverStarted.push({ userId: e.studentId, name, email, courseTitle: e.course.title });
     }
     const raw = (e.status ?? '').toLowerCase();

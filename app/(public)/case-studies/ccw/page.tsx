@@ -25,6 +25,7 @@ import {
   marketingStatCard,
   marketingTextMuted,
 } from '@/lib/marketing/marketing-ui';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 const PAGE_URL = `${getPublicSiteUrl()}/case-studies/ccw`;
 
@@ -34,6 +35,7 @@ export const metadata: Metadata = {
     'How Carpet Cleaners Warehouse became the first paying client of CCW-CRM — a $33,000/year SaaS contract unifying e-commerce and field-service customer relationships for an Australian cleaning-industry supplier.',
   alternates: { canonical: PAGE_URL },
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     title: 'Case Study: Carpet Cleaners Warehouse | CARSI',
     description:
       'How Carpet Cleaners Warehouse became the first paying client of CCW-CRM — unifying e-commerce and field-service customer relationships on one platform.',

@@ -10,6 +10,7 @@ import {
 } from '@/lib/server/carsi-workshop-access';
 import { getServerSessionClaims } from '@/lib/server/session-server';
 import { OG_IMAGES } from '@/lib/seo/og-image';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 // Access panel depends on the visitor's session and enrolment.
 export const dynamic = 'force-dynamic';
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   alternates: { canonical: `${siteUrl}${CARSI_WORKSHOP_PATH}` },
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     images: OG_IMAGES,
     title: 'CARSI Carpet Cleaning Workshop',
     description: DESCRIPTION,
