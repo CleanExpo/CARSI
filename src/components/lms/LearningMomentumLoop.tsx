@@ -3,6 +3,7 @@ import Link from 'next/link';
 
 import { customerJourneyLoopStages } from '@/lib/customer-journey-loop';
 import { dash } from '@/lib/dashboard-light-ui';
+import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
 
 import type { ContinueLearningSnapshot } from './ContinueLearningBanner';
 
@@ -60,7 +61,7 @@ function buildMomentumAction({
 
   const completedWithoutCertificate = enrollments.find(
     (enrollment) =>
-      (enrollment.all_lessons_complete || enrollment.status === 'completed') &&
+      isEnrollmentCompleted(enrollment.status) &&
       !enrollment.certificate_issued_at
   );
 
