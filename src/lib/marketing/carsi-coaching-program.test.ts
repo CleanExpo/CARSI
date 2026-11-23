@@ -23,6 +23,14 @@ describe('CARSI coaching program content', () => {
     expect(carsiCoachingPortalFeatures.length).toBeGreaterThanOrEqual(5);
   });
 
+  it('describes the coaching portal as live, not launching soon (GP-561)', () => {
+    const platform = carsiCoachingMonthlyInclusions.find((b) => b.category === 'Platform');
+    const portal = platform?.items.find((i) => i.title.includes('Business Coaching Portal'));
+    expect(portal?.title).toBe('Business Coaching Portal');
+    expect(portal?.detail?.toLowerCase()).not.toContain('launching soon');
+    expect(portal?.detail).toContain('/dashboard/coaching');
+  });
+
   it('uses a dedicated coaching portal path outside the LMS dashboard', () => {
     expect(carsiCoachingPortalPath).toBe('/dashboard/coaching');
   });
