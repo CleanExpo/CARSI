@@ -1,5 +1,5 @@
-import type { CoachingPortalWorkspace } from '@/lib/coaching-portal/types';
 import type { CoachingOnboardingSnapshot } from '@/lib/coaching-portal/onboarding-snapshot';
+import type { CoachingPortalWorkspace } from '@/lib/coaching-portal/types';
 
 /**
  * Seeded demo accounts live on this reserved, non-deliverable domain (RFC 2606 `.invalid`), so
@@ -202,13 +202,12 @@ export const PARTNER_DEMO_WALKTHROUGH_STEPS: readonly PartnerDemoWalkthroughStep
       'Automated website review, local-search checklist, 30-day social calendar and coach-approved fixes.',
   },
   {
-    title: 'Coming next: assistant, your chapter and the Hall',
-    segment: null,
+    title: 'Coach chapter, Ask coach & TradeHall preview',
+    segment: '/tradehall',
     minutes: 0.5,
-    advantage: 'A3 assistant, A5 chapters and A9 TradeHall',
-    status: 'coming',
+    advantage: 'A3 Ask coach, A5 chapter and A9 TradeHall preview',
+    status: 'live',
     shows:
-      'Coming: grounded answers from the coach’s own material, the coach’s own chapter, members and currency, and the Hall seminar room.',
-    tickets: ['GP-630', 'GP-632', 'GP-636'],
+      'Your coach chapter on home, session receipts, Ask my coach when enabled, TradeHall replays in the portal, and community links in Resources.',
   },
 ];

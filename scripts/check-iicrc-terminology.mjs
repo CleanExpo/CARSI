@@ -37,8 +37,8 @@
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
-import { isEntryPoint } from './lib/is-entry-point.mjs';
 import { isDraftCopy } from './lib/course-drafts.mjs';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 import { IICRC_CODE_ALT } from './iicrc-codes.mjs';
 
@@ -732,7 +732,7 @@ const EXEMPT = [
   'scripts/check-iicrc-terminology.mjs',
   'docs/agents/CLAUDE.md',
   'CLAUDE.md',
-  'skills/context/project-context.skill.md',
+  '.agents/references/engineering-principle.md',
   // The course-asset-kit engine's banned-phrase scanner mirrors this guard's
   // regexes and messages, and its tests use the banned phrases as fixtures to
   // prove the scan fires — same rationale as exempting this guard itself.
