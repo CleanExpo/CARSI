@@ -4,10 +4,7 @@ import path from 'node:path';
 import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
 
-import {
-  trainingRecordCourseMeta,
-  trainingRecordWording,
-} from '@/lib/certificate/certificate-cec-wording';
+import { APPROVED_CEC_BY_DISCIPLINE_HEADING, approvedCecHoursLine } from '@/lib/proof-pack-cec-wording';
 import type { ProofPackPayload } from '@/types/proof-pack';
 
 function wrapLines(text: string, maxChars: number): string[] {
@@ -52,9 +49,9 @@ async function loadLogoPng(): Promise<Uint8Array | null> {
 let notoBytesCache: Promise<Uint8Array | null> | null = null;
 
 function loadNotoBytes(): Promise<Uint8Array | null> {
-  notoBytesCache ??= readFile(
-    path.join(process.cwd(), 'public', 'fonts', 'NotoSans-Regular.ttf')
-  ).catch(() => null);
+  notoBytesCache ??= readFile(path.join(process.cwd(), 'public', 'fonts', 'NotoSans-Regular.ttf')).catch(
+    () => null
+  );
   return notoBytesCache;
 }
 
@@ -68,11 +65,7 @@ function canEncode(font: PDFFont, text: string): boolean {
 }
 
 /** The font to draw `text` in: the preferred standard font, else the Noto fallback. */
-export function fontFor(
-  text: string,
-  preferred: PDFFont,
-  fallback: PDFFont | null
-): PDFFont | null {
+export function fontFor(text: string, preferred: PDFFont, fallback: PDFFont | null): PDFFont | null {
   if (canEncode(preferred, text)) return preferred;
   return fallback;
 }
@@ -91,10 +84,7 @@ function chunkLines(text: string, maxChars: number): string[] {
 
 /** Word-wrap, then hard-split any word longer than a line (never truncates). */
 function wrapFull(text: string, maxChars: number): string[] {
-  const words = text
-    .split(/\s+/)
-    .filter(Boolean)
-    .flatMap((w) => chunkLines(w, maxChars));
+  const words = text.split(/\s+/).filter(Boolean).flatMap((w) => chunkLines(w, maxChars));
   return wrapLines(words.join(' '), maxChars);
 }
 
@@ -117,7 +107,7 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
     payload.learner_name,
     payload.learner_email,
     payload.issuing_organisation,
-    ...payload.cec_by_discipline.map((d) => d.discipline),
+    ...(payload.cec_by_discipline ?? []).map((d) => d.discipline),
     ...payload.credentials.flatMap((c) => [
       c.course_title,
       c.iicrc_discipline ?? '',
@@ -170,9 +160,9 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
     }
   }
 
-  // All credit wording comes from the certificate wording owner (GP-757).
-  const recordWording = trainingRecordWording(payload.summary.total_cec_hours);
-  const title = recordWording.heading;
+  // GP-748: the title, subtitle and footer name no IICRC and no CEC; those appear only in the
+  // approved-course lines below, and only when the learner has an approved course.
+  const title = 'Training summary';
   drawText(page, title, {
     x: MARGIN,
     y,
@@ -182,7 +172,7 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
   });
   y -= 26;
 
-  drawText(page, recordWording.pdfSubtitle, {
+  drawText(page, 'For employer, HR, or insurer evidence: course completions on CARSI.', {
     x: MARGIN,
     y,
     size: 9,
@@ -199,13 +189,7 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
     color: BLACK,
   });
   y -= 14;
-  drawText(page, `Email: ${payload.learner_email}`, {
-    x: MARGIN,
-    y,
-    size: 10,
-    font: helvetica,
-    color: BLACK,
-  });
+  drawText(page, `Email: ${payload.learner_email}`, { x: MARGIN, y, size: 10, font: helvetica, color: BLACK });
   y -= 14;
   drawText(page, `Issuing organisation: ${payload.issuing_organisation}`, {
     x: MARGIN,
@@ -247,8 +231,10 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
     color: BLACK,
   });
   y -= 14;
-  if (recordWording.totalLine) {
-    drawText(page, recordWording.totalLine, {
+  // GP-748 / GP-704: the payload carries a CEC total only when a completed course is in
+  // data/seed/cec-approvals.json, and the line takes its wording from approved-wording.ts.
+  if (payload.summary.total_cec_hours != null) {
+    drawText(page, approvedCecHoursLine(payload.summary.total_cec_hours), {
       x: MARGIN,
       y,
       size: 10,
@@ -259,9 +245,10 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
   }
   y -= 14;
 
-  if (payload.cec_by_discipline.length > 0) {
-    ensureSpace(40 + payload.cec_by_discipline.length * 16);
-    drawText(page, recordWording.byDisciplineHeading, {
+  const cecByDiscipline = payload.cec_by_discipline ?? [];
+  if (cecByDiscipline.length > 0) {
+    ensureSpace(40 + cecByDiscipline.length * 16);
+    drawText(page, APPROVED_CEC_BY_DISCIPLINE_HEADING, {
       x: MARGIN,
       y,
       size: 12,
@@ -269,15 +256,9 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
       color: BLACK,
     });
     y -= 16;
-    for (const row of payload.cec_by_discipline) {
+    for (const row of cecByDiscipline) {
       ensureSpace(20);
-      drawText(page, `${row.discipline}`, {
-        x: MARGIN,
-        y,
-        size: 10,
-        font: helvetica,
-        color: BLACK,
-      });
+      drawText(page, `${row.discipline}`, { x: MARGIN, y, size: 10, font: helvetica, color: BLACK });
       drawText(page, `${row.cec_hours}`, {
         x: PAGE_W - MARGIN - 40,
         y,
@@ -319,18 +300,18 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
   const colCourse = MARGIN;
 
   ensureSpace(22);
-  drawText(page, 'Course / verification', {
-    x: colCourse,
-    y,
-    size: 8,
-    font: helveticaBold,
-    color: MUTED,
-  });
+  drawText(page, 'Course / verification', { x: colCourse, y, size: 8, font: helveticaBold, color: MUTED });
   y -= 14;
 
   for (const c of payload.credentials) {
     const titleLines = wrapLines(c.course_title, 72);
-    const metaLine = `${trainingRecordCourseMeta(c)} · ID ${c.credential_id}`;
+    // GP-748: the hours part exists only for a course in the approvals registry; every other row
+    // shows the issue date and credential ID only.
+    const cecPart =
+      c.cec_hours != null
+        ? [c.iicrc_discipline?.trim() || null, approvedCecHoursLine(c.cec_hours)].filter(Boolean).join(' · ')
+        : null;
+    const metaLine = [cecPart, `issued ${c.issued_date}`, `ID ${c.credential_id}`].filter(Boolean).join(' · ');
     const urlLines = wrapLines(c.verification_url, 92);
     const blockH = titleLines.length * 11 + 14 + 12 + urlLines.length * 10 + 12;
     ensureSpace(blockH);
@@ -342,13 +323,7 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
     drawText(page, metaLine, { x: colCourse, y, size: 8, font: helvetica, color: MUTED });
     y -= 12;
     for (const ul of urlLines) {
-      drawText(page, ul, {
-        x: colCourse,
-        y,
-        size: 7,
-        font: helvetica,
-        color: rgb(0.1, 0.45, 0.75),
-      });
+      drawText(page, ul, { x: colCourse, y, size: 7, font: helvetica, color: rgb(0.1, 0.45, 0.75) });
       y -= 9;
     }
 
@@ -377,13 +352,7 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
           y -= 9;
         }
         for (const ul of refUrlLines) {
-          drawText(page, ul, {
-            x: colCourse + 14,
-            y,
-            size: 6.5,
-            font: helvetica,
-            color: rgb(0.1, 0.45, 0.75),
-          });
+          drawText(page, ul, { x: colCourse + 14, y, size: 6.5, font: helvetica, color: rgb(0.1, 0.45, 0.75) });
           y -= 8;
         }
         y -= 2;

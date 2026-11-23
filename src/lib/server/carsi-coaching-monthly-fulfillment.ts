@@ -1,6 +1,7 @@
 import type Stripe from 'stripe';
 
 import { getStripeClient } from '@/lib/api/stripe';
+import { tryBuildTaxInvoice } from '@/lib/billing/tax-invoice';
 import {
   carsiCoachingMonthlyPath,
   carsiCoachingMonthlyPriceCents,
@@ -236,6 +237,11 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
     amountLabel,
     dashboardUrl,
     coachingPageUrl,
+    taxInvoice: tryBuildTaxInvoice({
+      item: `${carsiCoachingProductName} (monthly)`,
+      totalCents: session.amount_total,
+      issuedAt: new Date(),
+    }),
   });
 
   const welcomeClaimed = await claimEmailDelivery(session.id, 'welcome');

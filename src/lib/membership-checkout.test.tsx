@@ -160,7 +160,9 @@ describe('membership_checkout_started — the shared checkout boundary', () => {
     mocks.post.mockResolvedValue({ url: STRIPE_URL });
     await registerFromSubscribe();
     expect(mocks.register).toHaveBeenCalledTimes(1);
-    expect(mocks.post).toHaveBeenLastCalledWith('/api/lms/subscription/checkout', {});
+    expect(mocks.post).toHaveBeenLastCalledWith('/api/lms/subscription/checkout', {
+      analytics_consent: 'granted',
+    });
     expect(nav.href).toBe(STRIPE_URL);
     expect(checkoutEvents()).toHaveLength(1);
     expect(checkoutEvents()[0][2]).toEqual({ value: 795, currency: 'AUD' });

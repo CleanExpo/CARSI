@@ -10,7 +10,8 @@ function roundCec(n: number): number {
 }
 
 /**
- * Employer / insurer oriented transcript: completed courses, dates, CEC by discipline, verification URLs.
+ * Employer / insurer oriented transcript: completed courses, dates and verification URLs, plus CEC
+ * hours by discipline for CEC-approved courses only (GP-748).
  */
 export async function getProofPackPayloadForStudent(
   userId: string,
@@ -38,24 +39,31 @@ export async function getProofPackPayloadForStudent(
 
   const base = origin.replace(/\/$/, '');
 
-  const credentials: ProofPackCredentialRow[] = rows.map((e) => ({
-    credential_id: e.id,
-    course_title: e.course.title,
-    iicrc_discipline: e.course.iicrcDiscipline,
-    // REGISTRY-ONLY, FAIL-CLOSED (GP-498). This employer/insurer transcript is an exported CEC
-    // record — it must never carry the stale WP-import `cecHours`. Registry approval only; an
-    // unapproved course contributes 0 to the row and the total.
-    cec_hours: roundCec(resolveLmsCourseCecHours({ slug: e.course.slug }) ?? 0),
-    issued_date: (e.certificateIssuedAt ?? e.completedAt)!.toISOString().slice(0, 10),
-    verification_url: `${base}/verify/credential/${e.id}`,
-    // BACKLOG #26: citations only, IICRC-naming ones dropped unless the course is CEC-approved.
-    references: proofPackReferencesForCourse(e.course.slug),
-  }));
+  const credentials: ProofPackCredentialRow[] = rows.map((e) => {
+    // REGISTRY-ONLY, FAIL-CLOSED (GP-498, GP-748). This employer/insurer transcript is an exported
+    // CEC record: hours come from data/seed/cec-approvals.json only, never the stale WP-import
+    // `cecHours`, duration or prose. A course that is not approved carries no CEC key and no IICRC
+    // discipline at all, so its row names neither.
+    const approvedHours = resolveLmsCourseCecHours({ slug: e.course.slug });
+    return {
+      credential_id: e.id,
+      course_title: e.course.title,
+      ...(approvedHours != null && approvedHours > 0
+        ? { iicrc_discipline: e.course.iicrcDiscipline, cec_hours: roundCec(approvedHours) }
+        : {}),
+      issued_date: (e.certificateIssuedAt ?? e.completedAt)!.toISOString().slice(0, 10),
+      verification_url: `${base}/verify/credential/${e.id}`,
+      // BACKLOG #26: citations only, IICRC-naming ones dropped unless the course is CEC-approved.
+      references: proofPackReferencesForCourse(e.course.slug),
+    };
+  });
+
+  const approved = credentials.filter((c) => c.cec_hours != null && c.cec_hours > 0);
 
   const byDisc = new Map<string, number>();
-  for (const c of credentials) {
+  for (const c of approved) {
     const d = c.iicrc_discipline?.trim() || '—';
-    byDisc.set(d, (byDisc.get(d) ?? 0) + c.cec_hours);
+    byDisc.set(d, (byDisc.get(d) ?? 0) + (c.cec_hours ?? 0));
   }
 
   // Drop zero-hour rows: a course off the approvals register must not get a credit row (GP-757).
@@ -64,19 +72,21 @@ export async function getProofPackPayloadForStudent(
     .map(([discipline, cec_hours]) => ({ discipline, cec_hours: roundCec(cec_hours) }))
     .sort((a, b) => a.discipline.localeCompare(b.discipline));
 
-  const total_cec_hours = roundCec(credentials.reduce((s, c) => s + c.cec_hours, 0));
+  const total_cec_hours = roundCec(approved.reduce((s, c) => s + (c.cec_hours ?? 0), 0));
+  // GP-748: no approved course means no CEC summary and no IICRC name anywhere in the pack.
+  const hasApprovedCec = approved.length > 0;
 
   return {
-    schema_version: 1,
+    schema_version: 2,
     learner_name: user.fullName?.trim() || user.email,
     learner_email: user.email,
     issuing_organisation: 'CARSI Learning',
     generated_at: new Date().toISOString(),
     summary: {
       completed_courses: credentials.length,
-      total_cec_hours,
+      ...(hasApprovedCec ? { total_cec_hours } : {}),
     },
-    cec_by_discipline,
+    ...(hasApprovedCec ? { cec_by_discipline } : {}),
     credentials,
   };
 }

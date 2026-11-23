@@ -117,6 +117,10 @@ export async function POST(request: NextRequest) {
         studentId: claims.sub,
         courseSlug: slug,
         appOrigin: origin,
+        payment: {
+          amountTotalCents: session.amount_total,
+          seatCount: fulfilled.kind === 'team' ? teamSeatCount : undefined,
+        },
       }).catch((e) => console.error('[guest-complete] email', e));
 
       notifyCrmEnrollmentCreated({

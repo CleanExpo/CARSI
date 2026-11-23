@@ -20,6 +20,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { authApi } from '@/lib/api/auth';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
+import { analyticsConsentCheckoutField } from '@/lib/analytics/consent-client';
 import { createMembershipCheckout } from '@/lib/membership-checkout';
 import {
   isMembershipCheckoutResume,
@@ -112,7 +113,7 @@ export function RegisterForm() {
           const surveyField = purchaseSurveyCheckoutField();
           const checkout = await apiClient.post<{ enrolled?: boolean; checkout_url?: string }>(
             '/api/lms/checkout',
-            { slug, success_url, cancel_url, customer_email: values.email, ...surveyField }
+            { slug, success_url, cancel_url, customer_email: values.email, ...surveyField, ...analyticsConsentCheckoutField() }
           );
           const checkoutUrl = checkout.checkout_url;
           if (checkoutUrl) {

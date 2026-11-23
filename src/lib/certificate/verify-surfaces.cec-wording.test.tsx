@@ -1,14 +1,8 @@
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
-
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
 import { CredentialVerificationPageContent } from '@/components/lms/CredentialVerificationPageContent';
-import {
-  trainingRecordCourseMeta,
-  trainingRecordWording,
-} from '@/lib/certificate/certificate-cec-wording';
+import {} from '@/lib/certificate/certificate-cec-wording';
 import { getApprovedCecHours } from '@/lib/seed/cec-approvals';
 import { certificateCecWordingForCourse } from '@/lib/server/certificate-cec-wording';
 import type { PublicCredentialJson } from '@/lib/server/credential-public';
@@ -101,41 +95,5 @@ describe('public credential verify page (GP-757)', () => {
   });
 });
 
-describe('shared training record (GP-757)', () => {
-  it('a course not on the approvals register gets no CEC or discipline-code line', () => {
-    const meta = trainingRecordCourseMeta({
-      iicrc_discipline: 'WRT',
-      cec_hours: 0,
-      issued_date: '2026-03-01',
-    });
-    expect(meta).toBe('issued 2026-03-01');
-  });
-
-  it('a registry-approved course carries its register hours', () => {
-    const hours = getApprovedCecHours(APPROVED_SLUG)!;
-    const meta = trainingRecordCourseMeta({
-      iicrc_discipline: 'WRT',
-      cec_hours: hours,
-      issued_date: '2026-03-01',
-    });
-    expect(meta).toContain(`${hours} IICRC CEC hour${hours === 1 ? '' : 's'}`);
-  });
-
-  it('a record with no approved course names no IICRC and no CEC', () => {
-    const w = trainingRecordWording(0);
-    expect(w.totalLine).toBeNull();
-    expect(`${w.heading} ${w.pdfSubtitle}`).not.toMatch(/IICRC|\bCECs?\b|accredit/i);
-  });
-
-  it('the training-record page and PDF print no CEC line except through the wording owner', () => {
-    const root = process.cwd();
-    for (const rel of [
-      'app/(public)/verify/training-record/page.tsx',
-      'src/lib/server/proof-pack-pdf.ts',
-    ]) {
-      const src = readFileSync(path.join(root, rel), 'utf8');
-      expect(src, rel).toContain('trainingRecordCourseMeta');
-      expect(src, rel).not.toMatch(/IICRC|\bCECs?\b/);
-    }
-  });
-});
+// The shared training record and its PDF are owned by src/lib/proof-pack-cec-wording.ts on main
+// (GP-748, #1297), which already names the IICRC only for approved courses.

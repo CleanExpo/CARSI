@@ -1,6 +1,7 @@
 import type { CheckoutCourse } from '@/lib/course-list-item';
 import { getStripeClient } from '@/lib/api/stripe';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
+import { analyticsConsentMetadata } from '@/lib/server/analytics-consent';
 
 /**
  * Resolve payer email: local HS256 session cookie, backend /me when upstream + Bearer cookie,
@@ -48,6 +49,11 @@ export async function createStripeCheckoutForCourse(params: {
   purchase_mode?: 'self' | 'team';
   team_seat_count?: number;
   attribution_journey_id?: string;
+  /**
+   * The visitor's analytics choice (GP-732). Recorded on the session either way; the webhook
+   * sends its GA4 `purchase` event only for a recorded yes. Omitted counts as a no.
+   */
+  analytics_consent?: boolean;
 }): Promise<{ checkout_url: string; checkout_session_id: string }> {
   const {
     slug,
@@ -63,6 +69,7 @@ export async function createStripeCheckoutForCourse(params: {
     purchase_mode = 'self',
     team_seat_count,
     attribution_journey_id,
+    analytics_consent = false,
   } = params;
 
   const priceNum = Number(course.price_aud);
@@ -98,6 +105,8 @@ export async function createStripeCheckoutForCourse(params: {
       ...(guest_checkout ? { guest_checkout: 'true' } : {}),
       ...(attribution_journey_id ? { attribution_journey_id } : {}),
       ...(extra_metadata ?? {}),
+      // After extra_metadata, so nothing passed in can overwrite the recorded choice.
+      ...analyticsConsentMetadata(analytics_consent),
     },
     line_items: [
       {

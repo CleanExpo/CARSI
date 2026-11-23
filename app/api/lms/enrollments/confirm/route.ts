@@ -38,6 +38,8 @@ export async function POST(request: NextRequest) {
   let paymentReference: string;
   let purchaseMode: 'self' | 'team' = 'self';
   let teamSeatCount: number | undefined;
+  /** GST-inclusive amount Stripe charged; set only for a paid Stripe session (GP-761). */
+  let paidAmountTotalCents: number | null = null;
 
   if (sessionId) {
     if (!process.env.STRIPE_SECRET_KEY?.trim()) {
@@ -74,6 +76,7 @@ export async function POST(request: NextRequest) {
       if (!confirmEmailOwnershipOk(sessionEmail, accountEmail)) {
         return NextResponse.json({ detail: 'Session email does not match account' }, { status: 403 });
       }
+      paidAmountTotalCents = session.amount_total ?? null;
     } catch (e) {
       console.error('[enrollments/confirm] stripe', e);
       void captureServerError(e, { route: '/api/lms/enrollments/confirm' });
@@ -144,6 +147,12 @@ export async function POST(request: NextRequest) {
         studentId: claims.sub,
         courseSlug: slug,
         appOrigin: getAppOrigin(request),
+        payment: sessionId
+          ? {
+              amountTotalCents: paidAmountTotalCents,
+              seatCount: purchaseMode === 'team' ? teamSeatCount : undefined,
+            }
+          : undefined,
       }).catch((e) => console.error('[enrollments/confirm] email', e));
 
       notifyCrmEnrollmentCreated({
