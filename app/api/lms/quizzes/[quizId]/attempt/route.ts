@@ -14,6 +14,7 @@ import { CHECKPOINT_UUID, CheckpointError } from '@/lib/lms/lesson-checkpoint';
 import { getVersionBoundQuizForAttempt, readCheckpointJsonBody } from '@/lib/server/lesson-checkpoint';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 import { countCountedQuizAttempts } from '@/lib/server/quiz-attempt-count';
+import { EnrollmentLockRefusal, withLockedEnrollment } from '@/lib/server/enrollment-row-lock';
 import { syncCompletionAfterAssessmentPassed } from '@/lib/server/enrollment-service';
 
 type Ctx = { params: Promise<{ quizId: string }> };
@@ -49,42 +50,48 @@ async function submitBound(studentId: string, quizId: string, body: unknown) {
         const question = graph.questions.find((candidate) => candidate.id === id);
         if (!question || !Array.isArray(question.options) || answer >= question.options.length) throw new CheckpointError(400);
       }
-      const attemptsUsed = await countCountedQuizAttempts(tx, quizId, studentId);
-      if (attemptsUsed >= graph.quiz.attemptsAllowed) throw new CheckpointError(409);
-      let earned = 0;
-      let totalPoints = 0;
-      let correctCount = 0;
-      for (const question of graph.questions) {
-        totalPoints += question.points;
-        if (input.answers[question.id] === question.correctIndex) {
-          earned += question.points;
-          correctCount += 1;
+      // GP-432: the attempt is a learner-record write, so it runs inside the one owner
+      // (enrollment-row-lock.ts): the enrolment is locked and must be this learner's and grant
+      // access at the lock, or nothing is written.
+      return withLockedEnrollment(tx, { enrollmentId: graph.enrollmentId, studentId, require: 'access' }, async () => {
+        const attemptsUsed = await countCountedQuizAttempts(tx, quizId, studentId);
+        if (attemptsUsed >= graph.quiz.attemptsAllowed) throw new CheckpointError(409);
+        let earned = 0;
+        let totalPoints = 0;
+        let correctCount = 0;
+        for (const question of graph.questions) {
+          totalPoints += question.points;
+          if (input.answers[question.id] === question.correctIndex) {
+            earned += question.points;
+            correctCount += 1;
+          }
         }
-      }
-      const { scorePercent, passed } = computeQuizResult(earned, totalPoints, graph.quiz.passPercentage);
-      const attempts = await tx.$queryRaw<{ id: string }[]>`INSERT INTO lms_quiz_attempts
-        (id, quiz_id, student_id, score_percent, passed, answers, content_version, created_at)
-        VALUES (${randomUUID()}::uuid, ${quizId}::uuid, ${studentId}::uuid, ${scorePercent}, ${passed},
-          ${JSON.stringify(input.answers)}::jsonb, ${graph.contentVersion}, NOW()) RETURNING id`;
-      if (attempts.length !== 1) throw new CheckpointError(503);
-      // Read after grading and outside the version-bound graph: an authored explanation must not
-      // change the lesson's content version (which would mark in-progress attempts stale).
-      const explained = await tx.$queryRaw<{ id: string; explanation: string | null }[]>`SELECT id, explanation
-        FROM lms_quiz_questions WHERE quiz_id = ${quizId}::uuid AND explanation IS NOT NULL`;
-      const feedback = buildQuizFeedback(graph.questions, input.answers,
-        new Map(explained.map((row) => [row.id, row.explanation])));
-      return { attempt_id: attempts[0].id, score_percent: scorePercent, passed,
-        pass_percentage: graph.quiz.passPercentage,
-        correct_count: correctCount,
-        question_count: graph.questions.length,
-        attempts_remaining: Math.max(0, graph.quiz.attemptsAllowed - attemptsUsed - 1),
-        feedback };
+        const { scorePercent, passed } = computeQuizResult(earned, totalPoints, graph.quiz.passPercentage);
+        const attempts = await tx.$queryRaw<{ id: string }[]>`INSERT INTO lms_quiz_attempts
+          (id, quiz_id, student_id, score_percent, passed, answers, content_version, created_at)
+          VALUES (${randomUUID()}::uuid, ${quizId}::uuid, ${studentId}::uuid, ${scorePercent}, ${passed},
+            ${JSON.stringify(input.answers)}::jsonb, ${graph.contentVersion}, NOW()) RETURNING id`;
+        if (attempts.length !== 1) throw new CheckpointError(503);
+        // Read after grading and outside the version-bound graph: an authored explanation must not
+        // change the lesson's content version (which would mark in-progress attempts stale).
+        const explained = await tx.$queryRaw<{ id: string; explanation: string | null }[]>`SELECT id, explanation
+          FROM lms_quiz_questions WHERE quiz_id = ${quizId}::uuid AND explanation IS NOT NULL`;
+        const feedback = buildQuizFeedback(graph.questions, input.answers,
+          new Map(explained.map((row) => [row.id, row.explanation])));
+        return { attempt_id: attempts[0].id, score_percent: scorePercent, passed,
+          pass_percentage: graph.quiz.passPercentage,
+          correct_count: correctCount,
+          question_count: graph.questions.length,
+          attempts_remaining: Math.max(0, graph.quiz.attemptsAllowed - attemptsUsed - 1),
+          feedback };
+      });
     });
     // GP-432: a pass may be the enrolment's last requirement; re-run the gated completion sync.
     if (result.passed) await syncCompletionAfterAssessmentPassed(studentId, courseId);
     return boundJson(result);
   } catch (error) {
-    const status = error instanceof CheckpointError ? error.status : 503;
+    const status = error instanceof CheckpointError ? error.status
+      : error instanceof EnrollmentLockRefusal ? 404 : 503;
     return boundJson({ detail: status === 400 ? 'Invalid quiz submission' : status === 404
       ? 'Quiz not found or access denied' : status === 409 ? 'Quiz submission conflict' : 'Quiz submission unavailable' }, status);
   }
@@ -186,22 +193,26 @@ export async function POST(request: NextRequest, ctx: Ctx) {
     // attemptsAllowed. SERIALIZABLE isolation makes Postgres detect the
     // read/write conflict and abort all but one racer (retried below), so the
     // limit holds under concurrency.
-    const result = await runSerializable(async (tx) => {
-      const attemptsUsed = await countCountedQuizAttempts(tx, quizId, claims.sub);
-      if (attemptsUsed >= quiz.attemptsAllowed) {
-        return { limitReached: true as const };
-      }
-      const attempt = await tx.lmsQuizAttempt.create({
-        data: {
-          quizId,
-          studentId: claims.sub,
-          scorePercent,
-          passed,
-          answers,
-        },
-      });
-      return { limitReached: false as const, attempt, attemptsUsed };
-    });
+    // GP-432: the enrolment found above is re-checked at its lock (one owner:
+    // enrollment-row-lock.ts); a revocation that committed since is refused and nothing is written.
+    const result = await runSerializable((tx) =>
+      withLockedEnrollment(tx, { enrollmentId: enrollment.id, studentId: claims.sub, require: 'access' }, async () => {
+        const attemptsUsed = await countCountedQuizAttempts(tx, quizId, claims.sub);
+        if (attemptsUsed >= quiz.attemptsAllowed) {
+          return { limitReached: true as const };
+        }
+        const attempt = await tx.lmsQuizAttempt.create({
+          data: {
+            quizId,
+            studentId: claims.sub,
+            scorePercent,
+            passed,
+            answers,
+          },
+        });
+        return { limitReached: false as const, attempt, attemptsUsed };
+      }),
+    );
 
     if (result.limitReached) {
       return NextResponse.json({ detail: 'No attempts remaining' }, { status: 409 });
@@ -221,6 +232,9 @@ export async function POST(request: NextRequest, ctx: Ctx) {
         new Map(quiz.questions.map((q) => [q.id, q.explanation]))),
     });
   } catch (e) {
+    if (e instanceof EnrollmentLockRefusal) {
+      return NextResponse.json({ detail: 'Enrollment required' }, { status: 403 });
+    }
     console.error('[quizzes/attempt]', e);
     return NextResponse.json({ detail: 'Failed to submit quiz' }, { status: 500 });
   }

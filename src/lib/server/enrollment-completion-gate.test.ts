@@ -69,8 +69,12 @@ vi.mock('@/lib/prisma', () => ({
     lmsPracticalAssessment: { findMany: vi.fn(async () => []) },
     lmsAssessmentSubmission: { findMany: vi.fn(async () => []) },
     // Runs the callback on this client; a throw restores the row, as a rollback would.
-    // Row lock (enrollment-row-lock.ts): the sync reads the prior status after it, via findUnique.
-    $queryRaw: async () => [{ id: "locked-row" }],
+    // Row lock (enrollment-row-lock.ts#withLockedEnrollment): answers with the enrolment row as
+    // the database would, so the owner's ownership and status checks run on real state.
+    $queryRaw: async () =>
+      state.enrollment
+        ? [{ id: (state.enrollment as { id: string }).id, studentId: (state.enrollment as { studentId?: string }).studentId, courseId: 'course', status: (state.enrollment as { status: string }).status }]
+        : [],
     async $transaction(fn: (tx: unknown) => Promise<unknown>) {
       const before = state.enrollment && { ...state.enrollment };
       try {

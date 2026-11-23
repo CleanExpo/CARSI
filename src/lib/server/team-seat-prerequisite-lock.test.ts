@@ -83,6 +83,14 @@ vi.mock('@/lib/prisma', () => {
     },
     stripeWebhookEvent: { findUnique: vi.fn(async () => null) },
     $executeRaw: vi.fn(async () => 0),
+    // GP-432: touchLessonProgress runs inside withLockedEnrollment; the row lock answers with the
+    // enrolment row by id, as the database would.
+    $queryRaw: vi.fn(async (_sql: TemplateStringsArray, id: string) => {
+      const e = db.enrolments.find((row) => row.id === id);
+      return e ? [{ id: e.id, studentId: e.studentId, courseId: e.courseId, status: e.status }] : [];
+    }),
+    lmsLessonProgress: { upsert: vi.fn(async () => ({})) },
+    lmsEnrollment: { update: vi.fn(async () => ({})) },
   };
   const client: Record<string, unknown> = {};
   const tx = new Proxy(txOwn, { get: (t, k: string) => (k in t ? t[k] : client[k]) });

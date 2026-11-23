@@ -9,6 +9,7 @@ import {
   type CheckpointInput, type CheckpointResponse, type LessonCheckpoint, type LessonCheckpointContent,
 } from '@/lib/lms/lesson-checkpoint';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
+import { EnrollmentLockRefusal, withLockedEnrollment } from '@/lib/server/enrollment-row-lock';
 import { withSerializationRetry } from '@/lib/server/db-tx';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 import { countCountedQuizAttempts } from '@/lib/server/quiz-attempt-count';
@@ -156,7 +157,8 @@ export async function getVersionBoundQuizForAttempt(tx: Prisma.TransactionClient
   const graph = await loadGraph(tx, studentId, lessonId);
   const version = contentVersion(graph);
   if (!graph.quiz || graph.quiz.id !== quizId || version !== expectedVersion) throw new CheckpointError(409);
-  return { quiz: graph.quiz, questions: graph.questions, contentVersion: version };
+  return { quiz: graph.quiz, questions: graph.questions, contentVersion: version,
+    enrollmentId: graph.context.enrollmentId };
 }
 
 export async function readCheckpointJsonBody(request: Request): Promise<unknown> {
@@ -189,39 +191,57 @@ async function transact(studentId: string, lessonId: string, input: CheckpointIn
   if (!CHECKPOINT_UUID.test(studentId) || !CHECKPOINT_UUID.test(lessonId)) throw new CheckpointError(404);
   // Configuration is checked before any database operation; never accept the development fallback.
   if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim().length < 32) return unavailable();
-  return withSerializationRetry(() => client.$transaction(async (tx) => {
-    const graph = await loadGraph(tx, studentId, lessonId);
-    const version = contentVersion(graph);
-    const progress = await tx.$queryRaw<{ checkpoint: unknown }[]>`
-      SELECT checkpoint FROM lms_lesson_progress WHERE student_id = ${studentId}::uuid
-        AND lesson_id = ${lessonId}::uuid FOR UPDATE`;
-    const stored = progress[0]?.checkpoint ?? null;
-    let checkpoint = parseStoredCheckpoint(stored);
-    if (input) {
-      const revision = checkpoint?.revision ?? 0;
-      if (input.expectedRevision !== revision || input.contentVersion !== version ||
-          (checkpoint && checkpoint.contentVersion !== version && !input.reset)) throw new CheckpointError(409);
-      if (revision >= Number.MAX_SAFE_INTEGER) throw new CheckpointError(409);
-      validateDraft(input, graph, 400);
-      if (input.reset && (input.position.value !== 0 || Object.keys(input.answers).length > 0)) throw new CheckpointError(400);
-      checkpoint = { version: 1, revision: revision + 1, contentVersion: version,
-        position: input.position, answers: input.answers };
-      const changed = await tx.$executeRaw`
-        INSERT INTO lms_lesson_progress AS p
-          (id, student_id, lesson_id, checkpoint, last_accessed_at, updated_at)
-        VALUES (${randomUUID()}::uuid, ${studentId}::uuid, ${lessonId}::uuid,
-          ${JSON.stringify(checkpoint)}::jsonb, NOW(), NOW())
-        ON CONFLICT (student_id, lesson_id) DO UPDATE SET checkpoint = EXCLUDED.checkpoint,
-          last_accessed_at = NOW(), updated_at = NOW()
-        WHERE p.checkpoint IS NOT DISTINCT FROM ${stored === null ? null : JSON.stringify(stored)}::jsonb`;
-      if (changed !== 1) throw new CheckpointError(409);
-      const pointerChanged = await tx.$executeRaw`UPDATE lms_enrollments
-        SET last_accessed_lesson_id = ${lessonId}::uuid WHERE id = ${graph.context.enrollmentId}::uuid
-          AND student_id = ${studentId}::uuid AND status IN (${Prisma.join([...ACCESS_GRANTING_STATUS_LIST])})`;
-      if (pointerChanged !== 1) return unavailable();
-    }
-    return response(tx, studentId, graph, version, checkpoint);
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }));
+  try {
+    return await withSerializationRetry(() => client.$transaction(async (tx) => {
+      const graph = await loadGraph(tx, studentId, lessonId);
+      const version = contentVersion(graph);
+      // GP-432: a save writes the learner's record, so reads and saves run inside the one owner
+      // (enrollment-row-lock.ts): the enrolment row is locked and must be this learner's and grant
+      // access AT THE LOCK, or nothing is written. loadGraph above already holds that row lock
+      // (FOR UPDATE OF e) with the same access filter; the owner re-checks the locked row, so the
+      // rule has one place. Lock order: enrolment row first, then lesson progress.
+      return withLockedEnrollment(
+        tx,
+        { enrollmentId: graph.context.enrollmentId, studentId, require: 'access' },
+        async (): Promise<CheckpointResponse> => {
+          const progress = await tx.$queryRaw<{ checkpoint: unknown }[]>`
+            SELECT checkpoint FROM lms_lesson_progress WHERE student_id = ${studentId}::uuid
+              AND lesson_id = ${lessonId}::uuid FOR UPDATE`;
+          const stored = progress[0]?.checkpoint ?? null;
+          let checkpoint = parseStoredCheckpoint(stored);
+          if (input) {
+            const revision = checkpoint?.revision ?? 0;
+            if (input.expectedRevision !== revision || input.contentVersion !== version ||
+                (checkpoint && checkpoint.contentVersion !== version && !input.reset)) throw new CheckpointError(409);
+            if (revision >= Number.MAX_SAFE_INTEGER) throw new CheckpointError(409);
+            validateDraft(input, graph, 400);
+            if (input.reset && (input.position.value !== 0 || Object.keys(input.answers).length > 0)) throw new CheckpointError(400);
+            checkpoint = { version: 1, revision: revision + 1, contentVersion: version,
+              position: input.position, answers: input.answers };
+            const changed = await tx.$executeRaw`
+              INSERT INTO lms_lesson_progress AS p
+                (id, student_id, lesson_id, checkpoint, last_accessed_at, updated_at)
+              VALUES (${randomUUID()}::uuid, ${studentId}::uuid, ${lessonId}::uuid,
+                ${JSON.stringify(checkpoint)}::jsonb, NOW(), NOW())
+              ON CONFLICT (student_id, lesson_id) DO UPDATE SET checkpoint = EXCLUDED.checkpoint,
+                last_accessed_at = NOW(), updated_at = NOW()
+              WHERE p.checkpoint IS NOT DISTINCT FROM ${stored === null ? null : JSON.stringify(stored)}::jsonb`;
+            if (changed !== 1) throw new CheckpointError(409);
+            const pointerChanged = await tx.$executeRaw`UPDATE lms_enrollments
+              SET last_accessed_lesson_id = ${lessonId}::uuid WHERE id = ${graph.context.enrollmentId}::uuid
+                AND student_id = ${studentId}::uuid AND status IN (${Prisma.join([...ACCESS_GRANTING_STATUS_LIST])})`;
+            if (pointerChanged !== 1) return unavailable();
+          }
+          return response(tx, studentId, graph, version, checkpoint);
+        },
+      );
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }));
+  } catch (error) {
+    // Refused at the lock (revoked, refunded, not this learner's): the same answer as an access
+    // denial before it, and nothing was written.
+    if (error instanceof EnrollmentLockRefusal) throw new CheckpointError(404);
+    throw error;
+  }
 }
 
 export function getLessonCheckpoint(studentId: string, lessonId: string, client: PrismaClient = prisma): Promise<CheckpointResponse> {
