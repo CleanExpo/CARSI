@@ -17,7 +17,10 @@ import {
 import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { TurnstileWidget } from '@/components/security/TurnstileWidget';
 import { isSafeInternalPath } from '@/lib/auth/guest-recovery-path';
-import { purchaseSurveyCheckoutField, rememberPurchaseSurveyKey } from '@/lib/marketing/purchase-survey-key';
+import {
+  purchaseSurveyCheckoutFieldFor,
+  rememberPurchaseSurveyKey,
+} from '@/lib/marketing/purchase-survey-key';
 import { analyticsConsentCheckoutField } from '@/lib/analytics/consent-client';
 
 /** Fail-closed client check: empty or space-only email never reaches checkout or free enrol. */
@@ -129,7 +132,10 @@ export function GuestEnrolForm({
         undefined,
         purchaseMode === 'team' ? { teamSeats } : undefined,
       );
-      const surveyField = purchaseSurveyCheckoutField();
+      // GP-783: a repeat of this purchase sends the same key, so it reuses the first Stripe session.
+      const surveyField = purchaseSurveyCheckoutFieldFor(
+        `${slug}:${purchaseMode}:${purchaseMode === 'team' ? teamSeats : 1}`
+      );
       const res = await fetch('/api/lms/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
