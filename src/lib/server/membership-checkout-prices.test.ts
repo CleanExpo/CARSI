@@ -134,12 +134,15 @@ beforeEach(() => {
   vi.stubEnv('STRIPE_PRICE_ORG_ANNUAL', 'price_owner');
   vi.stubEnv('STRIPE_PRICE_ORG_MONTHLY', 'price_owner_monthly_old');
   vi.stubEnv('STRIPE_PRICE_TEAMS_STARTER', 'price_team_starter');
+  vi.stubEnv('STRIPE_PRICE_TEAMS_EXTRA_SEAT', 'price_seat');
   catalogue = {
     price_individual: price('price_individual', 79_500),
     price_owner: price('price_owner', 129_500),
     price_owner_monthly_old: price('price_owner_monthly_old', 129_500, 'month'),
-    // Teams Starter shows $299 a year for 5 seats; checkout bills unit x 5, so the unit is A$59.80.
-    price_team_starter: price('price_team_starter', 5_980),
+    // Teams Starter shows $299 a year for 5 seats: a flat base Price billed once (GP-773 seat billing).
+    price_team_starter: price('price_team_starter', 29_900),
+    // Each extra staff seat: A$695 a year, its own subscription item.
+    price_seat: price('price_seat', 69_500),
   };
   mocks.pricesRetrieve.mockImplementation(async (id: string) => {
     const p = catalogue[id];
@@ -304,16 +307,17 @@ describe('Teams checkout', () => {
     const res = await teams(request({ tier: 'starter' }));
     expect(res.status).toBe(200);
     const args = lastSessionArgs();
-    expect(args.line_items).toEqual([{ price: 'price_team_starter', quantity: 5 }]);
+    expect(args.line_items).toEqual([{ price: 'price_team_starter', quantity: 1 }]);
     expect(args).not.toHaveProperty('allow_promotion_codes');
   });
 
   for (const [label, wrong] of [
-    ['a A$695 unit (5 x 695 = $3,475, not the $299 shown)', price('price_team_starter', 69_500)],
-    ['a monthly unit', price('price_team_starter', 5_980, 'month')],
-    ['another currency', price('price_team_starter', 5_980, 'year', 'usd')],
-    ['a quantity transform', transformed(price('price_team_starter', 5_980))],
-    ['tiered billing', tiered(price('price_team_starter', 5_980))],
+    ['a A$695 base (not the $299 shown)', price('price_team_starter', 69_500)],
+    ['the old A$59.80 per-unit Price (no longer billed x 5)', price('price_team_starter', 5_980)],
+    ['a monthly base', price('price_team_starter', 29_900, 'month')],
+    ['another currency', price('price_team_starter', 29_900, 'year', 'usd')],
+    ['a quantity transform', transformed(price('price_team_starter', 29_900))],
+    ['tiered billing', tiered(price('price_team_starter', 29_900))],
   ] as const) {
     it(`refuses a tier Price with ${label}, and Stripe Checkout is never opened`, async () => {
       catalogue.price_team_starter = wrong;
@@ -337,38 +341,55 @@ describe('extra staff seats: A$695 per year each', () => {
     mocks.subsUpdate.mockResolvedValue({});
   });
 
-  it('adds seats when the seat Price is A$695 per year', async () => {
+  const META = { plan: 'starter', base_price_id: 'price_team_starter', seat_price_id: 'price_seat' };
+  const BASE_ITEM = { id: 'si_base', quantity: 1, price: price('price_team_starter', 29_900) };
+
+  it('adds seats when the seat item is on the A$695 per year Price', async () => {
     mocks.subsRetrieve.mockResolvedValue({
-      items: { data: [{ id: 'si_1', quantity: 5, price: price('price_seat', 69_500) }] },
+      metadata: META,
+      items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_seat', 69_500) }] },
     });
-    const res = await expandSeats(request({ additional_seats: 2, request_id: 'seat-add-req-0001' }));
+    const res = await expandSeats(request({ additional_seats: 2 }));
     expect(res.status).toBe(200);
     expect(mocks.subsUpdate).toHaveBeenCalledWith(
       'sub_1',
-      expect.objectContaining({ items: [{ id: 'si_1', quantity: 7 }] }),
-      // GP-759: the page's per-click id is the Stripe idempotency key.
-      { idempotencyKey: 'carsi-expand-seats:sub_1:seat-add-req-0001' }
+      expect.objectContaining({ items: [{ id: 'si_seat', quantity: 4 }] })
     );
   });
 
+  // The verified seat Price itself is wrong: refused before Stripe is touched (503).
   for (const [label, seatPrice] of [
     ['the old $49 seat', price('price_seat', 4_900)],
     ['a tier bundle Price', price('price_seat', 29_900)],
     ['a monthly A$695', price('price_seat', 69_500, 'month')],
-    // 5 -> 7 seats would still bill 4 transformed units: the added seats cost less than A$695 each.
+    // 2 -> 4 seats would bill 2 transformed units: the added seats cost less than A$695 each.
     ['A$695 yearly with a quantity transform', transformed(price('price_seat', 69_500))],
     ['A$695 yearly with tiered billing', tiered(price('price_seat', 69_500))],
   ] as const) {
     it(`refuses, and charges nothing, when the seat Price is ${label}`, async () => {
+      catalogue.price_seat = seatPrice;
       mocks.subsRetrieve.mockResolvedValue({
-        items: { data: [{ id: 'si_1', quantity: 5, price: seatPrice }] },
+        metadata: META,
+        items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: seatPrice }] },
       });
-      const res = await expandSeats(request({ additional_seats: 2, request_id: 'seat-add-req-0001' }));
-      expect(res.status).toBe(409);
+      const res = await expandSeats(request({ additional_seats: 2 }));
+      expect(res.status).toBe(503);
       expect(mocks.subsUpdate).not.toHaveBeenCalled();
       expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
     });
   }
+
+  // The seat item on the subscription is not on the verified seat Price: refused (409).
+  it('refuses, and charges nothing, when the seat item is on a different Price', async () => {
+    mocks.subsRetrieve.mockResolvedValue({
+      metadata: { ...META, seat_price_id: 'price_other' },
+      items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_other', 4_900) }] },
+    });
+    const res = await expandSeats(request({ additional_seats: 2 }));
+    expect(res.status).toBe(409);
+    expect(mocks.subsUpdate).not.toHaveBeenCalled();
+    expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
+  });
 });
 
 describe('no membership checkout source enables promotion codes', () => {

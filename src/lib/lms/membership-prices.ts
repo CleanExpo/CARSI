@@ -53,15 +53,17 @@ export const BUSINESS_OWNER_PLAN: MembershipPrice = {
 };
 
 /**
- * One extra staff seat. Seats are the Stripe subscription quantity, so an extra seat is
- * billed at the subscription item's Price; seat expansion refuses unless that Price is this one.
+ * One extra staff seat on a Teams subscription (founder ruling 23/11/2026, "Build seat billing
+ * now"). Extra seats are their own subscription item on this Price, beside the tier's flat base
+ * Price; the item's quantity is the number of extra seats. Checkout and seat expansion only use
+ * a Price that matches this entry.
  */
 export const EXTRA_STAFF_SEAT: MembershipPrice = {
   amountCents: 69_500,
   currency: 'aud',
   interval: 'year',
-  envVar: null,
-  lookupKey: null,
+  envVar: 'STRIPE_PRICE_TEAMS_EXTRA_SEAT',
+  lookupKey: 'carsi_teams_extra_seat',
 };
 
 /** Whole dollars, e.g. 795 or 1295. */

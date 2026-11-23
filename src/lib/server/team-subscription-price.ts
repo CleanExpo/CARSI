@@ -1,26 +1,30 @@
 /**
- * Resolve the Stripe Price id for a Teams seat subscription tier (WS1-E2,
- * GP-442). One recurring (yearly) Price per tier; the seat count is carried by
- * the Stripe subscription `quantity`, NOT by a per-seat Price. Seat expansion is
- * a quantity change with proration (see docs/runbooks/rana-stripe-connection.md
- * and the PR body's seat-billing decision).
+ * Resolve the Stripe Price ids for a Teams subscription (WS1-E2, GP-442; seat model GP-773).
  *
- * Resolution order (mirrors E1's subscription-price.ts, founder-locked):
- *  1. the tier's explicit env override (STRIPE_PRICE_TEAMS_STARTER, …) if set.
- *  2. otherwise look up by `lookup_key` at runtime, cached per process.
+ * Seat billing (founder ruling 23/11/2026, "Build seat billing now"):
+ *  - each tier has ONE flat yearly base Price billed at quantity 1, for exactly the tier total
+ *    shown on /pricing (it includes the tier's seats: 5 / 15 / 25);
+ *  - extra staff seats are a SEPARATE subscription item on the A$695 yearly seat Price
+ *    (`EXTRA_STAFF_SEAT`), whose quantity is the number of extra seats.
  *
- * GP-773: the checkout bills `unit_amount × seatsIncluded`, so the Price is read
- * from Stripe and must bill exactly the tier total shown on /pricing (AUD,
- * yearly, per-unit). A Price that would bill any other total resolves to `null`
- * and the checkout route FAILS CLOSED with its honest "not yet available"
- * response — it never charges an amount the page did not show.
+ * Resolution order for every Price (mirrors E1's subscription-price.ts, founder-locked):
+ *  1. the explicit env override (STRIPE_PRICE_TEAMS_STARTER, …, STRIPE_PRICE_TEAMS_EXTRA_SEAT);
+ *  2. otherwise the `lookup_key`, cached per process.
+ * The Price is read from Stripe and must match amount, currency AUD, yearly interval and the
+ * per-unit shape (`stripePriceMatches`). Anything else resolves to `null` and the caller FAILS
+ * CLOSED with 503: it never charges an amount the page did not show.
  */
 
 import { getStripeClient } from '@/lib/api/stripe';
+import { EXTRA_STAFF_SEAT } from '@/lib/lms/membership-prices';
 import { teamTierById, type TeamBundleTierId, type TeamTier } from '@/lib/lms/pricing-tiers';
-import { stripePriceMatches, type StripePriceLike } from '@/lib/server/membership-price-check';
+import {
+  resolveVerifiedMembershipPriceId,
+  stripePriceMatches,
+  type StripePriceLike,
+} from '@/lib/server/membership-price-check';
 
-/** lookup_key + env override the runbook instructs Rana to set, per tier. */
+/** lookup_key + env override the runbook instructs Rana to set, per tier base Price. */
 export const TEAMS_TIER_PRICE_CONFIG: Record<
   TeamBundleTierId,
   { lookupKey: string; envVar: string }
@@ -34,30 +38,28 @@ export const TEAMS_TIER_PRICE_CONFIG: Record<
 };
 
 const cache = new Map<TeamBundleTierId, string>();
+const seatCache: { id: string | null } = { id: null };
 
-/** Test-only: clear the module cache so a fresh resolution runs. */
+/** Test-only: clear the module caches so a fresh resolution runs. */
 export function __resetTeamSubscriptionPriceCache(): void {
   cache.clear();
+  seatCache.id = null;
 }
 
 /**
- * True only when `quantity = seatsIncluded` on this Price bills exactly the tier's displayed
- * yearly total in AUD. The shape rules (per-unit, no transform, currency, interval) belong to
- * `stripePriceMatches`; this only derives the per-seat unit the tier total implies.
+ * True only when this Price, billed once (quantity 1), charges exactly the tier's displayed
+ * yearly total in AUD. The shape rules belong to `stripePriceMatches`.
  */
-export function teamTierPriceMatches(price: StripePriceLike | null | undefined, tier: TeamTier): boolean {
-  if (tier.seatsIncluded <= 0 || tier.priceCents % tier.seatsIncluded !== 0) return false;
-  return stripePriceMatches(price, {
-    amountCents: tier.priceCents / tier.seatsIncluded,
-    currency: 'aud',
-    interval: 'year',
-  });
+export function teamTierBasePriceMatches(
+  price: StripePriceLike | null | undefined,
+  tier: TeamTier,
+): boolean {
+  return stripePriceMatches(price, { amountCents: tier.priceCents, currency: 'aud', interval: 'year' });
 }
 
 /**
- * Returns the verified Price id for a Teams tier, or `null` when it cannot be
- * resolved or would bill a different total. Never throws — a null return is the
- * fail-closed signal for callers.
+ * Returns the verified base Price id for a Teams tier, or `null` when it cannot be resolved or
+ * would bill a different total. Never throws: a null return is the fail-closed signal.
  */
 export async function resolveTeamTierPriceId(
   tier: TeamBundleTierId,
@@ -86,10 +88,10 @@ export async function resolveTeamTierPriceId(
       price = prices.data[0] as StripePriceLike | undefined;
     }
     if (!price?.id) return null;
-    if (!teamTierPriceMatches(price, tierConfig)) {
+    if (!teamTierBasePriceMatches(price, tierConfig)) {
       console.error(
-        `[team-subscription-price] Stripe Price ${price.id} would not bill the ${tier} total ` +
-          `(${tierConfig.priceCents} aud per year for ${tierConfig.seatsIncluded} seats); checkout refused.`
+        `[team-subscription-price] Stripe Price ${price.id} is not the flat ${tier} base ` +
+          `(${tierConfig.priceCents} aud per year, billed once); checkout refused.`
       );
       return null;
     }
@@ -99,4 +101,12 @@ export async function resolveTeamTierPriceId(
     console.error('[team-subscription-price] Stripe price lookup failed:', error);
     return null;
   }
+}
+
+/**
+ * Returns the verified extra staff seat Price id (A$695 AUD yearly, per unit), or `null`
+ * (fail closed) when it is missing, unreadable or does not match.
+ */
+export async function resolveTeamSeatPriceId(): Promise<string | null> {
+  return resolveVerifiedMembershipPriceId(EXTRA_STAFF_SEAT, seatCache, 'team-seat-price');
 }

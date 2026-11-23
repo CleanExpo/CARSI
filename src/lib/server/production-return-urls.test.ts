@@ -31,6 +31,7 @@ vi.mock('@/lib/server/subscription-price', () => ({
 }));
 vi.mock('@/lib/server/team-subscription-price', () => ({
   resolveTeamTierPriceId: async () => 'price_test_team',
+  resolveTeamSeatPriceId: async () => 'price_test_team_seat',
 }));
 vi.mock('@/lib/server/org-subscription-price', () => ({
   resolveOrgAnnualPriceId: async () => 'price_test_org',

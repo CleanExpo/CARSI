@@ -2,13 +2,16 @@
  * POST /api/lms/subscription/teams/checkout — start a Teams SEAT subscription
  * (WS1-E2, GP-442) Stripe Checkout in `mode: 'subscription'`.
  *
- * Body: { tier: 'starter' | 'growth' | 'full_library', success_url?, cancel_url? }
+ * Body: { tier: 'starter' | 'growth' | 'full_library', extra_seats?: 0..50, success_url?, cancel_url? }
  *
- * Seat-billing decision (documented in the PR): ONE recurring Price per tier;
- * the seat count is the Stripe subscription `quantity`. The tier's included seat
- * count (5 / 15 / 25) is the initial quantity; seat expansion is a quantity
- * increase with proration (handled by the seat-expansion route). This is the
- * simplest correct model — no per-seat Price, no bespoke proration maths.
+ * Seat billing (GP-773, founder ruling 23/11/2026 "Build seat billing now"): the subscription
+ * carries the tier's verified flat base Price at quantity 1 (it includes 5 / 15 / 25 seats),
+ * plus a SEPARATE item on the verified A$695 yearly extra-seat Price whose quantity is the
+ * extra seats bought. With no extra seats the seat item is left out (Stripe Checkout is never
+ * sent a zero quantity); the seat-expansion route adds it later. Both verified Price ids are
+ * stamped into the subscription metadata (`base_price_id`, `seat_price_id`) so the webhook and
+ * seat expansion tell the items apart by id, not by amount. Both Prices must resolve and
+ * verify, or the checkout answers 503 and opens nothing.
  *
  * Ships DARK behind SUBSCRIPTIONS_ENABLED + TEAMS_SUBSCRIPTIONS_ENABLED and FAILS CLOSED at every uncertain
  * step (flag off / not signed in / Stripe unconfigured / Price unresolvable /
@@ -27,7 +30,7 @@ import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
 import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { teamTierById, type TeamBundleTierId } from '@/lib/lms/pricing-tiers';
-import { resolveTeamTierPriceId } from '@/lib/server/team-subscription-price';
+import { resolveTeamSeatPriceId, resolveTeamTierPriceId } from '@/lib/server/team-subscription-price';
 import { ensureContainerTeamForOwner, getTeamForUser } from '@/lib/server/teams';
 import {
   checkoutSessionIdempotencyKey,
@@ -38,6 +41,8 @@ import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
 const UNAVAILABLE = 'Teams membership purchasing is not yet available.';
 const TEAMS_SUBSCRIPTION_TIER = 'teams_subscription';
+/** Same cap as the seat-expansion route. */
+const MAX_EXTRA_SEATS = 50;
 
 export async function POST(request: NextRequest) {
   if (!teamSubscriptionsEnabled()) {
@@ -58,6 +63,7 @@ export async function POST(request: NextRequest) {
 
   const body = (await request.json().catch(() => ({}))) as {
     tier?: string;
+    extra_seats?: unknown;
     success_url?: string;
     cancel_url?: string;
   };
@@ -68,9 +74,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: 'Unknown Teams tier.' }, { status: 400 });
   }
 
-  const priceId = await resolveTeamTierPriceId(tierId);
-  if (!priceId) {
-    // Fail closed: no Price → honest unavailable, never a wrong Price.
+  const extraSeats = body.extra_seats === undefined ? 0 : body.extra_seats;
+  if (
+    typeof extraSeats !== 'number' ||
+    !Number.isInteger(extraSeats) ||
+    extraSeats < 0 ||
+    extraSeats > MAX_EXTRA_SEATS
+  ) {
+    return NextResponse.json(
+      { detail: `Choose between 0 and ${MAX_EXTRA_SEATS} extra seats.` },
+      { status: 400 }
+    );
+  }
+
+  // Fail closed: both the base and the seat Price must verify, never a wrong Price. The seat
+  // Price is required even with no extra seats, because the plan is sold with A$695 seats.
+  const [basePriceId, seatPriceId] = await Promise.all([
+    resolveTeamTierPriceId(tierId),
+    resolveTeamSeatPriceId(),
+  ]);
+  if (!basePriceId || !seatPriceId) {
     return NextResponse.json({ detail: UNAVAILABLE }, { status: 503 });
   }
 
@@ -117,7 +140,15 @@ export async function POST(request: NextRequest) {
         );
   }
 
-  const seats = tier.seatsIncluded;
+  const seats = tier.seatsIncluded + extraSeats;
+  const lineItems: Array<{ price: string; quantity: number }> = [{ price: basePriceId, quantity: 1 }];
+  if (extraSeats > 0) lineItems.push({ price: seatPriceId, quantity: extraSeats });
+  const seatMetadata = {
+    base_price_id: basePriceId,
+    seat_price_id: seatPriceId,
+    extra_seats: String(extraSeats),
+    seat_count: String(seats),
+  };
   const origin = getAppOrigin(request);
   const success_url = getCheckoutReturnUrl(
     body.success_url,
@@ -129,7 +160,7 @@ export async function POST(request: NextRequest) {
     const session = await getStripeClient().checkout.sessions.create(
       {
         mode: 'subscription',
-        line_items: [{ price: priceId, quantity: seats }],
+        line_items: lineItems,
         // Paired with the reservation TTL — see membership-checkout-reservation.
         expires_at: checkoutSessionExpiresAt(reservedAt),
         customer_email: claims.email,
@@ -139,7 +170,7 @@ export async function POST(request: NextRequest) {
           carsi_user_id: claims.sub,
           carsi_team_id: teamId,
           plan: tierId,
-          seat_count: String(seats),
+          ...seatMetadata,
           source: 'carsi-teams-subscription',
         },
         subscription_data: {
@@ -147,7 +178,7 @@ export async function POST(request: NextRequest) {
             carsi_user_id: claims.sub,
             carsi_team_id: teamId,
             plan: tierId,
-            seat_count: String(seats),
+            ...seatMetadata,
           },
         },
         // GP-773: no promotion codes on a membership (founder ruling: "no further discounts").
