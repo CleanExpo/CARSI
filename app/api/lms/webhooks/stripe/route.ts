@@ -26,6 +26,7 @@ import {
   persistAttributedRevenueReversal,
   recordAttributedStage,
 } from '@/lib/server/event-attribution';
+import { hasAnalyticsConsent } from '@/lib/server/analytics-consent';
 import { sendGa4PurchaseEvent } from '@/lib/server/ga4-measurement-protocol';
 import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
@@ -62,6 +63,7 @@ import {
 import { markSubscriptionStatusBySubscriptionId } from '@/lib/server/subscription-store';
 import { handleSubscriptionEvent, isSubscriptionEvent } from '@/lib/server/subscription-webhook';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
+import { revokeTeamSeatBlocksForRefund } from '@/lib/server/team-seat-refund';
 import { markTeamSubscriptionStatusBySubscriptionId } from '@/lib/server/team-subscription-store';
 
 /**
@@ -205,6 +207,10 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
       await recordCheckoutPaymentReversed(ref, reason, eventTimestamp);
       // A full refund also takes the session off the unfulfilled list, in the same transaction.
       await revokeEnrollmentsByPaymentReference(ref, reason, eventTimestamp);
+    }
+    // GP-759 (c): a refunded team seat checkout also takes its seats back.
+    if (revokeEntitlement && reason === 'refunded') {
+      await revokeTeamSeatBlocksForRefund(ref, eventTimestamp);
     }
   }
 }
@@ -560,10 +566,12 @@ export async function POST(request: NextRequest) {
 
         // WS3 / GP-447: server-side `purchase` event (GA4 Measurement Protocol).
         // Never blocks fulfilment — the utility itself no-ops/swallows errors.
+        // GP-732: sent only when the session records the visitor's yes to
+        // analytics at checkout; never with the learner's account id.
         const valueAud = typeof session.amount_total === 'number' ? session.amount_total / 100 : 0;
         void sendGa4PurchaseEvent({
           clientId: ref,
-          userId: claims.sub,
+          analyticsConsent: hasAnalyticsConsent(session.metadata),
           courseSlug: slug,
           valueAud,
           transactionId: ref,

@@ -113,12 +113,18 @@ export async function provisionTeamCoursePurchase(params: {
         throw new Error('ALREADY_ON_TEAM');
       }
 
-      await insertTeamCoursePurchaseTx(tx, {
+      const inserted = await insertTeamCoursePurchaseTx(tx, {
         teamId: team.id,
         courseSlug,
         seatLimit: seatCount,
         paymentReference,
       });
+      // A replayed fulfilment of a session already on record changes nothing. Recomputing here
+      // used to fall back to `seatCount` when the blocks summed to 0, which put the seats of a
+      // refunded block (zeroed by team-seat-refund.ts) straight back (GP-759).
+      if (!inserted) {
+        return { teamId: team.id, teamSlug: team.slug };
+      }
 
       const totalSeats = await sumTeamCoursePurchaseSeatsTx(tx, team.id);
       await tx.lmsTeam.update({
@@ -241,6 +247,13 @@ export async function enrollTeamMemberInPurchasedCourse(
 
   const claims = await sessionClaimsForUserId(userId);
   if (!claims) return;
+
+  // GP-759: membership survives a seat refund, so check for a paid seat before issuing one.
+  const { teamCourseSeatIsFree } = await import('@/lib/server/team-seat-refund');
+  if (!(await teamCourseSeatIsFree(teamId, slug, userId))) {
+    console.warn('[team-course-purchase] no paid seat left for member', { teamId, userId });
+    return;
+  }
 
   try {
     // Without the prerequisite the seat is issued LOCKED, not skipped (02/11/2026).

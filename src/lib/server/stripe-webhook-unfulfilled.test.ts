@@ -148,6 +148,11 @@ vi.mock('@/lib/server/ga4-measurement-protocol', () => ({
   sendGa4PurchaseEvent: vi.fn(async () => {}),
 }));
 vi.mock('@/lib/server/sentry', () => ({ captureServerError: vi.fn(async () => {}) }));
+// GP-759 (c) team seat revocation on refund: team tables, covered by team-seat-refund.test.ts.
+vi.mock('@/lib/server/team-seat-refund', () => ({
+  revokeTeamSeatBlocksForRefund: vi.fn(async () => {}),
+  teamCourseSeatIsFree: vi.fn(async () => true),
+}));
 
 const { POST } = await import('../../../app/api/lms/webhooks/stripe/route');
 const { isCheckoutPaymentReversed } = await import('./payment-integrity-ledger');
