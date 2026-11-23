@@ -200,7 +200,7 @@ if (evaluateContent(NON_APPROVED, 'This course is Australian-produced. Ten-quest
   const CERT_MUST_PASS = [
     ['third-person: FSRT is an IICRC certification', 'FSRT is an IICRC certification covering fire and smoke restoration.'],
     ['third-person: obtained only through approved schools', 'IICRC certification is obtained only through IICRC-approved schools and examinations.'],
-    ['denial: not IICRC CEC accredited', 'This course is not IICRC CEC accredited.'],
+    ['denial: not accredited by the IICRC', 'CARSI courses are not accredited by the IICRC.'],
     ['denial: CARSI does not deliver', 'CARSI does not deliver IICRC certification.'],
     ['denial: courses do not grant', 'CARSI courses do not grant IICRC certification.'],
     ['denial: no CARSI course will get you', 'No CARSI course will get you IICRC credentials.'],
@@ -210,7 +210,7 @@ if (evaluateContent(NON_APPROVED, 'This course is Australian-produced. Ten-quest
     ['third-person route to certification', 'Earn IICRC certification through an IICRC-approved school; CARSI CECs help keep it current.'],
     ['holders earn CECs', 'Technicians with IICRC certifications earn CECs through approved courses.'],
     ['learner brings own credentials', 'Bring your IICRC credentials, CEC records, and equipment inventory.'],
-    ['provider standing', 'CARSI is an IICRC CEC Accredited provider — CEC hours are shown only on courses the IICRC has approved.'],
+    ['provider standing', 'CARSI is an IICRC Approved CEC Provider — CEC hours are shown only on classes approved for IICRC CECs.'],
     ['industry fact', 'IICRC certification is required for many insurance panels.'],
   ];
   for (const [name, line] of CERT_MUST_BLOCK) {

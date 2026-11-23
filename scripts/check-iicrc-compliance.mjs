@@ -135,6 +135,8 @@ const BANNED = [
   // approved, in CERT_BASELINE_FILE by exact (file, text); see scanLine. The pin applies to the
   // line scan only — course records (data/wordpress-export/) get no pin.
   {
+    // GP-753 messages quote the provider wording from src/lib/iicrc/approved-wording.ts (GP-704):
+    // CARSI_PROVIDER_STATUS and FROM_IICRC_APPROVED_CEC_PROVIDER. Keep them in step with that file.
     // An IICRC "<Discipline> Certification" named as a product or headline. Case-sensitive on
     // purpose: Title Case words between "IICRC" and "Certification" are a product name; prose
     // ("IICRC provides technician-level certifications") and acronyms ("IICRC WRT certification",
@@ -143,7 +145,7 @@ const BANNED = [
     allow: /\b(?:your|their|existing|current|hold(?:s|ing)?|held)\s+(?:\w+\s+){0,2}IICRC\b/i,
     baselined: true,
     message:
-      'Do not name an IICRC certification as a CARSI product or headline ("IICRC <discipline> Certification", "IICRC Certification — Online"). CARSI is an IICRC CEC Accredited provider; IICRC certification comes only from IICRC-approved schools and examinations.',
+      'Do not name an IICRC certification as a CARSI product or headline ("IICRC <discipline> Certification", "IICRC Certification — Online"). CARSI is an IICRC Approved CEC Provider; IICRC certification comes only from IICRC-approved schools and examinations.',
   },
   {
     // "IICRC board-approved" (any order inside one sentence). The IICRC does not board-approve
@@ -152,7 +154,7 @@ const BANNED = [
     allow: null,
     baselined: true,
     message:
-      'Do not say CARSI\'s courses are "IICRC board-approved". State the provider standing: "CARSI is an IICRC CEC Accredited provider".',
+      'Do not say CARSI\'s courses are "IICRC board-approved". State the provider standing: "CARSI is an IICRC Approved CEC Provider."',
   },
   {
     // IICRC certification sold as the benefit of CARSI training: "Stand out … with IICRC
@@ -162,7 +164,7 @@ const BANNED = [
     allow: null,
     baselined: true,
     message:
-      'Do not sell IICRC certification/credentials as what CARSI training gives ("… with IICRC certifications"). Say "verifiable CARSI credentials" and "from an IICRC CEC Accredited provider".',
+      'Do not sell IICRC certification/credentials as what CARSI training gives ("… with IICRC certifications"). Say "verifiable CARSI credentials" and "from an IICRC Approved CEC Provider".',
   },
   {
     // A grant verb on an IICRC credential: "Earn verifiable IICRC credentials", "add IICRC
