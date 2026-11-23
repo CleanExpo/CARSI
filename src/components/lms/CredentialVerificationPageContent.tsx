@@ -3,7 +3,6 @@ import { Award, Building2, CheckCircle2, Download, PartyPopper } from 'lucide-re
 
 import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
 import { ReviewAsk } from '@/components/lms/ReviewAsk';
-import { CREDENTIAL_DISCLAIMER } from '@/components/seo/JsonLd';
 import { dash } from '@/lib/dashboard-light-ui';
 import { FLOOR_CARE_ONBOARDING_SLUG, isOnboardingCourse, ONBOARDING_BRAND } from '@/lib/onboarding/enterprise';
 import type { PublicCredentialJson } from '@/lib/server/credential-public';
@@ -30,7 +29,10 @@ export function CredentialVerificationPageContent({
   cecSubmittedAt = null,
 }: Props) {
   const pdfUrl = `/api/lms/credentials/${encodeURIComponent(credentialId)}?pdf=1`;
-  const cecSubmitted = cecSubmissionStatus === 'sent';
+  // A sent submission row alone is not enough to name the IICRC: the course must be approved on
+  // the register now. An old row, or a course since taken off the register, shows no banner (GP-757).
+  const cecSubmitted =
+    cecSubmissionStatus === 'sent' && credential.certificate_wording.approved;
   const isOnboardingCredential =
     courseSlug != null &&
     isOnboardingCourse({ slug: courseSlug });
@@ -109,7 +111,7 @@ export function CredentialVerificationPageContent({
           courseName={credential.course_title ?? undefined}
           discipline={credential.discipline ?? credential.iicrc_discipline ?? undefined}
           credentialId={credentialId}
-          cecHoursLabel={credential.cec_hours}
+          cecWording={credential.certificate_wording}
           completedDate={
             credential.completed_at
               ? new Date(credential.completed_at).toLocaleDateString('en-AU', {
@@ -138,7 +140,8 @@ export function CredentialVerificationPageContent({
           copy. A designation name alone ("CARSI Water Restoration Practitioner") reads exactly like
           a trade certification, so without this the product is disclaimed and the artifact is not,
           and the misleading happens where the stakes are highest.
-          Verbatim from CREDENTIAL_DISCLAIMER so the record and the course page cannot drift. */}
+          The statement comes from the certificate wording owner (GP-757): it names the IICRC only
+          for a course the approvals register lists as approved. */}
       <section
         className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4"
         aria-labelledby="credential-scope-heading"
@@ -146,7 +149,7 @@ export function CredentialVerificationPageContent({
         <h2 id="credential-scope-heading" className="text-sm font-semibold text-slate-900">
           What this credential is
         </h2>
-        <p className="mt-2 text-sm leading-relaxed text-slate-600">{CREDENTIAL_DISCLAIMER}</p>
+        <p className="mt-2 text-sm leading-relaxed text-slate-600">{credential.certificate_wording.scopeStatement}</p>
       </section>
 
       <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">

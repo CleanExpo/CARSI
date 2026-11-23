@@ -13,7 +13,7 @@ const base = {
   courseTitle: 'Water Damage Restoration Technician',
   completedDate: new Date('2026-03-01T00:00:00Z'),
   discipline: 'WRT',
-  resolvedCecHours: 14,
+  courseSlug: 'introduction-to-porous-materials-drying',
   courseLevel: 'Professional development',
   credentialId: '00000000-0000-0000-0000-000000000001',
 };
