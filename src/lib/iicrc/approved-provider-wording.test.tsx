@@ -37,7 +37,7 @@ import {
   RETIRED_WORDING_DETECTORS,
   RETIRED_WORDING_HISTORICAL,
   RETIRED_WORDING_PENDING,
-} from './claim-rules.mjs';
+} from '../../../scripts/iicrc-claim-rules.mjs';
 import { readingViews, sourceLine } from './reading-view';
 
 vi.mock('next/font/google', () => ({

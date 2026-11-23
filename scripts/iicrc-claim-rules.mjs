@@ -1,9 +1,10 @@
 /**
  * The one owner of the IICRC claim shapes that more than one guard enforces.
  *
- * Plain JavaScript with no imports, so the Node guards (scripts/check-iicrc-compliance.mjs,
- * scripts/check-iicrc-terminology.mjs) and the vitest guard
- * (src/lib/iicrc/approved-provider-wording.test.tsx) all import the same patterns. Do not copy a
+ * Plain JavaScript with no imports, so the Node guard (scripts/check-iicrc-compliance.mjs) and the
+ * vitest guard (src/lib/iicrc/approved-provider-wording.test.tsx) import the same patterns. It sits
+ * in scripts/ because it is guard tooling, not served code (scripts/licence-inventory.mjs scans
+ * app/, src/ and public/ and would read these patterns as copy). Do not copy a
  * pattern into a guard: a copied rule drifts, and a drifted copy is how GP-599 and GP-586 escaped
  * (each guard had its own list of special cases, and the case the copy missed went live).
  *
@@ -162,7 +163,7 @@ export const RETIRED_WORDING_DETECTORS = [
   'src/lib/server/public-catalogue-facts.branding.test.ts',
   // The vitest guard and this file: their pattern docs and controls spell the wording on purpose.
   'src/lib/iicrc/approved-provider-wording.test.tsx',
-  'src/lib/iicrc/claim-rules.mjs',
+  'scripts/iicrc-claim-rules.mjs',
 ];
 
 /**

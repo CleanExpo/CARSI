@@ -463,7 +463,7 @@ for (const [name, line] of SPAN_MUST_PASS) {
   if (f.length > 0) fail(`GP-584 span: MUST PASS but blocked: ${name}\n    ${line}\n    ${f.join('\n    ')}`);
 }
 
-// (9) GP-586 / GP-599 / GP-600 — one owner for the shared claim shapes (src/lib/iicrc/claim-rules.mjs).
+// (9) GP-586 / GP-599 / GP-600 — one owner for the shared claim shapes (scripts/iicrc-claim-rules.mjs).
 {
   const PAGE = 'app/(public)/courses/page.tsx';
   const runAt = (file, line) => evaluateContent(file, line, EMPTY, newCertificationContext([]));

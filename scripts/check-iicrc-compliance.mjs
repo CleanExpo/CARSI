@@ -30,7 +30,7 @@ import {
   CERTIFICATION_GRANT_ALLOW,
   RETIRED_PROVIDER_WORDING,
   retiredWordingExemption,
-} from '../src/lib/iicrc/claim-rules.mjs';
+} from './iicrc-claim-rules.mjs';
 
 /** GP-673 reviews r1 and r2 (Codex, P1). Course descriptions reach learners through the React
  *  component CourseFormattedBody: stripLegacyPurchaseCta, then sourceToStudentHtml
@@ -244,7 +244,7 @@ const BANNED = [
   // GAP CLOSED (GP-586) — CARSI or its training makes the learner certified, in any word order:
   // "CARSI courses get you certified.", "This course certifies technicians.", "You will be certified
   // after this course." The rule above only knew a fixed list of words between "get" and
-  // "certified". The shapes live in src/lib/iicrc/claim-rules.mjs (one owner; see there).
+  // "certified". The shapes live in scripts/iicrc-claim-rules.mjs (one owner; see there).
   {
     re: CERTIFICATION_GRANT,
     allow: CERTIFICATION_GRANT_ALLOW,
