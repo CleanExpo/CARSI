@@ -3,11 +3,7 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import {
-  APPROVED_CARSI_LOGO_PATHS,
-  CARSI_LOGO_SRC,
-  isApprovedCarsiLogoSrc,
-} from './carsi-logo';
+import { APPROVED_CARSI_LOGO_PATHS, CARSI_LOGO_SRC, isApprovedCarsiLogoSrc } from './carsi-logo';
 
 const ORIGIN = 'https://carsi.com.au';
 
@@ -26,14 +22,17 @@ describe('approved CARSI logo paths (single owner for PublicLogo and the live sm
 
   it('accepts each approved logo, served direct or through next/image', () => {
     for (const file of APPROVED_CARSI_LOGO_PATHS) {
-      expect(isApprovedCarsiLogoSrc(`${ORIGIN}${file}`), file).toBe(true);
-      expect(isApprovedCarsiLogoSrc(nextImageUrl(file)), `next/image ${file}`).toBe(true);
-      expect(isApprovedCarsiLogoSrc(`${file}?v=2`), `relative with cache-buster ${file}`).toBe(true);
+      expect(isApprovedCarsiLogoSrc(`${ORIGIN}${file}`, ORIGIN), file).toBe(true);
+      expect(isApprovedCarsiLogoSrc(nextImageUrl(file), ORIGIN), `next/image ${file}`).toBe(true);
+      expect(
+        isApprovedCarsiLogoSrc(`${ORIGIN}${file}?v=2`, ORIGIN),
+        `with cache-buster ${file}`
+      ).toBe(true);
     }
   });
 
   it('accepts the reversed wordmark the /login band shows (live smoke run 45109317306)', () => {
-    expect(isApprovedCarsiLogoSrc(nextImageUrl('/logo/dark-logo.png'))).toBe(true);
+    expect(isApprovedCarsiLogoSrc(nextImageUrl('/logo/dark-logo.png'), ORIGIN)).toBe(true);
   });
 
   it('rejects an unapproved logo, so a page showing only that still fails the smoke', () => {
@@ -47,9 +46,16 @@ describe('approved CARSI logo paths (single owner for PublicLogo and the live sm
       nextImageUrl('/logo/other.png?x=/logo/dark-logo.png'),
       '',
       'not a url at all',
+      // An approved path on another host is not the CARSI logo being served by this site.
+      'https://evil.example/logo/logo1.png',
+      '//evil.example/logo/logo1.png',
+      'https://evil.example/_next/image?url=%2Flogo%2Fdark-logo.png&w=640&q=75',
+      `${ORIGIN}/_next/image?url=${encodeURIComponent('https://evil.example/logo/logo1.png')}&w=640`,
+      `${ORIGIN}/_next/image?url=${encodeURIComponent('//evil.example/logo/dark-logo.png')}&w=640`,
+      'http://carsi.com.au/logo/logo1.png',
     ];
     for (const src of unapproved) {
-      expect(isApprovedCarsiLogoSrc(src), src).toBe(false);
+      expect(isApprovedCarsiLogoSrc(src, ORIGIN), src).toBe(false);
     }
   });
 });

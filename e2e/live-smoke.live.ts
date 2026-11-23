@@ -101,7 +101,8 @@ async function approvedLogoShown(page: Page): Promise<boolean> {
       })
       .map((img) => img.currentSrc || img.src || '')
   );
-  return visibleSources.some((src) => isApprovedCarsiLogoSrc(src));
+  const pageOrigin = new URL(page.url()).origin;
+  return visibleSources.some((src) => isApprovedCarsiLogoSrc(src, pageOrigin));
 }
 
 async function checkPublicPage(
@@ -123,9 +124,7 @@ async function checkPublicPage(
   const broken = await brokenImages(page);
   expect.soft(broken, `${url}: broken images`).toEqual([]);
 
-  expect
-    .soft(await approvedLogoShown(page), `${url}: approved CARSI logo visible`)
-    .toBe(true);
+  expect.soft(await approvedLogoShown(page), `${url}: approved CARSI logo visible`).toBe(true);
 
   if (testInfo.project.name.startsWith('phone')) {
     const widths = await page.evaluate(() => ({

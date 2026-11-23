@@ -17,24 +17,29 @@ export const APPROVED_CARSI_LOGO_PATHS: readonly string[] = Object.values(CARSI_
  * True only when an image URL (as the browser reports it in img.currentSrc) is one of the
  * approved wordmarks, served directly or through next/image (`/_next/image?url=...`).
  * The file path must match exactly; a URL that only contains an approved path (in a longer
- * name or in its query string) is rejected.
+ * name or in its query string) is rejected. The image, and the file next/image optimises,
+ * must both be served from `pageOrigin` (the site under test): an approved path on another
+ * host is not this site showing its logo.
  */
-export function isApprovedCarsiLogoSrc(src: string): boolean {
+export function isApprovedCarsiLogoSrc(src: string, pageOrigin: string): boolean {
+  let origin: string;
   let url: URL;
   try {
-    url = new URL(src, 'https://carsi.invalid');
+    origin = new URL(pageOrigin).origin;
+    url = new URL(src, origin);
   } catch {
     return false;
   }
-  let file = url.pathname;
-  if (file === '/_next/image') {
+  if (url.origin !== origin) return false;
+  if (url.pathname === '/_next/image') {
     const inner = url.searchParams.get('url');
     if (!inner) return false;
     try {
-      file = new URL(inner, 'https://carsi.invalid').pathname;
+      url = new URL(inner, origin);
     } catch {
       return false;
     }
+    if (url.origin !== origin) return false;
   }
-  return APPROVED_CARSI_LOGO_PATHS.includes(file);
+  return APPROVED_CARSI_LOGO_PATHS.includes(url.pathname);
 }
