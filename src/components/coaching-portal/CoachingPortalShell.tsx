@@ -177,6 +177,11 @@ export function CoachingPortalShell({
             <p className="text-[11px] font-medium tracking-wide text-slate-500">
               Business Coaching
             </p>
+            {dashboard.access.mode !== 'locked' ? (
+              <p className="mt-1 truncate text-[10px] text-slate-600" title={dashboard.coach.headline}>
+                {dashboard.coach.displayName}
+              </p>
+            ) : null}
           </div>
         </Link>
       </div>

@@ -18,6 +18,7 @@ import { CoachingOnboardingStatusBar } from '@/components/coaching-portal/Coachi
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
 import { CoachingFeatureSpotlight } from '@/components/coaching-portal/visual/CoachingFeatureSpotlight';
 import { CoachingQuickLinks } from '@/components/coaching-portal/visual/CoachingQuickLinks';
+import { CoachingCoachChapterCard } from '@/components/coaching-portal/visual/CoachingCoachChapterCard';
 import { CoachingMonthSummaryCard } from '@/components/coaching-portal/visual/CoachingMonthSummaryCard';
 import { buildCoachingHomeMonthSummary } from '@/lib/coaching-portal/coaching-home-month-summary';
 import { coachingHomeQuickLinks } from '@/lib/coaching-portal/coaching-home-quick-links';
@@ -198,6 +199,8 @@ function ActiveHome() {
       </header>
 
       <CoachingOnboardingStatusBar />
+
+      <CoachingCoachChapterCard className="mb-4" />
 
       <CoachingQuickLinks
         links={coachingHomeQuickLinks({

@@ -116,6 +116,7 @@ export function CoachingAskCoachPanel({ className = '' }: { className?: string }
         {ASK_COACH_COPY.title}
       </h2>
       <p className={`mt-2 max-w-2xl ${coachingMuted}`}>{ASK_COACH_COPY.intro}</p>
+      <p className="mt-2 max-w-2xl text-xs text-slate-500">{ASK_COACH_COPY.aiDisclaimer}</p>
 
       <div className="mt-4">
         <CoachingTextArea

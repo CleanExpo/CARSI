@@ -14,6 +14,8 @@ export type CoachingResourceSection = {
   title: string;
   description: string;
   items: CoachingResourceItem[];
+  /** Optional in-page anchor for deep links (e.g. TradeHall preview). */
+  anchorId?: string;
 };
 
 /** Curated resources for coaching members — implementation help lives under Growth services. */
@@ -80,6 +82,38 @@ export const COACHING_RESOURCE_SECTIONS: CoachingResourceSection[] = [
         description: 'Track commitments from your coaching plan.',
         href: coachingPortalPath('/actions'),
         tag: 'Workspace',
+      },
+    ],
+  },
+  {
+    id: 'community',
+    title: 'Owner community & TradeHall',
+    description:
+      'Peer rooms and the in-portal TradeHall seminar replays (Advantage A9).',
+    anchorId: 'tradehall',
+    items: [
+      {
+        id: 'owner-circle',
+        title: 'Owner Circle',
+        description:
+          'Monthly after-hours video room with other owners — separate from your 1:1 coaching plan.',
+        href: '/programs/owner-circle',
+        tag: 'Live',
+      },
+      {
+        id: 'tradehall-preview',
+        title: 'TradeHall seminar room',
+        description:
+          'Chapter replays and supplier briefings in your portal. Live Growth Days and Owner Circle stay your peer touchpoints between sessions.',
+        href: coachingPortalPath('/tradehall'),
+        tag: 'Preview',
+      },
+      {
+        id: 'partner-demo',
+        title: 'Partner demo walkthrough',
+        description: 'What a prospect coach sees on a sales call — every workspace screen.',
+        href: '/ccw-training/partner-demo',
+        tag: 'Sales',
       },
     ],
   },
