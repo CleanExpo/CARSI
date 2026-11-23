@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 import {
   listPrerequisiteLockedSeats,
   type PrerequisiteLockedSeat,
@@ -20,7 +21,7 @@ export async function serializeTeamForClient(team: TeamRecord, claimsSub: string
       where: {
         studentId: claimsSub,
         paymentReference: teamRef,
-        status: { notIn: ['cancelled'] },
+        status: { in: [...ACCESS_GRANTING_STATUS_LIST] },
       },
       include: { course: { select: { slug: true, title: true } } },
       orderBy: { enrolledAt: 'asc' },

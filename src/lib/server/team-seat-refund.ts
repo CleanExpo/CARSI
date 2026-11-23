@@ -1,4 +1,5 @@
 import type { prisma } from '@/lib/prisma';
+import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 
 type SeatDb = Pick<typeof prisma, 'lmsTeamCoursePurchase' | 'lmsEnrollment'>;
 
@@ -28,7 +29,7 @@ export async function teamPaidSeatHolders(
   return db.lmsEnrollment.findMany({
     where: {
       courseId,
-      status: { in: ['active', 'completed'] },
+      status: { in: [...ACCESS_GRANTING_STATUS_LIST] },
       paymentReference: { in: [`team:${teamId}`, ...blockRefs] },
     },
     orderBy: { enrolledAt: 'desc' },
