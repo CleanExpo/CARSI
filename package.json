@@ -57,6 +57,7 @@
     "test:cec-surfaces": "node scripts/check-cec-surfaces.test.mjs",
     "test:guard-enumeration": "node scripts/check-guard-enumeration.test.mjs",
     "test:agent-doc-paths": "node --test scripts/check-agent-doc-entrypoints.test.mjs",
+    "test:node-modules-untracked": "node --test scripts/check-node-modules-untracked.test.mjs",
     "test:consent-proof": "node --test scripts/analytics-proof/consent-checks.test.mjs",
     "test:water-go-live": "node scripts/verify-water-course-go-live.test.mjs",
     "check:cec": "node scripts/check-cec-approvals.mjs",
