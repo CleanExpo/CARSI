@@ -14,6 +14,7 @@ import {
   OnboardingQuickLink,
 } from '@/components/onboarding/OnboardingProgramsStrip';
 import { apiClient } from '@/lib/api/client';
+import { markDashboardPageReady } from '@/lib/onboarding/page-ready';
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
 import { CecRenewalFigure, CecRenewalStatus } from '@/components/lms/CecRenewalStatus';
 import { useRenewalSummary } from '@/hooks/use-renewal-summary';
@@ -139,12 +140,37 @@ function BrandRing({
   );
 }
 
+/** Plain placeholders in the shape of the record and CEC cards (GP-627). */
+function RecordSkeleton() {
+  return (
+    <section
+      className="grid w-full items-stretch gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]"
+      aria-busy="true"
+      aria-label="Loading your record"
+    >
+      <div className={`${surface} px-7 py-7`}>
+        <div className="h-3 w-24 animate-pulse rounded bg-white/15" />
+        <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className={`${inset} h-[5.5rem] animate-pulse rounded-xl`} />
+          ))}
+        </div>
+      </div>
+      <div className={`${surface} px-7 py-7`}>
+        <div className="h-3 w-32 animate-pulse rounded bg-white/15" />
+        <div className="mt-6 h-[84px] w-full animate-pulse rounded-xl bg-white/10" />
+      </div>
+    </section>
+  );
+}
+
 export default function StudentDashboardPage() {
   const { user } = useAuth();
   const [sub, setSub] = useState<SubData | null>(null);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [enrollmentsLoading, setEnrollmentsLoading] = useState(true);
   const [resume, setResume] = useState<ContinueLearningSnapshot | null>(null);
+  const [resumeLoading, setResumeLoading] = useState(true);
   const [enrollmentsError, setEnrollmentsError] = useState<string | null>(null);
   const [tab, setTab] = useState<'progress' | 'completed'>('progress');
 
@@ -179,6 +205,8 @@ export default function StudentDashboardPage() {
       setResume(resumeData && typeof resumeData === 'object' ? resumeData : null);
     } catch {
       setResume(null);
+    } finally {
+      setResumeLoading(false);
     }
   }, [user]);
 
@@ -189,6 +217,11 @@ export default function StudentDashboardPage() {
     fetchEnrollments();
     fetchResume();
   }, [user, fetchSub, fetchEnrollments, fetchResume]);
+
+  // GP-627: the first real view is on screen, so the onboarding wizard may open over it now.
+  useEffect(() => {
+    if (!enrollmentsLoading) markDashboardPageReady();
+  }, [enrollmentsLoading]);
 
   const inProgress = useMemo(
     () => enrollments.filter((e) => e.status !== 'completed' && e.all_lessons_complete !== true),
@@ -229,7 +262,9 @@ export default function StudentDashboardPage() {
         </p>
       </header>
 
-      {enrollments.length > 0 && !enrollmentsLoading ? (
+      {enrollmentsLoading && !enrollmentsError ? (
+        <RecordSkeleton />
+      ) : enrollments.length > 0 ? (
         <section className="grid w-full items-stretch gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
           <div className={`${surface} px-7 py-7`}>
             <p className={kicker}>Your record</p>
@@ -280,12 +315,18 @@ export default function StudentDashboardPage() {
         </section>
       ) : null}
 
-      {tab === 'progress' ? (
+      {tab === 'progress' && resumeLoading ? (
+        <div
+          className={`${surface} h-56 animate-pulse`}
+          aria-busy="true"
+          aria-label="Loading your next lesson"
+        />
+      ) : tab === 'progress' ? (
         <ContinueLearningBanner
           snapshot={resume}
           progressPercent={resumeEnrollment?.completion_percentage}
           description={resumeEnrollment?.description}
-          lessonIndex={resumeEnrollment?.lessons_completed}
+          lessonsCompleted={resumeEnrollment?.lessons_completed}
           lessonTotal={resumeEnrollment?.lessons_total}
         />
       ) : null}
@@ -332,7 +373,12 @@ export default function StudentDashboardPage() {
             <ArrowRight className="h-3.5 w-3.5" aria-hidden />
           </Link>
         </div>
-        <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Course lists">
+        <div
+          className="flex flex-wrap items-center gap-2"
+          role="tablist"
+          aria-label="Course lists"
+          aria-busy={enrollmentsLoading || undefined}
+        >
           {(
             [
               { id: 'progress' as const, label: 'In progress', count: inProgress.length },
@@ -352,11 +398,20 @@ export default function StudentDashboardPage() {
               }`}
             >
               {t.label}
-              <span
-                className={`ml-1.5 tabular-nums ${tab === t.id ? 'text-sky-200' : 'text-slate-400'}`}
-              >
-                {t.count}
-              </span>
+              {/* GP-627: no count until the courses arrive, so "0" never flashes. */}
+              {enrollmentsLoading ? (
+                <span
+                  className="ml-1.5 inline-block h-3 w-4 animate-pulse rounded bg-current align-middle opacity-30"
+                  aria-hidden
+                  data-testid="tab-count-loading"
+                />
+              ) : (
+                <span
+                  className={`ml-1.5 tabular-nums ${tab === t.id ? 'text-sky-200' : 'text-slate-400'}`}
+                >
+                  {t.count}
+                </span>
+              )}
             </button>
           ))}
           <OnboardingQuickLink />

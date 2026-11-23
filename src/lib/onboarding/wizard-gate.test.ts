@@ -21,7 +21,12 @@ describe('isLearningRoute (GP-593)', () => {
 });
 
 describe('shouldShowOnboardingWizard (GP-593)', () => {
-  const base = { onboardingCompleted: false, pathname: '/dashboard/student', skippedThisSession: false };
+  const base = {
+    onboardingCompleted: false,
+    pathname: '/dashboard/student',
+    skippedThisSession: false,
+    pageReady: true,
+  };
 
   it('shows on an ordinary dashboard page for a learner who has not onboarded', () => {
     expect(shouldShowOnboardingWizard(base)).toBe(true);
@@ -33,6 +38,10 @@ describe('shouldShowOnboardingWizard (GP-593)', () => {
 
   it('stays closed after Skip for the rest of the session', () => {
     expect(shouldShowOnboardingWizard({ ...base, skippedThisSession: true })).toBe(false);
+  });
+
+  it('waits until the page under it has loaded its first view (GP-627)', () => {
+    expect(shouldShowOnboardingWizard({ ...base, pageReady: false })).toBe(false);
   });
 
   it('never shows once onboarding is complete', () => {
