@@ -64,7 +64,7 @@ When searching for relevant panels, look for these category descriptions:
 
 Government procurement officers evaluate contractors on documented competency. IICRC (Institute of Inspection Cleaning and Restoration Certification) is a globally recognised standard for restoration qualifications, and many Australian government tender specifications for restoration work reference IICRC standards and certifications.
 
-**One important distinction before you plan your training:** IICRC certification itself (WRT, ASD, FSRT and so on) is obtained only through schools and examinations approved by the IICRC. CARSI is an IICRC CEC Accredited provider. CARSI courses do not grant IICRC certification.
+**One important distinction before you plan your training:** IICRC certification itself (WRT, ASD, FSRT and so on) is obtained only through schools and examinations approved by the IICRC. CARSI is an IICRC Approved CEC Provider. CARSI courses do not grant IICRC certification.
 
 **What procurement officers look for:**
 
@@ -103,7 +103,7 @@ IICRC certifications require ongoing education to maintain active status:
 
 - **14 CECs every four years** for a certification; Master and Inspector certifications need 14 CECs every two years (IICRC Australia FAQ, iicrc.org/ausfaqs)
 - CECs must be earned through CE providers approved by the IICRC
-- CARSI is an IICRC CEC Accredited provider
+- CARSI is an IICRC Approved CEC Provider
 - Government panels may audit your CEC records — keep them current
 
 **Pro tip:** A CARSI yearly membership ($795 AUD/year, per learner) provides access to all published CARSI courses, and team plans are available for crews and larger businesses — see carsi.com.au/pricing for current options. Online, self-paced training also avoids the travel and downtime costs of face-to-face sessions.

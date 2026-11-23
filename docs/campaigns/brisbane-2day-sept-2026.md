@@ -65,8 +65,8 @@ be forgotten and cannot silently grow.
 **This is a carpet cleaning course. It carries NO IICRC and NO CEC framing of any kind.**
 `CLAUDE.md` names the CCW truckmount course as the exact prior incident where IICRC framing was
 templated onto a course with no IICRC discipline. The CEC approvals registry is empty, so no
-course may display CEC hours at all. If a disclaimer is ever needed, the wording is "not IICRC CEC
-accredited" — never the bare banned literals, even negated.
+course may display CEC hours at all. If a disclaimer is ever needed, the wording is "not approved for
+IICRC CECs" — never the bare banned literals, even negated.
 
 Everything must be Australian-produced: Australian English, AUD, metric, AEST, and Australian
 suppliers and standards. No US spelling, voltages or products.

@@ -167,18 +167,11 @@ const PENDING: Record<string, string> = {
   'data/courses/': 'GP-748 (PR #1205): course research and drafts',
   'data/course-content/': 'GP-749: lesson content',
   'data/CARSI_Specialty_Courses_Collection.txt': 'GP-749: legacy course text',
-  'docs/marketing/': 'GP-770: unsent marketing drafts',
-  'docs/campaigns/': 'GP-770: unsent marketing drafts',
-  'docs/cec-submissions/': 'GP-770: unsent marketing drafts',
-  'docs/content/': 'GP-770: unsent marketing drafts',
   'docs/course-content/': 'GP-749: workshop course content',
 };
 
 /** Served PDFs whose text still carries the wording, with the owner who regenerates them. */
-const PENDING_PDFS: Record<string, string> = {
-  'public/downloads/carsi-government-contractor-guide.pdf':
-    'PR #1194 changes this PDF; regenerate it from scripts/generate-lead-magnet-pdf.mjs (already fixed) after that merges',
-};
+const PENDING_PDFS: Record<string, string> = {};
 
 const BINARY =
   /\.(?:png|jpe?g|gif|webp|avif|ico|pdf|mp4|mov|webm|mp3|wav|woff2?|ttf|otf|zip|gz|lock)$/i;
@@ -470,6 +463,11 @@ describe('tracked source carries no retired provider wording', () => {
     const withoutExemptions = pdfProblems({});
     for (const pdf of Object.keys(PENDING_PDFS))
       expect(withoutExemptions).toContain(`${pdf}: carries the retired wording`);
+    // GP-770: with no PDF pending, prove the text read reaches the provider sentence itself. The
+    // guide states CARSI's standing; if the extraction lost that line, the scan above could not
+    // see the retired wording there either.
+    const guide = pdfText(join(ROOT, 'public/downloads/carsi-government-contractor-guide.pdf'));
+    expect(guide.replace(/\s+/g, ' ')).toContain(CARSI_PROVIDER_STATUS);
   }, 60_000);
 
   it('served PDFs carry no retired wording outside PENDING_PDFS (and pending ones still need it)', () => {
