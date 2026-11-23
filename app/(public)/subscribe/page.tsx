@@ -16,6 +16,7 @@ import {
 } from '@/components/membership/MembershipLanding';
 import { SubscribeCta } from './SubscribeCta';
 
+import { APPROVED_FOR_IICRC_CECS } from '@/lib/iicrc/approved-wording';
 // `subscriptionsEnabled()` reads process.env at render time. Without this the
 // page is statically prerendered at BUILD time and served s-maxage=31536000,
 // so the flag's value is baked into the HTML and a run-time env var can never
@@ -39,7 +40,7 @@ const PLAN = {
 export const PRO_FEATURES = [
   '100% access to all published CARSI courses',
   'Introductory and specialist courses',
-  'IICRC CEC Accredited courses where stated',
+  `Courses ${APPROVED_FOR_IICRC_CECS} where stated`,
   'CEC tracking for completed eligible courses',
   'Water damage restoration courses',
   'Structural drying courses',

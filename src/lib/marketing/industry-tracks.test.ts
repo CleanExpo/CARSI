@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 
 import { industryHubCards } from './industry-hub';
 import {
@@ -75,7 +76,7 @@ describe('Track 2 facility management', () => {
       ...facilityManagementFaqs.flatMap((item) => [item.question, item.answer]),
     ].join('\n');
     expect(text).not.toMatch(/Sodexo|Compass|CBRE|JLL|ABM/i);
-    expect(text).toMatch(/IICRC CEC Accredited/);
+    expect(text).toContain(IICRC_APPROVED_CEC_PROVIDER);
     expect(text).not.toMatch(/IICRC CEC courses\b/);
     expect(DESIGNATION_ACRONYM.test(text)).toBe(false);
   });

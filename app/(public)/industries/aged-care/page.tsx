@@ -20,6 +20,7 @@ import {
   agedCareSearchTopics,
 } from '@/lib/marketing/industry-track1-topics';
 
+import { CARSI_PROVIDER_STATUS } from '@/lib/iicrc/approved-wording';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
@@ -90,8 +91,7 @@ const faqs = [
   },
   {
     question: 'How do IICRC CECs work on these courses?',
-    answer:
-      'CARSI is an IICRC CEC Accredited provider. Where the IICRC has approved a course, its CEC hours are shown on the course page and recorded in your learner dashboard when you pass. Unapproved titles show no CEC hours.',
+    answer: `${CARSI_PROVIDER_STATUS} Where the IICRC has approved a course, its CEC hours are shown on the course page and recorded in your learner dashboard when you pass. Unapproved titles show no CEC hours.`,
   },
   {
     question: 'What should I study first for mould in a care home?',
