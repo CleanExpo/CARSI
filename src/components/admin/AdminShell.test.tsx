@@ -171,9 +171,11 @@ describe('AdminShell responsive navigation', () => {
     expect(sidebar.classList.contains('md:w-[240px]')).toBe(true);
     expect(sidebar.classList.contains('md:flex')).toBe(true);
     const links = sidebar.querySelectorAll('nav a');
-    // Main's shared sidebar, plus GP-634's Coaching approvals and GP-759's Unfulfilled Payments.
-    expect(links).toHaveLength(21);
+    // Main's shared sidebar, plus GP-634's Coaching approvals, GP-759's Unfulfilled Payments and
+    // the Learning OS retention report.
+    expect(links).toHaveLength(22);
     expect(sidebar.querySelector('a[href="/admin/unfulfilled-payments"]')).not.toBeNull();
+    expect(sidebar.querySelector('a[href="/admin/retention"]')?.textContent).toContain('Retention');
     expect(sidebar.querySelector('a[href="/admin/coaching-actions"]')?.textContent).toContain(
       'Coaching approvals'
     );
