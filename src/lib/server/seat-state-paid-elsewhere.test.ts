@@ -372,3 +372,54 @@ describe('GP-759 follow-up: a member paid for elsewhere joins a full team withou
     expect(db.tables.lmsUser.map((u) => u.email)).not.toContain('dz@seat-race-test.invalid');
   });
 });
+
+/**
+ * Codex round 1 (Kind B): "holds the course" must be the access rule's own answer
+ * (`isEnrolmentAccessAllowed`: active or completed), not "any row that is not revoked". A pending
+ * or unrecognised own enrolment gives no access, so it must not let a learner past a full team,
+ * and where a seat is free the seat is issued over that row (updated, not a second row).
+ */
+describe.each(['pending', 'on_hold_unrecognised'])('GP-759 follow-up: an own enrolment with status %s does not hold the course', (status) => {
+  function ownRow() {
+    return { id: 'e-ua', studentId: 'ua', courseId: COURSE.id, status, paymentReference: 'cs_test_own', enrolledAt: new Date(Date.UTC(2026, 10, 3)), revokedReason: null, statusEventAt: null };
+  }
+
+  describe('at the full paid limit', () => {
+    beforeEach(() => {
+      db.tables.lmsEnrollment.push(
+        { id: 'e-x', studentId: 'ux', courseId: COURSE.id, status: 'active', paymentReference: 'team:team-1', enrolledAt: new Date(Date.UTC(2026, 10, 2)), revokedReason: null, statusEventAt: null },
+        ownRow(),
+      );
+      db.tables.lmsTeamMember.push({ teamId: 'team-1', userId: 'ux', role: 'member' });
+    });
+
+    it('token invite is refused and the learner is not added', async () => {
+      expect(await accept('ua', 'tok-a')).toBe(409);
+      expect(db.tables.lmsTeamMember.map((m) => m.userId)).not.toContain('ua');
+      expect(paidHolders()).toHaveLength(2);
+    });
+
+    it('direct invite is refused and the learner is not added', async () => {
+      expect(await direct('ua@seat-race-test.invalid')).toBe(409);
+      expect(db.tables.lmsTeamMember.map((m) => m.userId)).not.toContain('ua');
+      expect(paidHolders()).toHaveLength(2);
+    });
+  });
+
+  describe('with a paid seat free', () => {
+    beforeEach(() => {
+      db.tables.lmsEnrollment.push(ownRow());
+    });
+
+    it.each([
+      ['token invite', () => accept('ua', 'tok-a')],
+      ['direct invite', () => direct('ua@seat-race-test.invalid')],
+    ])('%s issues the seat over the existing row', async (_label, join) => {
+      expect(await join()).toBe(200);
+      const rows = db.tables.lmsEnrollment.filter((e) => e.studentId === 'ua' && e.courseId === COURSE.id);
+      expect(rows).toHaveLength(1);
+      expect(rows[0]).toMatchObject({ id: 'e-ua', status: 'active', paymentReference: 'team:team-1' });
+      expect(paidHolders()).toHaveLength(2);
+    });
+  });
+});

@@ -3,7 +3,7 @@ import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { isStripeCheckoutPaymentReference } from '@/lib/lms/course-prerequisites';
 import { isUniqueConstraintError } from '@/lib/server/db-errors';
 import { runSerializable } from '@/lib/server/db-tx';
-import { isRevokedStatus } from '@/lib/server/enrollment-access';
+import { isEnrolmentAccessAllowed } from '@/lib/server/enrollment-access';
 import {
   issuePreparedEnrolment,
   prepareEnrolment,
@@ -159,15 +159,17 @@ export async function prepareTeamMemberSeat(
 }
 
 /**
- * Whether the member already holds this course through a live enrolment (any payment). Such a
- * member needs no seat and uses none (Phill's ruling 22/11/2026: only seats the team paid for).
+ * Whether the member already holds this course through an enrolment that gives access (any
+ * payment). Such a member needs no seat and uses none (Phill's ruling 22/11/2026: only seats the
+ * team paid for). "Gives access" is `isEnrolmentAccessAllowed`, the single owner of that rule: a
+ * pending or unrecognised row does not hold the course (GP-759 follow-up, Codex round 1).
  */
 export async function memberHoldsCourse(tx: SeatTx, seat: TeamMemberSeat): Promise<boolean> {
   const held = await tx.lmsEnrollment.findUnique({
     where: { studentId_courseId: { studentId: seat.enrolment.studentId, courseId: seat.enrolment.courseId } },
     select: { status: true },
   });
-  return held !== null && !isRevokedStatus(held.status);
+  return held !== null && isEnrolmentAccessAllowed(held.status);
 }
 
 /**
@@ -286,7 +288,8 @@ async function issueCheckoutEnrolment(tx: SeatTx, enrolment: PreparedEnrolment):
       where: { studentId_courseId: { studentId: enrolment.studentId, courseId: enrolment.courseId } },
       select: { status: true, paymentReference: true, revokedReason: true },
     });
-    if (!existing || isRevokedStatus(existing.status)) {
+    // The same "would this write issue access?" test as the enrolment writer.
+    if (!existing || !isEnrolmentAccessAllowed(existing.status)) {
       const revokedForThisPayment =
         existing !== null &&
         existing.paymentReference === ref &&
