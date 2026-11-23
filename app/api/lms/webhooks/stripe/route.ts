@@ -494,6 +494,10 @@ export async function POST(request: NextRequest) {
           studentId: claims.sub,
           courseSlug: slug,
           appOrigin: origin,
+          payment: {
+            amountTotalCents: session.amount_total,
+            seatCount: purchaseMode === 'team' ? teamSeatCount : undefined,
+          },
         }).catch((e) => console.error('[stripe webhook] email', e));
         notifyCrmEnrollmentCreated({
           enrollmentId: fulfilled.enrollmentId,

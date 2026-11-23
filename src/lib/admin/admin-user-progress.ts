@@ -2,8 +2,8 @@ import {
   loadAdminCatalogSource,
   type AdminCatalogCourseOption,
 } from '@/lib/admin/admin-catalog-source';
+import { enrollmentIsStripePaid, revenueAudForPaidCount } from '@/lib/admin/admin-ops-metrics';
 import type { AdminCatalogCourse } from '@/lib/admin/load-admin-catalog';
-import { isStripeCheckoutPaymentReference } from '@/lib/lms/course-prerequisites';
 import { buildAdminCatalogFromSeed } from '@/lib/lms-seed-catalog';
 import { prisma } from '@/lib/prisma';
 import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
@@ -28,7 +28,8 @@ export type AdminCourseProgressForUser = {
   completedAt: string | null;
   paymentReference: string | null;
   certificateIssuedAt: string | null;
-  listPriceAud: number;
+  /** Paid through Stripe Checkout and not refunded or revoked (GP-763). */
+  paidViaStripe: boolean;
   /** Registry-resolved CEC hours (GP-498) — null when the course has no IICRC approval.
    *  Named distinctly from the raw `cecHours` column so no surface can render the stale value. */
   resolvedCecHours: number | null;
@@ -66,7 +67,8 @@ export type AdminUserProgress = {
   boughtNotStartedCount: number;
   paidEnrollmentCount: number;
   certificatesCount: number;
-  spentAud: number;
+  /** 0 with no Stripe-paid enrolments; null when there are some (price at purchase unknown). */
+  spentAud: number | null;
   enrollments: AdminCourseProgressForUser[];
 };
 
@@ -138,43 +140,9 @@ type EnrollmentRow = {
     slug: string;
     title: string;
     iicrcDiscipline: string | null;
-    isFree: boolean;
-    priceAud: unknown;
     modules: { lessons: { id: string }[] }[];
   };
 };
-
-export function listPriceAudFromCourse(course: { isFree: boolean; priceAud: unknown }): number {
-  if (course.isFree) return 0;
-  const n = Number(course.priceAud);
-  return Number.isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : 0;
-}
-
-export function enrollmentLooksPaid(e: {
-  status: string;
-  paymentReference: string | null;
-}): boolean {
-  const status = (e.status ?? '').toLowerCase();
-  if (status === 'refunded' || status === 'revoked') return false;
-  return Boolean(e.paymentReference?.trim());
-}
-
-/**
- * The learner bought this seat: it carries a Stripe Checkout session id (`cs_…`) and has not
- * been refunded or revoked (GP-766). Free (`free`), $0 discount (`discount:*`), admin
- * (`admin:*`), team and org seats (`team:*`, `team-seat:*`, `org:*`), membership
- * (`membership:*`) and CCW attendance (`ccw:*`) enrolments are not purchases by this learner.
- * The schema stores no amount paid per enrolment (GP-764), so the Stripe reference is the
- * only purchase signal; it cannot tell a legacy import with no reference from a free seat.
- */
-export function enrollmentIsStripeBought(e: {
-  status: string;
-  paymentReference: string | null;
-}): boolean {
-  const status = (e.status ?? '').toLowerCase();
-  if (status === 'refunded' || status === 'revoked') return false;
-  return isStripeCheckoutPaymentReference(e.paymentReference);
-}
 
 type UserRow = {
   id: string;
@@ -272,7 +240,7 @@ export function mapUserToAdminProgress(
       completedAt: e.completedAt?.toISOString() ?? null,
       paymentReference: e.paymentReference,
       certificateIssuedAt: e.certificateIssuedAt?.toISOString() ?? null,
-      listPriceAud: listPriceAudFromCourse(e.course),
+      paidViaStripe: enrollmentIsStripePaid(e),
       // REGISTRY-ONLY, FAIL-CLOSED (GP-498). The admin user-detail view derives IICRC-submission
       // eligibility and the "N CEC" badge from this value — so it must be the gated registry
       // figure, never the stale WP-import `cecHours`. No approval → null (ineligible, no badge).
@@ -292,7 +260,9 @@ export function mapUserToAdminProgress(
   });
 
   // Completed means the server marked the enrolment completed (GP-432 / GP-769), not 100% lessons.
-  const completedCourseCount = enrollmentsProgress.filter((e) => isEnrollmentCompleted(e.status)).length;
+  const completedCourseCount = enrollmentsProgress.filter((e) =>
+    isEnrollmentCompleted(e.status)
+  ).length;
   const activeCourseCount = enrollmentsProgress.filter(
     (e) => e.completionPct > 0 && !isEnrollmentCompleted(e.status)
   ).length;
@@ -308,13 +278,11 @@ export function mapUserToAdminProgress(
       lessonCountForEnrollment(e, catalogBySlug),
       completedLessonCounts
     );
-    return enrollmentIsStripeBought(e) && status === 'active' && done === 0;
+    return enrollmentIsStripePaid(e) && status === 'active' && done === 0;
   }).length;
-  const paidEnrollmentCount = userEnrollments.filter(enrollmentLooksPaid).length;
+  const paidEnrollmentCount = userEnrollments.filter(enrollmentIsStripePaid).length;
   const certificatesCount = userEnrollments.filter((e) => e.certificateIssuedAt).length;
-  const spentAud = userEnrollments
-    .filter(enrollmentLooksPaid)
-    .reduce((sum, e) => sum + listPriceAudFromCourse(e.course), 0);
+  const spentAud = revenueAudForPaidCount(paidEnrollmentCount);
 
   return {
     userId: user.id,
@@ -356,8 +324,6 @@ const enrollmentSelect = {
       slug: true,
       title: true,
       iicrcDiscipline: true,
-      isFree: true,
-      priceAud: true,
       modules: {
         orderBy: { orderIndex: 'asc' },
         select: {

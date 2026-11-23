@@ -25,7 +25,7 @@ import { useMemo, useState } from 'react';
 
 import { AdminPagination } from '@/components/admin/AdminPagination';
 import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
-import { formatAud } from '@/lib/admin/admin-ops-format';
+import { formatRevenueAud } from '@/lib/admin/admin-ops-format';
 import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
 import type {
   AdminCatalogCourseOption,
@@ -165,12 +165,7 @@ function CourseEnrollmentCard({
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge label={statusLabel} tone={enrollmentStatusTone(enrollment.status)} />
               {stuck ? <StatusBadge label="Not started" tone="warning" /> : null}
-              {enrollment.paymentReference ? <StatusBadge label="Paid" tone="info" /> : null}
-              {enrollment.listPriceAud > 0 ? (
-                <span className="text-xs text-white/45 tabular-nums">
-                  {formatAud(enrollment.listPriceAud)}
-                </span>
-              ) : null}
+              {enrollment.paidViaStripe ? <StatusBadge label="Paid" tone="info" /> : null}
               {enrollment.resolvedCecHours != null && enrollment.resolvedCecHours > 0 ? (
                 <span className="text-xs text-white/45">{enrollment.resolvedCecHours} CEC</span>
               ) : null}
@@ -807,7 +802,8 @@ export function AdminUserDetailClient({
     {
       id: 'progress',
       label: 'In progress',
-      count: user.enrollments.filter((e) => e.completionPct > 0 && !isCompletedEnrollment(e)).length,
+      count: user.enrollments.filter((e) => e.completionPct > 0 && !isCompletedEnrollment(e))
+        .length,
     },
     { id: 'done', label: 'Complete', count: completedCourses },
     {
@@ -934,7 +930,10 @@ export function AdminUserDetailClient({
         </div>
         <div className="grid gap-px bg-white/[0.06] sm:grid-cols-2 lg:grid-cols-5">
           {[
-            { label: 'Recognised', value: formatAud(user.spentAud), icon: Award },
+            // GP-763: a count, not dollars; the amount paid is not stored.
+            user.spentAud === null
+              ? { label: 'Paid · price unknown', value: user.paidEnrollmentCount, icon: Award }
+              : { label: 'Paid', value: formatRevenueAud(user.spentAud), icon: Award },
             { label: 'Enrolments', value: user.enrollments.length, icon: BookOpen },
             { label: 'Complete', value: completedCourses, icon: CheckCircle2 },
             {
