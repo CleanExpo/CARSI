@@ -1,6 +1,7 @@
 import type { Prisma } from '@/generated/prisma/client';
 import { runSerializable } from '@/lib/server/db-tx';
 import { subscriptionAccessBlock, type SubscriptionAccessBlock } from '@/lib/server/payment-integrity-ledger';
+import { runWithSubscriptionInvoiceView } from '@/lib/server/subscription-invoice-view';
 
 /**
  * GP-641: the one rule every subscription row write obeys. Stripe delivers events in any order,
@@ -10,7 +11,9 @@ import { subscriptionAccessBlock, type SubscriptionAccessBlock } from '@/lib/ser
  * individual, Teams, organisation or coaching subscription row runs here, reads that marker on
  * the same SERIALIZABLE transaction as its write, and writes the blocked status when it is set. A
  * reversal racing the write either commits first (the write sees the marker) or after it (and
- * cancels the row the write made).
+ * cancels the row the write made). When the ledger alone cannot say whether the reversed invoice
+ * is still the member's latest payment, Stripe's latest invoice is read before the transaction
+ * opens and matched by invoice id inside it (`subscription-invoice-view.ts`).
  *
  * Rows are keyed by their owner (member or team), not by subscription. An ended subscription
  * never overwrites a row that is already linked to a different subscription: the owner has
@@ -47,11 +50,13 @@ export function runGuardedSubscriptionWrite<T>(
   row: SubscriptionRowLink<T>,
   write: (tx: Prisma.TransactionClient, status: string) => Promise<T>,
 ): Promise<T> {
-  return runSerializable(async (tx) => {
-    const block = await subscriptionAccessBlock(tx, stripeSubscriptionId);
-    if (!block) return write(tx, status);
-    const linked = await row.linkedSubscriptionId(tx);
-    if (linked && linked !== stripeSubscriptionId) return row.skipped;
-    return write(tx, blockedSubscriptionStatus(block));
-  });
+  return runWithSubscriptionInvoiceView(stripeSubscriptionId, {}, (view) =>
+    runSerializable(async (tx) => {
+      const block = await subscriptionAccessBlock(tx, stripeSubscriptionId, view);
+      if (!block) return write(tx, status);
+      const linked = await row.linkedSubscriptionId(tx);
+      if (linked && linked !== stripeSubscriptionId) return row.skipped;
+      return write(tx, blockedSubscriptionStatus(block));
+    }),
+  );
 }

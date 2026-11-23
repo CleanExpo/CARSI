@@ -3,8 +3,8 @@
  * WS1-E3). Mirrors the individual `subscription-store.ts` idempotent upsert and
  * `statusEventAt` out-of-order guard, keyed on the unique `teamId` (the org
  * container) and the unique `stripeSubscriptionId`. GP-641: every write runs in
- * `runGuardedSubscriptionWrite`, so a reversed or deleted subscription is
- * written as `canceled`.
+ * `runGuardedSubscriptionWrite`, so a subscription whose latest payment was
+ * reversed is written as `unpaid`, and a deleted one as `canceled`.
  *
  * The Stripe subscription is mapped to a CARSI org (team) by, in order:
  *  1. the `carsi_team_id` metadata set at checkout / ops provisioning, then

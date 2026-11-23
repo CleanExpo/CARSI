@@ -43,9 +43,9 @@ export interface SubscriptionUpsertInput {
  * Insert or update the membership row for a user. Idempotent: keyed on both the
  * unique `userId` and the unique `stripeSubscriptionId`.
  *
- * GP-641: the write runs in `runGuardedSubscriptionWrite`, so a subscription that a refund,
- * chargeback or deletion has already ended is written as `canceled`, even when that event was
- * delivered before this row existed.
+ * GP-641: the write runs in `runGuardedSubscriptionWrite`, so a subscription whose latest
+ * payment was refunded or charged back is written as `unpaid`, and one Stripe deleted as
+ * `canceled`, even when that event was delivered before this row existed.
  *
  * Out-of-order guard (GP-441): Stripe delivers webhooks at-least-once and NOT in
  * order. A late `customer.subscription.updated` (status `active`) arriving AFTER

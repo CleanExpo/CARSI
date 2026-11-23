@@ -60,6 +60,7 @@ import {
 } from '@/lib/server/payment-integrity-ledger';
 import { sendUpcomingRenewalReminder } from '@/lib/server/renewal-reminder';
 import { trackSubscriptionLifecycleEvent } from '@/lib/server/subscription-analytics';
+import { runWithSubscriptionInvoiceView } from '@/lib/server/subscription-invoice-view';
 
 /** Stripe subscription lifecycle + invoice events this module owns. */
 export const SUBSCRIPTION_EVENT_TYPES = new Set<string>([
@@ -190,8 +191,10 @@ async function holdUnownedEntitlingSubscription(
   if (subscription.status !== 'active' && subscription.status !== 'trialing') return;
   // GP-641: a subscription whose latest payment was reversed, or which Stripe deleted, is owed
   // nothing: it is recorded closed and not retried while its owner is still unknown. The ledger
-  // decides that on the same transaction as the record.
-  const owed = await recordUnfulfilledPayment(subscription.id, reason, { subscription: true });
+  // decides that on the same transaction as the record, with Stripe's latest invoice read first.
+  const owed = await runWithSubscriptionInvoiceView(subscription.id, {}, (view) =>
+    recordUnfulfilledPayment(subscription.id, reason, { subscription: view }),
+  );
   if (owed && mode === 'retry') throw new Error(SUBSCRIPTION_OWNER_PENDING);
 }
 

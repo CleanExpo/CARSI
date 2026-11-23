@@ -43,8 +43,8 @@ export interface TeamSubscriptionUpsertInput {
  * both the unique `teamId` and the unique `stripeSubscriptionId`. Applies the
  * same out-of-order guard as the individual membership: a snapshot whose
  * `eventTimestamp` is strictly older than the stored `statusEventAt` is dropped.
- * GP-641: runs in `runGuardedSubscriptionWrite`, so a reversed or deleted
- * subscription is written as `canceled`.
+ * GP-641: runs in `runGuardedSubscriptionWrite`, so a subscription whose latest
+ * payment was reversed is written as `unpaid`, and a deleted one as `canceled`.
  */
 /** The team's row link, for `runGuardedSubscriptionWrite`. */
 function linkedTo(teamId: string): SubscriptionRowLink<void> {

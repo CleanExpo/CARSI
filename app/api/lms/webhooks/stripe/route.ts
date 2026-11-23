@@ -34,6 +34,7 @@ import {
   PAYMENT_REVERSED,
   recordUnfulfilledPayment,
   resolveUnfulfilledPayment,
+  type SubscriptionInvoiceRef,
 } from '@/lib/server/payment-integrity-ledger';
 import { recordPartnerReferralSale } from '@/lib/server/partner-referral-sales';
 import { captureServerError } from '@/lib/server/sentry';
@@ -171,10 +172,15 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
       const { blocked } = await applySubscriptionPaymentReversal(
         subscriptionId,
         reason,
-        invoiceOrderingTime(readInvoiceCreatedAtFromPaymentIntent(paymentIntent), eventTimestamp, subscriptionId),
+        subscriptionInvoiceRef(
+          invoiceTransactionId,
+          readInvoiceCreatedAtFromPaymentIntent(paymentIntent),
+          eventTimestamp,
+          subscriptionId,
+        ),
       );
       console.warn(
-        `[stripe webhook] subscription reversal for subscription=${subscriptionId} (${reason}): ${blocked ? 'access blocked' : 'access unchanged (a newer payment, or an earlier won dispute, decides)'}`
+        `[stripe webhook] subscription reversal for subscription=${subscriptionId} (${reason}): ${blocked ? 'access blocked' : 'access unchanged (a newer paid invoice, or a won dispute, decides)'}`
       );
     }
   } catch (error) {
@@ -244,14 +250,22 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
  * already-active row matches nothing; `lte`/`lt` guards make replays no-ops).
  */
 /**
- * GP-641: the order of a subscription's invoices is their creation time. Stripe always sends it;
- * should it be missing, the event time is used, which can only make a reversal count as newer
- * (blocking access), never older.
+ * GP-641: the subscription invoice an event is about, identified by its Stripe id (access is
+ * decided by invoice identity, see `subscriptionAccessBlock`). Stripe always sends the id and the
+ * creation time. A missing id is stored as unknown, which can never be matched and so never
+ * opens access; a missing creation time falls back to the event time, which can only make the
+ * invoice count as newer.
  */
-function invoiceOrderingTime(invoiceCreatedAt: Date | null, eventTimestamp: Date, subscriptionId: string): Date {
-  if (invoiceCreatedAt) return invoiceCreatedAt;
-  console.warn(`[stripe webhook] invoice creation time missing for subscription=${subscriptionId}; using the event time`);
-  return eventTimestamp;
+function subscriptionInvoiceRef(
+  invoiceId: string | null,
+  invoiceCreatedAt: Date | null,
+  eventTimestamp: Date,
+  subscriptionId: string,
+): SubscriptionInvoiceRef {
+  if (!invoiceId || !invoiceCreatedAt) {
+    console.warn(`[stripe webhook] invoice id or creation time missing for subscription=${subscriptionId}`);
+  }
+  return { id: invoiceId, createdAt: invoiceCreatedAt ?? eventTimestamp };
 }
 
 /**
@@ -293,7 +307,7 @@ async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
   if (subscriptionId) {
     const result = await applySubscriptionDisputeWon(
       subscriptionId,
-      invoiceOrderingTime(readInvoiceCreatedAtFromPaymentIntent(paymentIntent), eventTimestamp, subscriptionId),
+      subscriptionInvoiceRef(invoiceId, readInvoiceCreatedAtFromPaymentIntent(paymentIntent), eventTimestamp, subscriptionId),
     );
     await restoreReopenedSubscription(subscriptionId, result);
   }
@@ -429,7 +443,12 @@ export async function POST(request: NextRequest) {
         if (paidSubscriptionId && typeof invoice.amount_paid === 'number' && invoice.amount_paid > 0) {
           const result = await applySubscriptionInvoicePaid(
             paidSubscriptionId,
-            invoiceOrderingTime(readInvoiceCreatedAt(invoice), new Date(event.created * 1000), paidSubscriptionId),
+            subscriptionInvoiceRef(
+              typeof invoice.id === 'string' ? invoice.id : null,
+              readInvoiceCreatedAt(invoice),
+              new Date(event.created * 1000),
+              paidSubscriptionId,
+            ),
           );
           await restoreReopenedSubscription(paidSubscriptionId, result);
         }

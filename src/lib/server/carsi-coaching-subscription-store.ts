@@ -42,7 +42,11 @@ function linkedTo(userId: string): SubscriptionRowLink<void> {
   };
 }
 
-/** GP-641: runs in `runGuardedSubscriptionWrite`, so a reversed or deleted subscription is written as `canceled`. */
+/**
+ * GP-641: runs in `runGuardedSubscriptionWrite`. A subscription whose latest payment was reversed
+ * is written as `unpaid` (no paid-through access); a deleted one as `canceled` (paid-through
+ * access until the period end, as before GP-641).
+ */
 export async function upsertCoachingMonthlySubscription(
   input: CoachingSubscriptionUpsertInput,
 ): Promise<void> {

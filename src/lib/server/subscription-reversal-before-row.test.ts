@@ -31,6 +31,9 @@ const h = vi.hoisted(() => ({
   paymentIntentRetrieves: 0,
   // Creation time (seconds after T0) of the invoice the next refund or dispute reverses.
   reversedInvoiceAt: 100,
+  // The id of that invoice (default: derived from its creation time). Two invoices can be
+  // created in the same second, so the id is set on its own.
+  reversedInvoiceId: null as string | null,
 }));
 
 vi.mock('@/lib/api/stripe', () => ({
@@ -45,7 +48,7 @@ vi.mock('@/lib/api/stripe', () => ({
         return {
           id: 'pi_gp641',
           invoice: {
-            id: `in_gp641_${h.reversedInvoiceAt}`,
+            id: h.reversedInvoiceId ?? `in_gp641_${h.reversedInvoiceAt}`,
             created: 1_790_000_000 + h.reversedInvoiceAt,
             parent: { subscription_details: { subscription: SUB } },
           },
@@ -257,8 +260,9 @@ async function deliver(type: string, at: number, object: Row): Promise<number> {
   return res.status;
 }
 
-const refund = (at: number, full = true, invoiceAt = 100) => {
+const refund = (at: number, full = true, invoiceAt = 100, invoiceId: string | null = null) => {
   h.reversedInvoiceAt = invoiceAt;
+  h.reversedInvoiceId = invoiceId;
   return deliver('charge.refunded', at, {
     id: 'ch_gp641',
     payment_intent: 'pi_gp641',
@@ -267,8 +271,9 @@ const refund = (at: number, full = true, invoiceAt = 100) => {
     currency: 'aud',
   });
 };
-const dispute = (at: number, invoiceAt = 100) => {
+const dispute = (at: number, invoiceAt = 100, invoiceId: string | null = null) => {
   h.reversedInvoiceAt = invoiceAt;
+  h.reversedInvoiceId = invoiceId;
   return deliver('charge.dispute.created', at, {
     id: 'dp_gp641',
     payment_intent: 'pi_gp641',
@@ -277,8 +282,9 @@ const dispute = (at: number, invoiceAt = 100) => {
     status: 'needs_response',
   });
 };
-const disputeWon = (at: number, invoiceAt = 100) => {
+const disputeWon = (at: number, invoiceAt = 100, invoiceId: string | null = null) => {
   h.reversedInvoiceAt = invoiceAt;
+  h.reversedInvoiceId = invoiceId;
   return deliver('charge.dispute.closed', at, {
     id: 'dp_gp641',
     payment_intent: 'pi_gp641',
@@ -288,9 +294,9 @@ const disputeWon = (at: number, invoiceAt = 100) => {
   });
 };
 /** `invoiceAt`: when the paid invoice was created (default: the delivery time). */
-const invoicePaid = (at: number, amountPaid: number, invoiceAt = at) =>
+const invoicePaid = (at: number, amountPaid: number, invoiceAt = at, invoiceId?: string) =>
   deliver('invoice.paid', at, {
-    id: `in_gp641_${invoiceAt}`,
+    id: invoiceId ?? `in_gp641_${invoiceAt}`,
     created: T0 + invoiceAt,
     amount_paid: amountPaid,
     currency: 'aud',
@@ -323,6 +329,7 @@ beforeEach(() => {
   h.subscription = null;
   h.paymentIntentRetrieves = 0;
   h.reversedInvoiceAt = 100;
+  h.reversedInvoiceId = null;
   db.beforeNextTx = null;
   db.tables = {
     lmsUser: [{ id: USER, email: 'member@gp641-test.invalid' }],
@@ -506,15 +513,6 @@ describe('GP-641: what a won dispute lifts, and what it does not', () => {
     expect(rowFor(kind)?.status).toBe('unpaid');
   });
 
-  it('a won dispute does not lift a deletion', async () => {
-    expect(await created(kind, 100)).toBe(200);
-    expect(await dispute(150)).toBe(200);
-    expect(await deleted(kind, 200)).toBe(200);
-    expect(await disputeWon(300)).toBe(200);
-    // Still blocked (the deletion step wrote the reversal's status; nothing reopens it).
-    expect(rowFor(kind)?.status).toBe('unpaid');
-  });
-
   it('a newer paid invoice does not lift a deletion', async () => {
     expect(await deleted(kind, 200)).toBe(200);
     expect(await created(kind, 100)).toBe(200);
@@ -573,5 +571,148 @@ describe('GP-641: a reversed subscription with no owner yet is owed nothing', ()
       (r) => String(r.id).startsWith('unfulfilled-payment:') && r.processedAt == null,
     );
     expect(open).toEqual([]);
+  });
+});
+
+/** Stripe's answer for the subscription's latest invoice (what the access check re-reads). */
+function withLatestInvoice(kind: Kind, id: string, createdAt: number, amountPaid = 79_500, status = 'paid') {
+  h.subscription = {
+    ...stripeSubscription(kind, 'active'),
+    latest_invoice: { id, object: 'invoice', created: T0 + createdAt, status, amount_paid: amountPaid },
+  };
+}
+
+const FUTURE_END = new Date((T0 + 365 * 86_400) * 1000);
+const AT_NOW = new Date((T0 + NOW_AT) * 1000);
+function entitled(kind: Kind): boolean {
+  const row = rowFor(kind)!;
+  const input = { status: row.status as string, currentPeriodEnd: row.currentPeriodEnd as Date };
+  const decide = kind === 'coaching' ? decideCoachingPortalEntitlement : decideMembershipEntitlement;
+  return decide(input, AT_NOW).entitled;
+}
+
+describe('GP-641 sweep 2: invoices are told apart by id, never by their creation second', () => {
+  it.each(ALL_KINDS)('%s: a different invoice paid in the same second as a refunded one restores access', async (kind) => {
+    db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
+    expect(await created(kind, 50)).toBe(200);
+    expect(await refund(200, true, 100, 'in_A')).toBe(200);
+    expect(rowFor(kind)?.status).toBe('unpaid');
+    withLatestInvoice(kind, 'in_B', 100);
+    expect(await invoicePaid(300, 79_500, 100, 'in_B')).toBe(200);
+    expect(rowFor(kind)?.status).toBe('active');
+  });
+
+  it.each(ALL_KINDS)('%s: a refund of an older invoice in the same second as the paid one keeps access', async (kind) => {
+    db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
+    expect(await created(kind, 50)).toBe(200);
+    withLatestInvoice(kind, 'in_B', 100);
+    expect(await invoicePaid(150, 79_500, 100, 'in_B')).toBe(200);
+    expect(await refund(200, true, 100, 'in_A')).toBe(200);
+    expect(rowFor(kind)?.status).toBe('active');
+  });
+
+  it.each(ALL_KINDS)('%s control: the same invoice paid and then refunded stays blocked', async (kind) => {
+    db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
+    expect(await created(kind, 50)).toBe(200);
+    withLatestInvoice(kind, 'in_A', 100);
+    expect(await invoicePaid(150, 79_500, 100, 'in_A')).toBe(200);
+    expect(await refund(200, true, 100, 'in_A')).toBe(200);
+    expect(rowFor(kind)?.status).toBe('unpaid');
+    expect(await updated(kind, 300)).toBe(200);
+    expect(rowFor(kind)?.status).toBe('unpaid');
+  });
+
+  it.each(ALL_KINDS)('%s: the latest invoice charged back stays blocked when another invoice of that second was refunded', async (kind) => {
+    db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
+    expect(await created(kind, 50)).toBe(200);
+    withLatestInvoice(kind, 'in_Y', 100);
+    expect(await refund(200, true, 100, 'in_X')).toBe(200);
+    expect(await dispute(250, 100, 'in_Y')).toBe(200);
+    expect(await updated(kind, 300)).toBe(200);
+    expect(rowFor(kind)?.status).toBe('unpaid');
+  });
+
+  it.each(ALL_KINDS)('%s: a won dispute of one invoice does not lift the dispute of another in the same second', async (kind) => {
+    db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
+    expect(await created(kind, 50)).toBe(200);
+    withLatestInvoice(kind, 'in_A', 100);
+    expect(await dispute(200, 100, 'in_A')).toBe(200);
+    expect(await disputeWon(300, 100, 'in_B')).toBe(200);
+    expect(rowFor(kind)?.status).toBe('unpaid');
+  });
+});
+
+describe('GP-641 sweep 2: a paid invoice not delivered yet does not lock the member out', () => {
+  it.each(ALL_KINDS)('%s: an older invoice refunded before the newer invoice.paid arrives keeps access', async (kind) => {
+    db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
+    expect(await created(kind, 50)).toBe(200);
+    withLatestInvoice(kind, 'in_A', 100);
+    expect(await invoicePaid(110, 79_500, 100, 'in_A')).toBe(200);
+    // Stripe has already issued and charged the newer invoice; its invoice.paid is still queued.
+    withLatestInvoice(kind, 'in_B', 400);
+    expect(await refund(450, true, 100, 'in_A')).toBe(200);
+    expect(rowFor(kind)?.status).toBe('active');
+  });
+
+  it.each(ALL_KINDS)('%s control: the newer invoice still open (not paid) leaves access blocked', async (kind) => {
+    db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
+    expect(await created(kind, 50)).toBe(200);
+    withLatestInvoice(kind, 'in_A', 100);
+    expect(await invoicePaid(110, 79_500, 100, 'in_A')).toBe(200);
+    withLatestInvoice(kind, 'in_B', 400, 0, 'open');
+    expect(await refund(450, true, 100, 'in_A')).toBe(200);
+    expect(rowFor(kind)?.status).toBe('unpaid');
+  });
+
+  it.each(ALL_KINDS)('%s: a refund recorded after Stripe was read is not overruled by that read', async (kind) => {
+    db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
+    expect(await created(kind, 50)).toBe(200);
+    expect(await refund(200, true, 100, 'in_A')).toBe(200);
+    // The write below reads Stripe first: the latest invoice is B, paid.
+    withLatestInvoice(kind, 'in_B', 300);
+    // Before its transaction opens, a newer invoice C is issued and refunded.
+    db.beforeNextTx = async () => {
+      withLatestInvoice(kind, 'in_C', 350);
+      await refund(360, true, 350, 'in_C');
+    };
+    expect(await updated(kind, 400)).toBe(200);
+    expect(rowFor(kind)?.status).toBe('unpaid');
+  });
+
+  it.each(ALL_KINDS)('%s: a Stripe read that never settles leaves access blocked', async (kind) => {
+    db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
+    expect(await created(kind, 50)).toBe(200);
+    expect(await refund(200, true, 100, 'in_A')).toBe(200);
+    // Stripe keeps answering with an invoice older than the one the ledger has recorded.
+    withLatestInvoice(kind, 'in_OLD', 10);
+    expect(await updated(kind, 400)).toBe(200);
+    expect(rowFor(kind)?.status).toBe('unpaid');
+  });
+});
+
+describe('GP-641 sweep 2: every step that changes the decision rewrites the rows to it', () => {
+  it.each(ALL_KINDS)('%s: dispute, then deletion, then dispute won leaves the deletion status (canceled)', async (kind) => {
+    db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
+    expect(await created(kind, 100)).toBe(200);
+    expect(await dispute(150)).toBe(200);
+    expect(await deleted(kind, 200)).toBe(200);
+    expect(rowFor(kind)?.status).toBe('unpaid');
+    expect(await disputeWon(300)).toBe(200);
+    expect(rowFor(kind)?.status).toBe('canceled');
+    expect(rowFor(kind)?.currentPeriodEnd).toEqual(FUTURE_END);
+    // Coaching keeps its paid-through window on a deletion; the memberships read canceled as lapsed.
+    expect(entitled(kind)).toBe(kind === 'coaching');
+  });
+
+  it.each(ALL_KINDS)('%s: refund, then deletion, then a newer paid invoice leaves the deletion status (canceled)', async (kind) => {
+    db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
+    expect(await created(kind, 100)).toBe(200);
+    expect(await refund(150)).toBe(200);
+    expect(await deleted(kind, 200)).toBe(200);
+    expect(rowFor(kind)?.status).toBe('unpaid');
+    h.subscription = stripeSubscription(kind, 'canceled');
+    expect(await invoicePaid(400, 79_500)).toBe(200);
+    expect(rowFor(kind)?.status).toBe('canceled');
+    expect(entitled(kind)).toBe(kind === 'coaching');
   });
 });
