@@ -235,6 +235,12 @@ jobs:
       - name: Agent rule entry-point self-test
         run: npm run test:agent-doc-paths
 
+      # GP-750: the consent proof's checks must not pass vacuously. A library request that
+      # failed (proxy refusal), a non-2xx or an empty body must not satisfy B1, and a run where
+      # the library never loaded must report BLOCKED (exit 3) instead of passing B4 and C1.
+      - name: Consent proof check self-test
+        run: npm run test:consent-proof
+
       # Licence-critical STRUCTURAL backstop (GP-498): scans the whole application (app/, src/)
       # for the leak class the copy scanner cannot see — any code that reads the RAW course CEC
       # column (`.cecHours`) or uses `iicrcDiscipline` as a CEC/eligibility signal outside the
