@@ -2,9 +2,155 @@
   "comment": [
     "Frozen gaps for scripts/check-course-visuals.mjs (Course Standard v1 section 4.1 items 1-3, Linear GP-752), taken on origin/main 9f709922, 21/11/2026.",
     "Each entry is a known missing cover, lesson image or diagram, keyed by course slug, lesson id and kind; it covers that lesson in the seed catalogue and in its v1-draft copy.",
-    "This file only shrinks: when you add the missing visual, delete its entry in the same change (the check fails until you do). Adding an entry needs the founder's or lead's written approval in that PR; it is never a quiet way to let a new lesson through."
+    "This file only shrinks: when you add the missing visual, delete its entry in the same change (the check fails until you do). Adding an entry needs the founder's or lead's written approval in that PR; it is never a quiet way to let a new lesson through.",
+    "GP-772 (22/11/2026): 24 entries for assessing-indoor-environment-conditions (12 lesson images, 12 diagrams) in its GP-468 v1-draft, added with the founder's written approval on GP-772. Each entry is deleted when its visual lands (GP-468); the visuals stay required before that course is published.",
+    "GP-471 (23/11/2026): 26 entries for psychrometry-building-science-for-drying (13 lesson images, 13 diagrams) in its GP-471 v1-draft, added with the founder's written approval on GP-471 (Linear comment 5dabb8e6). Each entry is deleted when its visual lands; the visuals stay required before that course is published."
   ],
   "gaps": [
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "01cb4dd1-d65e-45e1-a8d1-4ae42373fbc9",
+      "lessonTitle": "Thermo-hygrometers and moisture meters: readings you can defend",
+      "missing": "diagram"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "01cb4dd1-d65e-45e1-a8d1-4ae42373fbc9",
+      "lessonTitle": "Thermo-hygrometers and moisture meters: readings you can defend",
+      "missing": "image"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "02084198-7f4e-4a3a-8d3d-96a05f8552c6",
+      "lessonTitle": "Talking to occupants, insurers and other professionals",
+      "missing": "diagram"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "02084198-7f4e-4a3a-8d3d-96a05f8552c6",
+      "lessonTitle": "Talking to occupants, insurers and other professionals",
+      "missing": "image"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "0aea90db-88e4-40b4-bf1d-9ecdd2bca36b",
+      "lessonTitle": "The building as a system in Australian and New Zealand climates",
+      "missing": "diagram"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "0aea90db-88e4-40b4-bf1d-9ecdd2bca36b",
+      "lessonTitle": "The building as a system in Australian and New Zealand climates",
+      "missing": "image"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "25105b80-b8cf-4c76-b083-c6c959d0190c",
+      "lessonTitle": "Interpreting readings in context",
+      "missing": "diagram"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "25105b80-b8cf-4c76-b083-c6c959d0190c",
+      "lessonTitle": "Interpreting readings in context",
+      "missing": "image"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "8d195f4d-b2c3-4c2a-a150-7c02815af615",
+      "lessonTitle": "Accredited laboratories, chain of custody and records",
+      "missing": "diagram"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "8d195f4d-b2c3-4c2a-a150-7c02815af615",
+      "lessonTitle": "Accredited laboratories, chain of custody and records",
+      "missing": "image"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "aef481cf-f9eb-49fe-93e6-ef0a637b6950",
+      "lessonTitle": "What an indoor environment assessment is, and what it is not",
+      "missing": "diagram"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "aef481cf-f9eb-49fe-93e6-ef0a637b6950",
+      "lessonTitle": "What an indoor environment assessment is, and what it is not",
+      "missing": "image"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "bef26c47-bb03-45a6-9a5f-804670e0a179",
+      "lessonTitle": "Source, pathway, receptor: frame the question before you measure",
+      "missing": "diagram"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "bef26c47-bb03-45a6-9a5f-804670e0a179",
+      "lessonTitle": "Source, pathway, receptor: frame the question before you measure",
+      "missing": "image"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "ceb700cb-b92b-4500-8567-ce6bcd4974e4",
+      "lessonTitle": "Stop and escalate: carbon monoxide, asbestos, silica and referral",
+      "missing": "diagram"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "ceb700cb-b92b-4500-8567-ce6bcd4974e4",
+      "lessonTitle": "Stop and escalate: carbon monoxide, asbestos, silica and referral",
+      "missing": "image"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "d0505492-e590-486a-b62a-f296bf98000f",
+      "lessonTitle": "Particle counters, CO2 and ATP: indicators, not verdicts",
+      "missing": "diagram"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "d0505492-e590-486a-b62a-f296bf98000f",
+      "lessonTitle": "Particle counters, CO2 and ATP: indicators, not verdicts",
+      "missing": "image"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "d339b599-5d7a-40ea-a7b6-de8f0c11fc25",
+      "lessonTitle": "When sampling helps, and when it does not",
+      "missing": "diagram"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "d339b599-5d7a-40ea-a7b6-de8f0c11fc25",
+      "lessonTitle": "When sampling helps, and when it does not",
+      "missing": "image"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "e11dbf71-6761-40db-be27-9d5a96db5bcf",
+      "lessonTitle": "Writing an assessment report that stands up",
+      "missing": "diagram"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "e11dbf71-6761-40db-be27-9d5a96db5bcf",
+      "lessonTitle": "Writing an assessment report that stands up",
+      "missing": "image"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "f778d8a3-593b-4bd0-8589-fbba82dc062c",
+      "lessonTitle": "Psychrometry in metric: why relative humidity alone misleads",
+      "missing": "diagram"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "lessonId": "f778d8a3-593b-4bd0-8589-fbba82dc062c",
+      "lessonTitle": "Psychrometry in metric: why relative humidity alone misleads",
+      "missing": "image"
+    },
     {
       "slug": "category-3-sewage-black-water-remediation",
       "lessonId": "2bf5ba46-ed5f-4fb3-a842-2976c7cb2461",
@@ -562,6 +708,188 @@
       "lessonId": "d2e87f23-e9be-45a5-81de-f41ba8bc7dbd",
       "lessonTitle": "Case study: writing the defensible job file",
       "missing": "image"
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "102a0311-cda3-4964-ba5c-df136b3d6b25",
+      "lessonTitle": "The building envelope: NCC climate zones, walls, subfloors and NZ rules",
+      "missing": "diagram",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "102a0311-cda3-4964-ba5c-df136b3d6b25",
+      "lessonTitle": "The building envelope: NCC climate zones, walls, subfloors and NZ rules",
+      "missing": "image",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "12a4443e-5261-48f2-a88c-6abd54a31f85",
+      "lessonTitle": "Vapour pressure, humidity ratio and dew point: doing the calculation",
+      "missing": "diagram",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "12a4443e-5261-48f2-a88c-6abd54a31f85",
+      "lessonTitle": "Vapour pressure, humidity ratio and dew point: doing the calculation",
+      "missing": "image",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "2581fed0-2d04-4f9a-b73c-54a3c1e5999d",
+      "lessonTitle": "Reading climate data for a job: Brisbane and Canberra compared",
+      "missing": "diagram",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "2581fed0-2d04-4f9a-b73c-54a3c1e5999d",
+      "lessonTitle": "Reading climate data for a job: Brisbane and Canberra compared",
+      "missing": "image",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "384cc2c0-6d70-46a7-b166-a767fb369318",
+      "lessonTitle": "Ventilate or dehumidify? Comparing inside and outside air in g/kg",
+      "missing": "diagram",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "384cc2c0-6d70-46a7-b166-a767fb369318",
+      "lessonTitle": "Ventilate or dehumidify? Comparing inside and outside air in g/kg",
+      "missing": "image",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "596778a2-6978-4c8b-a4c4-78bf47aa05fe",
+      "lessonTitle": "Moist air: the four numbers, and why RH alone misleads",
+      "missing": "diagram",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "596778a2-6978-4c8b-a4c4-78bf47aa05fe",
+      "lessonTitle": "Moist air: the four numbers, and why RH alone misleads",
+      "missing": "image",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "72261aa3-30a0-47a5-b60e-443e510619ea",
+      "lessonTitle": "Air changes per hour: from airflow, and from a CO2 decay test",
+      "missing": "diagram",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "72261aa3-30a0-47a5-b60e-443e510619ea",
+      "lessonTitle": "Air changes per hour: from airflow, and from a CO2 decay test",
+      "missing": "image",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "9d6f184b-5150-4d30-87fe-a105f71344c9",
+      "lessonTitle": "Equilibrium moisture content: why there is no universal dry number",
+      "missing": "diagram",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "9d6f184b-5150-4d30-87fe-a105f71344c9",
+      "lessonTitle": "Equilibrium moisture content: why there is no universal dry number",
+      "missing": "image",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "d22b54e2-2951-45b8-8efd-d20372c58927",
+      "lessonTitle": "Evaporation: the vapour pressure difference that drives drying",
+      "missing": "diagram",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "d22b54e2-2951-45b8-8efd-d20372c58927",
+      "lessonTitle": "Evaporation: the vapour pressure difference that drives drying",
+      "missing": "image",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "de581cf9-4fa9-451f-aae3-a34870c5986f",
+      "lessonTitle": "Warm the material or dry the air? Choosing the lever by climate",
+      "missing": "diagram",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "de581cf9-4fa9-451f-aae3-a34870c5986f",
+      "lessonTitle": "Warm the material or dry the air? Choosing the lever by climate",
+      "missing": "image",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "e7dd8da4-7b46-4668-94f0-2284177142e3",
+      "lessonTitle": "Heat flow, U-values and inside surface temperature",
+      "missing": "diagram",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "e7dd8da4-7b46-4668-94f0-2284177142e3",
+      "lessonTitle": "Heat flow, U-values and inside surface temperature",
+      "missing": "image",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "f48efa5a-2b21-476e-b856-904cfcd8e137",
+      "lessonTitle": "Moisture content: the oven-dry method, meters and WME",
+      "missing": "diagram",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "f48efa5a-2b21-476e-b856-904cfcd8e137",
+      "lessonTitle": "Moisture content: the oven-dry method, meters and WME",
+      "missing": "image",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "fb69b393-59f4-464e-a182-b685ddbe8b50",
+      "lessonTitle": "Daily monitoring: readings you can trust and grain depression in g/kg",
+      "missing": "diagram",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "fb69b393-59f4-464e-a182-b685ddbe8b50",
+      "lessonTitle": "Daily monitoring: readings you can trust and grain depression in g/kg",
+      "missing": "image",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "fce81c98-fc8f-4cbe-966f-a9844cabfd28",
+      "lessonTitle": "The surface condensation check: Canberra windows and Brisbane walls",
+      "missing": "diagram",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "lessonId": "fce81c98-fc8f-4cbe-966f-a9844cabfd28",
+      "lessonTitle": "The surface condensation check: Canberra windows and Brisbane walls",
+      "missing": "image",
+      "reason": "GP-471 v1-draft visual not yet built. Added with the founder's written approval on GP-471 (Phill, 23/11/2026, \"Approve all 26 entries\", Linear comment 5dabb8e6). Delete this entry when the visual lands."
     },
     {
       "slug": "structural-drying-fundamentals",

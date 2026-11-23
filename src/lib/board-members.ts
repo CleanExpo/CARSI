@@ -1,3 +1,4 @@
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 /**
  * CARSI board / leadership roster (single source of truth for the "Meet the Board" section).
  *
@@ -26,7 +27,7 @@ export const BOARD_MEMBERS: BoardMember[] = [
     order: 1,
     name: 'Philip McGurk',
     role: 'Founder',
-    bio: 'Founder of CARSI, leading the institute’s direction across course development, IICRC CEC accreditation and industry partnerships.',
+    bio: `Founder of CARSI, leading the institute’s direction across course development, CARSI's standing as an ${IICRC_APPROVED_CEC_PROVIDER} and industry partnerships.`,
   },
   {
     order: 2,

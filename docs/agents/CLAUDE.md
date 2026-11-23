@@ -56,13 +56,12 @@ alongside the Australian one, verified against a primary NZ source. No US framin
 
 ## IICRC CEC terminology — licence-critical (MUST)
 
-**CARSI is accredited as an IICRC CEC provider — it is not accredited to deliver IICRC courses or
-certification.** In any public, marketing, SEO, schema, email or in-app selling copy, describe
-what CARSI offers as "IICRC CEC Accredited courses" / "IICRC CEC Accredited" / "IICRC
-Continuing Education Credit (CEC) courses". The word "Accredited" must always appear together
-with "CEC" (e.g. "IICRC CEC Accredited") — **never** bare "IICRC Accredited" and **never**
-"IICRC Course Accredited" / "IICRC-accredited course(s)", both of which wrongly imply IICRC
-accredits the course or certification itself rather than CARSI's standing as a CEC provider.
+**CARSI is an IICRC Approved CEC Provider (the IICRC's own term, GP-704). It does not deliver
+IICRC courses or certification.** In any public, marketing, SEO, schema, email or in-app copy,
+take the wording from `src/lib/iicrc/approved-wording.ts` and never retype it. A single class is
+"approved for IICRC CECs" only when it is listed in `data/seed/cec-approvals.json`. **Never** call
+CARSI or a course "accredited" in connection with the IICRC or CECs, in any form; the guard
+`src/lib/iicrc/approved-provider-wording.test.tsx` fails the build on the retired wording.
 **Never** write copy implying CARSI delivers "IICRC courses", "IICRC certification course(s)",
 "IICRC-certified course(s)", or "get IICRC certified with CARSI".
 
@@ -108,8 +107,8 @@ standing fix inverts that to **fail-CLOSED — absent by default, added only by 
 - **IICRC framing is opt-in per course.** Reference IICRC, an S-standard, or CEC hours only on a
   course that genuinely maps to an IICRC discipline. Non-restoration courses (vehicle/truckmount,
   floor-care, facilities/biosecurity, admin, product training) carry **no** IICRC/S-standard/CEC
-  content; if a disclaimer is needed, write "not IICRC CEC accredited" (never the bare literals
-  "IICRC-accredited course" / "IICRC certification course", even when negated).
+  content; if a disclaimer is needed, write "not approved for IICRC CECs" (never an "accredited" form
+  next to IICRC or CEC, nor "IICRC certification course", even when negated).
 - **Two CI guards enforce this — do not weaken them.** `npm run check:iicrc-terminology` (narrow
   selling-phrase guard) and `npm run check:iicrc-compliance` (the backstop: scans all course-content
   and marketing surfaces — `data/seed`, `public/courses`, `docs/marketing`, `docs/content` — for
