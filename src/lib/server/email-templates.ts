@@ -2,6 +2,12 @@
  * CARSI branded transactional email layout — site theme (#060a14, glass card, #ed9d24 CTAs).
  * All project emails should use buildCarsiEmailHtml / render* helpers below.
  */
+import {
+  TaxInvoiceConfigError,
+  formatAudCents,
+  isValidAbn,
+  type TaxInvoice,
+} from '@/lib/billing/tax-invoice';
 import type { CcwAttendeeOffer } from '@/lib/marketing/ccw-roadshow-offers';
 
 import {
@@ -40,6 +46,52 @@ export function brandLink(href: string, label: string): string {
 
 export function formatPlainMessageAsHtml(message: string): string {
   return escapeHtml(message.trim()).replace(/\n/g, '<br>');
+}
+
+/**
+ * The tax invoice block for a paid purchase email (GP-761). Every paid confirmation
+ * renders this one block, so the wording and GST line cannot drift between emails.
+ * Refuses an invoice whose ABN is not valid: no placeholder ABN ever renders.
+ */
+export function renderTaxInvoiceSection(invoice: TaxInvoice): RenderedEmail {
+  if (!isValidAbn(invoice.abn)) {
+    throw new TaxInvoiceConfigError('Tax invoice has no valid ABN; refusing to render it');
+  }
+  const total = formatAudCents(invoice.totalCents);
+  const gst = formatAudCents(invoice.gstCents);
+  const rows: Array<[string, string]> = [
+    ['Seller', `${invoice.sellerName}, ABN ${invoice.abn}`],
+    ['Date', invoice.issuedOn],
+    ['Item', invoice.item],
+    ['Total (GST included)', total],
+    ['GST included in total', gst],
+  ];
+  const cell = `padding: 4px 0; font-family: ${BRAND.font}; font-size: 13px; line-height: 1.5;`;
+  const html =
+    `<div style="margin: 18px 0 0; padding: 14px 16px; border: 1px solid ${BRAND.cardBorder}; border-radius: 10px;">` +
+    `<p style="margin: 0 0 8px; font-family: ${BRAND.font}; font-size: 14px; font-weight: 700; color: ${BRAND.silverHi};">Tax invoice</p>` +
+    `<table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse;">` +
+    rows
+      .map(
+        ([label, value]) =>
+          `<tr><td style="${cell} color: ${BRAND.textMuted}; padding-right: 12px; vertical-align: top;">${escapeHtml(label)}</td>` +
+          `<td style="${cell} color: ${BRAND.text};">${escapeHtml(value)}</td></tr>`
+      )
+      .join('') +
+    `</table></div>`;
+  const text = ['Tax invoice', ...rows.map(([label, value]) => `${label}: ${value}`)].join('\n');
+  return { html, text };
+}
+
+/** Appends the tax invoice (when there is one) to an email's note and text body. */
+function withTaxInvoice(
+  invoice: TaxInvoice | null | undefined,
+  noteHtml: string | undefined,
+  text: string
+): { noteHtml: string | undefined; text: string } {
+  if (!invoice) return { noteHtml, text };
+  const section = renderTaxInvoiceSection(invoice);
+  return { noteHtml: `${noteHtml ?? ''}${section.html}`, text: `${text}\n\n${section.text}` };
 }
 
 const MARKETING_BODY_P = `margin: 0 0 14px; font-family: ${BRAND.font}; font-size: 15px; line-height: 1.65; color: ${BRAND.text};`;
@@ -584,6 +636,8 @@ export function renderEnrollmentWelcomeEmail(params: {
   setPasswordUrl?: string;
   /** CCW roadshow attendee offers (already gated/selected by the caller). */
   offers?: CcwAttendeeOffer[];
+  /** Present only when this enrolment was a paid purchase (GP-761). */
+  taxInvoice?: TaxInvoice | null;
 }): RenderedEmail {
   const offers = params.offers ?? [];
   const offersHtml = offers.length
@@ -608,6 +662,19 @@ export function renderEnrollmentWelcomeEmail(params: {
   // the whole email has to lead with setting one. Anything else sends a paying
   // customer to a sign-in screen that will tell them "Invalid credentials".
   if (params.needsPasswordSetup && params.setPasswordUrl) {
+    const paid = withTaxInvoice(
+      params.taxInvoice,
+      `${offersHtml}Enter this same email address on that page and we'll send you a link to set your password. ` +
+        `Once you're in, ${brandLink(params.startUrl, 'start lesson 1')} or open ` +
+        `${brandLink(params.dashboardUrl, 'My Learning')} any time. If anything goes wrong, just reply to this email.`,
+      `Hi ${params.name},\n\nYour payment went through and ${params.courseTitle} is yours. ` +
+        `You just need a password before you can open it.\n\n` +
+        `Set your password: ${params.setPasswordUrl}\n` +
+        `(Enter this same email address and we'll send you a link.)\n\n` +
+        `Once you're in — start lesson 1: ${params.startUrl}\n` +
+        `My Learning: ${params.dashboardUrl}${offersText}\n\n` +
+        `If anything goes wrong, just reply to this email.`
+    );
     return render(
       {
         appOrigin: params.appOrigin,
@@ -625,21 +692,17 @@ export function renderEnrollmentWelcomeEmail(params: {
           { label: 'Next action', value: 'Set your password, then start lesson 1' },
         ],
         cta: { label: 'Set your password', href: params.setPasswordUrl },
-        noteHtml:
-          `${offersHtml}Enter this same email address on that page and we'll send you a link to set your password. ` +
-          `Once you're in, ${brandLink(params.startUrl, 'start lesson 1')} or open ` +
-          `${brandLink(params.dashboardUrl, 'My Learning')} any time. If anything goes wrong, just reply to this email.`,
+        noteHtml: paid.noteHtml,
       },
-      `Hi ${params.name},\n\nYour payment went through and ${params.courseTitle} is yours. ` +
-        `You just need a password before you can open it.\n\n` +
-        `Set your password: ${params.setPasswordUrl}\n` +
-        `(Enter this same email address and we'll send you a link.)\n\n` +
-        `Once you're in — start lesson 1: ${params.startUrl}\n` +
-        `My Learning: ${params.dashboardUrl}${offersText}\n\n` +
-        `If anything goes wrong, just reply to this email.`
+      paid.text
     );
   }
 
+  const paid = withTaxInvoice(
+    params.taxInvoice,
+    `${offersHtml}Or open ${brandLink(params.dashboardUrl, 'My Learning')} to resume, track CEC progress, download certificates, and find the next recommended course.`,
+    `Hi ${params.name},\n\nYou're enrolled in ${params.courseTitle}.\n\nNext action: complete lesson 1 today so your progress loop starts.\n\nStart: ${params.startUrl}\n\nMy Learning: ${params.dashboardUrl}${offersText}`
+  );
   return render(
     {
       appOrigin: params.appOrigin,
@@ -657,9 +720,9 @@ export function renderEnrollmentWelcomeEmail(params: {
         { label: 'Next action', value: 'Complete lesson 1 today so your progress loop starts' },
       ],
       cta: { label: 'Start lesson 1', href: params.startUrl },
-      noteHtml: `${offersHtml}Or open ${brandLink(params.dashboardUrl, 'My Learning')} to resume, track CEC progress, download certificates, and find the next recommended course.`,
+      noteHtml: paid.noteHtml,
     },
-    `Hi ${params.name},\n\nYou're enrolled in ${params.courseTitle}.\n\nNext action: complete lesson 1 today so your progress loop starts.\n\nStart: ${params.startUrl}\n\nMy Learning: ${params.dashboardUrl}${offersText}`
+    paid.text
   );
 }
 
@@ -957,6 +1020,7 @@ export function renderCcwRoadshowBookingConfirmationEmail(params: {
   businessName?: string;
   phone?: string;
   eventPageUrl: string;
+  taxInvoice?: TaxInvoice | null;
 }): RenderedEmail {
   const name = params.attendeeName.trim() || 'there';
   const details: CarsiEmailDetail[] = [
@@ -981,6 +1045,11 @@ export function renderCcwRoadshowBookingConfirmationEmail(params: {
     details.push({ label: 'Phone', value: params.phone });
   }
 
+  const paid = withTaxInvoice(
+    params.taxInvoice,
+    `Questions? Reply to this email or visit ${brandLink(params.eventPageUrl, 'the event page')}.`,
+    `Hi ${name},\n\nYour booking for CARSI Business Growth Days is confirmed.\n\nEvent: ${params.eventCity} — ${params.eventDates}\nWhen: ${params.dateRangeLabel}. ${params.timeLabel}\nVenue: ${params.venueName}, ${params.venueAddress}\nTicket: ${params.ticketLabel} (${params.seatCount} seats)\nPaid: ${params.amountLabel}\n\nEvent page: ${params.eventPageUrl}`
+  );
   return render(
     {
       appOrigin: params.appOrigin,
@@ -994,9 +1063,9 @@ export function renderCcwRoadshowBookingConfirmationEmail(params: {
       ],
       details,
       cta: { label: 'View event details', href: params.eventPageUrl },
-      noteHtml: `Questions? Reply to this email or visit ${brandLink(params.eventPageUrl, 'the event page')}.`,
+      noteHtml: paid.noteHtml,
     },
-    `Hi ${name},\n\nYour booking for CARSI Business Growth Days is confirmed.\n\nEvent: ${params.eventCity} — ${params.eventDates}\nWhen: ${params.dateRangeLabel}. ${params.timeLabel}\nVenue: ${params.venueName}, ${params.venueAddress}\nTicket: ${params.ticketLabel} (${params.seatCount} seats)\nPaid: ${params.amountLabel}\n\nEvent page: ${params.eventPageUrl}`
+    paid.text
   );
 }
 
@@ -1127,6 +1196,7 @@ export function renderOwnerCircleBookingConfirmationEmail(params: {
   businessName?: string;
   discussionTopic?: string;
   programUrl: string;
+  taxInvoice?: TaxInvoice | null;
 }): RenderedEmail {
   const name = params.name.trim() || 'there';
   const statusLine =
@@ -1144,6 +1214,11 @@ export function renderOwnerCircleBookingConfirmationEmail(params: {
     { label: 'Paid', value: params.amountLabel },
     ...(params.businessName ? [{ label: 'Business', value: params.businessName }] : []),
   ];
+  const paid = withTaxInvoice(
+    params.taxInvoice,
+    undefined,
+    `Hi ${name},\n\n${statusLine}\n\n${params.sessionTitle}\n${params.dateLabel} · ${params.timeLabel}\n${params.venueName}, ${params.venueAddress}\n\n${params.programUrl}\n`
+  );
   return render(
     {
       appOrigin: params.appOrigin,
@@ -1160,8 +1235,9 @@ export function renderOwnerCircleBookingConfirmationEmail(params: {
         ? { messageHtml: formatPlainMessageAsHtml(`Topic you raised:\n${params.discussionTopic}`) }
         : {}),
       cta: { label: 'View Owner Circle', href: params.programUrl },
+      ...(paid.noteHtml ? { noteHtml: paid.noteHtml } : {}),
     },
-    `Hi ${name},\n\n${statusLine}\n\n${params.sessionTitle}\n${params.dateLabel} · ${params.timeLabel}\n${params.venueName}, ${params.venueAddress}\n\n${params.programUrl}\n`
+    paid.text
   );
 }
 
@@ -1171,8 +1247,14 @@ export function renderCarsiCoachingMonthlyWelcomeEmail(params: {
   amountLabel: string;
   dashboardUrl: string;
   coachingPageUrl: string;
+  taxInvoice?: TaxInvoice | null;
 }): RenderedEmail {
   const name = params.name.trim() || 'there';
+  const paid = withTaxInvoice(
+    params.taxInvoice,
+    `Program details: ${brandLink(params.coachingPageUrl, 'carsi.com.au/ccw-training')}.`,
+    `Hi ${name},\n\nYour CARSI Business Coaching subscription is confirmed (${params.amountLabel}/month).\n\nWe will email you within one business day with onboarding and your first monthly session with Phill.\n\nDashboard: ${params.dashboardUrl}\nProgram: ${params.coachingPageUrl}\n`
+  );
   return render(
     {
       appOrigin: params.appOrigin,
@@ -1189,9 +1271,9 @@ export function renderCarsiCoachingMonthlyWelcomeEmail(params: {
         { label: 'Billing', value: `${params.amountLabel} (monthly, via Stripe)` },
       ],
       cta: { label: 'Open your coaching portal', href: params.dashboardUrl },
-      noteHtml: `Program details: ${brandLink(params.coachingPageUrl, 'carsi.com.au/ccw-training')}.`,
+      noteHtml: paid.noteHtml,
     },
-    `Hi ${name},\n\nYour CARSI Business Coaching subscription is confirmed (${params.amountLabel}/month).\n\nWe will email you within one business day with onboarding and your first monthly session with Phill.\n\nDashboard: ${params.dashboardUrl}\nProgram: ${params.coachingPageUrl}\n`
+    paid.text
   );
 }
 
