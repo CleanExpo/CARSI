@@ -403,7 +403,7 @@ describe('the /courses hero CEC link is pinned to the permitted label', () => {
   const PINNED =
     '{catalogueAvailable && cecApprovedCount > 0 ? ( <Link href="/courses?discipline=iicrc-cec#catalogue" className="' +
     HERO_CLASS +
-    '" > IICRC CEC Accredited courses ({cecApprovedCount}) </Link> ) : null}';
+    '" > {APPROVED_FOR_IICRC_CECS_LABEL} ({cecApprovedCount}) </Link> ) : null}';
   // className is pinned too: a Tailwind content utility renders text (review of 6a1046e8)
 
   function heroCecLinks(src: string): string[] {
@@ -434,7 +434,6 @@ describe('the /courses hero CEC link is pinned to the permitted label', () => {
   // IICRC is pinned, and so is the count of the word itself: new IICRC copy there fails here
   // until it is reviewed and added.
   const HERO_IICRC_SENTENCES = [
-    'IICRC CEC Accredited courses ( )',
     'These are CARSI-issued credentials, not IICRC certifications.',
     'IICRC certification is obtained through schools and examinations approved by the IICRC.',
     'Same cards as the homepage — price, duration, and CEC hours only when the IICRC has approved that course.',
@@ -455,7 +454,7 @@ describe('the /courses hero CEC link is pinned to the permitted label', () => {
   it('hero: every IICRC sentence on /courses is a reviewed one', async () => {
     const src = readFileSync(HERO, 'utf8');
     expect(await heroIicrcSentences(src)).toEqual(HERO_IICRC_SENTENCES);
-    expect(iicrcCount(src)).toBe(13);
+    expect(iicrcCount(src)).toBe(15);
   });
 
   it.each([
@@ -469,14 +468,14 @@ describe('the /courses hero CEC link is pinned to the permitted label', () => {
     expect(planted).not.toBe(src);
     const pinned =
       JSON.stringify(await heroIicrcSentences(planted)) === JSON.stringify(HERO_IICRC_SENTENCES) &&
-      iicrcCount(planted) === 13;
+      iicrcCount(planted) === 15;
     expect(pinned).toBe(false);
   });
 
   it.each([
     [
       'a reworded label',
-      'IICRC CEC Accredited courses ({cecApprovedCount})',
+      '{APPROVED_FOR_IICRC_CECS_LABEL} ({cecApprovedCount})',
       'No waiting for your IICRC ' + 'online certification courses ({cecApprovedCount})',
     ],
     [

@@ -1,0 +1,254 @@
+name: Deploy Production
+
+# Production deploy gate (Phill, 22/11/2026: "Wait for green").
+#
+# DigitalOcean auto-deploy (deploy_on_push in app.yaml and the live app spec) is OFF, so
+# this workflow is the only automatic path to production. After the CI workflow finishes
+# on a push to main it:
+#   1. deploys only if that commit is still the head of main (a newer commit gets its own run),
+#   2. deploys only if main's own push CI run for that exact commit succeeded and every
+#      required check in that run passed (PR or branch runs on the same SHA do not count),
+#   3. asks DigitalOcean to build main and watches the deployment: if DigitalOcean resolved
+#      any commit other than the checked one (main moved after the checks), the deployment is
+#      cancelled before it goes live and the job fails,
+#   4. waits until https://carsi.com.au/api/health reports the new commit,
+#   5. job live-smoke: runs the read-only Playwright smoke of the LIVE site
+#      (`npm run test:smoke:live`, e2e/live-smoke.live.ts, config/playwright.live.config.ts) at
+#      desktop 1440x900 and phone 390x844: home, /courses, one published course page, /pricing,
+#      the login page (rendered only, no sign-in) and /api/health. Each page must return 200 with
+#      its key heading, no console errors, no broken images, the approved CARSI logo and, at
+#      phone width, no horizontal scroll. Screenshots are uploaded as the live-smoke-<sha>
+#      artifact. A failure turns the run red and prints the rollback steps; it never rolls back
+#      by itself (rollback is Phill's call). It loads pages and GETs only: nothing is signed in,
+#      bought or submitted.
+#
+# Pre-merge note: the live smoke runs only AFTER a deploy, against production. Before merging a
+# change to a page it covers, run `npm run test:smoke:live` (read-only) and `npm run test:e2e`
+# locally; a copy or layout change that breaks a heading, image, logo or phone layout will
+# otherwise first show up as a red live-smoke job with the change already live.
+# workflow_dispatch re-runs the same gate for the current head of main; force=true deploys
+# even when that commit is already live.
+#
+# Secret: DIGITALOCEAN_ACCESS_TOKEN, an environment secret of the `production-deploy`
+# environment, whose deployment branch policy allows main only. A workflow run from any
+# other branch cannot read it.
+#
+# Residual risk: if the cancel request itself fails, the job says so in red and the
+# deployment must be cancelled by hand. The decision rules live in
+# scripts/ci/production-deploy-gate.mjs (deploymentDecision) and are unit-tested.
+# The deployment JSON from doctl carries the app spec, which holds env values; only single
+# fields are extracted from it here and it is never printed.
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Deploy even if this commit is already live (proves the deploy path works)
+        type: boolean
+        default: false
+
+permissions:
+  actions: read
+  contents: read
+  checks: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+env:
+  DO_APP_ID: a9d718db-7961-4107-9477-96c72fcf620f
+  HEALTH_URL: https://carsi.com.au/api/health
+
+jobs:
+  deploy:
+    name: Deploy to DigitalOcean
+    outputs:
+      deploy: ${{ steps.target.outputs.deploy }}
+      sha: ${{ steps.target.outputs.sha }}
+      previous_commit: ${{ steps.release.outputs.previous_commit }}
+      previous_deployment: ${{ steps.release.outputs.previous_deployment }}
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: production-deploy
+    steps:
+      - name: Checkout gate script
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          sparse-checkout: scripts/ci
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+
+      - name: Choose the commit
+        id: target
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          main_sha=$(gh api "repos/${GITHUB_REPOSITORY}/commits/main" --jq .sha)
+          sha="${RUN_SHA:-$main_sha}"
+          if [ "$sha" != "$main_sha" ]; then
+            echo "::notice::$sha is no longer the head of main ($main_sha); that commit's own CI run will deploy it."
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "deploy=true" >> "$GITHUB_OUTPUT"
+
+      - name: Require every required check to have passed
+        if: steps.target.outputs.deploy == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci/production-deploy-gate.mjs checks "${{ steps.target.outputs.sha }}"
+
+      - name: Install doctl
+        if: steps.target.outputs.deploy == 'true'
+        uses: digitalocean/action-doctl@3cb3953159719656269e044e0e24ca16dd2a690f # v2.5.2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Deploy main, cancelling it before it goes live if it is not the checked commit
+        id: release
+        if: steps.target.outputs.deploy == 'true'
+        env:
+          SHA: ${{ steps.target.outputs.sha }}
+          FORCE: ${{ inputs.force == true }}
+          DO_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          app=$(doctl apps get "$DO_APP_ID" -o json)
+          live=$(jq -r '.[0].active_deployment.services[0].source_commit_hash // ""' <<<"$app")
+          # Recorded for the live smoke's rollback instructions: what was live before this run.
+          echo "previous_commit=$live" >> "$GITHUB_OUTPUT"
+          echo "previous_deployment=$(jq -r '.[0].active_deployment.id // ""' <<<"$app")" >> "$GITHUB_OUTPUT"
+          if [ "$live" = "$SHA" ] && [ "$FORCE" != "true" ]; then
+            echo "::notice::$SHA is already live; nothing to deploy."
+          else
+            dep=$(doctl apps create-deployment "$DO_APP_ID" --format ID --no-header)
+            echo "deployment $dep created"
+            deadline=$((SECONDS + 1800))
+            last=""
+            while :; do
+              info=$(doctl apps get-deployment "$DO_APP_ID" "$dep" -o json | jq -r '[.[0].phase // "", .[0].services[0].source_commit_hash // ""] | @tsv')
+              phase=$(cut -f1 <<<"$info")
+              commit=$(cut -f2 <<<"$info")
+              [ "$info" != "$last" ] && echo "deployment $dep: phase=$phase commit=${commit:-unresolved}"
+              last="$info"
+              decision=$(node scripts/ci/production-deploy-gate.mjs decide "$SHA" "$phase" "$commit")
+              case "$decision" in
+                live) break ;;
+                wait) ;;
+                cancel)
+                  echo "::error::DigitalOcean resolved $commit, not the checked commit $SHA (main moved after the checks). Cancelling deployment $dep before it goes live."
+                  curl -fsS -o /dev/null -X POST -H "Authorization: Bearer $DO_TOKEN" \
+                    "https://api.digitalocean.com/v2/apps/$DO_APP_ID/deployments/$dep/cancel" \
+                    || echo "::error::cancel request for deployment $dep FAILED; cancel it by hand in DigitalOcean now."
+                  exit 1 ;;
+                *)
+                  echo "::error::deployment $dep ended as $phase with commit ${commit:-unresolved}; not the checked commit $SHA going live."
+                  exit 1 ;;
+              esac
+              if [ "$SECONDS" -ge "$deadline" ]; then
+                echo "::error::deployment $dep still $phase after 30 minutes"
+                exit 1
+              fi
+              sleep 5
+            done
+          fi
+          node scripts/ci/production-deploy-gate.mjs wait-health "$SHA" 600
+
+  live-smoke:
+    name: Live smoke (Playwright, read-only)
+    needs: deploy
+    if: needs.deploy.result == 'success' && needs.deploy.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # No environment and no secrets: this job only reads the public site.
+    steps:
+      - name: Checkout the deployed commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.deploy.outputs.sha }}
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Same workaround as ci.yml: runner images sometimes ship broken Microsoft apt sources.
+      - name: Remove broken Microsoft apt sources
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list \
+                     /etc/apt/sources.list.d/microsoft-prod.sources \
+                     /etc/apt/sources.list.d/azure-cli.list \
+                     /etc/apt/sources.list.d/azure-cli.sources || true
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Smoke the live site at desktop and phone size
+        id: smoke
+        run: npm run test:smoke:live
+        env:
+          CI: true
+          LIVE_SMOKE_BASE_URL: https://carsi.com.au
+          LIVE_SMOKE_EXPECT_COMMIT: ${{ needs.deploy.outputs.sha }}
+
+      - name: Upload screenshots and failure traces
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: live-smoke-${{ needs.deploy.outputs.sha }}
+          path: test-results/live-smoke/
+          retention-days: 30
+
+      # The site was never checked: setup (checkout, npm ci, Chromium) failed before the smoke ran.
+      - name: Report that the live site was not checked
+        if: failure() && steps.smoke.outcome != 'failure'
+        run: |
+          echo "::error::The live smoke did not run (a setup step failed), so https://carsi.com.au was NOT checked after this deploy. Re-run this job; this is not evidence the site is broken or healthy."
+          exit 1
+
+      # Rollback is a human decision (Phill). This step only prints how; it changes nothing.
+      - name: Print rollback steps (the live site failed its smoke)
+        if: failure() && steps.smoke.outcome == 'failure'
+        env:
+          SHA: ${{ needs.deploy.outputs.sha }}
+          PREV_COMMIT: ${{ needs.deploy.outputs.previous_commit }}
+          PREV_DEPLOYMENT: ${{ needs.deploy.outputs.previous_deployment }}
+        run: |
+          prev="${PREV_DEPLOYMENT:-<previous deployment id>}"
+          echo "::error::The live smoke FAILED on https://carsi.com.au after deploying $SHA. Nothing was rolled back automatically."
+          echo "Live before this run: commit ${PREV_COMMIT:-unknown}, DigitalOcean deployment $prev."
+          if [ "$PREV_COMMIT" = "$SHA" ]; then
+            echo "That is this same commit (it was already live), so pick the earlier good deployment from the Activity tab instead."
+          fi
+          echo "Screenshots and traces: artifact live-smoke-$SHA on this run."
+          echo ""
+          echo "To roll back (Phill's decision), use one of:"
+          echo "  1. DigitalOcean console: Apps > carsi > Activity > deployment $prev > Rollback."
+          echo "  2. DigitalOcean API (doctl has no rollback subcommand, and"
+          echo "     'doctl apps create-deployment' rebuilds the head of main, which is the failing commit):"
+          echo "     curl -fsS -X POST -H \"Authorization: Bearer \$DIGITALOCEAN_ACCESS_TOKEN\" -H 'Content-Type: application/json' -d '{\"deployment_id\":\"$prev\"}' https://api.digitalocean.com/v2/apps/$DO_APP_ID/rollback"
+          echo "  3. Revert the bad commit on main through a PR; this workflow deploys the revert once its checks pass."
+          exit 1

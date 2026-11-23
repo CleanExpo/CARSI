@@ -12,6 +12,7 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
@@ -58,8 +59,7 @@ const faqs = [
   },
   {
     question: 'Can gallery and museum staff complete this training online?',
-    answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, ideal for museum staff who need to maintain building operations during opening hours. Courses can be completed around exhibition schedules and issue verifiable digital credentials on completion.',
+    answer: `Yes. CARSI, an ${IICRC_APPROVED_CEC_PROVIDER}, offers courses online and self-paced, ideal for museum staff who need to maintain building operations during opening hours. Courses can be completed around exhibition schedules and issue verifiable digital credentials on completion.`,
   },
   {
     question: 'What is the emergency response protocol for water damage in a museum?',

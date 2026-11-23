@@ -2,7 +2,7 @@
 /**
  * CEC course brand guard (licence-critical, fail-closed).
  *
- * Founder rule 19/10/2026: the CCW logo and name may not appear in any IICRC CEC accredited
+ * Founder rule 19/10/2026: the CCW logo and name may not appear in any course approved for IICRC CECs
  * course. They may appear in CCW-CARSI training materials and other marketing. A course is CEC
  * accredited when it has an approved entry in data/seed/cec-approvals.json (the SSOT).
  *

@@ -8,7 +8,7 @@ Job address: ______________________   Date: ____/____/______   Supervisor: _____
 
 - [ ] System serving the affected area identified on the building plan: unit, supply, return, plenum, zones served.
 - [ ] System turned off with the building manager, tagged out, time recorded.
-- [ ] Supply and return grilles in the work area sealed with film. HVAC never used to dry the work area.
+- [ ] Supply and return grilles in the work area sealed with film.
 - [ ] Condensate tray and drain inspected: water, slime, growth, blockage. Photos.
 - [ ] Filters inspected: loading, wetness, growth. Photos. Bagged as waste if removed.
 - [ ] Duct behind the nearest grilles inspected: sheet metal, internally lined or flexible.
