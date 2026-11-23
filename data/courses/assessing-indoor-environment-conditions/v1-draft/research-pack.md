@@ -114,7 +114,7 @@ threshold (IEA-041, IEA-071, IEA-076).
 
 | Row | Claim | Owner | Action |
 | --- | --- | --- | --- |
-| IEA-001 | Edition of AS-IICRC S520 named (nominative only); `founder_only` | Phill (SME) — licensed S520 | substantiate |
+| IEA-001 | S520 name removed from the description, meta and Lesson 4.1 on 22/11/2026 (GP-748); `founder_only`, so the row stays GAP until the founder records it as CUT | Phill (founder) | founder to CUT |
 | IEA-054 | Interpreting spore-trap results against outdoor and unaffected-indoor comparison samples; spore-trap method limits | Phill (SME); occupational hygienist review | substantiate |
 | IEA-056 | New Zealand public-health position on household mould testing (lesson currently says "check your public health service and local council") | Phill (SME) | substantiate |
 | IEA-070 | Queensland amending regulation for the WEL list and 15-substance transition actually made (WorkSafe Qld guidance states it; a practitioner source said on 12/11/2026 the regulation was not yet on the register) | Phill (SME); founder | substantiate |

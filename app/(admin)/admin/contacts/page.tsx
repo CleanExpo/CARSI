@@ -52,6 +52,13 @@ type ContactRow = {
 
 const SLA_MS = 2 * 60 * 60 * 1000;
 
+/** A 422 says why the reply was refused (GP-706 wording check); show that, else the fallback. */
+async function replyErrorMessage(res: Response, fallback: string): Promise<string> {
+  if (res.status !== 422) return fallback;
+  const body = (await res.json().catch(() => null)) as { detail?: unknown } | null;
+  return typeof body?.detail === 'string' && body.detail ? body.detail : fallback;
+}
+
 function slaCountdown(createdAt: string) {
   const remaining = new Date(createdAt).getTime() + SLA_MS - Date.now();
   if (remaining <= 0) return 'auto-sending imminently';
@@ -156,7 +163,7 @@ export default function AdminContactsPage() {
         body: JSON.stringify({ submissionId, replyBody: replyText }),
       });
       if (!res.ok) {
-        setError('Could not send the reply. Please try again.');
+        setError(await replyErrorMessage(res, 'Could not send the reply. Please try again.'));
         return;
       }
       setReplyOpen(null);
@@ -179,7 +186,12 @@ export default function AdminContactsPage() {
         body: JSON.stringify({ id, action, ...(body ? { replyBody: body } : {}) }),
       });
       if (!res.ok) {
-        setError(action === 'send' ? 'Could not send the draft.' : 'Could not discard the draft.');
+        setError(
+          await replyErrorMessage(
+            res,
+            action === 'send' ? 'Could not send the draft.' : 'Could not discard the draft.',
+          ),
+        );
         return;
       }
       setReplyOpen(null);
