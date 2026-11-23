@@ -452,4 +452,14 @@ describe('GP-759 follow-up: a seat that cannot be prepared at a full pool refuse
     expect(paidHolders()).toHaveLength(2);
     expect(vi.mocked(sendTeamMemberAddedEmail)).not.toHaveBeenCalled();
   });
+
+  it.each([
+    ['the preparation throws', () => vi.mocked(findCoursePrerequisiteBlock).mockRejectedValueOnce(new Error('prerequisite read failed'))],
+    ['the course is not found', () => vi.mocked(getOrCreateCourseBySlug).mockRejectedValueOnce(new Error('COURSE_NOT_FOUND'))],
+  ])('control, token invite: %s and the learner is not added', async (_label, plant) => {
+    plant();
+    expect(await accept('ub', 'tok-b')).not.toBe(200);
+    expect(db.tables.lmsTeamMember.map((m) => m.userId)).not.toContain('ub');
+    expect(paidHolders()).toHaveLength(2);
+  });
 });
