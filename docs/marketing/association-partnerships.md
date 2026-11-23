@@ -135,7 +135,7 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 
 Dear [Name],
 
-I'm Phill from CARSI (carsi.com.au), an Australian-owned online training platform delivering IICRC CEC Accredited courses in restoration, mould remediation and water damage management.
+I'm Phill from CARSI (carsi.com.au), an Australian-owned online training platform and IICRC Approved CEC Provider, delivering courses in restoration, mould remediation and water damage management.
 
 We'd like to explore a training partnership with [Association Name] — offering your members discounted access to 80 published courses, all available online and self-paced.
 
@@ -158,14 +158,14 @@ carsi.com.au | training@carsi.com.au
 
 Dear [Name],
 
-I'm writing to introduce CARSI (carsi.com.au), an Australian-owned platform delivering IICRC CEC Accredited online training in water damage restoration, mould remediation, structural drying and related disciplines.
+I'm writing to introduce CARSI (carsi.com.au), an Australian-owned platform and IICRC Approved CEC Provider delivering online training in water damage restoration, mould remediation, structural drying and related disciplines.
 
 We believe there's a strong alignment between CARSI's course catalogue and the professional development needs of [Association Name] members. Specifically:
 
 - **80 published courses** — covering water damage restoration, structural drying, mould remediation and carpet cleaning and more
 - **100% online, self-paced** — no classroom attendance or roster disruption
 - **Verifiable digital certificates** — public credential URL for employer and client verification
-- **IICRC CEC Accredited provider** — CEC hours are approved one course at a time, on application
+- **IICRC Approved CEC Provider** — CEC hours are approved one course at a time, on application
   to the IICRC, and every learner gets a CEC tracking dashboard for the credits they hold
 
 We'd like to propose an **Endorsed Provider** partnership at no cost to [Association Name]. Your members would receive:
@@ -193,7 +193,7 @@ carsi.com.au | training@carsi.com.au
 
 Dear [Name],
 
-I'm Phill from CARSI (carsi.com.au) — an Australian-owned online training platform specialising in IICRC CEC Accredited courses for restoration, cleaning and building maintenance professionals.
+I'm Phill from CARSI (carsi.com.au) — an Australian-owned online training platform and IICRC Approved CEC Provider, specialising in courses for restoration, cleaning and building maintenance professionals.
 
 I'm reaching out because I believe [Association Name] members could significantly benefit from access to our training catalogue, and I'd like to explore a formal partnership.
 
@@ -250,7 +250,7 @@ CARSI (carsi.com.au) is an Australian-owned online training platform delivering 
 | Discounted Training | 10–20% off all courses via unique member code |
 | Online, Self-Paced | No classroom, no roster disruption, any device |
 | Verifiable Credentials | Digital certificates with public verification URL |
-| IICRC CEC Accredited provider | CEC hours approved course by course; CEC tracking dashboard included |
+| IICRC Approved CEC Provider | CEC hours approved course by course; CEC tracking dashboard included |
 | Group Licensing | Bulk pricing for organisations enrolling teams |
 
 **What We Offer the Association**
@@ -264,7 +264,7 @@ CARSI (carsi.com.au) is an Australian-owned online training platform delivering 
 
 **Credibility**
 
-- IICRC CEC Accredited courses (board-voted)
+- IICRC Approved CEC Provider (board-voted)
 - 80 published courses across water damage, structural drying, mould, fire and smoke, odour control and carpet cleaning
 - Built for Australian tradespeople and professionals
 - Digital-first: verifiable credentials, LinkedIn sharing, employer audit trail

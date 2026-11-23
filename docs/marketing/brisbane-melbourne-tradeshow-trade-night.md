@@ -14,14 +14,14 @@ any paid spend remain founder-gated.
   - **RestoreAssist** — AI on the tools: turns site notes, photos and readings into a clear
     decision and a clean record. **The hero demo and the one CTA.**
   - **CARSI** — the know-how: training, the CARSI Southern Hemisphere Restoration Designations, and
-    IICRC CEC Accredited provider standing. Learn the science behind the AI's output.
+    IICRC Approved CEC Provider standing. Learn the science behind the AI's output.
 - **Audience:** mixed trade — cleaning operators (carpet/tile/rug, bond, facility) **and**
   restoration technicians and firm owners (water, mould, fire, biohazard).
 - **Format per city:** daytime **Tradeshow** (floor, live AI demos, stands) + evening **Trade Night**
   (a Phill McGurk talk on AI in business + networking).
 - **Primary call-to-action (one ask):** **Book a RestoreAssist demo.** Everything points here.
 - **Guardrails (licence- and claim-critical — do not break):**
-  - CARSI is an **IICRC CEC Accredited provider**; always pair "Accredited" with "CEC". Only a
+  - CARSI is an **IICRC Approved CEC Provider**; never call CARSI "accredited" with the IICRC. Only a
     course approved in `data/seed/cec-approvals.json` may state it earns CECs (founder-gated) —
     otherwise state CARSI's provider standing. Exact banned framings are in CLAUDE.md § "IICRC CEC
     terminology" — follow it verbatim.
@@ -67,7 +67,7 @@ Stations and the conversation at each:
    comms, admin and scheduling, marketing and follow-up. "AI in business" made concrete for a trade
    operator.
 3. **CARSI — the know-how behind the AI.** Over 50 courses live; the 9 CARSI Southern Hemisphere
-   Restoration Designations; IICRC CEC Accredited provider; the science that lets you trust and
+   Restoration Designations; IICRC Approved CEC Provider; the science that lets you trust and
    check what the AI gives you (AI supports judgement — you need to know the subject to own it).
 4. **"Bring your job" AI clinic.** Short, practical walk-throughs: use a real job only when its data
    is authorised for the demonstration and AI processing, with customer identifiers and sensitive
@@ -133,10 +133,10 @@ Run sheet:
 > yours.
 
 **Proof points (verified — use as-is):** over 50 courses live on carsi.com.au; 9 CARSI Southern
-Hemisphere Restoration Designations; CARSI is an **IICRC CEC Accredited provider** with **38 courses
+Hemisphere Restoration Designations; CARSI is an **IICRC Approved CEC Provider** with **38 courses
 approved for IICRC CECs**; Australian-produced throughout (AU English, 230 V / AS/NZS, metric, AUD).
 
 **Framing to avoid** (exact banned IICRC list in CLAUDE.md § "IICRC CEC terminology"): any wording
-that implies the IICRC accredits or delivers a CARSI course, or that CARSI issues the certification;
+that implies the IICRC delivers a CARSI course or certifies it, or that CARSI issues the certification;
 "guaranteed income"; any RTO or nationally-recognised-qualification claim; any suggestion that AI,
 RestoreAssist or a course replaces a standard, an SDS, or a professional's judgement.
