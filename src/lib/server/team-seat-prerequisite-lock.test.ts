@@ -67,7 +67,9 @@ vi.mock('@/lib/prisma', () => {
     COURSES.find((c) =>
       'id' in where ? c.id === where.id : 'slug' in where ? c.slug === where.slug : false
     ) ?? null;
-  const tx = {
+  // GP-759: the seat step runs every seat read and write on its transaction; reads it does not
+  // fake here fall through to the client below.
+  const txOwn: Record<string, unknown> = {
     lmsTeamMember: { findFirst: vi.fn(async () => null) },
     lmsTeam: {
       create: vi.fn(async () => ({ id: 'team-1', slug: 'my-team' })),
@@ -75,12 +77,37 @@ vi.mock('@/lib/prisma', () => {
     },
     lmsTeamCoursePurchase: {
       findFirst: vi.fn(async () => null),
+      findMany: vi.fn(async () => []),
       create: vi.fn(async () => ({})),
+      aggregate: vi.fn(async () => ({ _sum: { seatLimit: 0 } })),
     },
+    stripeWebhookEvent: { findUnique: vi.fn(async () => null) },
     $executeRaw: vi.fn(async () => 0),
+    // GP-432: touchLessonProgress runs inside withLockedEnrollment; the row lock answers with the
+    // enrolment row by id, as the database would.
+    $queryRaw: vi.fn(async (_sql: TemplateStringsArray, id: string) => {
+      const e = db.enrolments.find((row) => row.id === id);
+      return e ? [{ id: e.id, studentId: e.studentId, courseId: e.courseId, status: e.status }] : [];
+    }),
+    // lmsLessonProgress and lmsEnrollment are NOT faked here: the transaction uses the client's
+    // models below, so the enrolment row it updates is the one every other step reads.
   };
-  return {
-    prisma: {
+  const client: Record<string, unknown> = {};
+  // A model faked here EXTENDS the client's model of the same name: the methods named here win
+  // and every other method falls through to the client. Replacing the whole model hid
+  // lmsEnrollment.findUnique from the seat step when GP-432 added `lmsEnrollment: { update }`
+  // (main red at f4760672).
+  const isModel = (v: unknown): v is Record<string, unknown> =>
+    typeof v === 'object' && v !== null && !Array.isArray(v);
+  const tx = new Proxy(txOwn, {
+    get: (t, k: string) => {
+      if (!(k in t)) return client[k];
+      const own = t[k];
+      const base = client[k];
+      return isModel(own) && isModel(base) ? { ...base, ...own } : own;
+    },
+  });
+  Object.assign(client, {
       $transaction: vi.fn(async (fn: (t: typeof tx) => unknown) => fn(tx)),
       lmsUser: {
         findUnique: vi.fn(async ({ where }: { where: { id: string } }) => {
@@ -166,17 +193,12 @@ vi.mock('@/lib/prisma', () => {
           }
         ),
       },
-    },
-  };
+  });
+  return { prisma: client };
 });
 
-// GP-759 reversal ledger (a database read), covered by payment-reversal-sticky.test.ts.
-vi.mock('@/lib/server/payment-integrity-ledger', () => ({
-  PAYMENT_REVERSED: 'PAYMENT_REVERSED',
-  isCheckoutPaymentReversed: vi.fn(async () => false),
-}));
-// GP-759 paid-seat check (database reads), covered by team-seat-refund.test.ts.
-vi.mock('@/lib/server/team-seat-refund', () => ({ teamCourseSeatIsFree: vi.fn(async () => true) }));
+// GP-759 paid-seat counting is covered by team-seat-refund.test.ts and seat-state-races.test.ts;
+// here the team has no seat blocks, so every seat is free.
 vi.mock('@/lib/server/lms-user-sync', () => ({ ensureLmsUserFromClaims: vi.fn(async () => {}) }));
 vi.mock('@/lib/server/course-catalog-sync', () => ({
   getOrCreateCourseBySlug: vi.fn(async (slug: string) => {
@@ -190,6 +212,14 @@ vi.mock('@/lib/server/team-course-slug-db', () => ({
 }));
 vi.mock('@/lib/server/lms-auth', () => ({
   sessionClaimsForUserId: vi.fn(async (id: string) => db.users.get(id) ?? null),
+  // GP-760: verifyActiveSession reads the session's user on every request and refuses when it
+  // cannot; every fixture user is active, on generation 0, with the role their claims carry.
+  readLmsUserNow: vi.fn(async (_db: unknown, id: string) => {
+    const c = db.users.get(id);
+    return c
+      ? { id: c.sub, email: c.email, fullName: c.full_name, active: true, role: c.role, generation: c.sg ?? 0 }
+      : null;
+  }),
 }));
 vi.mock('@/lib/server/teams', () => ({ createUniqueTeamSlug: vi.fn(async () => 'my-team') }));
 vi.mock('@/lib/server/first-lesson', () => ({ getFirstLessonLearnPath: vi.fn(async () => null) }));
@@ -268,6 +298,25 @@ beforeEach(() => {
     [manager.sub, manager],
     [admin.sub, admin],
   ]);
+});
+
+// Guard for the fake itself: a model the transaction fake names must extend the client's model,
+// never replace it, or a method the code under test calls inside the transaction disappears.
+describe('the in-memory transaction', () => {
+  it('reaches every client model method, whatever the transaction fakes', async () => {
+    const { prisma } = await import('@/lib/prisma');
+    const client = prisma as unknown as Record<string, unknown>;
+    const tx = (await prisma.$transaction(async (t) => t)) as unknown as Record<string, unknown>;
+    for (const [model, methods] of Object.entries(client)) {
+      if (typeof methods !== 'object' || methods === null) continue;
+      for (const method of Object.keys(methods)) {
+        expect(typeof (tx[model] as Record<string, unknown>)[method], `${model}.${method}`).toBe(
+          'function'
+        );
+      }
+    }
+    expect(Object.keys(client)).toContain('lmsEnrollment');
+  });
 });
 
 describe('team seat for a member WITHOUT the prerequisite', () => {

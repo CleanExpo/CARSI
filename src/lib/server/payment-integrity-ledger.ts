@@ -1,3 +1,4 @@
+import type { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 import { runSerializable } from '@/lib/server/db-tx';
 
@@ -61,6 +62,7 @@ const DISPUTE_WON_TYPE = 'payment_reversal_lifted:dispute_won';
  * deliver events in order).
  */
 export async function recordCheckoutPaymentReversed(
+  tx: Prisma.TransactionClient,
   checkoutSessionId: string,
   reason: PaymentReversalReason,
   eventAt: Date,
@@ -68,32 +70,30 @@ export async function recordCheckoutPaymentReversed(
   const id = reversalId(checkoutSessionId);
   const type = `${REVERSED_TYPE_PREFIX}${reason}`;
   if (reason === 'refunded') {
-    // The refund marker and the unfulfilled record are settled together, in one serialisable
-    // transaction, so the order Stripe delivers the refund and the checkout in cannot matter
-    // (recordUnfulfilledPayment reads this marker in its own serialisable transaction).
-    await runSerializable(async (tx) => {
-      await tx.stripeWebhookEvent.upsert({
-        where: { id },
-        create: { id, type, processedAt: eventAt },
-        update: { type, processedAt: eventAt },
-      });
-      // A full refund means nothing is owed: no admin may grant it by hand.
-      await tx.stripeWebhookEvent.updateMany({
-        where: { id: unfulfilledId(checkoutSessionId), processedAt: null },
-        data: { processedAt: new Date() },
-      });
+    // The refund marker and the unfulfilled record are settled together, in the caller's
+    // serialisable transaction (the seat step), so the order Stripe delivers the refund and the
+    // checkout in cannot matter (recordUnfulfilledPayment reads this marker serialisably too).
+    await tx.stripeWebhookEvent.upsert({
+      where: { id },
+      create: { id, type, processedAt: eventAt },
+      update: { type, processedAt: eventAt },
+    });
+    // A full refund means nothing is owed: no admin may grant it by hand.
+    await tx.stripeWebhookEvent.updateMany({
+      where: { id: unfulfilledId(checkoutSessionId), processedAt: null },
+      data: { processedAt: new Date() },
     });
     return;
   }
-  const existing = await prisma.stripeWebhookEvent.findUnique({ where: { id } });
+  const existing = await tx.stripeWebhookEvent.findUnique({ where: { id } });
   if (!existing) {
-    await prisma.stripeWebhookEvent.create({ data: { id, type, processedAt: eventAt } });
+    await tx.stripeWebhookEvent.create({ data: { id, type, processedAt: eventAt } });
     return;
   }
   if (existing.type === DISPUTE_WON_TYPE) {
     const wonAt = existing.processedAt;
     if (wonAt && wonAt.getTime() >= eventAt.getTime()) return; // stale dispute-created
-    await prisma.stripeWebhookEvent.updateMany({
+    await tx.stripeWebhookEvent.updateMany({
       where: { id, type: DISPUTE_WON_TYPE },
       data: { type, processedAt: eventAt },
     });
@@ -106,13 +106,14 @@ export async function recordCheckoutPaymentReversed(
  * leaves a tombstone carrying the event time, which a delayed dispute-created event respects.
  */
 export async function clearDisputedCheckoutReversal(
+  tx: Prisma.TransactionClient,
   checkoutSessionId: string,
   eventAt: Date,
 ): Promise<void> {
   const id = reversalId(checkoutSessionId);
-  const existing = await prisma.stripeWebhookEvent.findUnique({ where: { id } });
+  const existing = await tx.stripeWebhookEvent.findUnique({ where: { id } });
   if (!existing) {
-    await prisma.stripeWebhookEvent.create({
+    await tx.stripeWebhookEvent.create({
       data: { id, type: DISPUTE_WON_TYPE, processedAt: eventAt },
     });
     return;
@@ -120,15 +121,18 @@ export async function clearDisputedCheckoutReversal(
   if (existing.type === `${REVERSED_TYPE_PREFIX}disputed` || existing.type === DISPUTE_WON_TYPE) {
     const markedAt = existing.processedAt;
     if (markedAt && markedAt.getTime() > eventAt.getTime()) return; // a newer dispute stands
-    await prisma.stripeWebhookEvent.updateMany({
+    await tx.stripeWebhookEvent.updateMany({
       where: { id, type: existing.type },
       data: { type: DISPUTE_WON_TYPE, processedAt: eventAt },
     });
   }
 }
 
-export async function isCheckoutPaymentReversed(checkoutSessionId: string): Promise<boolean> {
-  const row = await prisma.stripeWebhookEvent.findUnique({
+export async function isCheckoutPaymentReversed(
+  db: Prisma.TransactionClient | typeof prisma,
+  checkoutSessionId: string,
+): Promise<boolean> {
+  const row = await db.stripeWebhookEvent.findUnique({
     where: { id: reversalId(checkoutSessionId) },
   });
   return Boolean(row && row.type.startsWith(REVERSED_TYPE_PREFIX));

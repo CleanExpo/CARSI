@@ -8,6 +8,7 @@ import {
   getLessonContextForStudent,
   patchLessonProgress,
 } from '@/lib/server/enrollment-service';
+import { EnrollmentLockRefusal } from '@/lib/server/enrollment-row-lock';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 
 type Ctx = { params: Promise<{ lessonId: string }> };
@@ -91,6 +92,14 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
       return NextResponse.json(
         { detail: e.message, code: 'quiz_not_passed' },
         { status: 409, headers: { 'Cache-Control': 'no-store' } },
+      );
+    }
+    // GP-432: the enrolment was revoked or refunded after the access check above; the lock
+    // refused the write and nothing was recorded.
+    if (e instanceof EnrollmentLockRefusal) {
+      return NextResponse.json(
+        { detail: 'Lesson not found or access denied' },
+        { status: 403, headers: { 'Cache-Control': 'no-store' } },
       );
     }
     throw e;

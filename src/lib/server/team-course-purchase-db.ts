@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto';
-
 import { prisma } from '@/lib/prisma';
 
 export type TeamCoursePurchaseRecord = {
@@ -70,74 +68,6 @@ export async function findTeamCoursePurchasesByTeamId(
     ORDER BY purchased_at ASC
   `;
   return rows.map(mapRaw);
-}
-
-export async function findTeamCoursePurchaseByPaymentReference(
-  paymentReference: string,
-): Promise<TeamCoursePurchaseRecord | null> {
-  const ref = paymentReference.trim();
-  if (!ref) return null;
-
-  if (purchaseDelegateAvailable()) {
-    const row = await prisma.lmsTeamCoursePurchase.findFirst({
-      where: { paymentReference: ref },
-    });
-    if (!row) return null;
-    return {
-      id: row.id,
-      teamId: row.teamId,
-      courseSlug: row.courseSlug,
-      seatLimit: row.seatLimit,
-      paymentReference: row.paymentReference,
-      purchasedAt: row.purchasedAt,
-    };
-  }
-
-  const rows = await prisma.$queryRaw<
-    {
-      id: string;
-      team_id: string;
-      course_slug: string;
-      seat_limit: number;
-      payment_reference: string | null;
-      purchased_at: Date;
-    }[]
-  >`
-    SELECT id, team_id, course_slug, seat_limit, payment_reference, purchased_at
-    FROM lms_team_course_purchases
-    WHERE payment_reference = ${ref}
-    LIMIT 1
-  `;
-  const row = rows[0];
-  return row ? mapRaw(row) : null;
-}
-
-export async function insertTeamCoursePurchase(params: {
-  teamId: string;
-  courseSlug: string;
-  seatLimit: number;
-  paymentReference?: string;
-}): Promise<void> {
-  const slug = params.courseSlug.trim().toLowerCase();
-  const ref = params.paymentReference?.trim() || null;
-  const id = randomUUID();
-
-  if (purchaseDelegateAvailable()) {
-    await prisma.lmsTeamCoursePurchase.create({
-      data: {
-        teamId: params.teamId,
-        courseSlug: slug,
-        seatLimit: params.seatLimit,
-        paymentReference: ref,
-      },
-    });
-    return;
-  }
-
-  await prisma.$executeRaw`
-    INSERT INTO lms_team_course_purchases (id, team_id, course_slug, seat_limit, payment_reference, purchased_at)
-    VALUES (${id}::uuid, ${params.teamId}::uuid, ${slug}, ${params.seatLimit}, ${ref}, NOW())
-  `;
 }
 
 export async function sumTeamCoursePurchaseSeats(teamId: string): Promise<number> {

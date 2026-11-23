@@ -1,21 +1,48 @@
 import type { Prisma } from '@/generated/prisma/client';
-import { isRevokedStatus } from '@/lib/server/enrollment-access';
+import { isEnrolmentAccessAllowed, isRevokedStatus } from '@/lib/server/enrollment-access';
 
 /**
- * GP-432: the one owner of "lock this enrolment before changing the learner's record".
+ * GP-432: the ONE owner of "lock this enrolment, re-check it, then change the learner's record".
  *
- * Every admin action that changes a learner's record for one enrolment (force-complete, quiz
- * attempt reset, admin revoke) calls this first, inside its own transaction. The row lock
- * (SELECT ... FOR UPDATE) makes those actions and a revocation take turns: whichever locks
- * first finishes, and the other then sees its committed result. A plain read under READ
- * COMMITTED cannot do that: a revocation could commit between the read and the writes, and
- * the action would then change a revoked record (found by the GP-432 verdict review).
+ * Every writer of a learner-record row for one enrolment (lesson progress, quiz attempts,
+ * practical submissions, the completion decision, admin force-complete, quiz-attempt reset,
+ * admin revoke) runs its writes inside withLockedEnrollment. It takes the row lock
+ * (SELECT ... FOR UPDATE), then checks the LOCKED row against the caller's rule, and only then
+ * runs the writes. A revocation either committed before the lock (and is refused here) or waits
+ * until the writes commit.
  *
- * The Stripe revocation is a single UPDATE on the same row, so it waits on this lock too.
+ * Why one owner (GP-432 review rounds 1 and 2, one defect kind: "decided on state read before
+ * the enrolment lock, acted on after it"): when the lock returned a row each caller was free to
+ * ignore, each writer re-checked (or forgot to re-check) on its own, and a decision made from a
+ * read taken before the lock was acted on after it. Here the check cannot be skipped: the
+ * callback never runs unless the locked row passes. The raw lock is not exported; a static guard
+ * (gp-432-completion-gate.test.ts) refuses any other module that takes the lock itself.
  */
 export type LockedEnrollment = { id: string; studentId: string; courseId: string; status: string };
 
-export async function lockEnrollmentRow(
+/**
+ * What the locked row must satisfy before the writes run.
+ *  - 'access'       learner writes: the status must grant access (isEnrolmentAccessAllowed, the
+ *                   same predicate every learner read gate uses).
+ *  - 'admin-change' admin writes and the completion decision: anything but a revoked/refunded
+ *                   row (isRevokedStatus).
+ *  - 'revoke'       admin revoke: the row only has to exist.
+ */
+export type EnrollmentLockRule = 'access' | 'admin-change' | 'revoke';
+
+export type EnrollmentLockRefusalCode = 'ENROLLMENT_NOT_FOUND' | 'ENROLLMENT_REVOKED' | 'ENROLLMENT_NO_ACCESS';
+
+/** Thrown before any write. `message` is the code, so existing string checks keep working. */
+export class EnrollmentLockRefusal extends Error {
+  readonly code: EnrollmentLockRefusalCode;
+  constructor(code: EnrollmentLockRefusalCode) {
+    super(code);
+    this.name = 'EnrollmentLockRefusal';
+    this.code = code;
+  }
+}
+
+async function lockEnrollmentRow(
   tx: Prisma.TransactionClient,
   enrollmentId: string,
 ): Promise<LockedEnrollment | null> {
@@ -25,16 +52,35 @@ export async function lockEnrollmentRow(
   return rows[0] ?? null;
 }
 
+/** The rule check on the locked row. Exported for its unit tests only. */
+export function enrollmentLockRefusal(
+  row: LockedEnrollment | null,
+  params: { studentId?: string; require: EnrollmentLockRule },
+): EnrollmentLockRefusalCode | null {
+  if (!row) return 'ENROLLMENT_NOT_FOUND';
+  // Another learner's enrolment is "not found", never a hint that it exists.
+  if (params.studentId !== undefined && row.studentId !== params.studentId) return 'ENROLLMENT_NOT_FOUND';
+  if (params.require === 'access') {
+    return isEnrolmentAccessAllowed(row.status) ? null : 'ENROLLMENT_NO_ACCESS';
+  }
+  if (params.require === 'admin-change') {
+    return isRevokedStatus(row.status) ? 'ENROLLMENT_REVOKED' : null;
+  }
+  return null;
+}
+
 /**
- * Lock the enrolment and refuse a missing or revoked one. Throws ENROLLMENT_NOT_FOUND or
- * ENROLLMENT_REVOKED; the caller's routes map them to 404 and 409.
+ * Lock the enrolment row, check it against `require` (and ownership when `studentId` is given),
+ * then run `fn` with the locked row, all inside the caller's transaction `tx`. Throws
+ * EnrollmentLockRefusal before `fn` runs when the check fails.
  */
-export async function lockEnrollmentForAdminChange(
+export async function withLockedEnrollment<T>(
   tx: Prisma.TransactionClient,
-  enrollmentId: string,
-): Promise<LockedEnrollment> {
-  const row = await lockEnrollmentRow(tx, enrollmentId);
-  if (!row) throw new Error('ENROLLMENT_NOT_FOUND');
-  if (isRevokedStatus(row.status)) throw new Error('ENROLLMENT_REVOKED');
-  return row;
+  params: { enrollmentId: string; studentId?: string; require: EnrollmentLockRule },
+  fn: (row: LockedEnrollment) => Promise<T>,
+): Promise<T> {
+  const row = await lockEnrollmentRow(tx, params.enrollmentId);
+  const refusal = enrollmentLockRefusal(row, params);
+  if (refusal) throw new EnrollmentLockRefusal(refusal);
+  return fn(row!);
 }

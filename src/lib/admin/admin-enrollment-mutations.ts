@@ -11,7 +11,7 @@ import {
 import type { AdminSessionProvenance } from '@/lib/server/current-admin';
 import { forceCompleteEnrollment } from '@/lib/server/enrollment-service';
 import { isRevokedStatus } from '@/lib/server/enrollment-access';
-import { lockEnrollmentRow } from '@/lib/server/enrollment-row-lock';
+import { withLockedEnrollment } from '@/lib/server/enrollment-row-lock';
 
 function isWorkbookInfrastructureError(message: string): boolean {
   const m = message.toLowerCase();
@@ -146,19 +146,20 @@ export async function adminRevokeEnrollment(enrollmentId: string) {
   // GP-432: lock the enrolment row first (one owner: enrollment-row-lock.ts). An admin
   // force-complete or quiz reset holding the lock finishes before this deletes progress, so
   // its lesson writes cannot survive the revocation.
-  await prisma.$transaction(async (tx) => {
-    if (!(await lockEnrollmentRow(tx, en.id))) throw new Error('ENROLLMENT_NOT_FOUND');
-    await tx.lmsLessonProgress.deleteMany({
-      where: {
-        studentId: en.studentId,
-        lessonId: { in: lessonIds.map((l) => l.id) },
-      },
-    });
-    await tx.lmsEnrollment.update({
-      where: { id: en.id },
-      data: { status: 'revoked', certificateIssuedAt: null, completedAt: null },
-    });
-  });
+  await prisma.$transaction((tx) =>
+    withLockedEnrollment(tx, { enrollmentId: en.id, require: 'revoke' }, async () => {
+      await tx.lmsLessonProgress.deleteMany({
+        where: {
+          studentId: en.studentId,
+          lessonId: { in: lessonIds.map((l) => l.id) },
+        },
+      });
+      await tx.lmsEnrollment.update({
+        where: { id: en.id },
+        data: { status: 'revoked', certificateIssuedAt: null, completedAt: null },
+      });
+    }),
+  );
 }
 
 export type AdminBulkCompleteRow = {

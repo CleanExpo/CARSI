@@ -62,15 +62,31 @@ vi.mock('@/lib/prisma', () => ({
     lmsPracticalAssessment: { findMany: vi.fn(async () => []) },
     lmsAssessmentSubmission: { findMany: vi.fn(async () => []) },
     lmsQuizAttempt: { findMany: vi.fn(async () => []) },
-    // Row lock (enrollment-row-lock.ts): the sync reads the prior status after it, via findUnique.
-    $queryRaw: async () => [{ id: "locked-row" }],
+    // Row lock (enrollment-row-lock.ts#withLockedEnrollment): answers with the enrolment row as
+    // the database would, so the owner's ownership and status checks run on real state.
+    $queryRaw: async () =>
+      state.enrollment
+        ? [{ id: (state.enrollment as { id: string }).id, studentId: 'stu', courseId: 'course', status: (state.enrollment as { status: string }).status }]
+        : [],
     async $transaction(fn: (tx: unknown) => Promise<unknown>) {
       return fn(this);
     },
   },
 }));
 
-const { enrollStudentInCourse, syncEnrollmentCompletion } = await import('./enrollment-service');
+const enrolmentService = await import('./enrollment-service');
+const { prisma: prismaForSeatWrites } = await import('@/lib/prisma');
+// GP-759: `cs_*` and `team:*` enrolments are issued only inside the seat step (seat-state.ts).
+// These tests check the shared writer's row rules, so for those references they call its two
+// halves (prepare, then issue on a client) the way the step does; other references go through
+// enrollStudentInCourse as production does.
+const enrollStudentInCourse: typeof enrolmentService.enrollStudentInCourse = (claims, slug, ref, options) =>
+  enrolmentService.isSeatStatePaymentReference(ref)
+    ? enrolmentService
+        .prepareEnrolment(claims, slug, ref, options)
+        .then((prepared) => enrolmentService.issuePreparedEnrolment(prismaForSeatWrites as never, prepared))
+    : enrolmentService.enrollStudentInCourse(claims, slug, ref, options);
+const { syncEnrollmentCompletion } = enrolmentService;
 
 const learner: SessionClaims = { sub: 'stu', email: 'a@example.com', full_name: 'A', role: 'student' };
 

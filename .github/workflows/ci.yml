@@ -253,6 +253,12 @@ jobs:
       - name: Agent rule entry-point self-test
         run: npm run test:agent-doc-paths
 
+      # Phill, 23/11/2026: CARSI merges are his only. Cloud sessions load hooks from this
+      # checkout, so .claude/hooks/founder-merge-only.mjs refuses `gh pr ready` (except a
+      # plain --undo) and `gh pr merge`; its tests include mutants that drop each check.
+      - name: Founder-only merge hook self-test
+        run: npm run test:founder-merge-hook
+
       # GP-750: the consent proof's checks must not pass vacuously. A library request that
       # failed (proxy refusal), a non-2xx or an empty body must not satisfy B1, and a run where
       # the library never loaded must report BLOCKED (exit 3) instead of passing B4 and C1.

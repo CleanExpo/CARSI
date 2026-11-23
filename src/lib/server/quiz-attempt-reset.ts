@@ -1,7 +1,7 @@
 import { runSerializable } from '@/lib/server/db-tx';
 import { requireCurrentAdmin, type AdminSessionProvenance } from '@/lib/server/current-admin';
 import { ADMIN_AUDIT_REASON_MAX } from '@/lib/server/enrollment-service';
-import { lockEnrollmentForAdminChange } from '@/lib/server/enrollment-row-lock';
+import { withLockedEnrollment } from '@/lib/server/enrollment-row-lock';
 
 /**
  * Admin-only: give a learner fresh attempts on a course's quizzes (GP-432). Without this a
@@ -29,46 +29,51 @@ export async function resetQuizAttemptsForEnrollment(params: {
   return runSerializable(async (tx) => {
     const admin = await requireCurrentAdmin(tx, params.session);
 
-    // Locked, and refused when missing or revoked (one owner: enrollment-row-lock.ts).
-    const enrollment = await lockEnrollmentForAdminChange(tx, params.enrollmentId);
+    // Locked, and refused when missing or revoked (one owner: enrollment-row-lock.ts); the
+    // void and the audit row run only inside the owner, on the checked row.
+    return withLockedEnrollment(
+      tx,
+      { enrollmentId: params.enrollmentId, require: 'admin-change' },
+      async (enrollment) => {
+        const courseQuizIds = (
+          await tx.lmsQuiz.findMany({ where: { courseId: enrollment.courseId }, select: { id: true } })
+        ).map((q) => q.id);
+        let quizIds = courseQuizIds;
+        if (params.quizId) {
+          if (!courseQuizIds.includes(params.quizId)) throw new Error('QUIZ_NOT_FOUND');
+          quizIds = [params.quizId];
+        }
+        if (quizIds.length === 0) return { voided: 0, quizIds };
 
-    const courseQuizIds = (
-      await tx.lmsQuiz.findMany({ where: { courseId: enrollment.courseId }, select: { id: true } })
-    ).map((q) => q.id);
-    let quizIds = courseQuizIds;
-    if (params.quizId) {
-      if (!courseQuizIds.includes(params.quizId)) throw new Error('QUIZ_NOT_FOUND');
-      quizIds = [params.quizId];
-    }
-    if (quizIds.length === 0) return { voided: 0, quizIds };
+        const failed = await tx.lmsQuizAttempt.findMany({
+          where: { quizId: { in: quizIds }, studentId: enrollment.studentId, passed: false, voidedAt: null },
+          select: { id: true },
+          orderBy: { createdAt: 'asc' },
+        });
+        if (failed.length === 0) return { voided: 0, quizIds };
 
-    const failed = await tx.lmsQuizAttempt.findMany({
-      where: { quizId: { in: quizIds }, studentId: enrollment.studentId, passed: false, voidedAt: null },
-      select: { id: true },
-      orderBy: { createdAt: 'asc' },
-    });
-    if (failed.length === 0) return { voided: 0, quizIds };
+        const attemptIds = failed.map((a) => a.id);
+        const { count } = await tx.lmsQuizAttempt.updateMany({
+          where: { id: { in: attemptIds }, studentId: enrollment.studentId, passed: false, voidedAt: null },
+          data: { voidedAt: new Date() },
+        });
 
-    const attemptIds = failed.map((a) => a.id);
-    const { count } = await tx.lmsQuizAttempt.updateMany({
-      where: { id: { in: attemptIds }, studentId: enrollment.studentId, passed: false, voidedAt: null },
-      data: { voidedAt: new Date() },
-    });
+        await tx.lmsLearnerAdminAuditEvent.create({
+          data: {
+            action: 'quiz_attempts_reset',
+            reason,
+            actorKind: admin.kind,
+            actorRef: admin.ref,
+            actorEmail: admin.email,
+            studentRef: enrollment.studentId,
+            enrollmentRef: enrollment.id,
+            courseRef: enrollment.courseId,
+            details: { quizIds, voidedAttemptIds: attemptIds },
+          },
+        });
 
-    await tx.lmsLearnerAdminAuditEvent.create({
-      data: {
-        action: 'quiz_attempts_reset',
-        reason,
-        actorKind: admin.kind,
-        actorRef: admin.ref,
-        actorEmail: admin.email,
-        studentRef: enrollment.studentId,
-        enrollmentRef: enrollment.id,
-        courseRef: enrollment.courseId,
-        details: { quizIds, voidedAttemptIds: attemptIds },
+        return { voided: count, quizIds };
       },
-    });
-
-    return { voided: count, quizIds };
+    );
   });
 }

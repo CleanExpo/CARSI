@@ -2,10 +2,13 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
-import { runSerializable } from '@/lib/server/db-tx';
+import {
+  issueTeamMemberSeat,
+  prepareTeamMemberSeat,
+  runSeatStateStep,
+  teamHasRoomForNewMember,
+} from '@/lib/server/seat-state';
 import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
-import { enrollTeamMemberInPurchasedCourse } from '@/lib/server/team-course-purchase';
-import { countTeamPaidSeatsUsed } from '@/lib/server/team-seat-refund';
 
 /** POST /api/lms/teams/invite/accept — accept invite token. */
 export async function POST(request: NextRequest) {
@@ -56,41 +59,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Enforce the PAID seat limit for Teams subscription teams (E2, GP-442); the
-    // 6th acceptance on a 5-seat plan is rejected (spec §15 #4). Other teams use
-    // the team.seatLimit column.
-    const teamSub =
-      invite.team.bundleTier === 'teams_subscription'
-        ? await prisma.lmsTeamSubscription.findUnique({ where: { teamId: invite.teamId } })
-        : null;
-    const effectiveSeatLimit = teamSub ? teamSub.seatLimit : invite.team.seatLimit;
-
-    // The seat-limit guard and the member insert MUST be atomic. A plain
-    // count()-then-insert() is a TOCTOU race: two concurrent acceptances on the
-    // last free seat both read the same count, both pass the guard, and both
-    // insert — putting member rows past the paid seat limit (the sibling
-    // count-then-create in the quiz-attempt route hit the same class of bug).
-    // SERIALIZABLE isolation makes Postgres detect the read/write conflict and
-    // abort all but one racer (retried by runSerializable), so the (seatLimit+1)th
-    // concurrent acceptance is rejected here with the same 409 + seat-expansion
-    // path the non-concurrent over-limit case returns. The invite is consumed in
-    // the same transaction, so it is only marked accepted when the member is
-    // actually seated. An already-seated member (idempotent re-accept) does not
-    // consume a fresh seat.
-    const result = await runSerializable(async (tx) => {
+    // Teams SUBSCRIPTION teams (E2, GP-442) enforce the paid `LmsTeamSubscription.seatLimit`
+    // (a 6th acceptance on a 5-seat plan is rejected, spec §15 #4); course-purchase teams count
+    // only seats they paid for (GP-759); other teams count members.
+    //
+    // GP-759 (Phill, 23/11/2026): the seat checks and every write run in the one seat step, a
+    // SERIALIZABLE transaction (seat-state.ts). Two acceptances, or an acceptance and a direct
+    // invite, at the last seat cannot both commit: one is retried, sees the seat taken and gets
+    // the same 409. The course seat is issued before the member row and the invite, so a member
+    // with no paid seat is not left on the team and keeps the invite. An already-seated member
+    // (idempotent re-accept) does not use a fresh team seat.
+    const isSubscriptionTeam = invite.team.bundleTier === 'teams_subscription';
+    const seat = await prepareTeamMemberSeat(claims.sub, invite.teamId);
+    const result = await runSeatStateStep(async (tx) => {
       const existing = await tx.lmsTeamMember.findUnique({
         where: { teamId_userId: { teamId: invite.teamId, userId: claims.sub } },
         select: { userId: true },
       });
-      if (!existing) {
-        // GP-759: a course-purchase team counts only seats it paid for (one owner,
-        // teamPaidSeatHolders); other teams count members as before.
-        const paidSeatsUsed = teamSub ? null : await countTeamPaidSeatsUsed(tx, invite.teamId);
-        const seatsUsed =
-          paidSeatsUsed ?? (await tx.lmsTeamMember.count({ where: { teamId: invite.teamId } }));
-        if (seatsUsed >= effectiveSeatLimit) {
-          return { seatFull: true as const };
-        }
+      if (!existing && !(await teamHasRoomForNewMember(tx, invite.teamId))) {
+        return { seatFull: true as const };
+      }
+      if (seat && (await issueTeamMemberSeat(tx, seat)) === 'no_seat') {
+        return { seatFull: true as const };
       }
 
       await tx.lmsTeamMember.upsert({
@@ -113,7 +103,7 @@ export async function POST(request: NextRequest) {
 
     if (result.seatFull) {
       return NextResponse.json(
-        teamSub
+        isSubscriptionTeam
           ? {
               detail: 'This team has no seats left. Ask the owner to add seats.',
               reason: 'seat_full',
@@ -121,12 +111,6 @@ export async function POST(request: NextRequest) {
           : { detail: 'Team is full' },
         { status: 409 },
       );
-    }
-
-    try {
-      await enrollTeamMemberInPurchasedCourse(claims.sub, invite.teamId);
-    } catch (enrollErr) {
-      console.error('[teams/invite/accept] enrol', enrollErr);
     }
 
     return NextResponse.json({

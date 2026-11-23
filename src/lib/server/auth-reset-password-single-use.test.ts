@@ -78,7 +78,6 @@ vi.mock('@/lib/prisma', () => ({
 
 const { POST: reset } = await import('../../../app/api/auth/reset-password/route');
 const { getSessionClaimsFromRequest } = await import('@/lib/server/auth-from-request');
-const { __clearActiveCache } = await import('@/lib/server/user-active-cache');
 
 const nowSec = () => Math.floor(Date.now() / 1000);
 
@@ -117,7 +116,6 @@ function withSession(token: string) {
 beforeEach(() => {
   vi.stubEnv('DATABASE_URL', 'postgres://configured');
   row.current = { isActive: true, hashedPassword: 'x', isVerified: false, sessionGeneration: 0 };
-  __clearActiveCache();
   vi.spyOn(console, 'error').mockImplementation(() => {});
   vi.spyOn(console, 'warn').mockImplementation(() => {});
 });

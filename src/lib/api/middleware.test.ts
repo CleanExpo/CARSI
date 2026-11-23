@@ -53,3 +53,47 @@ describe('updateSession keeps the session sentinel in step with the verified ses
     expect(response.cookies.get('auth_token')?.value).toBe('');
   });
 });
+
+/**
+ * GP-760 review (f512fd90, P1): the edge checks only the token signature, so it cannot know that the
+ * server has ended a session (a password reset bumps the session generation). A server reader that
+ * refuses the cookie sends the browser to /login; if the edge then sends a signed cookie away from
+ * /login, the two redirect into each other forever, and a signed-in user cannot open a reset link.
+ * So the edge never sends a request away from an auth page on the signature alone.
+ */
+describe('updateSession never traps a signed cookie the server may have ended', () => {
+  function pageRequest(path: string) {
+    return new NextRequest(`https://carsi.com.au${path}`, {
+      headers: { cookie: `auth_token=${token}` },
+    });
+  }
+
+  it.each([
+    '/login',
+    '/login?next=/dashboard/coaching',
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+    '/reset-password?token=abc',
+  ])('lets a signed cookie through to %s', async (path) => {
+    const response = await updateSession(pageRequest(path));
+    expect(response.headers.get('location')).toBeNull();
+    expect(response.headers.get('x-middleware-next')).toBe('1');
+  });
+
+  it('does not loop: the coaching layout redirect target renders, and coaching itself passes the edge', async () => {
+    // The coaching layout (server) refuses an ended session and redirects here.
+    const login = await updateSession(pageRequest('/login?next=/dashboard/coaching'));
+    expect(login.headers.get('location')).toBeNull();
+    // The edge itself still lets a signed cookie reach the protected page (the server decides).
+    const coaching = await updateSession(pageRequest('/dashboard/coaching'));
+    expect(coaching.headers.get('location')).toBeNull();
+  });
+
+  it('still sends an unsigned request for a protected page to /login', async () => {
+    const response = await updateSession(new NextRequest('https://carsi.com.au/dashboard/coaching'));
+    const location = new URL(response.headers.get('location')!);
+    expect(location.pathname).toBe('/login');
+    expect(location.searchParams.get('next')).toBe('/dashboard/coaching');
+  });
+});

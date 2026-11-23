@@ -97,8 +97,12 @@ vi.mock('@/lib/prisma', () => ({
         state.passedPracticalIds.map((assessmentId) => ({ assessmentId })),
       ),
     },
-    // Row lock (enrollment-row-lock.ts): the sync reads the prior status after it, via findUnique.
-    $queryRaw: async () => [{ id: "locked-row" }],
+    // Row lock (enrollment-row-lock.ts#withLockedEnrollment): answers with the enrolment row as
+    // the database would, so the owner's ownership and status checks run on real state.
+    $queryRaw: async () =>
+      state.enrollment
+        ? [{ id: (state.enrollment as { id: string }).id, studentId: (state.enrollment as { studentId?: string }).studentId, courseId: 'course', status: (state.enrollment as { status: string }).status }]
+        : [],
     async $transaction(fn: (tx: unknown) => Promise<unknown>) {
       const before = state.enrollment && { ...state.enrollment };
       try {
@@ -298,6 +302,53 @@ describe('GP-432 path 2: the browser cannot mark a quiz lesson complete', () => 
 
     expect(state.progressWrites).toEqual([{ lessonId: 'quiz-lesson', completed: false }]);
   });
+
+  // GP-432 round-2 finding: the route's access check runs before the lock, so a revocation can
+  // commit in between. The lock now sees the revoked row and the write is refused.
+  it.each(['revoked', 'refunded'])(
+    'an enrolment %s by the time of the lock is refused and no progress is written',
+    async (status) => {
+      reset({
+        enrollment: { ...activeEnrollment('course-plain'), status },
+        courseSlug: PLAIN_SLUG,
+        lessonIds: ['reading-lesson'],
+        lesson: { contentType: 'text', contentBody: 'Read me', resources: null },
+      });
+
+      await expect(
+        patchLessonProgress({
+          studentId: 'student-1',
+          lessonId: 'reading-lesson',
+          enrollmentId: 'enr-1',
+          courseId: 'course-plain',
+          completed: false,
+        }),
+      ).rejects.toMatchObject({ name: 'EnrollmentLockRefusal', code: 'ENROLLMENT_NO_ACCESS' });
+
+      expect(state.progressWrites).toEqual([]);
+      expect(state.enrollment?.status).toBe(status);
+    },
+  );
+
+  it("another learner's enrolment is refused at the lock and no progress is written", async () => {
+    reset({
+      enrollment: { ...activeEnrollment('course-plain'), studentId: 'someone-else' },
+      courseSlug: PLAIN_SLUG,
+      lessonIds: ['reading-lesson'],
+      lesson: { contentType: 'text', contentBody: 'Read me', resources: null },
+    });
+
+    await expect(
+      patchLessonProgress({
+        studentId: 'student-1',
+        lessonId: 'reading-lesson',
+        enrollmentId: 'enr-1',
+        courseId: 'course-plain',
+        completed: false,
+      }),
+    ).rejects.toMatchObject({ code: 'ENROLLMENT_NOT_FOUND' });
+    expect(state.progressWrites).toEqual([]);
+  });
 });
 
 describe('GP-432 path 3: a published practical assessment gates completion', () => {
@@ -483,11 +534,11 @@ const STATUS_WRITER_ALLOW = new Map<string, StatusWriterHow>([
   [`${join('src', 'lib', 'server', 'ccw-attendance', 'provision.ts')}#finalizeAttendanceForSignIn`, 'guarded'],
   // Re-purchase after a refund: runs only after a verified payment and sets 'active', which is
   // the intended result whatever the row held; unchanged by GP-432.
-  [`${join('src', 'lib', 'server', 'enrollment-service.ts')}#enrollStudentInCourse`, 'limit'],
+  [`${join('src', 'lib', 'server', 'enrollment-service.ts')}#writeEnrolmentRow`, 'limit'],
   [`${join('src', 'lib', 'server', 'enrollment-service.ts')}#ensureAdminEnrollmentForCourse`, 'new-row'],
   [`${join('src', 'lib', 'server', 'enrollment-service.ts')}#reactivateStaffEnrollment`, 'guarded'],
   // GP-759 (#1258): a team-seat refund revokes the seats it sold, filtered on their status.
-  [`${join('src', 'lib', 'server', 'team-seat-refund.ts')}#revokeTeamSeatBlocksForRefund`, 'guarded'],
+  [`${join('src', 'lib', 'server', 'seat-state.ts')}#revokeSeatBlocksForRefund`, 'guarded'],
   [`${join('src', 'lib', 'admin', 'admin-enrollment-mutations.ts')}#adminGrantEnrollment`, 'new-row'],
 ]);
 
@@ -511,14 +562,13 @@ function statusWrites(text: string): { fn: string; how: StatusWriterHow | 'unsaf
     const data = withoutFilters(call);
     const setsStatus = /\bstatus\s*:/.test(data) || /\bSET\b[\s\S]*\bstatus\s*=/i.test(data);
     if (!setsStatus) continue;
-    const { name, start } = enclosingFunction(text, at);
-    const before = text.slice(start, at);
+    const { name } = enclosingFunction(text, at);
     const isNewRow =
       /\.\s*(create|createMany)\s*\(|INSERT\s+INTO/i.test(m[0]) ||
       (/\.\s*upsert\s*\(/.test(m[0]) && /\bupdate\s*:\s*\{\s*\}/.test(call));
     let how: StatusWriterHow | 'unsafe' = 'unsafe';
     if (isNewRow) how = 'new-row';
-    else if (/\block(EnrollmentRow|EnrollmentForAdminChange)\s*\(/.test(before)) how = 'locks';
+    else if (insideLockedCallback(text, at)) how = 'locks';
     else if (/\.\s*updateMany\s*\(/.test(m[0]) && /\bwhere\s*:\s*\{[\s\S]*\bstatus\b/.test(call)) how = 'guarded';
     else if (/^UPDATE/i.test(m[0]) && /\bWHERE\b[\s\S]*\bstatus\b/i.test(call)) how = 'guarded';
     out.push({ fn: name, how });
@@ -579,8 +629,9 @@ describe('GP-432 design guard: every enrolment status writer is safe against a r
 
   it('negative controls: a locked write, a guarded updateMany and a raw guarded UPDATE are recognised', () => {
     const src = `export async function a(tx, id) {
-      await lockEnrollmentRow(tx, id);
-      await tx.lmsEnrollment.update({ where: { id }, data: { status: 'active' } });
+      await withLockedEnrollment(tx, { enrollmentId: id, require: 'admin-change' }, async () => {
+        await tx.lmsEnrollment.update({ where: { id }, data: { status: 'active' } });
+      });
     }
     export async function b(id) {
       await prisma.lmsEnrollment.updateMany({ where: { id, status: 'active' }, data: { status: 'revoked' } });
@@ -596,6 +647,160 @@ describe('GP-432 design guard: every enrolment status writer is safe against a r
   });
 });
 
+// ---------------------------------------------------------------------------------------------
+// GP-432 design guard, one owner for "lock, re-check, then write" (review rounds 1 and 2 found
+// one kind twice: "decided on state read before the enrolment lock, acted on after it").
+// enrollment-row-lock.ts#withLockedEnrollment takes the lock, checks the LOCKED row against the
+// caller's rule and only then runs the callback. So:
+//   1. nothing outside the owner takes the enrolment row lock itself (allow-list below);
+//   2. every write to a learner-record table (lesson progress, quiz attempts, practical
+//      submissions) sits lexically INSIDE a withLockedEnrollment(...) call, in a listed writer.
+// ---------------------------------------------------------------------------------------------
+
+const OWNER_FILE = join('src', 'lib', 'server', 'enrollment-row-lock.ts');
+
+/** Spans [start, end) of every withLockedEnrollment(...) call in `text`. */
+function lockedCallbackSpans(text: string): Array<[number, number]> {
+  const spans: Array<[number, number]> = [];
+  for (const m of text.matchAll(/\bwithLockedEnrollment\s*\(/g)) {
+    const start = m.index ?? 0;
+    spans.push([start, start + callText(text, start).length]);
+  }
+  return spans;
+}
+
+function insideLockedCallback(text: string, offset: number): boolean {
+  return lockedCallbackSpans(text).some(([s, e]) => offset > s && offset < e);
+}
+
+// Taking the lock directly: the internal helper names, or raw SQL locking lms_enrollments.
+const RAW_LOCK =
+  /\block(EnrollmentRow|EnrollmentForAdminChange)\s*\(|\blms_enrollments\b[^`]*?\bFOR\s+(UPDATE|NO\s+KEY\s+UPDATE|SHARE)\b/gi;
+const LOCK_TAKER_ALLOW = new Map<string, string>([
+  [OWNER_FILE, 'the owner'],
+  // The checkpoint graph read locks the lesson, module, course and enrolment rows in one
+  // statement with the access filter; every checkpoint read and save then runs inside
+  // withLockedEnrollment, which re-checks the locked row.
+  [join('src', 'lib', 'server', 'lesson-checkpoint.ts'), 'graph read lock (FOR UPDATE OF e, c, m, l)'],
+  // Stated limit: a course review is not completion or certificate evidence. upsertReview locks
+  // the enrolment by (student, course) and re-checks it with the same isEnrolmentAccessAllowed
+  // predicate before its one write (release-gate r8).
+  [join('src', 'lib', 'server', 'course-reviews.ts'), 'review write, locks and re-checks access itself'],
+]);
+
+const LEARNER_RECORD_WRITE =
+  /\b(lmsLessonProgress|lmsQuizAttempt|lmsAssessmentSubmission)\s*\.\s*(update|updateMany|upsert|create|createMany|delete|deleteMany)\s*\(|\b(INSERT\s+INTO|UPDATE|DELETE\s+FROM)\s+(lms_lesson_progress|lms_quiz_attempts|lms_assessment_submissions)\b/g;
+const LEARNER_RECORD_WRITERS = new Set<string>([
+  `${join('src', 'lib', 'server', 'enrollment-service.ts')}#forceCompleteEnrollment`,
+  `${join('src', 'lib', 'server', 'enrollment-service.ts')}#touchLessonProgress`,
+  `${join('src', 'lib', 'server', 'enrollment-service.ts')}#patchLessonProgress`,
+  `${join('src', 'lib', 'admin', 'admin-enrollment-mutations.ts')}#adminRevokeEnrollment`,
+  `${join('src', 'lib', 'server', 'quiz-attempt-reset.ts')}#resetQuizAttemptsForEnrollment`,
+  `${join('src', 'lib', 'server', 'lesson-checkpoint.ts')}#transact`,
+  `${join('app', 'api', 'lms', 'quizzes', '[quizId]', 'attempt', 'route.ts')}#submitBound`,
+  `${join('app', 'api', 'lms', 'quizzes', '[quizId]', 'attempt', 'route.ts')}#POST`,
+  `${join('src', 'lib', 'server', 'practical-assessment.ts')}#submitPracticalAssessment`,
+  `${join('src', 'lib', 'server', 'practical-assessment.ts')}#reviewSubmission`,
+]);
+
+function ownerScanFiles(root: string): Array<{ rel: string; text: string }> {
+  const out: Array<{ rel: string; text: string }> = [];
+  const walk = (dir: string) => {
+    for (const name of readdirSync(dir)) {
+      if (name === 'node_modules' || name === 'generated' || name.startsWith('.')) continue;
+      const path = join(dir, name);
+      if (statSync(path).isDirectory()) {
+        walk(path);
+        continue;
+      }
+      if (!/\.(ts|tsx)$/.test(name) || /\.test\.tsx?$/.test(name)) continue;
+      out.push({ rel: relative(root, path), text: readFileSync(path, 'utf8') });
+    }
+  };
+  walk(join(root, 'app'));
+  walk(join(root, 'src'));
+  return out;
+}
+
+function lockTakerProblems(files: Array<{ rel: string; text: string }>): string[] {
+  const problems: string[] = [];
+  for (const { rel, text } of files) {
+    if (LOCK_TAKER_ALLOW.has(rel)) continue;
+    for (const m of text.matchAll(RAW_LOCK)) problems.push(`${rel}@${m.index ?? 0} takes the enrolment lock itself`);
+  }
+  return problems;
+}
+
+function learnerWriteProblems(files: Array<{ rel: string; text: string }>): { problems: string[]; seen: Set<string> } {
+  const problems: string[] = [];
+  const seen = new Set<string>();
+  for (const { rel, text } of files) {
+    for (const m of text.matchAll(LEARNER_RECORD_WRITE)) {
+      const at = m.index ?? 0;
+      const key = `${rel}#${enclosingFunction(text, at).name}`;
+      seen.add(key);
+      if (!LEARNER_RECORD_WRITERS.has(key)) problems.push(`unlisted learner-record writer ${key}`);
+      else if (!insideLockedCallback(text, at)) problems.push(`${key}@${at} writes outside withLockedEnrollment`);
+    }
+  }
+  return { problems, seen };
+}
+
+describe('GP-432 design guard: one owner locks, re-checks and runs every learner-record write', () => {
+  const root = join(__dirname, '..', '..', '..');
+  const files = ownerScanFiles(root);
+
+  it('nothing outside the owner takes the enrolment row lock itself', () => {
+    expect(lockTakerProblems(files)).toEqual([]);
+  });
+
+  it('every learner-record write is inside a withLockedEnrollment call, in a listed writer', () => {
+    const { problems, seen } = learnerWriteProblems(files);
+    expect(problems).toEqual([]);
+    for (const key of LEARNER_RECORD_WRITERS) expect(seen.has(key), `stale listing ${key}`).toBe(true);
+  });
+
+  it('the completion decision is written inside a withLockedEnrollment call', () => {
+    const text = readFileSync(join(root, GATED_WRITER_FILE), 'utf8');
+    const [s, e] = functionSpan(text, 'syncEnrollmentCompletion');
+    const writes = completedWriteOffsets(text).filter((o) => o >= s && o < e);
+    expect(writes.length).toBeGreaterThan(0);
+    for (const o of writes) expect(insideLockedCallback(text, o)).toBe(true);
+  });
+
+  it('positive controls: a direct lock call, a raw lock and a write outside the callback are flagged', () => {
+    const planted = [
+      { rel: 'x.ts', text: 'await lockEnrollmentRow(tx, id);' },
+      { rel: 'y.ts', text: 'await tx.$queryRaw`SELECT 1 FROM lms_enrollments WHERE id = ${id}::uuid FOR UPDATE`;' },
+    ];
+    expect(lockTakerProblems(planted)).toHaveLength(2);
+    const outside = {
+      rel: join('src', 'lib', 'server', 'enrollment-service.ts'),
+      text: `export async function patchLessonProgress(tx, id) {
+        await withLockedEnrollment(tx, { enrollmentId: id, require: 'access' }, async () => {});
+        await tx.lmsLessonProgress.upsert({ where: {}, create: {}, update: {} });
+      }`,
+    };
+    expect(learnerWriteProblems([outside]).problems).toEqual([
+      expect.stringContaining('writes outside withLockedEnrollment'),
+    ]);
+    const unlisted = { rel: 'z.ts', text: 'export async function planted(tx) { await tx.lmsQuizAttempt.create({ data: {} }); }' };
+    expect(learnerWriteProblems([unlisted]).problems).toEqual(['unlisted learner-record writer z.ts#planted']);
+  });
+
+  it('negative control: a write inside the callback of a listed writer passes', () => {
+    const inside = {
+      rel: join('src', 'lib', 'server', 'enrollment-service.ts'),
+      text: `export async function patchLessonProgress(tx, id) {
+        await withLockedEnrollment(tx, { enrollmentId: id, require: 'access' }, async () => {
+          await tx.lmsLessonProgress.upsert({ where: {}, create: {}, update: {} });
+        });
+      }`,
+    };
+    expect(learnerWriteProblems([inside]).problems).toEqual([]);
+  });
+});
+
 describe('GP-432 path 4b: one gated writer of a completed enrolment', () => {
   const root = join(__dirname, '..', '..', '..');
 
@@ -603,27 +808,6 @@ describe('GP-432 path 4b: one gated writer of a completed enrolment', () => {
     expect(completedWriterOffenders(root)).toEqual([]);
   });
 
-  // Design guard (GP-432 verdict rounds 1 and 2 found the same kind twice: a revoked-status
-  // decision made from a read that a revocation could overtake). Every writer of one learner's
-  // enrolment record takes the row lock (enrollment-row-lock.ts) before its first write.
-  it.each([
-    [GATED_WRITER_FILE, 'syncEnrollmentCompletion', 'lockEnrollmentRow('],
-    [GATED_WRITER_FILE, 'forceCompleteEnrollment', 'lockEnrollmentForAdminChange('],
-    [join('src', 'lib', 'server', 'quiz-attempt-reset.ts'), 'resetQuizAttemptsForEnrollment', 'lockEnrollmentForAdminChange('],
-    [join('src', 'lib', 'admin', 'admin-enrollment-mutations.ts'), 'adminRevokeEnrollment', 'lockEnrollmentRow('],
-  ])('%s %s takes the enrolment row lock before its first write', (file, fn, lockCall) => {
-    const text = readFileSync(join(root, file), 'utf8');
-    const [s, e] = functionSpan(text, fn);
-    expect(s, `${fn} not found`).toBeGreaterThan(-1);
-    const body = text.slice(s, e);
-    const lockAt = body.indexOf(lockCall);
-    const firstWrite = body.search(
-      /\.\s*(lmsEnrollment|lmsLessonProgress|lmsQuizAttempt|lmsLearnerAdminAuditEvent)\s*\.\s*(update|updateMany|upsert|create|createMany|delete|deleteMany)\s*\(/,
-    );
-    expect(lockAt, `${fn} does not call ${lockCall}`).toBeGreaterThan(-1);
-    expect(firstWrite, `${fn} has no write to guard`).toBeGreaterThan(-1);
-    expect(lockAt).toBeLessThan(firstWrite);
-  });
 
   it('the gated writer itself is still found (the scan is not blind)', () => {
     const text = readFileSync(join(root, GATED_WRITER_FILE), 'utf8');

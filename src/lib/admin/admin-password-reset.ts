@@ -1,6 +1,6 @@
 import { validateNewPassword } from '@/lib/auth/password-policy';
 import { prisma } from '@/lib/prisma';
-import { hashPassword } from '@/lib/server/lms-auth';
+import { hashPassword, setPasswordEndingSessions } from '@/lib/server/lms-auth';
 import { generateMemberTempPassword } from '@/lib/server/member-temp-password';
 import { sendAdminPasswordResetEmail } from '@/lib/server/transactional-email';
 
@@ -32,11 +32,8 @@ export async function adminResetUserPassword(params: {
   const policyError = validateNewPassword(plainPassword);
   if (policyError) throw new Error('INVALID_PASSWORD');
 
-  const hashedPassword = await hashPassword(plainPassword);
-  await prisma.lmsUser.update({
-    where: { id: user.id },
-    data: { hashedPassword, isActive: true },
-  });
+  // GP-760: a reset ends every older session of this member (setPasswordEndingSessions).
+  await setPasswordEndingSessions(user.id, await hashPassword(plainPassword), { isActive: true });
 
   let emailSent = false;
   if (params.sendEmail) {
