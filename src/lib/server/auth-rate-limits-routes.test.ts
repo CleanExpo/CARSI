@@ -82,7 +82,7 @@ describe('GP-760 rate limits on reset-password, verify-email and refresh', () =>
     expect(mocks.verifyEmailToken).toHaveBeenCalledTimes(20);
     const limited = await send();
     expect(mocks.verifyEmailToken).toHaveBeenCalledTimes(20);
-    expect(limited.headers.get('location')).toBe('/login?email_confirmed=0');
+    expect(limited.headers.get('location')).toBe('/confirm-email?email_confirmed=0');
   });
 
   it('refresh: the 31st renewal for one user in 15 minutes gets 429', async () => {
