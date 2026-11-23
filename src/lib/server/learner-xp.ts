@@ -7,6 +7,7 @@ import {
   XP_LESSON_COMPLETE,
   XP_COURSE_COMPLETE,
 } from '@/lib/server/leaderboard-xp';
+import { SQL_XP_ELIGIBLE, SQL_XP_LESSON_SOURCE } from '@/lib/server/xp-eligibility';
 
 export type LearnerLevelPayload = {
   total_xp: number;
@@ -29,14 +30,18 @@ function xpToNextLevel(totalXp: number): number {
   return 0;
 }
 
-/** Consecutive calendar days (Australia/Sydney) with at least one lesson completion. */
+/**
+ * Consecutive calendar days (Australia/Sydney) with at least one lesson completion that still
+ * earns XP (the same eligibility rule as the XP totals, from xp-eligibility.ts).
+ */
 async function computeStreakDays(studentId: string): Promise<{ current: number; longest: number }> {
   const rows = await prisma.$queryRaw<{ day: Date }[]>`
     SELECT DISTINCT (lp.completed_at AT TIME ZONE 'Australia/Sydney')::date AS day
-    FROM lms_lesson_progress lp
+    FROM ${SQL_XP_LESSON_SOURCE}
     WHERE lp.student_id = ${studentId}::uuid
       AND lp.completed = true
       AND lp.completed_at IS NOT NULL
+      AND ${SQL_XP_ELIGIBLE}
     ORDER BY day DESC
   `;
 
