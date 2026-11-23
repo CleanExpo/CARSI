@@ -26,7 +26,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           />
           <div className="relative flex flex-col items-center gap-3">
             <Link href="/" className="flex items-center justify-center">
-              <PublicLogo variant="auth" />
+              <PublicLogo variant="auth" surface="chrome" />
             </Link>
             <Link
               href="/"

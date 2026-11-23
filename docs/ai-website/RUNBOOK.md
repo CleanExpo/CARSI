@@ -10,7 +10,7 @@ the exact sequence to take it live, plus the optional upgrades (live LLM, real e
   `ai-website.css`; light/dark follows the site theme.
 - **AI Course Advisor** — `app/(public)/ai-website/Advisor.tsx` → `POST /api/ai-website/advisor`. A
   deterministic, catalogue-grounded advisor (`src/lib/ai-website/advisor.ts`) — no LLM key needed; it
-  works the moment the flag is on. Licence-correct wording (IICRC CEC Accredited; CARSI designations).
+  works the moment the flag is on. Licence-correct wording (IICRC Approved CEC Provider; CARSI designations).
 - **Lead capture → CRM** — `LeadMachine.tsx` → `POST /api/ai-website/lead`. Writes a real
   `AiWebsiteLead` row to Postgres and runs the enrolment flow.
 - **Enrolment automation** — `src/lib/ai-website/notifier.ts` records each step as an `AiWebsiteEvent`.

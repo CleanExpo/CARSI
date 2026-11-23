@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 
+import { FROM_IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export const runtime = 'edge';
 
 export const alt = 'CARSI — Professional Restoration Training';
@@ -102,7 +103,7 @@ export default async function Image() {
         }}
       >
         Restoration courses for healthcare, hospitality, government, mining and restoration
-        professionals across Australia, from an IICRC CEC Accredited provider.
+        professionals across Australia, {FROM_IICRC_APPROVED_CEC_PROVIDER}.
       </p>
 
       {/* Stats row */}
