@@ -16,6 +16,7 @@ import { LearnerLessonNotes } from '@/components/lms/LearnerLessonNotes';
 import { LearnModuleOverview } from '@/components/lms/LearnModuleOverview';
 import { LessonFooterNav } from '@/components/lms/LessonFooterNav';
 import { LessonPlayer } from '@/components/lms/LessonPlayer';
+import { scrollLessonToTop } from '@/lib/lms/lesson-scroll';
 import { ProgressSharePrompt } from '@/components/lms/ProgressSharePrompt';
 import { ReviewAsk } from '@/components/lms/ReviewAsk';
 import { shouldMountPlayerReviewAsk } from '@/lib/reviews/review-ask';
@@ -27,6 +28,7 @@ import { OnboardingModuleOverview } from '@/components/onboarding/OnboardingModu
 import { Button } from '@/components/ui/button';
 import { useOnlineStatus } from '@/hooks/use-online-status';
 import { apiClient, ApiClientError } from '@/lib/api/client';
+import { WATER_DAMAGE_HAZARD_LESSON_ID } from '@/lib/lms/append-interactive-pilot';
 import type { LessonResource } from '@/lib/lms/lesson-resources';
 import { applyNoteFormatting, type NoteFormatAction } from '@/lib/lms/note-formatting';
 import {
@@ -108,6 +110,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   const resetLock = useRef(false);
   const [resettingDraft, setResettingDraft] = useState(false);
   const [unknownResultKey, setUnknownResultKey] = useState<string | null>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
   const lessonFromQuery = searchParams.get('lesson');
   const moduleFromQuery = searchParams.get('module');
 
@@ -124,6 +127,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   const [lessonError, setLessonError] = useState<string | null>(null);
   const [savingComplete, setSavingComplete] = useState(false);
   const [completeError, setCompleteError] = useState<string | null>(null);
+  const [interactivePracticeReady, setInteractivePracticeReady] = useState(false);
   const [noteText, setNoteText] = useState('');
   const [loadingNote, setLoadingNote] = useState(false);
   const [savingNote, setSavingNote] = useState(false);
@@ -284,6 +288,18 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     setActiveModuleId(null);
   }, [curriculum, lessonFromQuery, moduleFromQuery, flatLessons]);
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset the practice gate when the lesson changes; behaviour-preserving, came in with the interactive pilot (5593ab7e)
+    setInteractivePracticeReady(false);
+  }, [activeLessonId]);
+
+  const handleInteractivePilotComplete = useCallback(() => {
+    setInteractivePracticeReady(true);
+    requestAnimationFrame(() => {
+      document.querySelector('[data-testid="lesson-footer"]')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  }, []);
+
   const loadLesson = useCallback(async (lessonId: string) => {
     if (!user) return;
     const learnerId = user.id;
@@ -440,6 +456,8 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     setActiveLessonId(lessonId);
     setActiveModuleId(null);
     replaceLessonQuery(lessonId);
+    // GP-627: the next lesson (including a quiz) opens at the top, not at the old offset.
+    scrollLessonToTop(shellRef.current);
   }
 
   async function selectModuleOverview(moduleId: string) {
@@ -726,7 +744,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="learner-home flex w-full max-w-none min-w-0 flex-col gap-6"
+    <div ref={shellRef} className="learner-home flex w-full max-w-none min-w-0 flex-col gap-6"
       onClickCapture={(event) => {
         const anchor = (event.target as HTMLElement).closest('a');
         const href = anchor?.getAttribute('href');
@@ -1003,6 +1021,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                         initialPosition={checkpoint.state.draft?.position}
                         onPositionChange={(position) => { if (checkpoint.state.draft) checkpoint.controller?.update({ position, answers: checkpoint.state.draft.answers }); }}
                         lesson={lessonDetail.lesson}
+                        enrolled={Boolean(lessonDetail.enrollment_id)}
                         resources={lessonDetail.resources}
                         variant={isOnboardingProgram ? 'enterprise' : 'default'}
                         moduleTitle={activeModule?.title}
@@ -1012,6 +1031,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                         moduleLessonNumber={moduleLessonPosition?.current}
                         moduleLessonTotal={moduleLessonPosition?.total}
                         courseProgressPercent={isOnboardingProgram ? onboardingProgressPct : null}
+                        onInteractivePilotComplete={handleInteractivePilotComplete}
                         footer={
                           isOnboardingProgram ? (
                             <EnterpriseLessonFooter
@@ -1052,6 +1072,11 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                         onComplete={() => void toggleComplete(true)}
                         onShare={openLessonSharePrompt}
                         error={completeError}
+                        emphasizeComplete={
+                          interactivePracticeReady &&
+                          activeLessonId === WATER_DAMAGE_HAZARD_LESSON_ID &&
+                          !currentMeta?.completed
+                        }
                       />
                       <LearnerLessonNotes
                         noteText={noteText}

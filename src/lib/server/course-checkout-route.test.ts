@@ -311,6 +311,55 @@ describe('campaign attribution', () => {
   });
 });
 
+describe('partner referral (GP-767)', () => {
+  function requestWithCookie(body: Record<string, unknown>, cookie: string): NextRequest {
+    return new NextRequest('https://carsi.example.test/api/lms/checkout', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', cookie },
+      body: JSON.stringify(body),
+    });
+  }
+
+  it('a buyer who arrived on a ?ref=ccw link carries referral_partner=ccw into the Stripe session', async () => {
+    mocks.findUser.mockResolvedValue(null);
+
+    const res = await POST(
+      requestWithCookie({ slug: COURSE_SLUG, customer_email: 'new@example.test' }, 'carsi_ref=ccw')
+    );
+
+    expect(res.status).toBe(200);
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({ referral_partner: 'ccw' });
+  });
+
+  it('keeps the partner on a discounted checkout', async () => {
+    mocks.verifySession.mockResolvedValue({ sub: 'user-disc' });
+    mocks.findUser.mockResolvedValue({ id: 'user-disc', isActive: true });
+    mocks.findEnrollment.mockResolvedValue(null);
+    mocks.discount.mockResolvedValue({ id: 'disc-1', discountType: 'percent', value: 20 });
+
+    const res = await POST(
+      requestWithCookie({ slug: COURSE_SLUG, customer_email: 'member@example.test' }, 'auth_token=tok; carsi_ref=ccw')
+    );
+
+    expect(res.status).toBe(200);
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({
+      referral_partner: 'ccw',
+      discount_id: 'disc-1',
+    });
+  });
+
+  it('ignores a cookie naming an unknown partner', async () => {
+    mocks.findUser.mockResolvedValue(null);
+
+    const res = await POST(
+      requestWithCookie({ slug: COURSE_SLUG, customer_email: 'new@example.test' }, 'carsi_ref=someone-else')
+    );
+
+    expect(res.status).toBe(200);
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({});
+  });
+});
+
 describe('purchase survey tab key (Authority Machine slice 1b, GP-662)', () => {
   const FLAG = 'PURCHASE_SURVEY_ENABLED';
   const TAB_KEY = '0123456789abcdef0123456789abcdef';
@@ -553,11 +602,18 @@ function checkoutFrom(tab: Tab, slug: string): NextRequest {
   });
 }
 
+/** Each survey post gets its own client IP so the route's per-IP limit (GP-694) stays out of these cases. */
+let surveyIpCounter = 0;
+
 async function surveyStatus(tab: Tab | null, sessionId: string): Promise<number> {
+  surveyIpCounter += 1;
   const res = await SURVEY_POST(
     new NextRequest('https://carsi.example.test/api/lms/checkout/survey', {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: {
+        'content-type': 'application/json',
+        'x-forwarded-for': `192.0.2.${surveyIpCounter % 250}`,
+      },
       body: JSON.stringify({
         session_id: sessionId,
         industry: 'commercial_cleaning',

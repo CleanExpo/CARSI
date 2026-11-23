@@ -1,3 +1,5 @@
+import { parseInteractiveLessonResource } from '@/lib/lms/interactive-experience-parse';
+
 /**
  * Lesson resource types shared by the lesson detail API route and the LMS
  * player components.
@@ -11,9 +13,15 @@
  * GP-486 adds a third kind — an inline slide deck viewer (shape matches
  * `data/seed/slides/*.json`):
  *
+ * GP-486 slide shape:
+ *
  *   { "kind": "slides", "label": "Lesson slides",
  *     "decks": [{ "module": "…",
  *       "slides": [{ "title": "…", "bullets": ["…"], "speakerNotes": "…" }] }] }
+ *
+ * Interactive restoration pilot — inline activities via registry id:
+ *
+ *   { "kind": "interactive", "label": "…", "experienceId": "water-damage-module-3-pilot" }
  *
  * Plain link resources carry no `kind` so existing data keeps working, and
  * `extractQuizIdFromLesson` (which only reads `url`) is unaffected.
@@ -51,13 +59,20 @@ export interface SlidesResource {
   decks: SlideDeck[];
 }
 
+export interface InteractiveLessonResource {
+  kind: 'interactive';
+  label: string;
+  url?: undefined;
+  experience: import('@/lib/lms/interactive-experience-types').InteractiveExperience;
+}
+
 export interface LinkResource {
   kind?: undefined;
   label?: string;
   url?: string;
 }
 
-export type LessonResource = LinkResource | FlashcardResource | SlidesResource;
+export type LessonResource = LinkResource | FlashcardResource | SlidesResource | InteractiveLessonResource;
 
 export function isFlashcardResource(
   resource: LessonResource
@@ -76,6 +91,15 @@ export function isSlidesResource(
     (resource as SlidesResource).kind === 'slides' &&
     Array.isArray((resource as SlidesResource).decks) &&
     (resource as SlidesResource).decks.length > 0
+  );
+}
+
+export function isInteractiveLessonResource(
+  resource: LessonResource
+): resource is InteractiveLessonResource {
+  return (
+    (resource as InteractiveLessonResource).kind === 'interactive' &&
+    Boolean((resource as InteractiveLessonResource).experience?.activities?.length)
   );
 }
 
@@ -167,6 +191,13 @@ export function parseLessonResources(raw: unknown): LessonResource[] {
           label: typeof o.label === 'string' ? o.label : 'Study flashcards',
           cards,
         });
+      }
+      continue;
+    }
+    if (o.kind === 'interactive') {
+      const parsed = parseInteractiveLessonResource(item);
+      if (parsed) {
+        out.push(parsed);
       }
       continue;
     }

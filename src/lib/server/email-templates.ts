@@ -10,6 +10,11 @@ import {
 } from '@/lib/billing/tax-invoice';
 import type { CcwAttendeeOffer } from '@/lib/marketing/ccw-roadshow-offers';
 
+import {
+  CARSI_PROVIDER_STATUS,
+  FROM_IICRC_APPROVED_CEC_PROVIDER,
+  IICRC_APPROVED_CEC_PROVIDER,
+} from '@/lib/iicrc/approved-wording';
 export const BRAND = {
   pageBg: '#060a14',
   glow: 'rgba(36, 144, 237, 0.08)',
@@ -159,7 +164,7 @@ export function carsiDarkLogoUrl(appOrigin: string): string {
 
 export function buildCarsiDarkLogoHeaderHtml(
   appOrigin: string,
-  tagline = 'IICRC CEC Accredited restoration training'
+  tagline = `Restoration training ${FROM_IICRC_APPROVED_CEC_PROVIDER}`
 ): string {
   const home = escapeHtml(appOrigin.replace(/\/$/, ''));
   const src = escapeHtml(carsiDarkLogoUrl(appOrigin));
@@ -190,7 +195,7 @@ export function buildCarsiWordmarkHtml(appOrigin: string): string {
       </span>
     </a>
     <p style="margin: 12px 0 0; font-family: ${BRAND.font}; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: ${BRAND.blue};">
-      IICRC CEC Accredited restoration courses
+      Restoration courses ${FROM_IICRC_APPROVED_CEC_PROVIDER}
     </p>`;
 }
 
@@ -229,7 +234,7 @@ export function buildCarsiEmailHtml(options: CarsiEmailContent): string {
   const headerHtml = options.headerDarkLogo
     ? buildCarsiDarkLogoHeaderHtml(
         options.appOrigin,
-        options.headerTagline ?? 'IICRC CEC Accredited restoration training'
+        options.headerTagline ?? `Restoration training ${FROM_IICRC_APPROVED_CEC_PROVIDER}`
       )
     : buildCarsiWordmarkHtml(options.appOrigin);
 
@@ -430,7 +435,7 @@ IICRC Triple Master | Bio Forensic Master Cleaner
 25+ years in carpet cleaning and restoration
 +61 457 123 005
 carsi.com.au | support@carsi.com.au
-CARSI | Restoration training — IICRC CEC Accredited`;
+CARSI | Restoration training — ${IICRC_APPROVED_CEC_PROVIDER}`;
 
 function phillMarketingSignatureHtml(appOrigin: string): string {
   const home = escapeHtml(appOrigin);
@@ -441,7 +446,7 @@ function phillMarketingSignatureHtml(appOrigin: string): string {
       25+ years in carpet cleaning and restoration<br />
       +61 457 123 005<br />
       ${brandLink(home, 'carsi.com.au')} | ${brandLink('mailto:support@carsi.com.au', 'support@carsi.com.au')}<br />
-      CARSI | Restoration training — IICRC CEC Accredited
+      CARSI | Restoration training — ${IICRC_APPROVED_CEC_PROVIDER}
     </p>`;
 }
 
@@ -553,7 +558,7 @@ export function renderRegistrationWelcomeEmail(params: {
       title: "You're all set",
       greeting: `Hi ${params.name},`,
       paragraphs: [
-        'Thank you for joining CARSI Learning — professional IICRC CEC Accredited restoration courses for Australian technicians and teams.',
+        `Thank you for joining CARSI Learning — professional restoration courses for Australian technicians and teams, ${FROM_IICRC_APPROVED_CEC_PROVIDER}.`,
         'Your account is active. Sign in to browse courses, track CEC progress, and continue your learning path.',
         ...(confirm
           ? ['Please confirm your email address so we know certificates and reminders reach you.']
@@ -579,8 +584,8 @@ export function renderRegistrationWelcomeEmail(params: {
 /**
  * GP-199 lead-magnet delivery email — sent to the person who requested the
  * "How to Get on Government Restoration Panels" guide, carrying the download
- * link. Copy is IICRC-CEC compliant: CARSI is described only as an IICRC CEC
- * Accredited provider (never as an IICRC certification/training school).
+ * link. Copy is IICRC-CEC compliant. CARSI is described only by its provider status
+ * (CARSI_PROVIDER_STATUS). It never says CARSI delivers IICRC certification.
  */
 export function renderGovContractorGuideEmail(params: {
   appOrigin: string;
@@ -598,7 +603,7 @@ export function renderGovContractorGuideEmail(params: {
     '',
     `Download the guide (PDF): ${params.downloadUrl}`,
     '',
-    'CARSI is an IICRC CEC Accredited provider.',
+    CARSI_PROVIDER_STATUS,
     '',
     `CARSI Learning — ${params.appOrigin}`,
   ].join('\n');
@@ -610,7 +615,7 @@ export function renderGovContractorGuideEmail(params: {
       title,
       paragraphs,
       cta: { label: 'Download the guide (PDF)', href: params.downloadUrl },
-      noteHtml: 'CARSI is an IICRC CEC Accredited provider.',
+      noteHtml: CARSI_PROVIDER_STATUS,
     },
     text
   );

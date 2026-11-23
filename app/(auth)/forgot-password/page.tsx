@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 
+import { FROM_IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 function ForgotPasswordForm() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -72,7 +73,7 @@ function ForgotPasswordForm() {
           </p>
         )}
         <p className="text-xs font-semibold tracking-wide text-[#146fc2]">
-          Restoration training from an IICRC CEC Accredited provider
+          Restoration training {FROM_IICRC_APPROVED_CEC_PROVIDER}
         </p>
       </div>
 

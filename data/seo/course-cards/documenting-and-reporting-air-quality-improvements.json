@@ -44,7 +44,7 @@
     "inLanguage": "en-AU",
     "offers": {
       "@type": "Offer",
-      "price": "28.98",
+      "price": "29",
       "priceCurrency": "AUD",
       "availability": "https://schema.org/InStock"
     },

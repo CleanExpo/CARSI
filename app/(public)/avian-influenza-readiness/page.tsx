@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale'
 
 const pageUrl = 'https://carsi.com.au/avian-influenza-readiness'
 const heroImage =
@@ -36,6 +37,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     title: 'Australian H5 Bird Flu Readiness | CARSI',
     description:
       'Official-source guidance, reporting steps, professional boundaries and training pathways for restoration and IAQ professionals. Campaign marketing support by Synthex.',

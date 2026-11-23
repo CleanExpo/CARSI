@@ -10,6 +10,7 @@ import { catalogueCourseCta } from '@/lib/learner-course-cta';
 import { isOnboardingCourse, ONBOARDING_BRAND } from '@/lib/onboarding/enterprise';
 import { getOnboardingLearnPath, resolveDashboardCourseHref } from '@/lib/onboarding/navigation';
 
+import { APPROVED_FOR_IICRC_CECS_LABEL } from '@/lib/iicrc/approved-wording';
 interface CourseCardProps {
   /** First visible cards: eager load + higher fetch priority (catalog / home grids). */
   priorityImage?: boolean;
@@ -125,7 +126,7 @@ export function CourseCard({ course, priorityImage, variant = 'catalog' }: Cours
         {isPremium ? (
           <p className="text-[11px] font-semibold tracking-[0.18em] text-sky-300 uppercase">
             {course.cec_hours
-              ? 'IICRC CEC Accredited'
+              ? APPROVED_FOR_IICRC_CECS_LABEL
               : onboarding
                 ? 'Organisation program'
                 : 'Professional learning'}

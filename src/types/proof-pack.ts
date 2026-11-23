@@ -1,3 +1,12 @@
+/** A citation from the course's lesson source lists (BACKLOG #26). Linked, never embedded. */
+export type ProofPackReference = {
+  label: string;
+  /** Absolute http(s) URL, or null for a source cited by name only. */
+  url: string | null;
+  /** "dd/mm/yyyy" read date as the lesson gives it, or null. */
+  read_on: string | null;
+};
+
 export type ProofPackCredentialRow = {
   credential_id: string;
   course_title: string;
@@ -5,6 +14,8 @@ export type ProofPackCredentialRow = {
   cec_hours: number;
   issued_date: string;
   verification_url: string;
+  /** Reference material cited by the course; empty when it cites none. */
+  references: ProofPackReference[];
 };
 
 export type ProofPackPayload = {

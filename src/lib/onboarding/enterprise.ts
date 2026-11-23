@@ -1,3 +1,5 @@
+import { BUSINESS_OWNER_PLAN, formatMembershipAud } from '@/lib/lms/membership-prices';
+
 /** Umbrella brand for CARSI Maintenance Company B2B onboarding programs. */
 export const ONBOARDING_BRAND = 'CARSI Maintenance Company Onboarding';
 
@@ -85,19 +87,15 @@ export function getPhasesForSlug(slug: string): OnboardingPhase[] {
   return [];
 }
 
+/**
+ * Price label for the organisation subscription, which is the founder's business owner plan
+ * (GP-773): the amount and interval come from `BUSINESS_OWNER_PLAN`, never from course meta.
+ * Course meta in the catalogue still says "1295, monthly, + GST"; that stale record must not
+ * reach a page. Only the seats wording is read from meta.
+ */
 export function formatOnboardingPrice(pricing?: OnboardingPricingMeta | null): string {
-  if (!pricing?.amountAud) return 'Organisation subscription';
-  const gst = pricing.gst === 'exclusive' ? ' + GST' : '';
-  const cycle = pricing.billingCycle === 'monthly' ? '/month' : '';
-  const seats = pricing.seats === 'unlimited' ? ' · unlimited learners' : '';
-  return `AUD $${pricing.amountAud.toLocaleString('en-AU')}${cycle}${gst}${seats}`;
-}
-
-/** Organisation subscription amount from course meta (defaults to floor-care list price). */
-export function resolveOnboardingAmountAud(meta?: OnboardingCourseMeta | null): number {
-  const amount = meta?.pricing?.amountAud;
-  if (typeof amount === 'number' && Number.isFinite(amount) && amount > 0) return amount;
-  return 1295;
+  const seats = pricing?.seats === 'unlimited' ? ' · unlimited learners' : '';
+  return `AUD ${formatMembershipAud(BUSINESS_OWNER_PLAN)}/year incl. GST${seats}`;
 }
 
 export function getPhaseForModuleIndex(

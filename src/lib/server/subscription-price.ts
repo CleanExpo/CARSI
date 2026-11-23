@@ -6,52 +6,31 @@
  *  2. Otherwise look up by `lookup_key` = 'carsi_pro_annual' at runtime and
  *     cache the result for the lifetime of the server process.
  *
- * The Price does NOT exist until Rana creates it per the runbook
- * (docs/runbooks/rana-stripe-connection.md). Until then this resolver returns
- * `null` and the checkout route FAILS CLOSED with an honest "membership
- * purchasing not yet available" response — it never falls back to a wrong Price.
+ * GP-773: either way the Price must match `INDIVIDUAL_MEMBERSHIP` in
+ * `src/lib/lms/membership-prices.ts` (amount, AUD, yearly). Until such a Price
+ * exists this resolver returns `null` and the checkout route FAILS CLOSED with
+ * an honest "membership purchasing not yet available" response — it never falls
+ * back to a wrong Price.
  */
 
-import { getStripeClient } from '@/lib/api/stripe';
+import { INDIVIDUAL_MEMBERSHIP } from '@/lib/lms/membership-prices';
+import { resolveVerifiedMembershipPriceId } from '@/lib/server/membership-price-check';
 
-/** The lookup_key the runbook instructs Rana to set on the annual Price. */
-export const PRO_ANNUAL_LOOKUP_KEY = 'carsi_pro_annual';
+/** The lookup_key the runbook instructs the operator to set on the annual Price. */
+export const PRO_ANNUAL_LOOKUP_KEY = INDIVIDUAL_MEMBERSHIP.lookupKey as string;
 
-let cachedPriceId: string | null = null;
+const cache: { id: string | null } = { id: null };
 
 /** Test-only: clear the module cache so a fresh resolution runs. */
 export function __resetSubscriptionPriceCache(): void {
-  cachedPriceId = null;
+  cache.id = null;
 }
 
 /**
- * Returns the resolved annual-membership Price id, or `null` when it cannot be
- * resolved (env unset AND no active Price carries the lookup_key). Never throws
- * for a missing Price — a null return is the fail-closed signal for callers.
+ * Returns the verified annual-membership Price id, or `null` when it cannot be
+ * resolved or does not match the membership price. Never throws — a null
+ * return is the fail-closed signal for callers.
  */
 export async function resolveProAnnualPriceId(): Promise<string | null> {
-  const envPrice = process.env.STRIPE_PRICE_PRO_ANNUAL?.trim();
-  if (envPrice) return envPrice;
-
-  if (cachedPriceId) return cachedPriceId;
-
-  if (!process.env.STRIPE_SECRET_KEY?.trim()) return null;
-
-  try {
-    const stripe = getStripeClient();
-    const prices = await stripe.prices.list({
-      lookup_keys: [PRO_ANNUAL_LOOKUP_KEY],
-      active: true,
-      limit: 1,
-    });
-    const price = prices.data[0];
-    if (price?.id) {
-      cachedPriceId = price.id;
-      return price.id;
-    }
-    return null;
-  } catch (error) {
-    console.error('[subscription-price] Stripe price lookup failed:', error);
-    return null;
-  }
+  return resolveVerifiedMembershipPriceId(INDIVIDUAL_MEMBERSHIP, cache, 'subscription-price');
 }

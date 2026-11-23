@@ -1,11 +1,13 @@
 /**
- * POST /api/lms/subscription/org/checkout — start the organisation monthly
- * subscription (WS1-E3, GP-443) — A$1,295/month + GST, unlimited learners.
+ * POST /api/lms/subscription/org/checkout — start the organisation subscription
+ * (WS1-E3, GP-443), which is the founder's business owner plan: A$1,295 per YEAR,
+ * GST included (GP-773; it was per month + GST). The amount lives in
+ * `src/lib/lms/membership-prices.ts`; the Price is verified against it.
  *
  * Body: { organisation_name: string, contact_email?, success_url?, cancel_url? }
  *
  * Executes docs/plans/2026-06-27-org-subscription-billing.md: a recurring
- * monthly Price (resolved by lookup_key `carsi_org_monthly`), a `mode:
+ * Price (GP-773: yearly, lookup_key `carsi_org_annual`), a `mode:
  * 'subscription'` checkout, and an `LmsOrgSubscription` row provisioned up front
  * so the webhook can map the subscription back to the org and refresh its
  * lifecycle. Reuses `LmsTeam` as the org container (unlimited seats).
@@ -20,7 +22,7 @@ import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
 
 import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
-import { resolveOrgMonthlyPriceId } from '@/lib/server/org-subscription-price';
+import { resolveOrgAnnualPriceId } from '@/lib/server/org-subscription-price';
 import { provisionOrgSubscriptionContainer } from '@/lib/server/org-subscription-provision';
 import {
   checkoutSessionIdempotencyKey,
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const priceId = await resolveOrgMonthlyPriceId();
+  const priceId = await resolveOrgAnnualPriceId();
   if (!priceId) {
     return NextResponse.json({ detail: UNAVAILABLE }, { status: 503 });
   }
@@ -143,7 +145,7 @@ export async function POST(request: NextRequest) {
             plan: 'org_monthly',
           },
         },
-        allow_promotion_codes: true,
+        // GP-773: no promotion codes on a membership (founder ruling: "no further discounts").
       },
       {
         idempotencyKey: checkoutSessionIdempotencyKey('org', teamId, reservedAt),

@@ -5,6 +5,7 @@ import { GovGuideForm } from '@/components/lead-magnet/GovGuideForm';
 import { leadMagnetEnabled } from '@/lib/server/lead-magnet-flag';
 import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 const pageUrl = 'https://carsi.com.au/resources/government-restoration-panels';
 
 export const metadata: Metadata = {
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
     'government contractor restoration',
     'AusTender restoration panel',
     'restoration WHS compliance',
-    'IICRC CEC Accredited courses',
+    IICRC_APPROVED_CEC_PROVIDER,
     'CARSI government guide',
   ],
   alternates: { canonical: pageUrl },
@@ -90,7 +91,7 @@ export default function GovernmentRestorationPanelsPage() {
           </ul>
 
           <p className="mt-8 text-xs leading-5 text-slate-500">
-            CARSI is an IICRC CEC Accredited provider. Its online, self-paced courses that the IICRC
+            CARSI is an {IICRC_APPROVED_CEC_PROVIDER}. Its online, self-paced courses that the IICRC
             has approved count toward the Continuing Education Credits (CECs) an existing IICRC
             certification needs — so your team keeps its credentials current without losing billable
             days.

@@ -64,7 +64,7 @@ beforeEach(() => {
   );
   mocks.apiGet.mockImplementation(async (path: string) => {
     if (path.includes('/gamification/me/level')) {
-      return { total_xp: 250, current_level: 1, level_title: 'Apprentice', total_cec_lifetime: 8 };
+      return { total_xp: 250, current_level: 1, level_title: 'Getting started', total_cec_lifetime: 8 };
     }
     return [
       {

@@ -173,6 +173,15 @@ export async function PATCH(request: NextRequest) {
         { status: 400 }
       );
     }
+    if (msg === 'BULK_PUBLISH_REFUSED') {
+      return NextResponse.json(
+        {
+          detail:
+            'Courses cannot be published in bulk. Open each course, submit it for review, record an approval, then publish it.',
+        },
+        { status: 409 }
+      );
+    }
     console.error('[admin/courses PATCH]', e);
     return NextResponse.json({ detail: 'Failed to update courses' }, { status: 500 });
   }
@@ -206,6 +215,15 @@ export async function POST(request: NextRequest) {
     }
     if (msg === 'MODULES_REQUIRED') {
       return NextResponse.json({ detail: 'At least one module is required' }, { status: 400 });
+    }
+    if (msg === 'COURSE_CREATE_PUBLISHED_REFUSED') {
+      return NextResponse.json(
+        {
+          detail:
+            'New courses are created as drafts. Save it as a draft, submit it for review, record an approval, then publish it.',
+        },
+        { status: 409 }
+      );
     }
     console.error('[admin/courses POST]', e);
     return NextResponse.json({ detail: 'Failed to create course' }, { status: 500 });

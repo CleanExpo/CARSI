@@ -15,7 +15,19 @@
  */
 import { existsSync, readFileSync } from 'node:fs';
 
-import { evaluateContent, evaluateIicrcFree, IICRC_FREE_FILES, normaliseLine } from './check-iicrc-compliance.mjs';
+import {
+  CEC_APPROVED_SLUGS,
+  CEC_BARE_SCOPE,
+  SCANNED_DIRS,
+  classifyBareFindings,
+  evaluateBareCecClaims,
+  evaluateContent,
+  evaluateIicrcFree,
+  IICRC_FREE_FILES,
+  inScope,
+  loadBareBaseline,
+  normaliseLine,
+} from './check-iicrc-compliance.mjs';
 
 // A non-approved course fixture path (no slug appears in cec-approvals.json → not slug-exempt).
 const NON_APPROVED = 'data/seed/courses-catalog.json';
@@ -152,6 +164,81 @@ if (evaluateContent(NON_APPROVED, spacedVariant, allowG).length > 0) fail('white
 if (evaluateContent(NON_APPROVED, 'This course awards 4 IICRC CECs.', EMPTY).length === 0) fail('planted "awards 4 IICRC CECs" did not fire.');
 if (evaluateContent(NON_APPROVED, 'This course is Australian-produced. Ten-question knowledge check.', EMPTY).length > 0) fail('clean line fired the guard.');
 
+// (6b) GP-753 — copy implying CARSI delivers or grants IICRC certification, or that the IICRC
+// approved ("board-approved") the course. The first three lines are the GP-525 breaches verbatim
+// from docs/marketing; this guard exited 0 on all three before GP-753. Dynamic import so the
+// static import line above stays untouched (open PR #1190 edits it).
+{
+  const guard = await import('./check-iicrc-compliance.mjs');
+  const MARKETING = 'docs/marketing/google-ads-campaign.md';
+  const ctxOf = (entries = []) =>
+    typeof guard.newCertificationContext === 'function' ? guard.newCertificationContext(entries) : undefined;
+  const run = (line, ctx = ctxOf()) => guard.evaluateContent(MARKETING, line, EMPTY, ctx);
+  const CERT_MUST_BLOCK = [
+    ['GP-525 E1: product headline', '| Headline 1 | IICRC Cleaning Certification — Online |'],
+    ['GP-525 E3: board-approved',
+      `| "Online training isn't as good as hands-on" | "CARSI's courses are IICRC board-approved — the same credential standard as any classroom course. Plus, your crew gets hands-on experience on real job sites, which no classroom can replicate." |`],
+    ['GP-525 E1: "with IICRC certifications" as a benefit',
+      '| Description 1 | Stand out from competitors with IICRC certifications. Carpet cleaning, mould remediation, water damage — all available online. Build recognised skills and grow your business. |'],
+    ['discipline certification as a product', 'IICRC Water Damage Certification'],
+    ['multi-word discipline certification', 'Enrol in the IICRC Mould Remediation Certification today.'],
+    ['ampersand discipline certification', 'IICRC Fire & Smoke Certifications'],
+    ['online label, lower case', 'IICRC certification - online'],
+    ['online prefix', 'Online IICRC Certification for cleaners'],
+    ['board-approved, hyphen variant', 'Every module is IICRC-board-approved.'],
+    ['board-approved, reordered', 'Board-approved by the IICRC and ready to start.'],
+    ['board approved, spaced', 'CARSI courses: IICRC board approved.'],
+    ['"with IICRC Creds" headline', '| Headline 4 | Win More Contracts with IICRC Creds |'],
+    ['"with IICRC credentials" benefit', 'Builders and project managers — reduce defect liability with IICRC credentials.'],
+    ['"companies with IICRC certifications win"', 'Cleaning companies with IICRC certifications win 3x more remediation contracts.'],
+    ['grant verb "add"', 'Cleaning franchise owners and operators — add IICRC credentials to your business.'],
+    ['grant verb "earn verifiable"', 'Earn verifiable IICRC credentials your HSE team can audit.'],
+    ['grant verb "get your"', 'Get your IICRC certification in a weekend.'],
+    ['grant verb "gain"', 'Gain IICRC qualifications without leaving the job site.'],
+    ['slang "IICRC certs"', 'The 3 IICRC certs that unlock restoration revenue'],
+  ];
+  const CERT_MUST_PASS = [
+    ['third-person: FSRT is an IICRC certification', 'FSRT is an IICRC certification covering fire and smoke restoration.'],
+    ['third-person: obtained only through approved schools', 'IICRC certification is obtained only through IICRC-approved schools and examinations.'],
+    ['denial: not accredited by the IICRC', 'CARSI courses are not accredited by the IICRC.'],
+    ['denial: CARSI does not deliver', 'CARSI does not deliver IICRC certification.'],
+    ['denial: courses do not grant', 'CARSI courses do not grant IICRC certification.'],
+    ['denial: no CARSI course will get you', 'No CARSI course will get you IICRC credentials.'],
+    ["student's own recert tracking", 'Track your IICRC WRT certification renewal and CEC hours.'],
+    ["student's own designation, title case", 'Your IICRC Water Restoration Technician Certification is due for renewal.'],
+    ['CEC toward an existing certification', 'Earn IICRC CECs toward maintaining your existing IICRC certification.'],
+    ['third-person route to certification', 'Earn IICRC certification through an IICRC-approved school; CARSI CECs help keep it current.'],
+    ['holders earn CECs', 'Technicians with IICRC certifications earn CECs through approved courses.'],
+    ['learner brings own credentials', 'Bring your IICRC credentials, CEC records, and equipment inventory.'],
+    ['provider standing', 'CARSI is an IICRC Approved CEC Provider — CEC hours are shown only on classes approved for IICRC CECs.'],
+    ['industry fact', 'IICRC certification is required for many insurance panels.'],
+  ];
+  for (const [name, line] of CERT_MUST_BLOCK) {
+    if (run(line).length === 0) fail(`GP-753 MUST BLOCK but passed: ${name}\n    ${line}`);
+  }
+  for (const [name, line] of CERT_MUST_PASS) {
+    const f = run(line);
+    if (f.length > 0) fail(`GP-753 MUST PASS but blocked: ${name}\n    ${line}\n    ${f.join('\n    ')}`);
+  }
+  // Known-findings baseline: a pinned exact (file, text) line is reported, not blocked; a near-miss
+  // or the same text in another file still blocks; a pinned entry whose line is gone is stale.
+  const pinnedLine = 'Win insurance work with IICRC credentials';
+  if (typeof guard.newCertificationContext !== 'function' || typeof guard.staleCertificationEntries !== 'function') {
+    fail('GP-753 baseline API (newCertificationContext / staleCertificationEntries) is not exported');
+  } else {
+    const ctx = ctxOf([{ file: MARKETING, text: pinnedLine }]);
+    if (run(`   ${pinnedLine}  `, ctx).length > 0) fail('GP-753 pinned line (whitespace variant) should not block');
+    if (ctx.known.size !== 1) fail('GP-753 pinned line should be recorded as a known finding');
+    if (guard.staleCertificationEntries(ctx).length !== 0) fail('GP-753 matched pinned entry reported stale');
+    if (run('Win more insurance work with IICRC credentials', ctx).length === 0) fail('GP-753 near-miss of pinned line should BLOCK');
+    if (guard.evaluateContent('docs/marketing/other.md', pinnedLine, EMPTY, ctx).length === 0) fail('GP-753 pinned text in another file should BLOCK');
+    const staleCtx = ctxOf([{ file: MARKETING, text: 'a line that is not there' }]);
+    run('Clean copy.', staleCtx);
+    if (guard.staleCertificationEntries(staleCtx).length !== 1) fail('GP-753 unmatched pinned entry should be STALE (baseline only shrinks)');
+  }
+  console.log(`  GP-753 certification-phrase cases: ${CERT_MUST_BLOCK.length} block, ${CERT_MUST_PASS.length} pass, baseline controls.`);
+}
+
 // (7) IICRC-free files (public review policy): planted IICRC/CEC wording fires, neutral copy is
 // silent, and every listed file exists and is currently clean.
 for (const planted of [
@@ -174,6 +261,117 @@ for (const f of IICRC_FREE_FILES) {
   else if (evaluateIicrcFree(f, readFileSync(f, 'utf8')).length > 0) fail(`IICRC-free file carries IICRC/CEC wording: ${f}`);
 }
 
+// (8) 2026-11-21 — bare numbered-CEC claims (no "IICRC" next to the number). Before this rule,
+// "This course earns 4 CEC hours" planted in public/courses/<slug>/field-tools/*.md exited 0.
+// Paths are real course-content locations for NON-approved slugs (hard-floor-care is not in
+// data/seed/cec-approvals.json; the scope floor below asserts that).
+const BARE_PATHS = [
+  'public/courses/hard-floor-care/field-tools/zz-plant.md',
+  'data/courses/hard-floor-care/v1-draft/lessons/zz-plant.md',
+  'data/seed/courses-catalog.json',
+  'docs/marketing/zz-plant.md',
+  'app/(public)/zz-plant/page.tsx',
+  'public/courses/hard-floor-care/infographics/zz-plant.svg',
+  'data/courses/hard-floor-care/v1-draft/evidence/zz-plant.jsonl',
+];
+const BARE_MUST_BLOCK = [
+  ['N CEC hours', 'This course earns 4 CEC hours.'],
+  ['N CECs', 'Completing this module gives you 3 CECs.'],
+  ['earns N CEC', 'Each lesson earns 1 CEC.'],
+  ['decimal N CECs', 'Worth 1.5 CECs on completion.'],
+  ['N Continuing Education Credits', 'Earn 4 Continuing Education Credits.'],
+  ['N Continuing Education hours', 'Includes 6 Continuing Education hours.'],
+  ['hyphenated N-CEC', 'Our 2-CEC refresher module.'],
+  ['N-hour CEC phrasing', 'Delivers 4 hours of CEC training.'],
+  ['N hours of IICRC continuing education', 'Delivers 4 hours of IICRC continuing education.'],
+  ['qualified N approved CEC hours', 'Carries 4 approved CEC hours.'],
+  ['label form "CEC hours: N"', 'CEC hours: 4'],
+  ['label form "CECs = N"', 'CECs = 3'],
+  ['label form "Continuing Education Credits (CEC): N"', 'Continuing Education Credits (CEC): 2'],
+  ['number word', 'This course earns four CEC hours.'],
+  ['no separator, upper-case', 'Earn 4CECs today.'],
+  ['non-breaking space', 'Earns 4 CEC hours.'],
+  ['CEC credits', 'Awards 8 CEC credits.'],
+  ['claim beside the conversion rate still blocks', 'Earns 4 CECs (1 CEC = 1 contact hour).'],
+  ['svg text', '<text x="10" y="20">4 CEC hours</text>'],
+  ['JSON string value', '"summary": "Completing this course earns 4 CEC hours.",'],
+  ['program fact still needs human review (exact-line allowlist)', 'IICRC recertification requires 14 CECs per 4-year cycle.'],
+];
+const BARE_MUST_PASS = [
+  ['zero CEC', 'This course carries 0 CEC.'],
+  ['zero decimal', 'cecHours stays 0.0 CECs until approval.'],
+  ['not CEC-approved', 'This course is not CEC-approved.'],
+  ['CEC hours appear only after approval', 'CEC hours appear only after IICRC approval.'],
+  ['provider wording', 'CARSI provides IICRC CEC Accredited training.'],
+  ['denial', 'It is not IICRC CEC accredited and it does not award CECs.'],
+  ['generic CEC mention', 'Track your CECs in the dashboard.'],
+  ['conversion rate on an approved-course note', 'durationHours records the contact hour (1 CEC = 1 contact hour, per the founder list).'],
+  ['conversion rate "per hour"', 'The IICRC general arithmetic is 1 CEC per hour of learning.'],
+  ['hex id containing cec', '"lesson_id":"549e8ba9-cec0-4a48-b286-b86676295418"'],
+  ['uuid segment ending in a digit before cec', '"id":"a1b2c3d4-1cec-4a48-b286-b86676295418"'],
+  ['ticket id', 'GP-498 CEC licence gate'],
+  ['course count, not CEC count', 'CARSI delivers 40+ online courses.'],
+  ['clean line', 'Ten-question knowledge check, Australian-produced.'],
+];
+for (const path of BARE_PATHS) {
+  for (const [name, line] of BARE_MUST_BLOCK) {
+    if (evaluateBareCecClaims(path, line, EMPTY, []).length === 0) fail(`BARE MUST BLOCK but passed (${path}): ${name}\n    ${line}`);
+  }
+  for (const [name, line] of BARE_MUST_PASS) {
+    const f = evaluateBareCecClaims(path, line, EMPTY, []);
+    if (f.length > 0) fail(`BARE MUST PASS but blocked (${path}): ${name}\n    ${line}`);
+  }
+}
+// The planted gap file end-to-end through the COPY_EXT/scope path the CLI uses: .md, .svg and .jsonl.
+for (const p of ['public/courses/x/field-tools/a.md', 'public/courses/x/a.svg', 'data/courses/x/v1-draft/evidence/a.jsonl']) {
+  if (!/\.(tsx?|jsx?|mdx?|html?|jsonl?|svg)$/.test(p) || !inScope(p)) fail(`scope: ${p} is not scanned`);
+}
+// One finding per claim: a line CEC_NUMBER already blocks is not double-reported by the bare rule,
+// and CEC_NUMBER still blocks it.
+if (evaluateBareCecClaims(BARE_PATHS[0], 'This course awards 4 IICRC CECs.', EMPTY, []).length !== 0) fail('bare rule double-reported an IICRC-adjacent line');
+if (evaluateContent(BARE_PATHS[0], 'This course awards 4 IICRC CECs.', EMPTY).length === 0) fail('CEC_NUMBER no longer blocks an IICRC-adjacent line');
+// Approved slug path exempts (same rule as CEC_NUMBER); an unrelated slug does not.
+if (evaluateBareCecClaims('public/courses/approved-x/a.md', 'Earns 4 CEC hours.', EMPTY, ['approved-x']).length !== 0) fail('approved-slug path should exempt a bare claim');
+if (evaluateBareCecClaims('public/courses/other/a.md', 'Earns 4 CEC hours.', EMPTY, ['approved-x']).length === 0) fail('non-approved slug path must not be exempt');
+// Exact-line allowlist is honoured, exactly (a near-miss still blocks).
+const FACT = 'IICRC recertification requires 14 CECs per 4-year cycle.';
+if (evaluateBareCecClaims(BARE_PATHS[0], FACT, allowOf(FACT), []).length !== 0) fail('allowlisted exact line should pass the bare rule');
+if (evaluateBareCecClaims(BARE_PATHS[0], FACT.replace('14', '15'), allowOf(FACT), []).length === 0) fail('near-miss of an allowlisted line should block the bare rule');
+// src/ is out of the bare scope by design (learner tracking, renewal calculator, tests); every
+// other scanned directory is in it.
+if (evaluateBareCecClaims('src/components/lms/CECProgressRing.tsx', "label: '10 CECs Earned'", EMPTY, []).length !== 0) fail('src/ should be outside the bare scope');
+for (const d of ['data/courses/', 'public/courses/', 'data/seed/', 'docs/marketing/', 'docs/content/', 'app/']) {
+  if (!CEC_BARE_SCOPE.includes(d)) fail(`CEC_BARE_SCOPE no longer lists ${d}`);
+}
+for (const d of SCANNED_DIRS) {
+  if (d !== 'src/' && !CEC_BARE_SCOPE.includes(d)) fail(`scanned dir ${d} is missing from CEC_BARE_SCOPE`);
+}
+if (CEC_APPROVED_SLUGS.includes('hard-floor-care')) fail('fixture slug hard-floor-care is now approved; pick a non-approved fixture');
+// Baseline classification: pinned lines are known (not blocking); a new line, a changed line and a
+// stale entry all block; an empty baseline blocks everything.
+{
+  const base = [{ file: 'docs/marketing/a.md', text: 'needs 14 CECs every four years' }];
+  const pinnedHit = { file: 'docs/marketing/a.md', line: 3, text: 'needs 14 CECs every four years' };
+  const r1 = classifyBareFindings([pinnedHit], base);
+  if (r1.blocking.length !== 0 || r1.known.length !== 1) fail('baseline: pinned exact line should be known, not blocking');
+  const r2 = classifyBareFindings([pinnedHit, { file: 'docs/marketing/a.md', line: 9, text: 'earns 4 CECs' }], base);
+  if (r2.blocking.length !== 1) fail('baseline: a new line must block');
+  const r3 = classifyBareFindings([{ ...pinnedHit, text: 'needs 15 CECs every four years' }], base);
+  if (r3.blocking.filter((f) => !f.stale).length !== 1 || r3.blocking.filter((f) => f.stale).length !== 1) fail('baseline: a changed line must block and leave a stale entry');
+  const r4 = classifyBareFindings([{ ...pinnedHit, file: 'docs/marketing/b.md' }], base);
+  if (r4.blocking.filter((f) => !f.stale).length !== 1) fail('baseline: the same text in another file must block');
+  if (classifyBareFindings([pinnedHit], []).blocking.length !== 1) fail('baseline: empty baseline must block every finding');
+  if (loadBareBaseline('/nonexistent/baseline.json').length !== 0) fail('baseline: missing file must load as EMPTY (fail-closed)');
+  // The shipped baseline only pins lines that really exist, under the scanned scope, and never
+  // under public/courses or data/courses (those trees ship clean and stay enforced).
+  for (const e of loadBareBaseline()) {
+    if (!existsSync(e.file)) { fail(`baseline entry for missing file ${e.file}`); continue; }
+    const hits = evaluateBareCecClaims(e.file, readFileSync(e.file, 'utf8'));
+    if (!hits.some((h) => h.text === normaliseLine(e.text))) fail(`baseline entry is stale: ${e.file}`);
+    if (/^(public\/courses|data\/courses)\//.test(e.file)) fail(`baseline must not pin course-tree files: ${e.file}`);
+  }
+}
+
 if (failed > 0) {
   console.error(`\n✖ IICRC/CEC compliance guard self-test failed — ${failed} case(s).`);
   process.exit(1);
@@ -181,6 +379,7 @@ if (failed > 0) {
 console.log(
   `✓ IICRC/CEC compliance guard self-test passed ` +
   `(${MUST_BLOCK.length} block, ${GENUINE_ALLOWLISTABLE.length} genuine block+allowlist, ` +
-  `${MUST_PASS_ALWAYS.length} always-pass, near-miss + normalisation + plant/clean controls OK).`
+  `${MUST_PASS_ALWAYS.length} always-pass, near-miss + normalisation + plant/clean controls OK; ` +
+  `bare-CEC rule ${BARE_MUST_BLOCK.length} block / ${BARE_MUST_PASS.length} pass x ${BARE_PATHS.length} paths + baseline controls OK).`
 );
 process.exit(0);
