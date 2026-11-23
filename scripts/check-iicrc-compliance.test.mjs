@@ -239,6 +239,64 @@ if (evaluateContent(NON_APPROVED, 'This course is Australian-produced. Ten-quest
   console.log(`  GP-753 certification-phrase cases: ${CERT_MUST_BLOCK.length} block, ${CERT_MUST_PASS.length} pass, baseline controls.`);
 }
 
+// (6c) GP-753 follow-up — the certification promise WITHOUT the word "IICRC" ("get certified",
+// "certification course", "earn your certification"). Every CERT_BARE_MUST_BLOCK line exited 0
+// against the guard as of PR #1201's head (81a73f91); the rules after it block them. Run the
+// same plant against that guard to see it pass (vacuity check for this block).
+{
+  const guard = await import('./check-iicrc-compliance.mjs');
+  const MARKETING = 'docs/marketing/google-ads-campaign.md';
+  const ctx = () => (typeof guard.newCertificationContext === 'function' ? guard.newCertificationContext([]) : undefined);
+  const run = (line) => guard.evaluateContent(MARKETING, line, EMPTY, ctx());
+  const CERT_BARE_MUST_BLOCK = [
+    ['podcast CTA (docs/content, fixed here)', '"💧 The 3 water categories every restorer must know (IICRC S500). Get certified → carsi.com.au #waterdamage"'],
+    ['get certified, lower case', 'get certified fast and win more jobs'],
+    ['become certified', 'Become certified in water restoration in a weekend.'],
+    ['become a certified technician', 'Complete this course to become a certified technician.'],
+    ['become fully certified', 'Our learners become fully certified online.'],
+    ['getting certified', 'Getting certified has never been easier.'],
+    ['certification course', 'Enrol in our certification course today.'],
+    ['certification courses, hyphen', 'Online certification-courses for carpet cleaners.'],
+    ['certification training', 'IICRC certification training online.'],
+    ['certification program', 'Join the CARSI certification program.'],
+    ['certification programme', 'A 12-week certification programme for technicians.'],
+    ['certification class', 'Book a certification class near you.'],
+    ['earn your certification', 'Earn your certification online with CARSI.'],
+    ['achieve certification', 'Achieve certification in mould remediation.'],
+    ['gain an industry certification', 'Gain an industry certification without leaving the job site.'],
+    ['obtain your certification', 'Obtain your certification in three days.'],
+    ['receive certification', 'Receive certification on completion.'],
+  ];
+  const CERT_BARE_MUST_PASS = [
+    ['provider standing', 'CARSI is an IICRC Approved CEC Provider.'],
+    ['tagline: from an approved provider', 'Restoration training from an IICRC Approved CEC Provider.'],
+    ['third-person: FSRT', 'FSRT is an IICRC certification covering fire and smoke restoration.'],
+    ['third-person: obtained through schools', 'IICRC certification is obtained only through IICRC-approved schools and examinations.'],
+    ['third-person: route through school', 'Technicians get certified through an IICRC-approved school, then keep it current with CECs.'],
+    ['third-person requirement ("be certified")', 'Technicians must be certified by the IICRC to join many insurance panels.'],
+    ["student's own recert", 'Your IICRC recertification is due in March.'],
+    ["student's own renewal", 'Track the CECs you need to renew your IICRC certification.'],
+    ["student's own: keep current", 'Keep your IICRC certification current with CEC courses.'],
+    ["student's own: maintain", 'Earn IICRC CECs toward maintaining your existing certification.'],
+    ['member number', 'Enter your IICRC member number to log CECs.'],
+    ['CEC tracking', 'Your CEC hours this cycle: 4 of 14 logged.'],
+    ['CARSI designation', 'Earn your CARSI Water Restoration Practitioner designation.'],
+    ['completion certificate', 'Download your certificate of completion.'],
+    ['denial: not a certification course', 'This is not a certification course.'],
+    ['denial: paired adjective (ccw-truckmount-assessment)', 'It is a manufacturer/operator competency assessment, not an accredited or certification course.'],
+    ['denial: does not get you certified', 'A CARSI course does not get you certified by the IICRC.'],
+    ['denial: cannot become certified here', 'You cannot become certified through a CARSI course.'],
+  ];
+  for (const [name, line] of CERT_BARE_MUST_BLOCK) {
+    if (run(line).length === 0) fail(`GP-753 (bare) MUST BLOCK but passed: ${name}\n    ${line}`);
+  }
+  for (const [name, line] of CERT_BARE_MUST_PASS) {
+    const f = run(line);
+    if (f.length > 0) fail(`GP-753 (bare) MUST PASS but blocked: ${name}\n    ${line}\n    ${f.join('\n    ')}`);
+  }
+  console.log(`  GP-753 bare certification cases: ${CERT_BARE_MUST_BLOCK.length} block, ${CERT_BARE_MUST_PASS.length} pass.`);
+}
+
 // (7) IICRC-free files (public review policy): planted IICRC/CEC wording fires, neutral copy is
 // silent, and every listed file exists and is currently clean.
 for (const planted of [
