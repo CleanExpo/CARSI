@@ -105,7 +105,7 @@ export const COACHING_RESOURCE_SECTIONS: CoachingResourceSection[] = [
         title: 'TradeHall seminar room (preview)',
         description:
           'A dedicated hall for member workshops and supplier briefings. Full in-portal video ships with GP-636; until then, Growth Days and Owner Circle are your live peer touchpoints.',
-        href: '/ccw-training#booking',
+        href: coachingPortalPath('/tradehall'),
         tag: 'Preview',
       },
       {

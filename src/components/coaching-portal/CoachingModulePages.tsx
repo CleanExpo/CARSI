@@ -1,6 +1,6 @@
 'use client';
 
-import { ClipboardList, Compass, ExternalLink, Loader2, Megaphone, Video } from 'lucide-react';
+import { ClipboardList, Compass, ExternalLink, Loader2, Megaphone, Ticket, Video } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -32,6 +32,7 @@ import { actionBoardStats } from '@/lib/coaching-portal/action-board-view';
 import { COACHING_PAGE_META } from '@/lib/coaching-portal/coaching-page-meta';
 import { COACHING_RESOURCE_SECTIONS } from '@/lib/coaching-portal/coaching-resources';
 import { buildSessionReceiptView, isPastSession } from '@/lib/coaching-portal/session-receipt';
+import { buildTradeHallPassport } from '@/lib/coaching-portal/trade-hall-passport';
 import {
   COACHING_GROWTH_SERVICE_CATEGORIES,
   type GrowthServiceItem,
@@ -788,6 +789,82 @@ export function CoachingServicesPage() {
           onClose={() => setQuoteService(null)}
         />
       ) : null}
+    </div>
+  );
+}
+
+export function CoachingTradeHallPage() {
+  const { user, coach, access } = useCoachingPortal();
+  const meta = COACHING_PAGE_META.tradehall;
+  const periodStart = null;
+  const passport = buildTradeHallPassport({
+    memberDisplayName: user.displayName,
+    coach,
+    subscriptionStartedAt: periodStart,
+  });
+  const memberSince = new Date(passport.memberSinceIso).toLocaleDateString('en-AU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  return (
+    <div className={coachingPage} data-testid="coaching-tradehall-page">
+      <CoachingPageHeader
+        eyebrow={meta.eyebrow}
+        title={meta.title}
+        description={meta.description}
+        testId="coaching-tradehall-header"
+      />
+
+      <CoachingSection title="Hall passport" testId="coaching-tradehall-passport">
+        <p className={`flex flex-wrap items-center gap-2 ${coachingMuted}`}>
+          <Ticket className="h-4 w-4 text-sky-400" aria-hidden />
+          Preview — in-portal seminar video ships with GP-636.
+        </p>
+        <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div>
+            <dt className="text-xs font-semibold tracking-wide text-slate-500 uppercase">Passport</dt>
+            <dd className="mt-1 font-mono text-sm text-white">{passport.passportId}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-semibold tracking-wide text-slate-500 uppercase">Chapter</dt>
+            <dd className="mt-1 text-sm text-white">{passport.chapterSlug}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-semibold tracking-wide text-slate-500 uppercase">Coach</dt>
+            <dd className="mt-1 text-sm text-white">{passport.coachName}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-semibold tracking-wide text-slate-500 uppercase">Member since</dt>
+            <dd className="mt-1 text-sm text-white">{memberSince}</dd>
+          </div>
+        </dl>
+      </CoachingSection>
+
+      <CoachingSection title="Seminar room" testId="coaching-tradehall-room">
+        <CoachingEmptyState
+          icon={Video}
+          title="Seminar room (coming next)"
+          description="Live supplier briefings and chapter workshops will open here. Until then, join Owner Circle or book a Business Growth Day."
+          testId="coaching-tradehall-room-empty"
+        />
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link href="/programs/owner-circle" className={coachingPrimaryBtn}>
+            Owner Circle
+          </Link>
+          <Link href="/ccw-training#booking" className={coachingSecondaryBtn}>
+            Growth Days
+          </Link>
+        </div>
+      </CoachingSection>
+
+      <CoachingSupportPanel
+        className="mt-8"
+        mailSubject={meta.supportSubject}
+        tips={meta.supportTips}
+        testId="coaching-tradehall-support"
+      />
     </div>
   );
 }

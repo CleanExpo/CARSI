@@ -293,6 +293,8 @@ export async function loadCoachingPortalDashboard(
 
   const coachProfile = resolveCoachingMemberCoach({
     sessionCoachName: upcoming?.coachName ?? null,
+    chapterSlug: profile?.chapterSlug ?? null,
+    coachUserId: profile?.coachUserId ?? null,
   });
 
   return {

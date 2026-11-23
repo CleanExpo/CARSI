@@ -203,7 +203,7 @@ export const PARTNER_DEMO_WALKTHROUGH_STEPS: readonly PartnerDemoWalkthroughStep
   },
   {
     title: 'Coach chapter, Ask coach & TradeHall preview',
-    segment: '/resources#tradehall',
+    segment: '/tradehall',
     minutes: 0.5,
     advantage: 'A3 Ask coach, A5 chapter and A9 TradeHall preview',
     status: 'live',

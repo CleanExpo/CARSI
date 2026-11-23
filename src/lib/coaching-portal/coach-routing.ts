@@ -36,10 +36,17 @@ export const DEFAULT_COACHING_COACH: CoachingCoachProfile = {
  */
 export function resolveCoachingMemberCoach(input?: {
   sessionCoachName?: string | null;
+  chapterSlug?: string | null;
+  coachUserId?: string | null;
 }): CoachingCoachProfile {
+  const chapterSlug = input?.chapterSlug?.trim() || DEFAULT_COACHING_CHAPTER_SLUG;
   const name = input?.sessionCoachName?.trim();
-  if (name && name !== DEFAULT_COACHING_COACH.displayName) {
-    return { ...DEFAULT_COACHING_COACH, displayName: name };
+  const base = { ...DEFAULT_COACHING_COACH, chapterSlug };
+  if (input?.coachUserId) {
+    return { ...base, id: input.coachUserId };
   }
-  return DEFAULT_COACHING_COACH;
+  if (name && name !== DEFAULT_COACHING_COACH.displayName) {
+    return { ...base, displayName: name };
+  }
+  return base;
 }

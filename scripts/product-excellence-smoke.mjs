@@ -67,6 +67,8 @@ const STEPS = [
       'src/lib/coaching-portal/session-receipt.test.ts',
       'src/lib/marketing/carsi-coaching-program.test.ts',
       'src/lib/coaching-portal/partner-demo-page.test.tsx',
+      'src/lib/coaching-portal/onboarding-coach-brief.test.ts',
+      'src/lib/coaching-portal/trade-hall-passport.test.ts',
     ],
   },
   {
