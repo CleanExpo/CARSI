@@ -4,6 +4,9 @@
 node_modules
 .pnpm-store/
 
+# SDA Playwright captures (local evidence)
+artifacts/sda-evidence/
+
 # Build outputs
 .next/
 dist/

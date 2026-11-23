@@ -13,6 +13,7 @@ import {
 import { carsiCoachingPortalPath } from '@/lib/marketing/carsi-coaching-program';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
+import { generateAndStoreOnboardingCoachBrief } from '@/lib/server/carsi-coaching-onboarding-brief';
 import { assignLearningPathFromAssessment } from '@/lib/server/carsi-coaching-learning-path';
 import { getCarsiCoachingMonthlyNotifyRecipients } from '@/lib/server/carsi-coaching-monthly-notify';
 import { sendEmail } from '@/lib/server/email';
@@ -186,6 +187,13 @@ export async function submitCoachingOnboardingToCoach(
     await assignLearningPathFromAssessment(userId);
   } catch (err) {
     console.error('[coaching] learning path assignment failed', { userId, err });
+  }
+
+  // GP-628 / A1: coach brief for Phill (model when configured, else deterministic fallback).
+  try {
+    await generateAndStoreOnboardingCoachBrief(userId, snapshot);
+  } catch (err) {
+    console.error('[coaching] onboarding coach brief failed', { userId, err });
   }
 
   const appOrigin = getAppOrigin();
