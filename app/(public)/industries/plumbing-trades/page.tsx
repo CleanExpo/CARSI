@@ -12,6 +12,7 @@ import { IndustryRecommendedCourses } from '@/components/industries/IndustryReco
 import { FAQSchema } from '@/components/seo/JsonLd';
 import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
@@ -63,8 +64,7 @@ const faqs = [
   },
   {
     question: 'Can I complete CARSI training online while running a plumbing business?',
-    answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and fully self-paced. There are no fixed class times, so modules fit between jobs, in the evening or on weekends. Every completed course issues a verifiable CARSI credential, and CEC hours are recorded only for courses the IICRC has approved.',
+    answer: `Yes. CARSI, an ${IICRC_APPROVED_CEC_PROVIDER}, offers courses online and fully self-paced. There are no fixed class times, so modules fit between jobs, in the evening or on weekends. Every completed course issues a verifiable CARSI credential, and CEC hours are recorded only for courses the IICRC has approved.`,
   },
 ];
 

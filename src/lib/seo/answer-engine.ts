@@ -1,3 +1,4 @@
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 /**
  * Short question-and-answer copy for the pages buyers and answer engines ask about. Each page
  * renders these visibly (HomeFaqSection / its own list) AND emits FAQPage JSON-LD from the same
@@ -56,8 +57,7 @@ function membershipSentence(m: MembershipFacts): string {
     : `Yearly membership (${aud(m.priceAud)} per year) is listed on the pricing page as coming soon and cannot be bought yet.`;
 }
 
-const CERTIFICATION_ANSWER =
-  'No. IICRC certification is obtained only through IICRC-approved schools and examinations. CARSI is an IICRC CEC Accredited provider and issues its own credentials, the CARSI Southern Hemisphere Restoration Designations. Each one has a public verification page.';
+const CERTIFICATION_ANSWER = `No. IICRC certification is obtained only through IICRC-approved schools and examinations. CARSI is an ${IICRC_APPROVED_CEC_PROVIDER} and issues its own credentials, the CARSI Southern Hemisphere Restoration Designations. Each one has a public verification page.`;
 
 /** /courses — catalogue questions. */
 export function catalogueFaqs(f: CatalogueAnswerFacts): Faq[] {

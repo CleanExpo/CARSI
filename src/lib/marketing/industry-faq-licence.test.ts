@@ -12,6 +12,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
+import * as approvedWording from '@/lib/iicrc/approved-wording';
 import { getCecApprovalEntries, isCecApprovalCurrent } from '@/lib/seed/cec-approvals';
 
 import { evaluateContent as complianceFindings } from '../../../scripts/check-iicrc-compliance.mjs';
@@ -63,12 +64,24 @@ export function faqsFromSource(source: string): Faq[] {
     i++;
   }
   const block = source.slice(start, i);
+  // A template literal may only interpolate the GP-704 wording constants; they are resolved here so
+  // the sweep reads exactly what the page renders. Any other interpolation throws.
+  const resolve = (tpl: string) =>
+    tpl.replace(/\$\{(\w+)\}/g, (_, name: string) => {
+      const value = (approvedWording as Record<string, unknown>)[name];
+      if (typeof value !== 'string')
+        throw new Error(`unresolvable interpolation in an FAQ: ${name}`);
+      return value;
+    });
   const strings = (key: string) =>
     Array.from(
       block.matchAll(
-        new RegExp(`${key}:\\s*(?:'((?:\\\\.|[^'\\\\])*)'|"((?:\\\\.|[^"\\\\])*)")`, 'g')
+        new RegExp(
+          `${key}:\\s*(?:'((?:\\\\.|[^'\\\\])*)'|"((?:\\\\.|[^"\\\\])*)"|\`((?:\\\\.|[^\`\\\\])*)\`)`,
+          'g'
+        )
       ),
-      (m) => unquote(m[1] ?? m[2])
+      (m) => (m[3] !== undefined ? resolve(unquote(m[3])) : unquote(m[1] ?? m[2]))
     );
   const questions = strings('question');
   const answers = strings('answer');
