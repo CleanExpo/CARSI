@@ -8,6 +8,7 @@
  * statement than "I could not read Stripe".
  */
 import { normalizeStripeSecretKey } from '@/lib/api/stripe';
+import { formatMembershipAud, INDIVIDUAL_MEMBERSHIP } from '@/lib/lms/membership-prices';
 
 import { computeRwr, formatAud } from './rwr';
 import { collectRwrInputs, RwrUnreadableError, type RwrStripeReader } from './rwr-stripe';
@@ -98,7 +99,7 @@ export async function runRwrReport(deps: RwrReportDeps): Promise<number> {
   }
   deps.out(`RWR: ${formatAud(r.rwrWeeklyCents)} per week`);
   deps.out(
-    `  Recurring: ${r.memberships} memberships x $795 + ${r.seats} seats = ` +
+    `  Recurring: ${r.memberships} memberships x ${formatMembershipAud(INDIVIDUAL_MEMBERSHIP)} + ${r.seats} seats = ` +
       `${formatAud(r.membershipAnnualCents + r.seatAnnualCents)} a year, ÷ 52 = ${formatAud(r.recurringWeeklyCents)}`
   );
   deps.out(
