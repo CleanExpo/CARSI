@@ -370,7 +370,7 @@ describe('partner referral (GP-767)', () => {
   });
 
   it('keeps the partner on a discounted checkout', async () => {
-    mocks.verifySession.mockResolvedValue({ sub: 'user-disc' });
+    mocks.verifySession.mockResolvedValue({ sub: 'user-disc', role: 'student' });
     mocks.findUser.mockResolvedValue({ id: 'user-disc', isActive: true });
     mocks.findEnrollment.mockResolvedValue(null);
     mocks.discount.mockResolvedValue({ id: 'disc-1', discountType: 'percent', value: 20 });

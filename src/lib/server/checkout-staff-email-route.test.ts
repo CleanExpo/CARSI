@@ -48,18 +48,11 @@ vi.mock('@/lib/prisma', () => ({
 }));
 
 vi.mock('@/lib/server/local-course-checkout', () => ({
-  // A Bearer "email:<address>" header resolves to that address, as a verified Bearer JWT would.
+  // The current session's email when there is one (GP-760: buyer and payer are one credential),
+  // otherwise the typed email.
   resolveCheckoutEmail: vi.fn(
-    async ({
-      bodyEmail,
-      authorizationHeader,
-    }: {
-      bodyEmail?: string;
-      authorizationHeader?: string;
-    }) =>
-      authorizationHeader?.startsWith('Bearer email:')
-        ? authorizationHeader.slice('Bearer email:'.length)
-        : bodyEmail?.trim().toLowerCase() || null
+    async ({ session, bodyEmail }: { session: { email: string } | null; bodyEmail?: string }) =>
+      session ? session.email : bodyEmail?.trim().toLowerCase() || null
   ),
   createStripeCheckoutForCourse: stripe.create,
 }));
@@ -212,10 +205,12 @@ describe('POST /api/lms/checkout — unclaimed staff email', () => {
 
   it('refuses a deactivated account reached by Bearer token or typed email, with no cookie', async () => {
     db.users.push({ id: 'learner-7', email: 'gone@example.com', isActive: false });
+    // GP-760: a signed Bearer token is a session like the cookie; the server refuses it for a
+    // deactivated user, and checkout does not fall through to the guest path.
     const bearer = await post(
       { slug: 'water-damage-essentials', guest_checkout: true },
       undefined,
-      'Bearer email:gone@example.com'
+      'Bearer valid:learner-7'
     );
     expect(bearer.status).toBe(401);
     expect((await bearer.json()).code).toBe('inactive_account');
