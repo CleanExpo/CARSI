@@ -172,6 +172,26 @@ model LmsCourse {
   @@map("lms_courses")
 }
 
+/// Append-only course approval and publish record (GP-776). An `approve` row is a named admin's
+/// approval of exactly the content whose sha256 it stores; a `publish` row records who published,
+/// which approval it relied on and the content it published. Application code only INSERTs.
+/// No FK to lms_courses on purpose: the record must outlive the course.
+model LmsCourseApproval {
+  id            String   @id @default(uuid()) @db.Uuid
+  courseRef     String   @map("course_ref") @db.Uuid
+  courseSlug    String   @map("course_slug")
+  /// approve | publish (DB CHECK)
+  action        String   @db.VarChar(16)
+  actorEmail    String   @map("actor_email")
+  contentSha256 String   @map("content_sha256") @db.VarChar(64)
+  /// For a publish row: the approve row it relied on.
+  approvalRef   String?  @map("approval_ref") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([courseRef, action, createdAt(sort: Desc)], map: "ix_lms_course_approvals_course_action_created")
+  @@map("lms_course_approvals")
+}
+
 /// Student course reviews / star ratings (1–5). One review per student per course
 /// (`uq_lms_course_review`), gated on an existing enrolment. `isPublished` lets an
 /// admin hide a review without deleting it; public listings filter on it.

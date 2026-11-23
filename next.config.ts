@@ -60,6 +60,10 @@ const nextConfig: NextConfig = {
     '/api/lms/workshops/carpet-cleaning/instructor-manual': [
       './docs/course-content/ccw-workshop/instructor-guide.md',
     ],
+    // GP-776: the publish gate reads each course's evidence ledger and its git course copy
+    // (data/courses, data/seed) at request time. public/ is copied into the image separately.
+    // A file missing at runtime blocks publishing; it never passes.
+    '/api/admin/courses/[id]/workflow': ['./data/courses/**/*', './data/seed/**/*'],
   },
   reactStrictMode: true,
   poweredByHeader: false,
