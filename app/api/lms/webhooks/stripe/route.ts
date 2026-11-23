@@ -57,6 +57,7 @@ import {
 import { markSubscriptionStatusBySubscriptionId } from '@/lib/server/subscription-store';
 import { handleSubscriptionEvent, isSubscriptionEvent } from '@/lib/server/subscription-webhook';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
+import { checkoutAmountPaid } from '@/lib/server/checkout-payment';
 import { applyCheckoutPaymentReversal, applyDisputeWon } from '@/lib/server/seat-state';
 import { markTeamSubscriptionStatusBySubscriptionId } from '@/lib/server/team-subscription-store';
 
@@ -522,6 +523,7 @@ export async function POST(request: NextRequest) {
         paymentReference: ref,
         purchaseMode,
         teamSeatCount: Number.isFinite(teamSeatCount) ? teamSeatCount : undefined,
+        amountPaid: checkoutAmountPaid(session),
       });
       await resolveUnfulfilledPayment(ref);
 

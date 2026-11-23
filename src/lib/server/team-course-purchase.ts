@@ -6,6 +6,7 @@ import {
   type TeamSeatBlock,
 } from '@/lib/server/seat-state';
 import { createUniqueTeamSlug } from '@/lib/server/teams';
+import type { CheckoutAmountPaid } from '@/lib/server/checkout-payment';
 
 export function buildTeamDashboardUrl(
   origin: string,
@@ -26,6 +27,12 @@ export async function fulfillCourseCheckoutForUser(params: {
   paymentReference: string;
   purchaseMode: 'self' | 'team';
   teamSeatCount?: number;
+  /**
+   * GP-764: the paid session's own amount and currency (`checkoutAmountPaid(session)`), recorded
+   * once per Stripe checkout session. Null for a grant that is not a Stripe checkout (free,
+   * discount). Required, so no fulfilment path can forget it.
+   */
+  amountPaid: CheckoutAmountPaid | null;
 }): Promise<{
   kind: 'self' | 'team';
   enrollmentId?: string;
@@ -34,7 +41,7 @@ export async function fulfillCourseCheckoutForUser(params: {
   redirectPath: string;
   alreadyEnrolled: boolean;
 }> {
-  const { claims, courseSlug, paymentReference, purchaseMode, teamSeatCount } = params;
+  const { claims, courseSlug, paymentReference, purchaseMode, teamSeatCount, amountPaid } = params;
   const isTeam = purchaseMode === 'team' && !!teamSeatCount && teamSeatCount >= 2;
 
   // GP-759: reads and slow work first; then the buyer's enrolment and the seat block are written
@@ -56,7 +63,7 @@ export async function fulfillCourseCheckoutForUser(params: {
     };
   }
 
-  const { result, team } = await fulfilCheckoutInStep(enrolment, block);
+  const { result, team } = await fulfilCheckoutInStep(enrolment, block, amountPaid);
   const alreadyEnrolled = result === 'already_enrolled';
   if (team === 'already_on_team') throw new Error('ALREADY_ON_TEAM');
 

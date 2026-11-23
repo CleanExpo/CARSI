@@ -24,6 +24,7 @@ import {
   type PaymentReversalReason,
 } from '@/lib/server/payment-integrity-ledger';
 import { countTeamPaidSeatsUsed, teamPaidSeatHolders } from '@/lib/server/team-seat-refund';
+import type { CheckoutAmountPaid } from '@/lib/server/checkout-payment';
 
 /**
  * GP-759, Phill's ruling 23/11/2026 ("Fix the design once"): the ONE owner of session and team
@@ -247,21 +248,66 @@ async function writeTeamSeatBlock(
 }
 
 /**
+ * GP-764: record what this checkout session cost, once. The buyer's enrolment may already be held
+ * through another payment, and a team buyer may sit on another team, but the session was still
+ * paid, so the record is written whatever the enrolment outcome. A replay (webhook and success
+ * page, or a Stripe retry) finds the row and changes nothing. A reversed session is not recorded;
+ * a reversal landing later is read from its marker by admin revenue.
+ */
+async function recordCheckoutPayment(
+  tx: SeatTx,
+  enrolment: PreparedEnrolment,
+  block: TeamSeatBlock | null,
+  paid: CheckoutAmountPaid
+): Promise<void> {
+  const ref = enrolment.paymentReference.trim();
+  if (!isStripeCheckoutPaymentReference(ref)) return;
+  if (await isCheckoutSessionReversed(tx, ref)) return;
+  const existing = await tx.lmsCheckoutPayment.findUnique({
+    where: { checkoutSessionId: ref },
+    select: { checkoutSessionId: true },
+  });
+  if (existing) return;
+  await tx.lmsCheckoutPayment.create({
+    data: {
+      checkoutSessionId: ref,
+      studentId: enrolment.studentId,
+      courseId: enrolment.courseId,
+      purchaseMode: block ? 'team' : 'self',
+      seatCount: block ? block.seatCount : 1,
+      amountTotalCents: paid.amountTotalCents,
+      currency: paid.currency,
+      paidAt: paid.sessionCreatedAt ?? new Date(),
+    },
+  });
+}
+
+/**
  * Fulfil a paid checkout: the buyer's enrolment and, for a team checkout, its seat block, in one
  * step that first checks the session was not reversed. Throws `PAYMENT_REVERSED` when it was.
+ * `paid` is the session's own amount and currency (GP-764), recorded once per Stripe session;
+ * null for a grant that is not a Stripe checkout.
  */
 export function fulfilCheckoutInStep(
   enrolment: PreparedEnrolment,
   block: TeamSeatBlock | null,
-): Promise<{ result: EnrollResult; team: { teamId: string; teamSlug: string } | 'already_on_team' | null }> {
+  paid: CheckoutAmountPaid | null
+): Promise<{
+  result: EnrollResult;
+  team: { teamId: string; teamSlug: string } | 'already_on_team' | null;
+}> {
   return runSeatStateStep(async (tx) => {
     const result = await issueCheckoutEnrolment(tx, enrolment);
-    if (!block) return { result, team: null };
+    if (!block) {
+      if (paid) await recordCheckoutPayment(tx, enrolment, null, paid);
+      return { result, team: null };
+    }
     // The buyer may hold the course through another payment ('already_enrolled' issued nothing),
     // so check the session again before its seats are provisioned.
     if (isStripeCheckoutPaymentReference(block.paymentReference) && (await isCheckoutSessionReversed(tx, block.paymentReference))) {
       throw new Error(PAYMENT_REVERSED);
     }
+    if (paid) await recordCheckoutPayment(tx, enrolment, block, paid);
     return { result, team: await writeTeamSeatBlock(tx, block) };
   });
 }

@@ -65,6 +65,18 @@ describe('GP-759: the seat step is the only writer of seat and session state', (
     ).toEqual([]);
   });
 
+  it('GP-764: only the step writes the checkout payment record', () => {
+    expect(FILES.find((f) => f.path === OWNER)?.text).toMatch(/lmsCheckoutPayment\.create\(/);
+    expect(
+      writersOutsideOwner(
+        /lmsCheckoutPayment\.(create|createMany|update|updateMany|upsert|delete|deleteMany)\(/
+      )
+    ).toEqual([]);
+    expect(
+      writersOutsideOwner(/(INSERT INTO|UPDATE|DELETE FROM)\s+"?lms_checkout_payments/i)
+    ).toEqual([]);
+  });
+
   it('only the step issues a prepared enrolment (checkout and team seats)', () => {
     const service = join('src', 'lib', 'server', 'enrollment-service.ts');
     expect(writersOutsideOwner(/\bissuePreparedEnrolment\(/, [service])).toEqual([]);

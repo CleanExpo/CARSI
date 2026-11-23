@@ -13,6 +13,7 @@ import {
 import { captureServerError } from '@/lib/server/sentry';
 import { getTeamForUser } from '@/lib/server/teams';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
+import { checkoutAmountPaid } from '@/lib/server/checkout-payment';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
 
@@ -102,6 +103,7 @@ export async function POST(request: NextRequest) {
       paymentReference: sessionId,
       purchaseMode,
       teamSeatCount: Number.isFinite(teamSeatCount) ? teamSeatCount : undefined,
+      amountPaid: checkoutAmountPaid(session),
     });
 
     await markUnfulfilledPaymentResolved(sessionId, '[guest-complete]');

@@ -29,9 +29,40 @@ export function revenueAudForPaidCount(paidEnrollments: number): number | null {
   return paidEnrollments > 0 ? null : 0;
 }
 
+/**
+ * GP-764: one paid course checkout as recorded at fulfilment (`lms_checkout_payments`), or a
+ * partner referral sale for an older session (same Stripe `amount_total`). `reversed` is the
+ * session's reversal marker (full refund, or a dispute not won).
+ */
+export type CheckoutPaymentLike = {
+  checkoutSessionId: string;
+  /** When the checkout was paid (its Stripe session's creation time); periods are windowed on it. */
+  paidAt: Date;
+  amountTotalCents: number | null;
+  currency: string | null;
+  reversed: boolean;
+};
+
+/** A recorded payment whose dollars are known: not reversed, a whole amount, in AUD. */
+function knownAudCents(p: CheckoutPaymentLike): number | null {
+  if (p.reversed || p.amountTotalCents === null) return null;
+  return (p.currency ?? '').toLowerCase() === 'aud' ? p.amountTotalCents : null;
+}
+
 export type AdminOpsPeriodKpis = {
-  /** 0 when the window has no Stripe-paid enrolments; null when it has any (price unknown). */
+  /**
+   * The window's revenue when every paid checkout in it has a recorded amount; null while any
+   * paid enrolment in it has none (price at purchase unknown; see the two fields below).
+   */
   revenueAud: number | null;
+  /** GP-764: AUD actually paid in the window, from recorded checkouts not refunded or disputed. */
+  revenueRecordedAud: number;
+  /**
+   * GP-764: paid checkouts in the window whose amount is not known: Stripe-paid enrolments
+   * with no recorded payment (paid before amounts were stored), and recorded payments with no
+   * amount or not in AUD. Never valued at a course's price today.
+   */
+  paidPriceUnknown: number;
   /** Stripe-paid enrolments (one per Checkout session and learner; a team purchase is one). */
   paidEnrollments: number;
   enrollments: number;
@@ -80,10 +111,13 @@ export function summariseOpsPeriod(
   sales: SaleLike[],
   usersCreatedAt: Date[],
   period: AdminOpsPeriod,
-  now = new Date()
+  now = new Date(),
+  payments: CheckoutPaymentLike[] = []
 ): AdminOpsPeriodKpis {
   const { from, to } = periodBounds(period, now);
+  const recorded = new Set(payments.map((p) => p.checkoutSessionId));
   let paidEnrollments = 0;
+  let paidPriceUnknown = 0;
   let enrollments = 0;
   let completions = 0;
   let certificates = 0;
@@ -91,7 +125,11 @@ export function summariseOpsPeriod(
   for (const row of sales) {
     if (inRange(row.enrolledAt, from, to)) {
       enrollments += 1;
-      if (enrollmentIsStripePaid(row)) paidEnrollments += 1;
+      if (enrollmentIsStripePaid(row)) {
+        paidEnrollments += 1;
+        // Its session's dollars come from the payment record (counted below), when there is one.
+        if (!recorded.has((row.paymentReference ?? '').trim())) paidPriceUnknown += 1;
+      }
     }
     if (row.completedAt && inRange(row.completedAt, from, to)) {
       completions += 1;
@@ -101,9 +139,22 @@ export function summariseOpsPeriod(
     }
   }
 
+  // One record per Stripe session: a team purchase is counted once, for all its seats.
+  let recordedCents = 0;
+  for (const p of payments) {
+    if (p.reversed || !inRange(p.paidAt, from, to)) continue;
+    const cents = knownAudCents(p);
+    if (cents === null) paidPriceUnknown += 1;
+    else recordedCents += cents;
+  }
+  const revenueRecordedAud = recordedCents / 100;
+
   const newUsers = usersCreatedAt.filter((at) => inRange(at, from, to)).length;
   return {
-    revenueAud: revenueAudForPaidCount(paidEnrollments),
+    // With no payment records this is GP-763's rule unchanged: 0 with no paid enrolments, else null.
+    revenueAud: paidPriceUnknown === 0 ? revenueRecordedAud : null,
+    revenueRecordedAud,
+    paidPriceUnknown,
     paidEnrollments,
     enrollments,
     completions,

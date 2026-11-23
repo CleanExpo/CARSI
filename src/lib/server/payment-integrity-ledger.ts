@@ -139,6 +139,25 @@ export async function isCheckoutPaymentReversed(
 }
 
 /**
+ * GP-764: of `checkoutSessionIds`, the ones currently reversed (refunded, or disputed and not
+ * won), by the same rule as `isCheckoutPaymentReversed`, read in one query for admin revenue.
+ */
+export async function reversedCheckoutSessionIds(
+  db: Prisma.TransactionClient | typeof prisma,
+  checkoutSessionIds: string[]
+): Promise<Set<string>> {
+  if (checkoutSessionIds.length === 0) return new Set();
+  const rows = await db.stripeWebhookEvent.findMany({
+    where: {
+      id: { in: checkoutSessionIds.map(reversalId) },
+      type: { startsWith: REVERSED_TYPE_PREFIX },
+    },
+    select: { id: true },
+  });
+  return new Set(rows.map((r) => r.id.slice(REVERSAL_PREFIX.length)));
+}
+
+/**
  * Store (or re-open) the unfulfilled record for a paid Stripe object. Idempotent per object:
  * a retried delivery updates the reason and keeps the first-seen time.
  */

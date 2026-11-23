@@ -30,7 +30,7 @@ import { formatAdminDate } from '@/components/admin/admin-learner-ui';
 import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
 import type { AdminDashboardClientData } from '@/lib/admin/admin-dashboard-data';
 import {
-  formatRevenueAud,
+  formatRevenueSummary,
   formatSignedPct,
   momDeltaPct,
   type AdminOpsPeriod,
@@ -205,7 +205,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
             {snapshot.paidEnrollments.toLocaleString()}
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/55">
-            <span>Revenue: {formatRevenueAud(snapshot.revenueAud)}</span>
+            <span>Revenue: {formatRevenueSummary(snapshot)}</span>
             <DeltaChip
               current={snapshot.paidEnrollments}
               previous={data.ops.lastMonth.paidEnrollments}

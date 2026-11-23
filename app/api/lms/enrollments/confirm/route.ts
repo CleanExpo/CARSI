@@ -13,7 +13,11 @@ import {
 } from '@/lib/server/payment-integrity-ledger';
 import { captureServerError } from '@/lib/server/sentry';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
-import { isPrerequisiteNotMetError, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
+import { checkoutAmountPaid } from '@/lib/server/checkout-payment';
+import {
+  isPrerequisiteNotMetError,
+  prerequisiteBlockBody,
+} from '@/lib/server/course-prerequisites';
 import { computeDiscountedAud, findActiveUserDiscount } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 import { getAppOrigin } from '@/lib/server/app-url';
@@ -45,6 +49,8 @@ export async function POST(request: NextRequest) {
   let teamSeatCount: number | undefined;
   /** GST-inclusive amount Stripe charged; set only for a paid Stripe session (GP-761). */
   let paidAmountTotalCents: number | null = null;
+  // GP-764: the paid session's own amount and currency, recorded once at fulfilment.
+  let amountPaid: ReturnType<typeof checkoutAmountPaid> | null = null;
 
   if (sessionId) {
     if (!process.env.STRIPE_SECRET_KEY?.trim()) {
@@ -82,6 +88,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ detail: 'Session email does not match account' }, { status: 403 });
       }
       paidAmountTotalCents = session.amount_total ?? null;
+      amountPaid = checkoutAmountPaid(session);
     } catch (e) {
       console.error('[enrollments/confirm] stripe', e);
       void captureServerError(e, { route: '/api/lms/enrollments/confirm' });
@@ -145,6 +152,7 @@ export async function POST(request: NextRequest) {
       paymentReference,
       purchaseMode,
       teamSeatCount,
+      amountPaid,
     });
 
     if (sessionId) {
