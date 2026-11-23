@@ -39,7 +39,9 @@ let container: HTMLDivElement;
 let root: Root;
 let gtagCalls: unknown[][];
 const realLocation = window.location;
-const nav = { href: '', origin: 'https://carsi.example.test' };
+// The page the membership button is on. GA4 sends only from a counted page (P1-5), as a real
+// visitor's window.location always carries a pathname.
+const nav = { href: '', origin: 'https://carsi.example.test', pathname: '/subscribe', search: '' };
 
 const checkoutEvents = () =>
   gtagCalls.filter((c) => c[0] === 'event' && c[1] === 'membership_checkout_started');
