@@ -29,10 +29,6 @@ import {
   findCoursePrerequisiteBlock,
   PrerequisiteNotMetError,
 } from '@/lib/server/course-prerequisites';
-import {
-  isCheckoutPaymentReversed,
-  PAYMENT_REVERSED,
-} from '@/lib/server/payment-integrity-ledger';
 
 /**
  * Assessment gate for completion: the ONE rule for "has this learner passed every required
@@ -138,12 +134,52 @@ export type EnrollOptions = {
   onPrerequisiteNotMet?: 'refuse' | 'lock';
 };
 
+/**
+ * GP-759 (Phill, 23/11/2026): a Stripe checkout session (`cs_*`) and a team seat (`team:*`) are
+ * session and seat state. They are issued only inside the one serialisable seat step
+ * (`seat-state.ts`), which checks the session's reversal and the team's paid seats in the same
+ * transaction as the write. This writer refuses them so no route can issue one around the step.
+ */
+export function isSeatStatePaymentReference(paymentReference: string): boolean {
+  const ref = paymentReference.trim();
+  return ref.startsWith('cs_') || ref.startsWith('team:');
+}
+
 export async function enrollStudentInCourse(
   claims: SessionClaims,
   slug: string,
   paymentReference: string,
   options: EnrollOptions = {},
 ): Promise<EnrollResult> {
+  if (isSeatStatePaymentReference(paymentReference)) {
+    throw new Error('SEAT_STATE_OUTSIDE_STEP');
+  }
+  const prepared = await prepareEnrolment(claims, slug, paymentReference, options);
+  return writeEnrolmentRow(prisma, prepared, { swallowUniqueClash: true });
+}
+
+/** An enrolment made ready outside a transaction; written by `issuePreparedEnrolment`. */
+export type PreparedEnrolment = {
+  studentId: string;
+  courseId: string;
+  paymentReference: string;
+  /** `prerequisiteGated` to store if this write issues access. */
+  prerequisiteGated: boolean;
+  /** Set when the prerequisite refuses a NEW enrolment; thrown only if the write would issue. */
+  refusal: PrerequisiteNotMetError | null;
+};
+
+/**
+ * The reading half of an enrolment: learner sync, course, cohort-only rule (GP-736) and the
+ * prerequisite decision. Reads and idempotent syncs only, so a caller can do this before it opens
+ * a transaction and then write with `issuePreparedEnrolment` inside it.
+ */
+export async function prepareEnrolment(
+  claims: SessionClaims,
+  slug: string,
+  paymentReference: string,
+  options: EnrollOptions = {},
+): Promise<PreparedEnrolment> {
   await ensureLmsUserFromClaims(claims);
   const course = await getOrCreateCourseBySlug(slug);
 
@@ -154,41 +190,55 @@ export async function enrollStudentInCourse(
     throw new Error('COURSE_NOT_SELF_ENROLABLE');
   }
 
-  const existing = await prisma.lmsEnrollment.findUnique({
-    where: {
-      studentId_courseId: { studentId: claims.sub, courseId: course.id },
-    },
-    select: { id: true, status: true, paymentReference: true, revokedReason: true },
-  });
-
-  // GP-759: a refunded or charged-back checkout session never issues or reactivates access.
-  // Stripe still reports such a session as `paid`, so the success page alone cannot tell.
-  // Refused when the revoked row was revoked for this very session, or when the reversal was
-  // recorded before any row existed. A NEW paid session still reactivates (re-purchase below).
-  // Checked only when this call would issue access (no row, or a revoked row): a learner who
-  // already holds live access through another payment still gets 'already_enrolled'.
-  const wouldIssueAccess = !existing || isRevokedStatus(existing.status);
-  if (wouldIssueAccess && isStripeCheckoutPaymentReference(paymentReference)) {
-    const revokedForThisPayment =
-      existing !== null &&
-      existing.paymentReference === paymentReference &&
-      (existing.revokedReason === 'refunded' || existing.revokedReason === 'disputed');
-    if (revokedForThisPayment || (await isCheckoutPaymentReversed(paymentReference))) {
-      throw new Error(PAYMENT_REVERSED);
-    }
-  }
-
-  // Prerequisite gate (DECISIONS #41) — checked only when an enrolment is ISSUED (a new
-  // row, or a revoked row being reactivated). An existing active/completed row is
-  // grandfathered and returns 'already_enrolled' below without a re-check.
   let prerequisiteGated = false;
-  if (!existing || isRevokedStatus(existing.status)) {
+  let refusal: PrerequisiteNotMetError | null = null;
+  try {
     prerequisiteGated = await checkPrerequisitesForNewEnrolment(
       claims,
       course,
       paymentReference,
       options.onPrerequisiteNotMet ?? 'refuse',
     );
+  } catch (e) {
+    if (!(e instanceof PrerequisiteNotMetError)) throw e;
+    refusal = e;
+  }
+  return { studentId: claims.sub, courseId: course.id, paymentReference, prerequisiteGated, refusal };
+}
+
+/**
+ * Writes a prepared enrolment with the caller's transaction client (the seat step). Inside a
+ * transaction a unique-key clash is not swallowed: Postgres has already aborted it.
+ */
+export function issuePreparedEnrolment(
+  db: Prisma.TransactionClient,
+  prepared: PreparedEnrolment,
+): Promise<EnrollResult> {
+  return writeEnrolmentRow(db, prepared, { swallowUniqueClash: false });
+}
+
+/** The one writer of an enrolment row: issue, reactivate a revoked row, or report a duplicate. */
+async function writeEnrolmentRow(
+  db: Prisma.TransactionClient | typeof prisma,
+  prepared: PreparedEnrolment,
+  { swallowUniqueClash }: { swallowUniqueClash: boolean },
+): Promise<EnrollResult> {
+  const { studentId, paymentReference } = prepared;
+  const course = { id: prepared.courseId };
+  const existing = await db.lmsEnrollment.findUnique({
+    where: {
+      studentId_courseId: { studentId, courseId: course.id },
+    },
+    select: { id: true, status: true },
+  });
+
+  // Prerequisite gate (DECISIONS #41) — applied only when an enrolment is ISSUED (a new
+  // row, or a revoked row being reactivated). An existing active/completed row is
+  // grandfathered and returns 'already_enrolled' below without a re-check.
+  let prerequisiteGated = false;
+  if (!existing || isRevokedStatus(existing.status)) {
+    if (prepared.refusal) throw prepared.refusal;
+    prerequisiteGated = prepared.prerequisiteGated;
   }
 
   if (existing) {
@@ -198,7 +248,7 @@ export async function enrollStudentInCourse(
     // again is not left locked out by the read gates that now deny 'revoked'.
     // An active/completed row is a genuine duplicate and stays 'already_enrolled'.
     if (isRevokedStatus(existing.status)) {
-      await prisma.lmsEnrollment.update({
+      await db.lmsEnrollment.update({
         where: { id: existing.id },
         data: {
           status: 'active',
@@ -214,10 +264,10 @@ export async function enrollStudentInCourse(
   }
 
   try {
-    const enrollment = await prisma.lmsEnrollment.create({
+    const enrollment = await db.lmsEnrollment.create({
       data: {
         id: randomUUID(),
-        studentId: claims.sub,
+        studentId,
         courseId: course.id,
         status: 'active',
         paymentReference,
@@ -230,7 +280,7 @@ export async function enrollStudentInCourse(
     // Concurrent enrolment (Stripe webhook + success-page confirm racing) hits
     // the @@unique([studentId, courseId]) constraint. Treat as already enrolled
     // instead of surfacing a 500 to a paying customer.
-    if (isUniqueConstraintError(error)) {
+    if (swallowUniqueClash && isUniqueConstraintError(error)) {
       return 'already_enrolled';
     }
     throw error;

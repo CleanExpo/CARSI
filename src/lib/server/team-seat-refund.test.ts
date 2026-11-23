@@ -26,6 +26,7 @@ const db = vi.hoisted(() => ({
   team: { id: 'team-1', slug: 'team-one', ownerId: 'owner', seatLimit: 0 },
   members: [] as string[],
   refundedSession: '',
+  markers: [] as Array<{ id: string; type: string; processedAt: Date }>,
 }));
 const h = vi.hoisted(() => ({ event: null as Record<string, unknown> | null }));
 
@@ -82,7 +83,17 @@ vi.mock('@/lib/server/stripe-revocation', async (importOriginal) => ({
 const enrolSpy = vi.hoisted(() => vi.fn());
 vi.mock('@/lib/server/enrollment-service', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/server/enrollment-service')>()),
-  enrollStudentInCourse: enrolSpy,
+  prepareEnrolment: vi.fn(async (claims: { sub: string }, _slug: string, ref: string) => ({
+    studentId: claims.sub,
+    courseId: 'course-1',
+    paymentReference: ref,
+    prerequisiteGated: false,
+    refusal: null,
+  })),
+  // GP-759: the seat step issues seats with the prepared-enrolment writer.
+  issuePreparedEnrolment: vi.fn((_tx: unknown, prepared: { studentId: string; paymentReference: string }) =>
+    enrolSpy({ sub: prepared.studentId }, 'team-course', prepared.paymentReference),
+  ),
 }));
 vi.mock('@/lib/server/team-course-slug-db', () => ({
   readTeamCourseSlug: vi.fn(async () => 'team-course'),
@@ -133,7 +144,30 @@ vi.mock('@/lib/prisma', () => {
         },
       })),
     },
+    // GP-759: payment reversal markers (namespaced keys in the Stripe event ledger).
+    stripeWebhookEvent: {
+      findUnique: vi.fn(async (args: { where: { id: string } }) => db.markers.find((m) => m.id === args.where.id) ?? null),
+      create: vi.fn(async (args: { data: { id: string; type: string; processedAt: Date } }) => {
+        db.markers.push({ ...args.data });
+        return args.data;
+      }),
+      upsert: vi.fn(async (args: { where: { id: string }; create: { id: string; type: string; processedAt: Date }; update: { type: string; processedAt: Date } }) => {
+        const row = db.markers.find((m) => m.id === args.where.id);
+        if (row) Object.assign(row, args.update);
+        else db.markers.push({ ...args.create });
+        return row ?? args.create;
+      }),
+      update: vi.fn(async (args: { where: { id: string }; data: { type: string; processedAt: Date } }) => {
+        const row = db.markers.find((m) => m.id === args.where.id)!;
+        Object.assign(row, args.data);
+        return row;
+      }),
+    },
+    lmsUser: {
+      findUnique: vi.fn(async () => ({ email: 'owner@seat-refund-test.invalid', fullName: null })),
+    },
     lmsTeam: {
+      findUnique: vi.fn(async () => null),
       update: vi.fn(async (args: { data: { seatLimit?: number } }) => {
         if (typeof args.data.seatLimit === 'number') db.team.seatLimit = args.data.seatLimit;
         return db.team;
@@ -172,6 +206,10 @@ vi.mock('@/lib/prisma', () => {
             )
             .sort((a, b) => b.enrolledAt.getTime() - a.enrolledAt.getTime()),
       ),
+      findUnique: vi.fn(async (args: { where: { studentId_courseId: { studentId: string; courseId: string } } }) => {
+        const k = args.where.studentId_courseId;
+        return db.enrolments.find((e) => e.studentId === k.studentId && e.courseId === k.courseId) ?? null;
+      }),
       count: vi.fn(
         async (args: { where: { courseId: string; studentId: { in: string[] }; status: { notIn: string[] } } }) =>
           db.enrolments.filter(
@@ -200,7 +238,7 @@ vi.mock('@/lib/prisma', () => {
 });
 
 const { POST } = await import('../../../app/api/lms/webhooks/stripe/route');
-const { provisionTeamCoursePurchase, enrollTeamMemberInPurchasedCourse } = await import('./team-course-purchase');
+const { fulfillCourseCheckoutForUser, enrollTeamMemberInPurchasedCourse } = await import('./team-course-purchase');
 const { assertCourseSeatsAvailable } = await import('./team-course-seats');
 const { prisma: prismaClient } = await import('@/lib/prisma');
 const prismaFake = () => prismaClient as never;
@@ -239,6 +277,7 @@ beforeEach(() => {
   process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test_placeholder';
   process.env.DATABASE_URL = 'postgresql://offline.invalid/test';
   db.team.seatLimit = 8;
+  db.markers = [];
   db.purchases = [
     { id: 'p-1', teamId: 'team-1', courseSlug: COURSE.slug, seatLimit: 5, paymentReference: 'cs_test_first' },
     { id: 'p-2', teamId: 'team-1', courseSlug: COURSE.slug, seatLimit: 3, paymentReference: 'cs_test_second' },
@@ -279,14 +318,16 @@ describe('GP-759 (c): refunding a team seat purchase revokes those seats', () =>
     await refund('cs_test_second');
     await refund('cs_test_first');
 
-    await provisionTeamCoursePurchase({
-      ownerId: 'owner',
-      ownerEmail: 'owner@seat-refund-test.invalid',
-      ownerName: null,
-      courseSlug: COURSE.slug,
-      seatCount: 5,
-      paymentReference: 'cs_test_first',
-    });
+    // The refund left a reversal marker, so the replay is refused before any seat is written.
+    await expect(
+      fulfillCourseCheckoutForUser({
+        claims: { sub: 'owner', email: 'owner@seat-refund-test.invalid' } as never,
+        courseSlug: COURSE.slug,
+        paymentReference: 'cs_test_first',
+        purchaseMode: 'team',
+        teamSeatCount: 5,
+      }),
+    ).rejects.toThrow('PAYMENT_REVERSED');
 
     expect(db.team.seatLimit).toBe(0);
     expect(db.purchases.map((p) => p.seatLimit)).toEqual([0, 0]);

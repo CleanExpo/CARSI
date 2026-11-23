@@ -1,8 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import {
-  findTeamCoursePurchaseByPaymentReference,
   findTeamCoursePurchasesByTeamId,
-  insertTeamCoursePurchase,
 } from '@/lib/server/team-course-purchase-db';
 import { readTeamCourseSlug } from '@/lib/server/team-course-slug-db';
 import { teamPaidSeatHolders } from '@/lib/server/team-seat-refund';
@@ -145,21 +143,6 @@ export async function getTeamCourseSeatPools(teamId: string) {
   }
 
   return [...bySlug.values()];
-}
-
-export async function addTeamCoursePurchase(params: {
-  teamId: string;
-  courseSlug: string;
-  seatLimit: number;
-  paymentReference?: string;
-}): Promise<void> {
-  const ref = params.paymentReference?.trim();
-  if (ref) {
-    const existing = await findTeamCoursePurchaseByPaymentReference(ref);
-    if (existing) return;
-  }
-
-  await insertTeamCoursePurchase(params);
 }
 
 export async function assertCourseSeatsAvailable(
