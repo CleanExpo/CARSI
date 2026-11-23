@@ -14,6 +14,8 @@ import { act, createElement, StrictMode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { CONSENT_NOTICE_VERSION, CONSENT_STORAGE_KEY } from './consent';
+
 vi.hoisted(() => {
   process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID = 'G-TEST1234';
 });
@@ -49,10 +51,19 @@ const tick = (ms: number) =>
     await vi.advanceTimersByTimeAsync(ms);
   });
 
+const grantAnalytics = () =>
+  window.localStorage.setItem(
+    CONSENT_STORAGE_KEY,
+    JSON.stringify({ version: CONSENT_NOTICE_VERSION, analytics: true, timestamp: 'x' })
+  );
+
 beforeEach(() => {
   vi.resetModules();
   vi.useFakeTimers();
   calls = [];
+  // Every test below is about a visitor who said yes (GP-731); the last test is the one who did not.
+  window.localStorage.clear();
+  grantAnalytics();
   delete (window as unknown as W).gtag;
   delete (window as unknown as W).dataLayer;
   container = document.createElement('div');
@@ -132,5 +143,17 @@ describe('membership_view reaches a configured GA4 destination', () => {
       )
     );
     expect(views()).toHaveLength(1);
+  });
+
+  it('without a stored yes, is never sent and never kept for later (GP-731)', async () => {
+    window.localStorage.clear();
+    const { MembershipViewTracker, ga4 } = await load();
+    installGtag();
+    ga4.markGa4Configured();
+    act(() => root.render(createElement(MembershipViewTracker, { checkoutEnabled: true })));
+    grantAnalytics(); // a later yes must not release an event recorded before it
+    ga4.markGa4Configured();
+    await tick(1_000);
+    expect(views()).toHaveLength(0);
   });
 });

@@ -188,6 +188,7 @@ function buildDocument(bodyHtml) {
   * { box-sizing: border-box; }
   body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-kerning: none; /* kerning offsets split words ("WR T") in the extracted PDF text the licence inventory scans */
     color: #1e293b;
     font-size: 10.5pt;
     line-height: 1.55;
@@ -231,7 +232,7 @@ function buildDocument(bodyHtml) {
 <body>
   <div class="cover">
     <div class="brand">CARSI</div>
-    <div class="brand-sub">Cleaning &amp; Restoration Sciences Institute &middot; IICRC CEC Accredited provider</div>
+    <div class="brand-sub">Cleaning &amp; Restoration Sciences Institute &middot; IICRC Approved CEC Provider</div>
     <h1>How to Get on Government Restoration Panels</h1>
     <p class="subtitle">A practical guide for Australian restoration contractors</p>
   </div>

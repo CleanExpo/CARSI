@@ -26,6 +26,7 @@ vi.mock('@/lib/api/client', async (orig) => ({
 }));
 
 import { RegisterForm } from '@/components/auth/register-form';
+import { CONSENT_NOTICE_VERSION, CONSENT_STORAGE_KEY } from '@/lib/analytics/consent';
 import { markGa4Configured } from '@/lib/analytics/ga4-client';
 import { ApiClientError } from '@/lib/api/client';
 
@@ -47,6 +48,11 @@ beforeEach(() => {
   mocks.post.mockReset();
   mocks.register.mockClear();
   gtagCalls = [];
+  // The visitor said yes to analytics (GP-731); without it no funnel event is sent.
+  window.localStorage.setItem(
+    CONSENT_STORAGE_KEY,
+    JSON.stringify({ version: CONSENT_NOTICE_VERSION, analytics: true, timestamp: 'x' })
+  );
   // GA4 is configured on the page (GoogleAnalytics.tsx does this after its config command).
   markGa4Configured();
   (window as unknown as { gtag: (...a: unknown[]) => void }).gtag = (...a: unknown[]) => {
