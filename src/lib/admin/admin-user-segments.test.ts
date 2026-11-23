@@ -49,17 +49,49 @@ describe('matchesAdminUserSegment', () => {
     expect(matchesAdminUserSegment(done, 'in_progress', now)).toBe(false);
   });
 
-  it('Bought, not started is enrolled at 0%', () => {
-    const unopened = user({
+  it('Bought, not started is a Stripe-paid seat with no lessons done (GP-766)', () => {
+    const paidUnopened = user({
       overallCompletionPct: 0,
       enrollmentCount: 1,
       completedCourseCount: 0,
+      boughtNotStartedCount: 1,
+    });
+    // Free, admin or team enrolment only: enrolled at 0%, but nothing was bought.
+    const freeOnlyUnopened = user({
+      overallCompletionPct: 0,
+      enrollmentCount: 1,
+      completedCourseCount: 0,
+      boughtNotStartedCount: 0,
+      paidEnrollmentCount: 0,
+      spentAud: 0,
+    });
+    // Started a free course, still sitting on a paid course they have not opened.
+    const paidUnopenedBesideStarted = user({
+      overallCompletionPct: 30,
+      enrollmentCount: 2,
+      completedCourseCount: 0,
+      boughtNotStartedCount: 1,
+    });
+    const empty = user({ overallCompletionPct: 0, enrollmentCount: 0, boughtNotStartedCount: 0 });
+    expect(matchesAdminUserSegment(paidUnopened, 'never_started', now)).toBe(true);
+    expect(matchesAdminUserSegment(freeOnlyUnopened, 'never_started', now)).toBe(false);
+    expect(matchesAdminUserSegment(paidUnopenedBesideStarted, 'never_started', now)).toBe(true);
+    expect(matchesAdminUserSegment(empty, 'never_started', now)).toBe(false);
+  });
+
+  it('Enrolled, not started is any enrolment at 0% overall, paid or not', () => {
+    const freeOnlyUnopened = user({
+      overallCompletionPct: 0,
+      enrollmentCount: 1,
+      completedCourseCount: 0,
+      boughtNotStartedCount: 0,
     });
     const empty = user({ overallCompletionPct: 0, enrollmentCount: 0 });
     const mid = user({ overallCompletionPct: 20, enrollmentCount: 1 });
-    expect(matchesAdminUserSegment(unopened, 'never_started', now)).toBe(true);
-    expect(matchesAdminUserSegment(empty, 'never_started', now)).toBe(false);
-    expect(matchesAdminUserSegment(mid, 'never_started', now)).toBe(false);
+    expect(matchesAdminUserSegment(freeOnlyUnopened, 'enrolled_not_started', now)).toBe(true);
+    expect(matchesAdminUserSegment(empty, 'enrolled_not_started', now)).toBe(false);
+    expect(matchesAdminUserSegment(mid, 'enrolled_not_started', now)).toBe(false);
+    expect(parseAdminUserSegment('enrolled_not_started')).toBe('enrolled_not_started');
   });
 
   it('Completed a course is 100% overall', () => {

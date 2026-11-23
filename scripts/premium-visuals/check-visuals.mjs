@@ -18,13 +18,19 @@
  *   manifest-missing          no media.manifest.json at all
  *   manifest-invalid          manifest not {version:1, entries:[...]}, or an entry with a bad src, kind
  *                             (image|video|render), source (client|stock|generated|blender), non-string
- *                             credit/alt, duplicate src, or a video without a poster. Listed as a finding
- *                             AND a configuration error: exit 2 in every mode, report mode included (GP-688)
+ *                             credit/alt, duplicate src, a video without a poster, a poster that is not an
+ *                             image file, or a poster with no image entry of its own (GP-669: a video entry
+ *                             does not cover its poster's provenance). Listed as a finding AND a
+ *                             configuration error: exit 2 in every mode, report mode included (GP-688)
  *   manifest-missing-file     manifest entry (or poster) whose file is not in any public dir
  *   hero-missing-media        marketing page without a rendered <PremiumHero media|video={...}> (or data-pv-hero + media element)
  *   no-motion                 marketing page with no rendered <MotionSection> / data-pv-motion
  *   marketing-coverage        fewer marketing pages found than minMarketingPages (default 1)
  *   media-budget              raster > imageMaxKB, video > videoMaxKB, PNG/JPG > legacyRasterMaxKB, or .mov
+ *                             (an oversize PNG/JPG gets both the image-budget and the PNG/JPG finding)
+ *
+ * nonMarketing entries match whole route segments: '/auth' excludes /auth and /auth/x, never /authority.
+ * An entry that ends in '/' or '.' already carries its own boundary and matches as written.
  *
  * Comments are never evidence and never findings. String literals count for findings
  * (a string can be rendered) but never as evidence of a hero or motion section.
@@ -32,6 +38,8 @@
  *
  * The allowlist exempts files from the code-drawn-art rules only (inline-svg-art, svg-asset,
  * css-art, canvas-drawing). It never exempts budgets, provenance, placeholders or page rules.
+ * Likewise a logo/icon/favicon-style file name exempts a public file from svg-asset only, never
+ * from the manifest (GP-669): every shipped image or video needs a provenance entry.
  *
  * Exit: 0 = no findings, or report-only; 1 = findings in enforce mode; 2 = configuration error in any
  * mode: the config file is missing or invalid (no silent defaults), or the manifest is invalid (GP-688).
@@ -42,7 +50,8 @@ import path from 'node:path';
 
 const CODE_EXTS = ['tsx', 'jsx', 'ts', 'js', 'mdx', 'html', 'astro', 'vue', 'svelte'];
 const STYLE_EXTS = ['css', 'scss', 'sass', 'less'];
-const MEDIA_EXTS = ['avif', 'webp', 'png', 'jpg', 'jpeg', 'gif', 'mp4', 'webm', 'mov'];
+const IMAGE_EXTS = ['avif', 'webp', 'png', 'jpg', 'jpeg', 'gif'];
+const MEDIA_EXTS = [...IMAGE_EXTS, 'mp4', 'webm', 'mov'];
 const KINDS = ['image', 'video', 'render'];
 const SOURCES = ['client', 'stock', 'generated', 'blender'];
 
@@ -81,6 +90,9 @@ function main() {
   let u;
   try { u = JSON.parse(fs.readFileSync(cfgPath, 'utf8')); } catch (e) { return configError(`${cfgPath} is not valid JSON (${e.message})`); }
   if (!u || typeof u !== 'object' || Array.isArray(u)) return configError(`${cfgPath} must be a JSON object`);
+  // A budgets value that is not a plain object (array, string, null) is an error, never ignored (GP-669).
+  if ('budgets' in u && (!u.budgets || typeof u.budgets !== 'object' || Array.isArray(u.budgets)))
+    return configError(`budgets must be an object, got ${JSON.stringify(u.budgets)}`);
   const cfg = { ...DEFAULTS, ...u, budgets: { ...DEFAULTS.budgets, ...(u.budgets || {}) } };
   if (!['report', 'enforce'].includes(cfg.mode)) return configError(`mode must be "report" or "enforce", got ${JSON.stringify(cfg.mode)}`);
   for (const k of ['srcDirs', 'publicDirs', 'ignore', 'allowlist', 'marketingPages', 'nonMarketing']) {
@@ -93,9 +105,22 @@ function main() {
   }
   const reportOnly = flag('--report-only') || cfg.mode === 'report';
 
-  const allowRes = cfg.allowlist.map((a) => globToRe(a.replace(/^\.\//, '')));
+  // An invalid glob is a configuration error (exit 2), not an uncaught exception (exit 1) (GP-669).
+  let allowRes, mktRes;
+  try {
+    allowRes = cfg.allowlist.map((a) => globToRe(a.replace(/^\.\//, '')));
+    mktRes = cfg.marketingPages.map(globToRe);
+  } catch (e) { return configError(e.message); }
   const allowed = (r) => allowRes.some((re) => re.test(r));
-  const mktRes = cfg.marketingPages.map(globToRe);
+  // Whole route segments (GP-669): '/auth' must not exclude '/authority'.
+  const segmentMatch = (route, n) => {
+    if (/[/.]$/.test(n)) return route.includes(n);
+    for (let at = route.indexOf(n); at >= 0; at = route.indexOf(n, at + 1)) {
+      const next = route[at + n.length];
+      if (next === undefined || next === '/') return true;
+    }
+    return false;
+  };
 
   const testFile = /\.(test|spec|stories)\.[cm]?[jt]sx?$/;
   function walk(dir, out = []) {
@@ -119,14 +144,16 @@ function main() {
   const add = (rule, file, line, detail) => violations.push({ rule, file, line, detail });
   const lineOf = (text, idx) => text.slice(0, idx).split('\n').length;
 
-  // Public-path exemptions by name: whole-word logo/icon/favicon/og names, or an icons/logos folder.
+  // svg-asset exemption by name only (GP-669): whole-word logo/icon/favicon/og names, or an icons/logos
+  // folder. It never exempts a file from the manifest (provenance) rules.
   const BRAND_NAME = /(^|[-_.\s])(logo|logos|icon|icons|favicon|apple-touch-icon|og|opengraph|opengraph-image|twitter-image|mark|wordmark|badge-official|flag)([-_.\s@]|$)/i;
   const BRAND_DIR = /(^|\/)(icons?|logos?|favicons?)\//i;
   const brandAsset = (p) => BRAND_NAME.test(path.basename(p)) || BRAND_DIR.test(p);
   const findPublic = (src) => cfg.publicDirs.map((d) => path.join(root, d, src)).find((p) => fs.existsSync(p) && fs.statSync(p).isFile());
 
   // ---- manifest ----
-  const manifestSrcs = new Set();
+  const manifestSrcs = new Set(); // srcs that have their own manifest entry (provenance)
+  const posters = []; // [poster, owning entry id], checked once every entry is known (order-independent)
   const mPath = path.join(root, cfg.manifest);
   const manifestBad = (detail) => add('manifest-invalid', cfg.manifest, 0, detail);
   let entryCount = 0;
@@ -154,17 +181,21 @@ function main() {
             if (!isText(e.credit)) bad.push('credit (non-empty text)');
             if (!isText(e.alt)) bad.push('alt (non-empty text)');
             if (e.kind === 'video' && e.poster === undefined) bad.push('poster (required for video)');
-            if (e.poster !== undefined && !validPath(e.poster)) bad.push('poster (absolute public path to an image)');
+            if (e.poster !== undefined && !(validPath(e.poster) && IMAGE_EXTS.includes(extOf(e.poster)))) bad.push('poster (absolute public path to an image file)');
             if (bad.length) manifestBad(`${id}: invalid ${bad.join(', ')}`);
             if (validPath(e.src)) {
               manifestSrcs.add(e.src);
               if (!findPublic(e.src)) add('manifest-missing-file', cfg.manifest, 0, `${e.src} is listed but no such file exists in ${cfg.publicDirs.join(' or ')}`);
             }
             if (validPath(e.poster)) {
-              manifestSrcs.add(e.poster);
+              posters.push([e.poster, id]);
               if (!findPublic(e.poster)) add('manifest-missing-file', cfg.manifest, 0, `${e.poster} (poster of ${id}) does not exist in ${cfg.publicDirs.join(' or ')}`);
             }
           });
+          // A poster is shipped media with its own credit and alt, so it needs its own image entry;
+          // the video entry does not cover it (GP-669). Checked after the loop, so order is irrelevant.
+          for (const [poster, id] of posters)
+            if (!manifestSrcs.has(poster)) manifestBad(`${poster}: poster of ${id} has no image entry of its own`);
         }
       }
     }
@@ -179,7 +210,7 @@ function main() {
     const ext = extOf(f);
     const isCode = CODE_EXTS.includes(ext);
     const raw = fs.readFileSync(f, 'utf8');
-    const v = scrub(raw, { slashComments: ext !== 'css', htmlComments: ['html', 'mdx', 'astro', 'vue', 'svelte'].includes(ext) });
+    const v = scrub(raw, { slashComments: ext !== 'css', htmlComments: ['html', 'mdx', 'astro', 'vue', 'svelte'].includes(ext), jsxText: ['tsx', 'jsx', 'js', 'mdx'].includes(ext) });
     views.set(f, v);
     const t = v.code;
     const artOk = allowed(r);
@@ -208,7 +239,6 @@ function main() {
       MEDIA_PATH.lastIndex = 0;
       while ((m = MEDIA_PATH.exec(t))) {
         const p = m[1].split('?')[0];
-        if (brandAsset(p)) continue;
         if (!manifestSrcs.has(p)) add('unmanifested-media', r, lineOf(t, m.index), `${p} has no ${cfg.manifest} entry`);
       }
     }
@@ -223,19 +253,20 @@ function main() {
     if (ext === 'svg' && !brandAsset(publicPath) && !allowed(r))
       add('svg-asset', r, 0, 'SVG illustration asset: replace with photo/generated image (logos/icons: name them *-logo*/*-icon* or allowlist)');
     // Budgets apply to every file. Neither the allowlist nor a brand-like name exempts them.
-    if (['avif', 'webp', 'png', 'jpg', 'jpeg', 'gif'].includes(ext) && kb > cfg.budgets.imageMaxKB) add('media-budget', r, 0, `${kb.toFixed(0)}KB > ${cfg.budgets.imageMaxKB}KB image budget`);
-    else if (['png', 'jpg', 'jpeg'].includes(ext) && !/^(favicon|icon|apple-touch-icon|apple-icon|og|opengraph-image|twitter-image)([-_.@]|$)/.test(base) && kb > cfg.budgets.legacyRasterMaxKB)
+    if (IMAGE_EXTS.includes(ext) && kb > cfg.budgets.imageMaxKB) add('media-budget', r, 0, `${kb.toFixed(0)}KB > ${cfg.budgets.imageMaxKB}KB image budget`);
+    // Not `else`: an oversize PNG/JPG breaks both budgets and is reported for both (GP-669).
+    if (['png', 'jpg', 'jpeg'].includes(ext) && !/^(favicon|icon|apple-touch-icon|apple-icon|og|opengraph-image|twitter-image)([-_.@]|$)/.test(base) && kb > cfg.budgets.legacyRasterMaxKB)
       add('media-budget', r, 0, `${kb.toFixed(0)}KB PNG/JPG: ship AVIF/WebP (budget ${cfg.budgets.legacyRasterMaxKB}KB)`);
     if (['mp4', 'webm', 'mov'].includes(ext) && kb > cfg.budgets.videoMaxKB) add('media-budget', r, 0, `${(kb / 1024).toFixed(1)}MB > ${(cfg.budgets.videoMaxKB / 1024).toFixed(1)}MB video budget`);
     if (ext === 'mov') add('media-budget', r, 0, '.mov: encode to AV1/H.264 MP4 + WebM');
-    if (MEDIA_EXTS.includes(ext) && !brandAsset(publicPath) && !manifestSrcs.has(publicPath))
+    if (MEDIA_EXTS.includes(ext) && !manifestSrcs.has(publicPath))
       add('unmanifested-public-media', r, 0, `${publicPath} is in a public dir with no ${cfg.manifest} entry`);
   }
 
   // ---- marketing pages ----
   const marketing = srcFiles.filter((f) => ['tsx', 'jsx', 'ts', 'js', 'mdx'].includes(extOf(f))).filter((f) => {
     const r = rel(f);
-    return mktRes.some((re) => re.test(r)) && !cfg.nonMarketing.some((n) => ('/' + r).includes(n));
+    return mktRes.some((re) => re.test(r)) && !cfg.nonMarketing.some((n) => segmentMatch('/' + r, n));
   });
   for (const f of marketing) {
     const r = rel(f);
@@ -301,6 +332,7 @@ function globToRe(g) {
     else if ('.+^$()|[]\\?{}'.includes(c)) s += '\\' + c;
     else s += c;
   }
+  if (inBrace) throw new Error(`invalid glob ${JSON.stringify(g)}: unmatched "{"`);
   return new RegExp('^' + s + '$');
 }
 
@@ -309,36 +341,49 @@ function globToRe(g) {
  *   code: comments blanked (strings kept, since a string can be rendered)
  *   bare: comments and string-literal contents blanked (used for positive evidence only)
  * A '...' or "..." literal must close on its line; an unclosed quote is JSX text (e.g. "don't").
- * `//` after ':' or '(' is a URL, not a comment. In the code view a `//` only counts as a comment at
- * line start or after `; { } ) ]`, so JSX text such as `See // <svg />` cannot hide a finding.
+ *
+ * One comment rule for both views (GP-669). A `//` or `/*` is a comment only where JSX text cannot
+ * be: at line start, or after code punctuation `; { } ( ) [ ] , = & | ? !` (`/*` also after `:`).
+ * `//` after ':' or '(' is a URL, not a comment. Anywhere else (after `>` or a word) it is rendered
+ * JSX text, so `See // <svg />`, or a `/*` opened inside `<p>` text, stays visible to the findings rules, and a
+ * <MotionSection> later on such a line is real evidence. In tsx/jsx/js/mdx an unclosed `/*` is not
+ * a comment (it would be a syntax error), so it can never blank the rest of the file. Plain .ts and
+ * style files keep the language rule: every `/*` is a comment.
  */
-function scrub(text, { slashComments, htmlComments }) {
+function scrub(text, { slashComments, htmlComments, jsxText = false }) {
   const code = text.split('');
   const bare = text.split('');
   const blank = (arr, a, b) => { for (let k = a; k < b; k++) if (arr[k] !== '\n') arr[k] = ' '; };
+  const prevChar = (i) => {
+    let k = i - 1;
+    while (k >= 0 && (text[k] === ' ' || text[k] === '\t')) k--;
+    return k < 0 ? '\n' : text[k];
+  };
+  const LINE_CTX = '\n;{}()[],=&|?!';
+  const BLOCK_CTX = LINE_CTX + ':';
   const n = text.length;
   let i = 0;
   while (i < n) {
     const c = text[i];
     const d = text[i + 1];
     if (c === '/' && d === '*') {
-      const e = text.indexOf('*/', i + 2); const end = e < 0 ? n : e + 2;
-      blank(code, i, end); blank(bare, i, end); i = end; continue;
+      const e = text.indexOf('*/', i + 2);
+      if (!jsxText || (e >= 0 && BLOCK_CTX.includes(prevChar(i)))) {
+        const end = e < 0 ? n : e + 2;
+        blank(code, i, end); blank(bare, i, end); i = end; continue;
+      }
+      i++; continue; // rendered JSX text
     }
     if (htmlComments && text.startsWith('<!--', i)) {
       const e = text.indexOf('-->', i + 4); const end = e < 0 ? n : e + 3;
       blank(code, i, end); blank(bare, i, end); i = end; continue;
     }
     if (slashComments && c === '/' && d === '/' && text[i - 1] !== ':' && text[i - 1] !== '(') {
-      const e = text.indexOf('\n', i); const end = e < 0 ? n : e;
-      // Evidence view: any // ends the line, so a comment can never fake a hero or motion section.
-      blank(bare, i, end);
-      // Findings view: only a // that starts a line or follows code punctuation is a comment.
-      // `See // <svg />` in JSX text renders, so it stays visible to the findings rules.
-      let k = i - 1;
-      while (k >= 0 && (text[k] === ' ' || text[k] === '\t')) k--;
-      if (k < 0 || '\n;{})]'.includes(text[k])) blank(code, i, end);
-      i = end; continue;
+      if (LINE_CTX.includes(prevChar(i))) {
+        const e = text.indexOf('\n', i); const end = e < 0 ? n : e;
+        blank(code, i, end); blank(bare, i, end); i = end; continue;
+      }
+      i += 2; continue; // rendered JSX text
     }
     if (c === '"' || c === "'" || c === '`') {
       let j = i + 1;
@@ -372,6 +417,9 @@ function hasHeroMedia(code, bare) {
     const attrRe = /(?<![\w$-])(media|video)\s*=\s*/g; // not data-media=, heroMedia=
     let a;
     while ((a = attrRe.exec(attrsBare))) {
+      // Top-level attributes only (GP-669): media= inside a nested prop value such as
+      // slot={<Card media={x} />} belongs to another element, not to the hero.
+      if (braceDepth(attrsBare, a.index) > 0) continue;
       const vStart = m.index + a.index + a[0].length;
       const opener = code[vStart];
       let value;
@@ -383,6 +431,16 @@ function hasHeroMedia(code, bare) {
   }
   // data-pv-hero on a real element, with a real media element somewhere in the page.
   return /\bdata-pv-hero\b/.test(bare) && /<(img|Image|picture|video|PremiumImage|PremiumVideo)\b/.test(bare);
+}
+
+/** `{` nesting depth at `idx` (bare view, so braces in strings are ignored). */
+function braceDepth(bare, idx) {
+  let depth = 0;
+  for (let i = 0; i < idx; i++) {
+    if (bare[i] === '{') depth++;
+    else if (bare[i] === '}') depth = Math.max(0, depth - 1);
+  }
+  return depth;
 }
 
 /** Index of the `}` matching the `{` at `open` (in the bare view, so braces in strings are ignored). */

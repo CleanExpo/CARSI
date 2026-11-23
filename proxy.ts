@@ -9,6 +9,7 @@ import {
 } from '@/lib/courses/course-asset-access';
 import { isAttributionCaptureEnabled } from '@/lib/server/attribution-capture-flag';
 import { withFirstTouchCookie } from '@/lib/server/first-touch-capture';
+import { withPartnerRefCookie } from '@/lib/server/partner-referral-cookie';
 import { lookupCourseSlugInDatabase, renamedCourseRedirect } from '@/lib/seo/renamed-course-slugs';
 
 /** Course publication state for course files. Only closed answers are cached (see the module). */
@@ -42,7 +43,9 @@ export async function proxy(request: NextRequest) {
   if (courseAsset === 'serve') return NextResponse.next();
 
   const renamed = await renamedCourseRedirect(request, lookupCourseSlugInDatabase);
-  const response = renamed ?? (await updateSession(request));
+  // GP-767: a partner link (`?ref=ccw`) records the partner for 30 days. Always on: it credits a
+  // partner for a sale, and an unknown ref does nothing.
+  const response = withPartnerRefCookie(request, renamed ?? (await updateSession(request)));
   // First-touch attribution (dark unless ATTRIBUTION_CAPTURE_ENABLED). Read per request, so it
   // also covers prerendered pages, whose render-time flag reads are frozen at build.
   return isAttributionCaptureEnabled() ? withFirstTouchCookie(request, response) : response;

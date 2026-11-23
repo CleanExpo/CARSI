@@ -90,6 +90,11 @@ jobs:
       - name: Seed and media-input guard tests
         run: npm run test:seed-guards
 
+      # node_modules must never be committed, not even as a symlink (beb27250 committed a
+      # self-referencing one; a `node_modules/` rule only matches directories).
+      - name: node_modules is not tracked
+        run: npm run test:node-modules-untracked
+
       # CARSI designation registry validity. This script existed but was run by NO workflow
       # (audited 2026-08-07) — a guard nothing invokes is not a guard. It validates that every
       # designation resolves to a real catalogue course, so a renamed or removed course cannot
@@ -124,6 +129,15 @@ jobs:
       - name: Course visibility guard self-test
         run: npm run test:course-visibility
 
+      # Site-address guard (GP-756). getAppOrigin is the one rule for links, emails,
+      # certificates and the CSP; six hand-built origins had drifted, two falling back to
+      # http://localhost:3000 in production. The self-test proves the guard can fail.
+      - name: Site-address guard
+        run: npm run check:app-origin
+
+      - name: Site-address guard self-test
+        run: npm run test:app-origin
+
       - name: IICRC terminology guard self-test
         run: npm run test:iicrc-terminology
 
@@ -133,6 +147,12 @@ jobs:
       # symlinked path on planted violations and needs exit 1 from both.
       - name: Script entry-point helper self-test
         run: npm run test:entry-point
+
+      # GP-780 main rewrite detector (.github/workflows/main-rewrite-guard.yml). Plants a
+      # force-push rewrite in a throwaway repo and needs exit 1 with the lost PRs listed, and
+      # needs exit 0 for a plain fast-forward.
+      - name: Main rewrite detector self-test
+        run: npm run test:main-rewrite
 
       - name: Source-citation scorecard self-test
         run: npm run test:sources
@@ -167,6 +187,15 @@ jobs:
       # if it scans nothing.
       - name: Draft course content check (report only)
         run: npm run check:draft-content
+
+      # GP-678: applied Prisma migrations are frozen (Prisma checksums them; an edit makes
+      # `prisma migrate dev` demand a schema reset), and new ones must be whitespace-clean and
+      # pinned in prisma/migration-checksums.json. Exits 2 if it scans no migrations.
+      - name: Prisma migration guard
+        run: npm run check:migrations
+
+      - name: Prisma migration guard self-test
+        run: npm run test:migrations
 
       # Licence-critical backstop: scans all course-content + marketing surfaces
       # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC
@@ -223,6 +252,12 @@ jobs:
       # must keep pointing at the licence and premium-visual rules, or agents work without them.
       - name: Agent rule entry-point self-test
         run: npm run test:agent-doc-paths
+
+      # GP-750: the consent proof's checks must not pass vacuously. A library request that
+      # failed (proxy refusal), a non-2xx or an empty body must not satisfy B1, and a run where
+      # the library never loaded must report BLOCKED (exit 3) instead of passing B4 and C1.
+      - name: Consent proof check self-test
+        run: npm run test:consent-proof
 
       # Licence-critical STRUCTURAL backstop (GP-498): scans the whole application (app/, src/)
       # for the leak class the copy scanner cannot see — any code that reads the RAW course CEC
@@ -303,6 +338,17 @@ jobs:
 
       - name: W0a evidence ledger check tests
         run: npm run test:evidence-ledger
+
+      # GP-719: every VERIFIED quote checked offline against what CI can read (repo: sources and
+      # committed open-licence snapshots under data/evidence-sources/), plus the licensed-standards
+      # rule (short reference only, needs_human_verification). BLOCKING; the findings on main when
+      # it landed are listed in data/evidence-sources/quote-findings-baseline.json and only shrink.
+      # The live fetch (npm run check:ledger-quotes:live) needs network and is opt-in, not here.
+      - name: GP-719 ledger quote check
+        run: npm run check:ledger-quotes
+
+      - name: GP-719 ledger quote check tests
+        run: npm run test:ledger-quotes
 
       - name: Course Standard depth audit
         run: npm run check:course-standard

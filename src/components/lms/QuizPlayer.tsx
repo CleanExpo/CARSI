@@ -238,9 +238,9 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default', initialDraft, 
                 i !== activeIndex && answers[q.id] != null && 'border-emerald-200 bg-emerald-50 text-emerald-700',
                 i !== activeIndex && answers[q.id] == null && 'border-slate-200 text-slate-500'
               )}
-              aria-label={`Question ${i + 1}`}
+              aria-label={`Question ${i + 1}, ${answers[q.id] != null ? 'answered' : 'not answered'}`}
             >
-              {answers[q.id] != null ? <CheckCircle2 className="h-4 w-4" /> : i + 1}
+              {answers[q.id] != null ? <CheckCircle2 className="h-4 w-4" aria-hidden /> : i + 1}
             </button>
           </li>
         ))}

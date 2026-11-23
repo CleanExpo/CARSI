@@ -134,6 +134,31 @@ describe('RegisterForm — sign up from a free course', () => {
     expect(nav.href).toBe('https://checkout.stripe.test/cs_course');
   });
 
+  it('GP-694: a paid checkout keeps the survey key it sent, once checkout returns a checkout_url', async () => {
+    window.sessionStorage.clear();
+    mocks.post.mockResolvedValue({ checkout_url: 'https://checkout.stripe.test/cs_course' });
+
+    await registerWith(`next=%2Fcourses%2F${SLUG}`);
+
+    const sent = (mocks.post.mock.calls[0][1] as { survey_key?: string }).survey_key;
+    expect(sent).toMatch(/^[0-9a-f]{32}$/);
+    expect(window.sessionStorage.getItem('carsi_svk')).toBe(sent);
+  });
+
+  it('GP-694: a free (enrolled) checkout sends a key but keeps none, so it cannot push out a paid one', async () => {
+    window.sessionStorage.clear();
+    mocks.post.mockImplementation(async (path: string) => {
+      if (path === '/api/lms/checkout') return { enrolled: true };
+      return { learn_url: `/dashboard/learn/${SLUG}/lesson-1` };
+    });
+
+    await registerWith(`next=%2Fcourses%2F${SLUG}`);
+
+    const checkoutCall = mocks.post.mock.calls.find(([path]) => path === '/api/lms/checkout');
+    expect((checkoutCall?.[1] as { survey_key?: string }).survey_key).toMatch(/^[0-9a-f]{32}$/);
+    expect(window.sessionStorage.getItem('carsi_svk')).toBeNull();
+  });
+
   it.each([
     ['backslash host', 'next=%2F%5Cevil.example'],
     ['protocol-relative host', 'next=%2F%2Fevil.example'],

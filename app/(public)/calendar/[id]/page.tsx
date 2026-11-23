@@ -20,6 +20,7 @@ import {
   marketingTextStrong,
   marketingTopicPill,
 } from '@/lib/marketing/marketing-ui';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 const BACKEND_URL = getBackendOrigin();
 
@@ -97,6 +98,7 @@ export async function generateMetadata({
     title: `${event.title} | CARSI Industry Calendar`,
     description,
     openGraph: {
+      ...OG_LOCALE_FIELDS,
       title: event.title,
       description,
       type: 'website',

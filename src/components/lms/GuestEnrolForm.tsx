@@ -17,7 +17,7 @@ import {
 import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { TurnstileWidget } from '@/components/security/TurnstileWidget';
 import { isSafeInternalPath } from '@/lib/auth/guest-recovery-path';
-import { purchaseSurveyCheckoutField } from '@/lib/marketing/purchase-survey-key';
+import { purchaseSurveyCheckoutField, rememberPurchaseSurveyKey } from '@/lib/marketing/purchase-survey-key';
 
 /** Fail-closed client check: empty or space-only email never reaches checkout or free enrol. */
 export function guestEnrolEmailIsUsable(value: string): boolean {
@@ -128,6 +128,7 @@ export function GuestEnrolForm({
         undefined,
         purchaseMode === 'team' ? { teamSeats } : undefined,
       );
+      const surveyField = purchaseSurveyCheckoutField();
       const res = await fetch('/api/lms/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -140,7 +141,7 @@ export function GuestEnrolForm({
           full_name: fullName,
           purchase_mode: purchaseMode,
           ...(purchaseMode === 'team' ? { team_seat_count: teamSeats } : {}),
-          ...purchaseSurveyCheckoutField(),
+          ...surveyField,
         }),
       });
       const data = (await res.json().catch(() => ({}))) as {
@@ -162,6 +163,8 @@ export function GuestEnrolForm({
         return;
       }
       if (data.checkout_url) {
+        // Only a checkout that reached Stripe keeps its survey key (GP-694).
+        rememberPurchaseSurveyKey(surveyField.survey_key);
         trackFunnelEvent({
           name: 'checkout_started',
           course_slug: slug,
