@@ -5,6 +5,7 @@ import { ErrorBanner } from '@/components/lms/ErrorBanner';
 import { LinkedInShareButton } from '@/components/lms/LinkedInShareButton';
 import { useToast } from '@/hooks/use-toast';
 import { apiClient } from '@/lib/api/client';
+import { markDashboardPageReady } from '@/lib/onboarding/page-ready';
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
 import { APPROVED_FOR_IICRC_CECS_LABEL } from '@/lib/iicrc/approved-wording';
 import { CecRenewalFigure, CecRenewalStatus } from '@/components/lms/CecRenewalStatus';
@@ -260,24 +261,27 @@ function ProofPackCard() {
 }
 
 export default function StudentCredentialsPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [credentials, setCredentials] = useState<CredentialOut[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [fetching, setFetching] = useState(true);
+  // GP-627: while the session is still resolving there is no user yet. That is "loading", not
+  // "no certificates" — the old page showed the empty state, then the real list.
+  const loading = authLoading || fetching;
   const [error, setError] = useState<string | null>(null);
 
   const fetchCredentials = useCallback(async () => {
     if (!user) {
-      setLoading(false);
+      setFetching(false);
       return;
     }
-    setLoading(true);
+    setFetching(true);
     setError(null);
     try {
       setCredentials(await apiClient.get<CredentialOut[]>('/api/lms/credentials/me'));
     } catch {
       setError('We could not load your certificates.');
     } finally {
-      setLoading(false);
+      setFetching(false);
     }
   }, [user]);
 
@@ -285,6 +289,10 @@ export default function StudentCredentialsPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch-on-mount
     fetchCredentials();
   }, [fetchCredentials]);
+
+  useEffect(() => {
+    if (!loading) markDashboardPageReady();
+  }, [loading]);
 
   const approvedCec = useMemo(
     () => credentials.reduce((sum, c) => sum + (c.cec_hours > 0 ? c.cec_hours : 0), 0),
@@ -344,6 +352,17 @@ export default function StudentCredentialsPage() {
             </div>
             <CecRenewalStatus progress={cecProgress} textClassName={muted} />
           </div>
+        </section>
+      ) : null}
+
+      {loading ? (
+        <section
+          className="grid w-full items-stretch gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]"
+          aria-busy="true"
+          aria-label="Loading your record"
+        >
+          <div className={`${surface} h-48 animate-pulse`} />
+          <div className={`${surface} h-48 animate-pulse`} />
         </section>
       ) : null}
 

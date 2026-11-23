@@ -12,6 +12,7 @@ import { pricingFaqs } from '@/lib/seo/answer-engine';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 import { getPublicCatalogueFacts } from '@/lib/server/public-catalogue-facts';
 import { subscriptionsEnabled, teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 // The two flag readers (`subscriptionsEnabled()`, `teamSubscriptionsEnabled()`) read
 // process.env at render time. Without this the
@@ -40,6 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
       'mould remediation online course',
     ],
     openGraph: {
+      ...OG_LOCALE_FIELDS,
       images: OG_IMAGES,
       title: 'Pricing | CARSI — Restoration Training Online',
       description: teamsLive

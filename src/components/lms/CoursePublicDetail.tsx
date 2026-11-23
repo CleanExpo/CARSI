@@ -13,10 +13,10 @@ import { CoursesIndexLink } from '@/components/lms/CoursesIndexLink';
 import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { EnrolButton } from '@/components/lms/EnrolButton';
 import { ReviewPolicyLink } from '@/components/lms/ReviewPolicy';
+import { CARSI_PROVIDER_STATUS } from '@/lib/iicrc/approved-wording';
 import { courseDurationLabel } from '@/lib/course-duration-label';
 import { approvedCecHours } from '@/lib/courses/course-credential-copy';
 import { CARSI_CREDENTIAL_STATEMENT } from '@/components/seo/JsonLd';
-import { CARSI_PROVIDER_STATUS } from '@/lib/iicrc/approved-wording';
 import type { DesignationDefinition } from '@/lib/designations/registry';
 
 /** The "Earns N IICRC CEC hour(s)" label, pluralised, from the resolved approval hours. */

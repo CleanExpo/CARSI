@@ -10,6 +10,11 @@
  *
  * Only adjacency is matched, so "nationally accredited VET qualification" and similar true
  * statements about other bodies stay legal.
+ *
+ * GP-771 closed two gaps. Source files are also read the way a visitor reads them (reading-view.ts),
+ * so a phrase split across JSX tags, `{' '}`, literals, entities, line breaks or markdown emphasis
+ * is caught. And CARSI_ACCREDITED_CLAIM catches an unqualified "accredited" claim about CARSI that
+ * names no IICRC or CEC.
  */
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
@@ -26,6 +31,7 @@ import {
   FROM_IICRC_APPROVED_CEC_PROVIDER,
   IICRC_APPROVED_CEC_PROVIDER,
 } from './approved-wording';
+import { readingViews, sourceLine } from './reading-view';
 
 vi.mock('next/font/google', () => ({
   Outfit: () => ({ variable: 'font-display' }),
@@ -57,6 +63,42 @@ const ROOT = process.cwd();
  */
 export const RETIRED_PROVIDER_WORDING =
   /\b(?:IICRC|CECs?)[\s-]+accredit\w*|\baccredit\w*[\s-]+(?:IICRC|CECs?)\b|\baccredited[\s-]+provider\b|(?<!\b(?:not|never)(?:[\s-]+\w+)?[\s-]+)\baccredited(?:[\s-]+[\w'’]+){0,4}?[\s-]+(?:IICRC|CECs?)\b|\b(?:IICRC|CECs?)(?:[\s-]+[\w'’]+){0,3}?[\s-]+(?<!nationally[\s-]+)accredit\w*|\baccreditation[\s-]+(?:from|by|with)[\s-]+(?:the[\s-]+)?(?:IICRC|CECs?)\b/gi;
+
+/**
+ * GP-771: an unqualified "accredited" claim about CARSI, with no IICRC or CEC named ("CARSI is fully
+ * accredited."). CARSI is not accredited by anyone; it is an IICRC Approved CEC Provider and issues
+ * its own designations. The proximity rule is grammatical, not a word window: the "accredit" word
+ * must be said OF CARSI (or "we" / "our courses") in one of four shapes, with nothing between them
+ * except words from the closed lists below:
+ *   1. attached: "CARSI accreditation", "CARSI's accreditation", "CARSI-accredited";
+ *   2. a linking verb: "CARSI (courses) is/are/'s (an/fully/nationally/...) accredited",
+ *      "we are / we're (an) accredited", "our courses are accredited";
+ *   3. possession: "CARSI holds/has/earned (full/national) accreditation", "our accreditation";
+ *   4. agent: "accredited by/through/with CARSI".
+ * So a negation ("CARSI is not accredited", "does not award nationally accredited VET
+ * qualifications"), a question ("Is CARSI accredited?": shape 1 does not match after an auxiliary
+ * that opens a question, and the others need CARSI before the verb) and "accredited" about another body
+ * ("CARSI recommends a NATA-accredited laboratory") do not match. "nationally accredited" is not
+ * exempt here: "CARSI courses are nationally accredited" is false (CARSI is not an RTO).
+ */
+const SEP = '[\\s-]+';
+const CARSI_THING =
+  '(?:own[\\s-]+)?(?:courses?|training|programs?|programmes?|classes|designations?|credentials?|certificates?|qualifications?)';
+const SUBJECT = `(?:CARSI(?:['’]s)?(?:${SEP}${CARSI_THING})?|we|our${SEP}${CARSI_THING})`;
+const LINK = `(?:${SEP}(?:is|are|was|were|has${SEP}been|have${SEP}been|remains?|becomes?|became)|['’](?:s|re))`;
+const MODIFIER =
+  '(?:an?|the|now|also|fully|officially|nationally|internationally|formally|properly|independently|government|industry|and)';
+export const CARSI_ACCREDITED_CLAIM = new RegExp(
+  [
+    // Not after an auxiliary that opens a question ("Is CARSI accredited?").
+    `(?<!\\b(?:is|are|was|were|isn['’]t|aren['’]t|wasn['’]t)${SEP})\\bCARSI(?:['’]s)?${SEP}accredit\\w*`,
+    `\\b${SUBJECT}${LINK}(?:${SEP}${MODIFIER})*${SEP}accredit\\w*`,
+    `\\b(?:CARSI|we)${SEP}(?:holds?|has|have|gained|earned|received|achieved|obtained)${SEP}(?:(?:full|national|formal|official|government)${SEP})?accreditations?\\b`,
+    `\\bour${SEP}accreditations?\\b`,
+    `\\baccredit\\w*${SEP}(?:by|through|with)${SEP}CARSI\\b`,
+  ].join('|'),
+  'gi'
+);
 
 /**
  * Dated records of the past: audits, handoffs, session notes, specs, decision logs and applied
@@ -159,8 +201,33 @@ function servedPdfs(): string[] {
   return repoFiles().filter((f) => /^public\/.*\.pdf$/i.test(f));
 }
 
+/** Every match of both rules in already-visible text (rendered markup, JSON, PDF text). */
 function matchesIn(text: string): string[] {
-  return [...text.matchAll(RETIRED_PROVIDER_WORDING)].map((m) => m[0]);
+  return [...text.matchAll(RETIRED_PROVIDER_WORDING), ...text.matchAll(CARSI_ACCREDITED_CLAIM)].map(
+    (m) => m[0]
+  );
+}
+
+/**
+ * Matches in a source file, with the 1-based line each starts on (GP-771). The raw text is read,
+ * then both reading views, so a phrase split across JSX tags, `{' '}`, literals, entities or line
+ * breaks is seen the way a visitor sees it. A match found twice on one line is reported once.
+ */
+function sourceHits(src: string, file = ''): { line: number; match: string }[] {
+  const hits: { line: number; match: string }[] = [];
+  const seen = new Set<string>();
+  const add = (line: number, match: string) => {
+    const key = `${line}\u0000${match.replace(/\s+/g, ' ').toLowerCase()}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    hits.push({ line, match });
+  };
+  for (const re of [RETIRED_PROVIDER_WORDING, CARSI_ACCREDITED_CLAIM]) {
+    for (const m of src.matchAll(re)) add(src.slice(0, m.index).split('\n').length, m[0]);
+    for (const view of readingViews(src, { markdown: /\.mdx?$/i.test(file) }))
+      for (const m of view.text.matchAll(re)) add(sourceLine(src, view, m.index), m[0]);
+  }
+  return hits;
 }
 
 function covered(file: string, list: Record<string, string> | string[]): string | null {
@@ -216,6 +283,101 @@ describe('the retired-wording pattern (positive and negative controls)', () => {
   }
 });
 
+/**
+ * GP-771 controls. Each `catch` case is source text a visitor reads as the retired or unqualified
+ * wording; each `clean` twin is the approved phrasing in the same markup and must pass.
+ * Words are split with '' + '' so this file's own source does not spell the cases.
+ */
+describe('GP-771: wording split across JSX tags and expressions', () => {
+  const A = 'Accre' + 'dited';
+  const a = 'accre' + 'dited';
+  const catches = [
+    `<p>CARSI is an IICRC <strong>${A}</strong> provider.</p>`,
+    `<p>IICRC{' '}${A} courses</p>`,
+    `<p>IICRC{" "}CEC{' '}${A}</p>`,
+    `<span>IICRC</span> <b>${a}</b>`,
+    `<p>IICRC&nbsp;${A}</p>`,
+    `<p>courses ${a} by the{' '}\n  <a href="/about">IICRC</a></p>`,
+    `<p>{'IICRC'} {"${a}"}</p>`,
+    `<p>IICRC {\`CEC\`} ${A}</p>`,
+    `<p>IICRC accre<span>dited</span></p>`,
+    `<p>IICRC<!-- --> ${A}</p>`,
+  ];
+  for (const src of catches) {
+    it(`flags ${JSON.stringify(src)}`, () => {
+      expect(sourceHits(src)).not.toHaveLength(0);
+    });
+  }
+  const clean = [
+    `<p>CARSI is an IICRC <strong>Approved CEC Provider</strong>.</p>`,
+    `<p>${CARSI_PROVIDER_STATUS}</p>`,
+    `<p>IICRC{' '}Continuing Education Credit (CEC) hours</p>`,
+    `<p>{'IICRC'} {"Approved CEC Provider"}</p>`,
+    `<p>${APPROVED_FOR_IICRC_CECS}</p>{' '}<p>Not a nationally ${a} VET qualification.</p>`,
+    `<p>Courses are not ${a} by the{' '}<a href="/about">IICRC</a>.</p>`,
+    `const isAccredited = flag; <p>{isAccredited ? 'IICRC' : null}</p>`,
+  ];
+  for (const src of clean) {
+    it(`leaves ${JSON.stringify(src)} alone`, () => {
+      expect(sourceHits(src)).toEqual([]);
+    });
+  }
+  it('reads markdown emphasis the way the rendered page shows it', () => {
+    // docs/iicrc-compliance.md carried this shape; the old guard missed it.
+    expect(sourceHits(`courses ${a} by the **IICRC**.`, 'x.md')).not.toHaveLength(0);
+    expect(sourceHits(`an __IICRC__ ${A} provider`, 'x.md')).not.toHaveLength(0);
+    expect(sourceHits(`CARSI is an **${IICRC_APPROVED_CEC_PROVIDER}**.`, 'x.md')).toEqual([]);
+  });
+  it('reports a split match on the source line it starts on', () => {
+    const src = `line one\nline two\n<p>IICRC{' '}\n  <strong>${A}</strong></p>\n`;
+    expect(sourceHits(src).map((h) => h.line)).toEqual([3]);
+  });
+});
+
+describe('GP-771: unqualified "accredited" claims about CARSI', () => {
+  const a = 'accre' + 'dited';
+  const catches = [
+    `CARSI is fully ${a}.`,
+    `CARSI courses are nationally ${a}.`,
+    `CARSI's accre` + `ditation means employers trust the course.`,
+    `CARSI is an ${a} training organisation.`,
+    `CARSI-${a} training`,
+    `CARSI holds full accre` + `ditation.`,
+    `We are fully ${a}.`,
+    `We're an ${a} training school.`,
+    `Our courses are ${a}.`,
+    `Training ${a} by CARSI`,
+    `<p>CARSI is fully <strong>${a}</strong>.</p>`,
+  ];
+  for (const src of catches) {
+    it(`flags ${JSON.stringify(src)}`, () => {
+      expect(sourceHits(src)).not.toHaveLength(0);
+    });
+  }
+  const clean = [
+    CARSI_PROVIDER_STATUS,
+    `CARSI is an ${IICRC_APPROVED_CEC_PROVIDER}.`,
+    'CARSI is an IICRC Approved CEC Provider (Continuing Education Credit).',
+    // True VET negations (GP-771 acceptance).
+    `CARSI does not award nationally ${a} VET qualifications.`,
+    `CARSI is not an RTO and its courses are not nationally ${a}.`,
+    `CARSI isn't ${a} by any VET regulator.`,
+    `We do not claim accre` + `ditation.`,
+    // A question is not a claim.
+    `Can CARSI award nationally ${a} Australian qualifications?`,
+    `Is CARSI ${a}?`,
+    // "accredited" about another body, with CARSI nearby but not its subject.
+    `CARSI recommends a NATA-${a} laboratory for mould sampling.`,
+    `The laboratory is NATA ${a}.`,
+    `Our team uses ${a} laboratories.`,
+  ];
+  for (const src of clean) {
+    it(`leaves ${JSON.stringify(src)} alone`, () => {
+      expect(sourceHits(src)).toEqual([]);
+    });
+  }
+});
+
 describe('tracked source carries no retired provider wording', () => {
   const files = trackedTextFiles();
 
@@ -234,8 +396,11 @@ describe('tracked source carries no retired provider wording', () => {
       } catch {
         continue;
       }
-      const hits = matchesIn(text);
-      if (hits.length) offenders.push(`${file}: ${[...new Set(hits)].join(' | ')}`);
+      const hits = sourceHits(text, file);
+      if (hits.length)
+        offenders.push(
+          `${file}: ${[...new Set(hits.map((h) => `L${h.line} ${h.match.replace(/\s+/g, ' ')}`))].join(' | ')}`
+        );
     }
     expect(offenders).toEqual([]);
   });
@@ -246,7 +411,9 @@ describe('tracked source carries no retired provider wording', () => {
       const scope = entry.endsWith('/')
         ? files.filter((f) => f.startsWith(entry))
         : files.filter((f) => f === entry);
-      const dirty = scope.some((f) => matchesIn(readFileSync(join(ROOT, f), 'utf8')).length > 0);
+      const dirty = scope.some(
+        (f) => sourceHits(readFileSync(join(ROOT, f), 'utf8'), f).length > 0
+      );
       if (!dirty) stale.push(`${entry} (${owner})`);
     }
     expect(stale).toEqual([]);
@@ -256,7 +423,7 @@ describe('tracked source carries no retired provider wording', () => {
     const missing = [...HISTORICAL, ...DETECTORS]
       .filter((k) => !k.endsWith('/'))
       .filter(
-        (k) => !files.includes(k) || matchesIn(readFileSync(join(ROOT, k), 'utf8')).length === 0
+        (k) => !files.includes(k) || sourceHits(readFileSync(join(ROOT, k), 'utf8'), k).length === 0
       );
     expect(missing).toEqual([]);
   });

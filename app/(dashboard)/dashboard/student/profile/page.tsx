@@ -53,7 +53,6 @@ export default function StudentProfilePage() {
   const [expiry, setExpiry] = useState('');
   const [cardUrl, setCardUrl] = useState('');
   const [leaderboardShow, setLeaderboardShow] = useState(false);
-  const [leaderboardName, setLeaderboardName] = useState('');
   const [profile, setProfile] = useState<User | null>(null);
 
   const load = useCallback(async () => {
@@ -68,7 +67,6 @@ export default function StudentProfilePage() {
       setExpiry(data.iicrc_expiry_date ?? '');
       setCardUrl(data.iicrc_card_image_url ?? '');
       setLeaderboardShow(data.leaderboard_show_display_name ?? false);
-      setLeaderboardName(data.leaderboard_display_name ?? '');
     } catch {
       setError('Could not load profile.');
     } finally {
@@ -116,10 +114,16 @@ export default function StudentProfilePage() {
     setError(null);
     try {
       const data = await apiClient.patch<User>('/api/lms/auth/me', {
+        // Only the consent choice is sent; a stored label is kept but never shown (ruling 22/11).
         leaderboard_show_display_name: leaderboardShow,
-        leaderboard_display_name: leaderboardName.trim() || null,
       });
       setProfile(data);
+      // Show what was actually stored, and confirm only when the stored choice is the one asked
+      // for (GP-775): a learner must never be told they left the board while still on it.
+      setLeaderboardShow(data.leaderboard_show_display_name ?? false);
+      if ((data.leaderboard_show_display_name ?? false) !== leaderboardShow) {
+        throw new Error('leaderboard choice not stored');
+      }
       await refreshUser();
       toast({ title: 'Achievement preferences saved' });
     } catch {
@@ -345,10 +349,10 @@ export default function StudentProfilePage() {
               </div>
               <p className="mb-6 text-sm text-slate-500">
                 The monthly board highlights completion-based activity for the current calendar
-                month (Australia/Sydney). It is{' '}
-                <span className="text-slate-700">anonymous by default</span> — only an optional
-                label you enter here can appear publicly. Your email and account name are never
-                shown on the board.
+                month (Australia/Sydney). Taking part is{' '}
+                <span className="text-slate-700">optional and off by default</span> — you are only
+                listed if you turn it on here, and you can turn it off at any time. Your email and
+                account name are never shown on the board.
               </p>
               <form
                 onSubmit={saveRecognition}
@@ -364,31 +368,13 @@ export default function StudentProfilePage() {
                   />
                   <div>
                     <label htmlFor="lb_show" className="text-sm font-medium text-slate-800">
-                      Show my chosen public label on the monthly recognition board
+                      Appear on the monthly recognition board
                     </label>
                     <p className="mt-1 text-xs text-slate-400">
-                      If off, you appear as a neutral professional identifier (not your real name).
+                      If off, you are not listed or ranked. If on, you appear only under a neutral
+                      identifier, never your name or email.
                     </p>
                   </div>
-                </div>
-                <div>
-                  <label htmlFor="lb_name" className="block text-xs font-medium text-slate-500">
-                    Public label (optional, max 48 characters)
-                  </label>
-                  <input
-                    id="lb_name"
-                    type="text"
-                    value={leaderboardName}
-                    onChange={(ev) => setLeaderboardName(ev.target.value.slice(0, 48))}
-                    disabled={!leaderboardShow}
-                    placeholder="e.g. Alex K., QLD"
-                    className={`mt-2 w-full max-w-md ${dash.input} disabled:cursor-not-allowed disabled:opacity-45`}
-                    autoComplete="off"
-                  />
-                  <p className="mt-1.5 text-xs text-slate-400">
-                    Do not use your email. This is only for the leaderboard — not certificates or
-                    verification.
-                  </p>
                 </div>
                 <Button
                   type="submit"

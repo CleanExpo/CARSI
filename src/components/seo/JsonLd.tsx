@@ -4,9 +4,9 @@
 // Content is server-generated from controlled objects, not user input.
 
 import { CARSI_SOCIAL_PROFILE_URLS } from '@/lib/brand/social-profiles';
+import { CARSI_PROVIDER_STATUS } from '@/lib/iicrc/approved-wording';
 import { buildFounderPersonSchema } from '@/lib/schema/founder';
 import { CARSI_ENTITY, entityAreaServed, entityPostalAddress } from '@/lib/seo/carsi-entity';
-import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 import { serializeJsonLd } from '@/lib/seo/json-ld';
 
 interface OrganizationSchemaProps {
@@ -142,8 +142,8 @@ export const CREDENTIAL_DISCLAIMER =
   // the schema test (which rejects numeric CEC and provider identifiers) passed it, and it
   // never says "CEC", so the terminology guard's CEC rule did not see it either.
   // Provider standing is true and stays; course-level eligibility now depends on approval.
-  `A CARSI-issued credential — not an IICRC certification. CARSI is an ${IICRC_APPROVED_CEC_PROVIDER}` +
-  '; a course displays IICRC CECs only where that course holds IICRC ' +
+  'A CARSI-issued credential — not an IICRC certification. ' +
+  `${CARSI_PROVIDER_STATUS.replace(/\.$/, '')}; a course displays IICRC CECs only where that course holds IICRC ` +
   'approval. IICRC certification itself is obtained through a school and examination ' +
   'approved by the IICRC.';
 
