@@ -1,9 +1,19 @@
+import type { Metadata } from 'next';
 import { LoginForm } from '@/components/auth/login-form';
 import Link from 'next/link';
 
 import { registerPathWithNext } from '@/lib/membership-signup-path';
 
 import { FROM_IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
+
+/** Its own title and description, not the home page's. robots.txt already disallows this page. */
+export const metadata: Metadata = {
+  title: 'Sign in',
+  description:
+    'Sign in to your CARSI account to pick up your restoration and cleaning courses where you left off and see your progress.',
+  robots: { index: false, follow: true },
+};
+
 export default async function LoginPage({
   searchParams,
 }: {
