@@ -86,9 +86,18 @@ export async function addCourseTeamMemberByEmail(params: {
         await assertCourseSeatsAvailable(team.id, teamCourseSlugs);
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
-        if (msg === 'COURSE_SEATS_FULL') throw new Error('COURSE_SEATS_FULL');
-        if (msg === 'NO_SEATS_FOR_COURSE') throw new Error('NO_SEATS_FOR_COURSE');
-        throw e;
+        // A full pool is decided in the seat step below, once the member is known: a learner
+        // who already holds the course through another payment joins without a seat (GP-759
+        // follow-up, ruling 22/11/2026). Everyone else is refused there with COURSE_SEATS_FULL.
+        if (msg !== 'COURSE_SEATS_FULL') {
+          if (msg === 'NO_SEATS_FOR_COURSE') throw new Error('NO_SEATS_FOR_COURSE');
+          throw e;
+        }
+        // Someone with no account cannot hold the course yet: refuse now, before an account
+        // is created for them.
+        if (!(await prisma.lmsUser.findUnique({ where: { email }, select: { id: true } }))) {
+          throw new Error('COURSE_SEATS_FULL');
+        }
       }
     }
   }
