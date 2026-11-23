@@ -3,6 +3,7 @@ import {
   type AdminCatalogCourseOption,
 } from '@/lib/admin/admin-catalog-source';
 import type { AdminCatalogCourse } from '@/lib/admin/load-admin-catalog';
+import { isStripeCheckoutPaymentReference } from '@/lib/lms/course-prerequisites';
 import { buildAdminCatalogFromSeed } from '@/lib/lms-seed-catalog';
 import { prisma } from '@/lib/prisma';
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
@@ -60,7 +61,7 @@ export type AdminUserProgress = {
   completedCourseCount: number;
   activeCourseCount: number;
   neverStartedCount: number;
-  /** Paid seat, still active, zero lessons — the “Bought, not started” filter. */
+  /** Stripe-bought seat, still active, zero lessons — the “Bought, not started” filter. */
   boughtNotStartedCount: number;
   paidEnrollmentCount: number;
   certificatesCount: number;
@@ -155,6 +156,23 @@ export function enrollmentLooksPaid(e: {
   const status = (e.status ?? '').toLowerCase();
   if (status === 'refunded' || status === 'revoked') return false;
   return Boolean(e.paymentReference?.trim());
+}
+
+/**
+ * The learner bought this seat: it carries a Stripe Checkout session id (`cs_…`) and has not
+ * been refunded or revoked (GP-766). Free (`free`), $0 discount (`discount:*`), admin
+ * (`admin:*`), team and org seats (`team:*`, `team-seat:*`, `org:*`), membership
+ * (`membership:*`) and CCW attendance (`ccw:*`) enrolments are not purchases by this learner.
+ * The schema stores no amount paid per enrolment (GP-764), so the Stripe reference is the
+ * only purchase signal; it cannot tell a legacy import with no reference from a free seat.
+ */
+export function enrollmentIsStripeBought(e: {
+  status: string;
+  paymentReference: string | null;
+}): boolean {
+  const status = (e.status ?? '').toLowerCase();
+  if (status === 'refunded' || status === 'revoked') return false;
+  return isStripeCheckoutPaymentReference(e.paymentReference);
 }
 
 type UserRow = {
@@ -288,7 +306,7 @@ export function mapUserToAdminProgress(
       lessonCountForEnrollment(e, catalogBySlug),
       completedLessonCounts
     );
-    return enrollmentLooksPaid(e) && status === 'active' && done === 0;
+    return enrollmentIsStripeBought(e) && status === 'active' && done === 0;
   }).length;
   const paidEnrollmentCount = userEnrollments.filter(enrollmentLooksPaid).length;
   const certificatesCount = userEnrollments.filter((e) => e.certificateIssuedAt).length;
