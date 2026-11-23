@@ -266,6 +266,10 @@ if (evaluateContent(NON_APPROVED, 'This course is Australian-produced. Ten-quest
     ['gain an industry certification', 'Gain an industry certification without leaving the job site.'],
     ['obtain your certification', 'Obtain your certification in three days.'],
     ['receive certification', 'Receive certification on completion.'],
+    // GP-584: a school route elsewhere on the line excuses nothing.
+    ['get certified + unrelated school route', 'Get certified online with us. Others go through an IICRC-approved school.'],
+    ['earn certification + unrelated school route', 'Earn your certification here. Others earn it through an IICRC-approved exam.'],
+    ['certification course + school in another sentence', 'Enrol in our certification course. We also list IICRC-approved schools.'],
   ];
   const CERT_BARE_MUST_PASS = [
     ['provider standing', 'CARSI is an IICRC Approved CEC Provider.'],
@@ -428,6 +432,34 @@ if (CEC_APPROVED_SLUGS.includes('hard-floor-care')) fail('fixture slug hard-floo
     if (!hits.some((h) => h.text === normaliseLine(e.text))) fail(`baseline entry is stale: ${e.file}`);
     if (/^(public\/courses|data\/courses)\//.test(e.file)) fail(`baseline must not pin course-tree files: ${e.file}`);
   }
+}
+
+// (8) GP-584 — an allow excuses only the ban occurrence it overlaps, never a ban elsewhere on the
+// same line. Before the fix, a legitimate phrase anywhere on a line suppressed a violation anywhere
+// else on it (`Buy our IICRC courses today. We are an IICRC CEC provider.` -> 0 findings).
+const SPAN_MUST_BLOCK = [
+  ['rule 1: violation beside an IICRC CEC phrase', 'Buy our IICRC courses today. We are an IICRC CEC provider.'],
+  ['rule 1: IICRC CEC phrase first, violation after', 'We are an IICRC CEC provider. Buy our IICRC courses today.'],
+  ['IICRC-approved: violation beside a CEC-provider phrase', 'Our IICRC-approved courses get you certified. CARSI is a CEC provider.'],
+  ['IICRC-approved: violation after an approved-school phrase', 'Study at IICRC-approved schools. Our IICRC-approved courses are better.'],
+  ['IICRC Accredited: bare claim beside the CEC form', 'CARSI is IICRC Accredited and offers IICRC CEC Accredited training.'],
+  ['CEC-accredited training: claim beside a denial', 'This is CEC-accredited training. The other one is not CEC accredited.'],
+];
+const SPAN_MUST_PASS = [
+  ['approved provider wording (GP-704)', 'CARSI is an IICRC Approved CEC Provider.'],
+  ['approved provider wording, hyphenated', 'CARSI is an IICRC-approved CEC provider for restoration teams.'],
+  ['approved CE provider', 'CARSI is an IICRC-approved CE provider.'],
+  ['third-person schools and exams', 'IICRC certification comes only from IICRC-approved schools and IICRC-approved examinations.'],
+  ['board approval process', 'Each class goes through the IICRC board approval process.'],
+  ['negated CEC-accredited denial', 'It is not CEC accredited training.'],
+  ['sanctioned CEC Accredited training', 'CARSI provides IICRC CEC Accredited training for aged care teams.'],
+];
+for (const [name, line] of SPAN_MUST_BLOCK) {
+  if (evaluateContent(NON_APPROVED, line, EMPTY).length === 0) fail(`GP-584 span: MUST BLOCK but passed: ${name}\n    ${line}`);
+}
+for (const [name, line] of SPAN_MUST_PASS) {
+  const f = evaluateContent(NON_APPROVED, line, EMPTY);
+  if (f.length > 0) fail(`GP-584 span: MUST PASS but blocked: ${name}\n    ${line}\n    ${f.join('\n    ')}`);
 }
 
 if (failed > 0) {

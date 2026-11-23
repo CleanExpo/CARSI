@@ -36,6 +36,7 @@ import type { BusinessCoachingSession } from '@/lib/marketing/business-coaching'
 import { businessCoachingPath } from '@/lib/marketing/business-coaching';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { isProvisionalPasswordHash } from '@/lib/server/lms-auth';
+import { tryBuildTaxInvoice } from '@/lib/billing/tax-invoice';
 
 export { isEmailConfigured };
 export type { SendEmailResult };
@@ -149,6 +150,12 @@ export async function sendEnrollmentWelcomeEmail(params: {
   courseSlug: string;
   appOrigin: string;
   offers?: import('@/lib/marketing/ccw-roadshow-offers').CcwAttendeeOffer[];
+  /**
+   * Pass only from a paid purchase, with the GST-inclusive amount Stripe charged
+   * (`session.amount_total`). The email then carries a tax invoice (GP-761).
+   * Free, membership, team and attendance enrolments leave it out.
+   */
+  payment?: { amountTotalCents: number | null | undefined; seatCount?: number };
 }): Promise<SendEmailResult> {
   const { studentId, courseSlug, appOrigin } = params;
   const user = await prisma.lmsUser.findUnique({
@@ -187,6 +194,16 @@ export async function sendEnrollmentWelcomeEmail(params: {
     needsPasswordSetup,
     setPasswordUrl,
     offers: params.offers,
+    taxInvoice: params.payment
+      ? tryBuildTaxInvoice({
+          item:
+            params.payment.seatCount && params.payment.seatCount > 1
+              ? `${course.title}, team purchase (${params.payment.seatCount} seats)`
+              : course.title,
+          totalCents: params.payment.amountTotalCents,
+          issuedAt: new Date(),
+        })
+      : null,
   });
 
   return sendEmail({
@@ -312,6 +329,8 @@ export async function sendCcwRoadshowBookingConfirmationEmail(params: {
   ticketLabel: string;
   seatCount: number;
   amountLabel: string;
+  /** GST-inclusive amount Stripe charged; makes the email a tax invoice (GP-761). */
+  amountTotalCents?: number | null;
   businessName?: string;
   phone?: string;
   appOrigin: string;
@@ -334,6 +353,11 @@ export async function sendCcwRoadshowBookingConfirmationEmail(params: {
     businessName: params.businessName,
     phone: params.phone,
     eventPageUrl,
+    taxInvoice: tryBuildTaxInvoice({
+      item: `CARSI Roadshow ${params.eventCity}, ${params.ticketLabel} (${params.seatCount} ${params.seatCount === 1 ? 'seat' : 'seats'})`,
+      totalCents: params.amountTotalCents,
+      issuedAt: new Date(),
+    }),
   });
 
   try {
@@ -622,6 +646,8 @@ export async function sendBusinessCoachingConfirmationEmail(params: {
   packageLabel: string;
   seatCount: number;
   amountLabel: string;
+  /** GST-inclusive amount Stripe charged; makes the email a tax invoice (GP-761). */
+  amountTotalCents?: number | null;
   registrationStatus: 'confirmed' | 'waitlisted';
   businessName?: string;
   phone?: string;
@@ -644,6 +670,11 @@ export async function sendBusinessCoachingConfirmationEmail(params: {
     businessName: params.businessName,
     discussionTopic: params.discussionTopic,
     programUrl: `${base}${businessCoachingPath}`,
+    taxInvoice: tryBuildTaxInvoice({
+      item: `Owner Circle: ${params.session.title}, ${params.packageLabel} (${params.seatCount} ${params.seatCount === 1 ? 'seat' : 'seats'})`,
+      totalCents: params.amountTotalCents,
+      issuedAt: new Date(),
+    }),
   });
 
   return sendEmail({

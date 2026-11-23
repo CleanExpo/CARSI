@@ -15,6 +15,13 @@
  * No-ops (resolves without throwing or sending a request) when
  * `NEXT_PUBLIC_GA_MEASUREMENT_ID` or `GA4_MEASUREMENT_PROTOCOL_API_SECRET`
  * is unset, so local/dev/CI environments never fire real events.
+ *
+ * CONSENT (GP-732): nothing is sent unless the caller passes
+ * `analyticsConsent: true`, which callers derive from the visitor's choice as
+ * recorded on the Stripe session or subscription at checkout
+ * (`hasAnalyticsConsent` in ./analytics-consent). A missing or unknown choice
+ * sends nothing. No GA4 `user_id` is ever sent: the learner's account id stays
+ * out of third-party analytics, as it does in the browser (GP-731 / GP-750).
  */
 
 const MEASUREMENT_PROTOCOL_ENDPOINT = 'https://www.google-analytics.com/mp/collect';
@@ -25,15 +32,17 @@ export interface Ga4MeasurementProtocolEvent {
   /** GA4 event params, e.g. { currency: 'AUD', value: 199, course_slug: '...' }. */
   params: Record<string, unknown>;
   /**
-   * A stable per-user/session identifier GA4 requires for Measurement
-   * Protocol hits. We don't have a GA4 client_id from the server, so callers
-   * pass a stable identifier (e.g. the learner's user id or the Stripe
-   * checkout session id) and we hash-free pass it straight through — GA4
-   * accepts any non-empty string.
+   * The pseudonymous identifier GA4 requires for Measurement Protocol hits.
+   * We don't have a GA4 client_id from the server, so callers pass the Stripe
+   * object the event is about (checkout session or subscription id). Never a
+   * learner's account id, email or name.
    */
   clientId: string;
-  /** Optional GA4 user_id for cross-device / logged-in attribution. */
-  userId?: string;
+  /**
+   * The visitor's analytics choice for this purchase (GP-732). Only `true`
+   * sends; derive it with `hasAnalyticsConsent(stripeObject.metadata)`.
+   */
+  analyticsConsent: boolean;
 }
 
 function getMeasurementId(): string | undefined {
@@ -63,6 +72,10 @@ export async function sendGa4MeasurementProtocolEvent(
   const apiSecret = getApiSecret();
   const fetchImpl = opts.fetchImpl ?? fetch;
 
+  if (event.analyticsConsent !== true) {
+    return { sent: false };
+  }
+
   if (!measurementId || !apiSecret) {
     return { sent: false };
   }
@@ -73,7 +86,6 @@ export async function sendGa4MeasurementProtocolEvent(
 
   const body = {
     client_id: event.clientId,
-    ...(event.userId ? { user_id: event.userId } : {}),
     events: [{ name: event.name, params: event.params }],
   };
 
@@ -103,7 +115,7 @@ export async function sendGa4MeasurementProtocolEvent(
  */
 export async function sendGa4PurchaseEvent(input: {
   clientId: string;
-  userId?: string;
+  analyticsConsent: boolean;
   courseSlug: string;
   valueAud: number;
   transactionId: string;
@@ -111,7 +123,7 @@ export async function sendGa4PurchaseEvent(input: {
   return sendGa4MeasurementProtocolEvent({
     name: 'purchase',
     clientId: input.clientId,
-    userId: input.userId,
+    analyticsConsent: input.analyticsConsent,
     params: {
       currency: 'AUD',
       value: input.valueAud,

@@ -30,7 +30,7 @@ import { formatAdminDate } from '@/components/admin/admin-learner-ui';
 import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
 import type { AdminDashboardClientData } from '@/lib/admin/admin-dashboard-data';
 import {
-  formatAud,
+  formatRevenueAud,
   formatSignedPct,
   momDeltaPct,
   type AdminOpsPeriod,
@@ -87,7 +87,7 @@ function DeltaChip({
 
 export function AdminDashboardClient({ data }: { data: AdminDashboardClientData }) {
   const [period, setPeriod] = useState<AdminOpsPeriod>('this_month');
-  const revenuePaging = useAdminListPaging(data.ops.topByRevenue);
+  const revenuePaging = useAdminListPaging(data.ops.topByPaidEnrollments);
   const snapshot =
     data.ops[
       period === 'this_month'
@@ -151,9 +151,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
     data.ops.attention.refunds.length +
     data.kpis.neverStartedEnrollments;
 
-  const topCourse = data.ops.topByRevenue[0];
-  const avgTicket =
-    snapshot.paidEnrollments > 0 ? snapshot.revenueAud / snapshot.paidEnrollments : 0;
+  const topCourse = data.ops.topByPaidEnrollments[0];
 
   return (
     <div className="relative px-5 py-8 pb-24 sm:px-8 sm:py-10">
@@ -176,7 +174,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
             What needs you today
           </h1>
           <p className="text-sm leading-relaxed text-white/55">
-            Catalogue AUD on paid seats — not a Stripe payout file. {data.ops.revenueNote}
+            {data.ops.revenueNote}
           </p>
         </div>
         <div className="flex flex-wrap gap-1 rounded-full border border-white/10 bg-black/20 p-1">
@@ -201,25 +199,22 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
       <section className="relative mb-8 grid gap-4 xl:grid-cols-12">
         <div className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#1a1408] via-[#0c1018] to-[#0a1220] p-6 xl:col-span-7">
           <p className="text-[11px] font-semibold tracking-[0.16em] text-[#ed9d24]/80 uppercase">
-            Recognised revenue
+            Paid enrolments
           </p>
           <p className="mt-3 text-4xl font-bold tracking-tight text-white tabular-nums sm:text-5xl">
-            {formatAud(snapshot.revenueAud)}
+            {snapshot.paidEnrollments.toLocaleString()}
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/55">
-            <span>
-              {snapshot.paidEnrollments.toLocaleString()} paid seats
-              {avgTicket > 0 ? ` · ${formatAud(avgTicket)} average` : ''}
-            </span>
+            <span>Revenue: {formatRevenueAud(snapshot.revenueAud)}</span>
             <DeltaChip
-              current={snapshot.revenueAud}
-              previous={data.ops.lastMonth.revenueAud}
+              current={snapshot.paidEnrollments}
+              previous={data.ops.lastMonth.paidEnrollments}
               show={compare}
             />
           </div>
           {topCourse ? (
             <p className="mt-4 text-xs text-white/40">
-              Leading course: {topCourse.title} · {formatAud(topCourse.revenueAud)}
+              Leading course: {topCourse.title} · {topCourse.paidEnrollments} paid
             </p>
           ) : (
             <p className="mt-4 text-xs text-white/40">No paid seats in this window yet.</p>
@@ -332,8 +327,10 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
 
       <section className="mb-8 grid gap-5 lg:grid-cols-12">
         <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5 lg:col-span-7">
-          <h2 className="text-sm font-semibold text-white/88">Revenue and seats by month</h2>
-          <p className="mt-1 text-xs text-white/45">Gold is recognised AUD. Blue is enrolments.</p>
+          <h2 className="text-sm font-semibold text-white/88">Paid and total enrolments by month</h2>
+          <p className="mt-1 text-xs text-white/45">
+            Gold is Stripe-paid enrolments. Blue is all enrolments.
+          </p>
           <div className="mt-4 h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
               <ComposedChart
@@ -347,7 +344,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                         tickLine={false}
                       />
                       <YAxis
-                  yAxisId="aud"
+                  yAxisId="paid"
                   tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10 }}
                         tickLine={false}
                         axisLine={false}
@@ -363,10 +360,10 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                 />
                 <Tooltip {...chartTooltipProps} />
                 <Area
-                  yAxisId="aud"
+                  yAxisId="paid"
                   type="monotone"
-                  dataKey="revenueAud"
-                  name="AUD"
+                  dataKey="paidEnrollments"
+                  name="Paid"
                   stroke="#ed9d24"
                   fill="#ed9d24"
                   fillOpacity={0.16}
@@ -385,14 +382,16 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-5 lg:col-span-5">
-          <h2 className="text-sm font-semibold text-white/88">Highest-earning courses</h2>
-          <p className="mt-1 text-xs text-white/45">Catalogue price × paid enrolments.</p>
-          {data.ops.topByRevenue.length === 0 ? (
+          <h2 className="text-sm font-semibold text-white/88">Most-bought courses</h2>
+          <p className="mt-1 text-xs text-white/45">
+            Stripe-paid enrolments per course. Price at purchase unknown.
+          </p>
+          {data.ops.topByPaidEnrollments.length === 0 ? (
             <p className="pt-16 text-center text-sm text-white/40">No paid enrolments yet.</p>
           ) : (
             <ol className="mt-5 space-y-3">
               {revenuePaging.pageRows.map((row, i) => {
-                const max = data.ops.topByRevenue[0]?.revenueAud || 1;
+                const max = data.ops.topByPaidEnrollments[0]?.paidEnrollments || 1;
                 const rank = revenuePaging.start + i + 1;
                 return (
                   <li key={row.title}>
@@ -404,26 +403,23 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                         {row.title}
                       </span>
                       <span className="shrink-0 text-xs font-medium text-[#ed9d24] tabular-nums">
-                        {formatAud(row.revenueAud)}
+                        {row.paidEnrollments} paid
                       </span>
                     </div>
                     <div className="h-1 overflow-hidden rounded-full bg-white/8">
                       <div
                         className="h-full rounded-full bg-[#ed9d24]"
                         style={{
-                          width: `${Math.max(6, Math.round((row.revenueAud / max) * 100))}%`,
+                          width: `${Math.max(6, Math.round((row.paidEnrollments / max) * 100))}%`,
                         }}
                       />
                 </div>
-                    <p className="mt-1 text-[11px] text-white/35">
-                      {row.enrollments} paid seat{row.enrollments === 1 ? '' : 's'}
-                    </p>
                   </li>
                 );
               })}
             </ol>
           )}
-          {data.ops.topByRevenue.length > 0 ? (
+          {data.ops.topByPaidEnrollments.length > 0 ? (
             <div className="mt-4">
               <AdminPagination
                 page={revenuePaging.page}
