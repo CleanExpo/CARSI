@@ -16,7 +16,7 @@ This applies to every page a customer can see.
 4. **Premium type and layout:** Fraunces display + Manrope body + JetBrains Mono data via next/font (or the repo's approved brand system). No system/Inter/Roboto/Arial.
 5. **Media budgets:** AVIF/WebP images ≤ 450 KB, videos ≤ 6 MB, no PNG/JPG > 80 KB, no .mov.
 6. **Visibility pillars first:** Find → Crawl → Index → Ranking are set up before any SEO/AEO/GEO tactics.
-7. **Process:** plan the page with the **SPM** skill (`/spm` — spec before build, include the media plan and prompt manifest), then pass the **SDA visual and commercial evidence gate** (`skills/visual-qa`, `sda_evidence_gate.py`: real Playwright screenshots at 390/768/1440, reduced-motion check, video frame review, named SDA rubric). Non-zero = HOLD.
+7. **Process:** plan the page with the **SPM** skill (`.agents/skills/product/carsi-spm/SKILL.md` — spec before build, include the media plan and prompt manifest), then pass the **SDA visual and commercial evidence gate** (`.agents/skills/quality/carsi-visual-qa/SKILL.md`; `sda_evidence_gate.py` when present: real Playwright screenshots at 390/768/1440, reduced-motion check, video frame review, named SDA rubric). Non-zero = HOLD.
 8. Once the package is installed: generate media with `npx generate-media --prompts media.prompts.json` (dry run by default; `--go` uses the existing Higgsfield plan; keys from env, never printed) and render 3D with `npx blender-render model.glb --id <id>`. Neither command is available in CARSI today.
 
 ---

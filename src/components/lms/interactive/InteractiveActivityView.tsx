@@ -11,6 +11,10 @@ import type {
   ScenarioActivity,
   SequenceActivity,
 } from '@/lib/lms/interactive-experience-types';
+import {
+  InteractiveChoiceButton,
+  InteractiveFeedbackPanel,
+} from '@/components/lms/interactive/interactive-primitives';
 import { cn } from '@/lib/utils';
 
 interface ActivityViewProps {
@@ -46,21 +50,6 @@ export function InteractiveActivityView({ activity, mastered, onComplete }: Acti
     default:
       return null;
   }
-}
-
-function FeedbackPanel({ tone, children }: { tone: 'ok' | 'warn' | 'neutral'; children: string }) {
-  return (
-    <p
-      className={cn(
-        'mt-4 rounded-lg border px-4 py-3 text-sm leading-relaxed',
-        tone === 'ok' && 'border-emerald-200 bg-emerald-50 text-emerald-950',
-        tone === 'warn' && 'border-amber-200 bg-amber-50 text-amber-950',
-        tone === 'neutral' && 'border-slate-200 bg-slate-50 text-slate-800'
-      )}
-    >
-      {children}
-    </p>
-  );
 }
 
 function ScenarioView({
@@ -116,7 +105,7 @@ function ScenarioView({
       </ul>
       {choice ? (
         <>
-          <FeedbackPanel tone={choice.correct ? 'ok' : 'warn'}>{choice.feedback}</FeedbackPanel>
+          <InteractiveFeedbackPanel tone={choice.correct ? 'ok' : 'warn'}>{choice.feedback}</InteractiveFeedbackPanel>
           {choice.correct ? (
             <button
               type="button"
@@ -311,13 +300,13 @@ function HazardSpotView({
           Check hazards
         </button>
       ) : success ? (
-        <FeedbackPanel tone="ok">{activity.successFeedback}</FeedbackPanel>
+        <InteractiveFeedbackPanel tone="ok">{activity.successFeedback}</InteractiveFeedbackPanel>
       ) : (
         <>
-          <FeedbackPanel tone="warn">
+          <InteractiveFeedbackPanel tone="warn">
             Not quite — electrical, biological, slip, structural and on-site chemical hazards are
             all in play on this job. Noise from traffic is not the focus inside the flooded room.
-          </FeedbackPanel>
+          </InteractiveFeedbackPanel>
           {/* Always offered: a wrong answer must never leave the learner with no way forward. */}
           <button
             type="button"
@@ -374,8 +363,8 @@ function DecisionView({
       </ul>
       {choice ? (
         <>
-          <FeedbackPanel tone={choice.correct ? 'ok' : 'warn'}>{choice.feedback}</FeedbackPanel>
-          {choice.followUp ? <FeedbackPanel tone="neutral">{choice.followUp}</FeedbackPanel> : null}
+          <InteractiveFeedbackPanel tone={choice.correct ? 'ok' : 'warn'}>{choice.feedback}</InteractiveFeedbackPanel>
+          {choice.followUp ? <InteractiveFeedbackPanel tone="neutral">{choice.followUp}</InteractiveFeedbackPanel> : null}
           {!choice.correct && !passed ? (
             <button
               type="button"
@@ -449,11 +438,11 @@ function SequenceView({
       </ul>
       {done ? (
         <>
-          <FeedbackPanel tone={ok ? 'ok' : 'warn'}>
+          <InteractiveFeedbackPanel tone={ok ? 'ok' : 'warn'}>
             {ok
               ? activity.successFeedback
               : 'That order does not match the restoration arc. Safety and hazard control come first.'}
-          </FeedbackPanel>
+          </InteractiveFeedbackPanel>
           {!ok ? (
             <button
               type="button"
@@ -510,9 +499,9 @@ function KnowledgeView({
       </ul>
       {picked ? (
         <>
-          <FeedbackPanel tone={correct ? 'ok' : 'warn'}>
+          <InteractiveFeedbackPanel tone={correct ? 'ok' : 'warn'}>
             {correct ? activity.successFeedback : activity.incorrectFeedback}
-          </FeedbackPanel>
+          </InteractiveFeedbackPanel>
           {!correct && !passed ? (
             <button
               type="button"

@@ -34,7 +34,7 @@ export const PUBLIC_LIGHT_FOOTER_CLASS =
 export const PUBLIC_LIGHT_LINK_CLASS =
   'rounded-md px-2 py-2 text-sm font-medium text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none';
 
-/** Shared landing type helpers: Outfit display plus calm body. Refined weights, never heavy bold. */
+/** Shared landing type helpers: Fraunces display plus Manrope body. Refined weights, never heavy bold. */
 export const LANDING_EYEBROW_CLASS =
   'text-[11px] font-medium tracking-[0.24em] text-[#146fc2] uppercase';
 
