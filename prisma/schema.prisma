@@ -1391,7 +1391,7 @@ model CarsiCoachingBusinessProfile {
   onboardingSnapshotJson       String?   @map("onboarding_snapshot_json") @db.Text
   onboardingCoachBriefJson   String?   @map("onboarding_coach_brief_json") @db.Text
   onboardingCoachBriefAt     DateTime? @map("onboarding_coach_brief_at") @db.Timestamptz(6)
-  coachUserId                String?   @map("coach_user_id") @db.Uuid
+  coachUserId                String?   @map("coach_user_id") @db.VarChar(64)
   chapterSlug                String?   @map("chapter_slug") @db.VarChar(120)
   sessionPrepNotes             String?   @map("session_prep_notes") @db.Text
   completedAt         DateTime? @map("completed_at") @db.Timestamptz(6)

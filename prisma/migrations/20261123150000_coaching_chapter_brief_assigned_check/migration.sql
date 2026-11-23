@@ -3,7 +3,7 @@
 -- GP-646 / T0: assigned_to allowlist (NOT VALID until Phill confirms prod rows — then VALIDATE).
 
 ALTER TABLE "carsi_coaching_business_profiles"
-  ADD COLUMN IF NOT EXISTS "coach_user_id" UUID,
+  ADD COLUMN IF NOT EXISTS "coach_user_id" VARCHAR(64),
   ADD COLUMN IF NOT EXISTS "chapter_slug" VARCHAR(120),
   ADD COLUMN IF NOT EXISTS "onboarding_coach_brief_json" TEXT,
   ADD COLUMN IF NOT EXISTS "onboarding_coach_brief_at" TIMESTAMPTZ(6);
