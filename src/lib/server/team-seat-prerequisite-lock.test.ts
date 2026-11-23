@@ -89,11 +89,24 @@ vi.mock('@/lib/prisma', () => {
       const e = db.enrolments.find((row) => row.id === id);
       return e ? [{ id: e.id, studentId: e.studentId, courseId: e.courseId, status: e.status }] : [];
     }),
-    lmsLessonProgress: { upsert: vi.fn(async () => ({})) },
-    lmsEnrollment: { update: vi.fn(async () => ({})) },
+    // lmsLessonProgress and lmsEnrollment are NOT faked here: the transaction uses the client's
+    // models below, so the enrolment row it updates is the one every other step reads.
   };
   const client: Record<string, unknown> = {};
-  const tx = new Proxy(txOwn, { get: (t, k: string) => (k in t ? t[k] : client[k]) });
+  // A model faked here EXTENDS the client's model of the same name: the methods named here win
+  // and every other method falls through to the client. Replacing the whole model hid
+  // lmsEnrollment.findUnique from the seat step when GP-432 added `lmsEnrollment: { update }`
+  // (main red at f4760672).
+  const isModel = (v: unknown): v is Record<string, unknown> =>
+    typeof v === 'object' && v !== null && !Array.isArray(v);
+  const tx = new Proxy(txOwn, {
+    get: (t, k: string) => {
+      if (!(k in t)) return client[k];
+      const own = t[k];
+      const base = client[k];
+      return isModel(own) && isModel(base) ? { ...base, ...own } : own;
+    },
+  });
   Object.assign(client, {
       $transaction: vi.fn(async (fn: (t: typeof tx) => unknown) => fn(tx)),
       lmsUser: {
@@ -285,6 +298,25 @@ beforeEach(() => {
     [manager.sub, manager],
     [admin.sub, admin],
   ]);
+});
+
+// Guard for the fake itself: a model the transaction fake names must extend the client's model,
+// never replace it, or a method the code under test calls inside the transaction disappears.
+describe('the in-memory transaction', () => {
+  it('reaches every client model method, whatever the transaction fakes', async () => {
+    const { prisma } = await import('@/lib/prisma');
+    const client = prisma as unknown as Record<string, unknown>;
+    const tx = (await prisma.$transaction(async (t) => t)) as unknown as Record<string, unknown>;
+    for (const [model, methods] of Object.entries(client)) {
+      if (typeof methods !== 'object' || methods === null) continue;
+      for (const method of Object.keys(methods)) {
+        expect(typeof (tx[model] as Record<string, unknown>)[method], `${model}.${method}`).toBe(
+          'function'
+        );
+      }
+    }
+    expect(Object.keys(client)).toContain('lmsEnrollment');
+  });
 });
 
 describe('team seat for a member WITHOUT the prerequisite', () => {
