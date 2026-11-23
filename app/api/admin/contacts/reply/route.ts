@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
-import { ensureReplyDisclaimer } from '@/lib/server/contact-reply';
+import {
+  STANDARD_WORDING_REJECTION,
+  ensureReplyDisclaimer,
+  findStandardWordingInFreeText,
+} from '@/lib/server/contact-reply';
 import { ticketRefFromId } from '@/lib/server/contact-reply-dispatch';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { sendContactReplyEmail } from '@/lib/server/transactional-email';
@@ -28,6 +32,15 @@ export async function POST(request: NextRequest) {
   const rawReply = body.replyBody?.trim();
   if (!submissionId || !rawReply) {
     return NextResponse.json({ detail: 'submissionId and replyBody required' }, { status: 400 });
+  }
+
+  // GP-706: free text from an authorised admin is still checked for standard wording.
+  const wordingHit = findStandardWordingInFreeText(rawReply);
+  if (wordingHit) {
+    return NextResponse.json(
+      { detail: STANDARD_WORDING_REJECTION, reason: wordingHit.reason },
+      { status: 422 },
+    );
   }
 
   const submission = await prisma.contactSubmission.findUnique({ where: { id: submissionId } });
