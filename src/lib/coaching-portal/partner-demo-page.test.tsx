@@ -6,7 +6,10 @@ import { describe, expect, it } from 'vitest';
 
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { PARTNER_DEMO_WALKTHROUGH_STEPS } from '@/lib/coaching-portal/partner-demo';
-import { buildPartnerDemoSeedPlan, PARTNER_DEMO_COACH_LABEL } from '@/lib/coaching-portal/partner-demo-seed';
+import {
+  buildPartnerDemoSeedPlan,
+  PARTNER_DEMO_COACH_LABEL,
+} from '@/lib/coaching-portal/partner-demo-seed';
 
 import CoachingPartnerDemoPage from '../../../app/(public)/ccw-training/partner-demo/page';
 
@@ -42,7 +45,9 @@ describe('/ccw-training/partner-demo page (rendered)', () => {
     PARTNER_DEMO_WALKTHROUGH_STEPS.forEach((step) => expect(text).toContain(step.title));
     const html = renderToStaticMarkup(createElement(CoachingPartnerDemoPage));
     for (const [i, step] of PARTNER_DEMO_WALKTHROUGH_STEPS.entries()) {
-      const li = html.match(new RegExp(`data-testid="partner-demo-step-${i + 1}"[\\s\\S]*?</li>`))?.[0] ?? '';
+      const li =
+        html.match(new RegExp(`data-testid="partner-demo-step-${i + 1}"[\\s\\S]*?</li>`))?.[0] ??
+        '';
       expect(li, step.title).not.toBe('');
       if (step.status === 'coming') {
         // Every ticket the run sheet names for the step is shown (CodeRabbit PR #1007).
@@ -58,10 +63,11 @@ describe('/ccw-training/partner-demo page (rendered)', () => {
     }
   });
 
-  it('shows the marketing pack as live and every ticket on the combined coming step', () => {
+  it('shows the marketing pack and coach chapter step as live', () => {
     const html = renderToStaticMarkup(createElement(CoachingPartnerDemoPage));
     expect(html).toContain('Marketing pack');
     expect(html).not.toContain('GP-634');
-    expect(html).toContain('Coming (GP-630, GP-632, GP-636)');
+    expect(html).toMatch(/Coach chapter, Ask coach (&amp;|&) TradeHall preview/);
+    expect(html).not.toContain('Coming (GP-630, GP-632, GP-636)');
   });
 });

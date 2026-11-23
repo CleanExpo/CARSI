@@ -4,7 +4,7 @@ Stable `data-carsi-event` names. Clicks are collected app-wide by `CarsiProductE
 
 | Event                  | When                              | `data-carsi-context` example                         |
 | ---------------------- | --------------------------------- | ---------------------------------------------------- |
-| `course_cta`           | Role guide start-here course card | `role-guide:commercial-cleaning-contractors:start-1` |
+| `course_cta`           | Role guide start-here or catalogue card | `role-guide:commercial-cleaning-contractors:start-1`, `catalogue:water-damage-restoration-fundamentals` |
 | `coaching_cta`         | Coaching / CCW secondary card     | `role-guide:nsw-builders`                            |
 | `role_guide_start`     | Hub entry (future)                | `hub`                                                |
 | `marketing_pack_build` | Pack build button                 | `coaching-marketing`                                 |
