@@ -245,7 +245,6 @@ function HazardSpotView({
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [submitted, setSubmitted] = useState(false);
-  const [attempts, setAttempts] = useState(0);
 
   const toggle = (id: string) => {
     if (submitted) return;
@@ -265,7 +264,6 @@ function HazardSpotView({
 
   const submit = () => {
     setSubmitted(true);
-    setAttempts((a) => a + 1);
     if (selected.size === correctSet.size && [...correctSet].every((id) => selected.has(id))) {
       onComplete(activity.xp);
     }
@@ -320,15 +318,14 @@ function HazardSpotView({
             Not quite — electrical, biological, slip, structural and on-site chemical hazards are
             all in play on this job. Noise from traffic is not the focus inside the flooded room.
           </FeedbackPanel>
-          {attempts < 4 ? (
-            <button
-              type="button"
-              onClick={retry}
-              className="mt-3 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50"
-            >
-              Try again
-            </button>
-          ) : null}
+          {/* Always offered: a wrong answer must never leave the learner with no way forward. */}
+          <button
+            type="button"
+            onClick={retry}
+            className="mt-3 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+          >
+            Try again
+          </button>
         </>
       )}
     </div>

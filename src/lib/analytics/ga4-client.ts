@@ -13,6 +13,7 @@ import type {
   MembershipCheckoutStartedPayload,
   MembershipViewPayload,
 } from './funnel-events';
+import { isCountedPath } from './consent';
 import { getAnalyticsChoice } from './consent-client';
 
 declare global {
@@ -45,12 +46,24 @@ function canSend(): boolean {
   return configured && typeof window.gtag === 'function' && getAnalyticsChoice() === 'granted';
 }
 
+/**
+ * The page showing now is one the site counts (P1-5). The same rule, from the same owner
+ * (`isCountedPath` in consent.ts), that PostHog applies in `scrubPostHogEvent`: nothing is sent
+ * about a signed-in, admin or identifier page. Asked at the moment of sending, because gtag would
+ * otherwise attach the page_location of the last public page it was configured on.
+ */
+function onCountedPage(): boolean {
+  return isCountedPath(window.location.pathname);
+}
+
 function flushPending(): void {
   if (!canSend()) return;
   if (dropTimer) clearTimeout(dropTimer);
   dropTimer = null;
   const batch = pending;
   pending = [];
+  // Queued on a public page but the visitor is now on a private one: the batch is dropped, not sent.
+  if (!onCountedPage()) return;
   for (const [name, params] of batch) window.gtag!('event', name, params);
 }
 
@@ -75,6 +88,8 @@ function sendGa4Event(name: string, params: Record<string, unknown>): void {
   if (typeof window === 'undefined') return;
   // Nothing is sent, or kept for later, without a stored yes (GP-731).
   if (getAnalyticsChoice() !== 'granted') return;
+  // Nothing is sent, or kept for later, about a private page (P1-5).
+  if (!onCountedPage()) return;
   if (canSend() && pending.length === 0) {
     window.gtag!('event', name, params);
     return;

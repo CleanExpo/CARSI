@@ -85,8 +85,14 @@ export function readInteractiveProgress(
   if (typeof window === 'undefined') return null;
   const key = storageKey(experienceId, lessonKey);
   const legacy = legacyStorageKey(experienceId, lessonKey);
-  const raw = tryParseSnapshot(window.localStorage.getItem(key));
-  const migrated = raw ?? tryParseSnapshot(window.localStorage.getItem(legacy));
+  let migrated: InteractiveProgressSnapshot | null;
+  try {
+    // Reading `window.localStorage` itself throws when the browser blocks site data.
+    const raw = tryParseSnapshot(window.localStorage.getItem(key));
+    migrated = raw ?? tryParseSnapshot(window.localStorage.getItem(legacy));
+  } catch {
+    return null;
+  }
   if (!migrated) return null;
   const normalized = normalizeInteractiveProgress(experience, migrated);
   try {

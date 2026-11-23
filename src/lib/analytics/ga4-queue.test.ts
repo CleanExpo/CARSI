@@ -64,6 +64,8 @@ beforeEach(() => {
   // Every test below is about a visitor who said yes (GP-731); the last test is the one who did not.
   window.localStorage.clear();
   grantAnalytics();
+  // The page these events fire on (GA4 sends only from a counted page, P1-5).
+  window.history.pushState({}, '', '/subscribe');
   delete (window as unknown as W).gtag;
   delete (window as unknown as W).dataLayer;
   container = document.createElement('div');
