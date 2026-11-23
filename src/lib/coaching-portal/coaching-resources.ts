@@ -89,7 +89,7 @@ export const COACHING_RESOURCE_SECTIONS: CoachingResourceSection[] = [
     id: 'community',
     title: 'Owner community & TradeHall',
     description:
-      'Peer rooms and the TradeHall seminar space — preview what ships with Advantage A9 (GP-636).',
+      'Peer rooms and the in-portal TradeHall seminar replays (Advantage A9).',
     anchorId: 'tradehall',
     items: [
       {
@@ -102,9 +102,9 @@ export const COACHING_RESOURCE_SECTIONS: CoachingResourceSection[] = [
       },
       {
         id: 'tradehall-preview',
-        title: 'TradeHall seminar room (preview)',
+        title: 'TradeHall seminar room',
         description:
-          'A dedicated hall for member workshops and supplier briefings. Full in-portal video ships with GP-636; until then, Growth Days and Owner Circle are your live peer touchpoints.',
+          'Chapter replays and supplier briefings in your portal. Live Growth Days and Owner Circle stay your peer touchpoints between sessions.',
         href: coachingPortalPath('/tradehall'),
         tag: 'Preview',
       },

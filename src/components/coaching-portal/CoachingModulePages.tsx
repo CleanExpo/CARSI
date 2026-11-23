@@ -1,6 +1,14 @@
 'use client';
 
-import { ClipboardList, Compass, ExternalLink, Loader2, Megaphone, Ticket, Video } from 'lucide-react';
+import {
+  ClipboardList,
+  Compass,
+  ExternalLink,
+  Loader2,
+  Megaphone,
+  Ticket,
+  Video,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -28,16 +36,19 @@ import {
   CoachingStatGrid,
   CoachingSupportPanel,
 } from '@/components/coaching-portal/visual';
+import { CoachingTradeHallSeminarPlayer } from '@/components/coaching-portal/visual/CoachingTradeHallSeminarPlayer';
 import { actionBoardStats } from '@/lib/coaching-portal/action-board-view';
+import { COACHING_RECORDS_DEFAULT } from '@/lib/coaching-portal/coaching-ai-governance';
 import { COACHING_PAGE_META } from '@/lib/coaching-portal/coaching-page-meta';
 import { COACHING_RESOURCE_SECTIONS } from '@/lib/coaching-portal/coaching-resources';
-import { buildSessionReceiptView, isPastSession } from '@/lib/coaching-portal/session-receipt';
-import { buildTradeHallPassport } from '@/lib/coaching-portal/trade-hall-passport';
 import {
   COACHING_GROWTH_SERVICE_CATEGORIES,
   type GrowthServiceItem,
 } from '@/lib/coaching-portal/growth-services';
 import { learningCourseLink } from '@/lib/coaching-portal/learning-path';
+import { buildSessionReceiptView, isPastSession } from '@/lib/coaching-portal/session-receipt';
+import { buildTradeHallPassport } from '@/lib/coaching-portal/trade-hall-passport';
+import { tradeHallSeminarsForChapter } from '@/lib/coaching-portal/trade-hall-seminar';
 import type { CoachingActionStatus } from '@/lib/coaching-portal/types';
 import { carsiCoachingMonthlyPriceLabel } from '@/lib/marketing/carsi-coaching-monthly';
 
@@ -92,10 +103,7 @@ function LearningProgress({ learning }: { learning: NonNullable<ActionItem['lear
         aria-valuenow={learning.percent}
         aria-label="Course progress"
       >
-        <div
-          className={coachingProgressFill}
-          style={coachingProgressFillStyle(learning.percent)}
-        />
+        <div className={coachingProgressFill} style={coachingProgressFillStyle(learning.percent)} />
       </div>
       <p className="mt-1 text-xs text-slate-400">{learning.percent}% of the course complete</p>
     </div>
@@ -164,7 +172,11 @@ export function CoachingPlanPage() {
         />
       )}
 
-      <CoachingSection title="Business direction" className="space-y-4" testId="coaching-plan-direction">
+      <CoachingSection
+        title="Business direction"
+        className="space-y-4"
+        testId="coaching-plan-direction"
+      >
         <label className="block text-xs text-slate-400">Horizontal (what you bring today)</label>
         <textarea
           value={horizontal}
@@ -278,7 +290,10 @@ export function CoachingActionsPage() {
       />
 
       {loading ? (
-        <Loader2 className="mx-auto mt-12 h-8 w-8 motion-safe:animate-spin text-sky-400" aria-label="Loading" />
+        <Loader2
+          className="mx-auto mt-12 h-8 w-8 text-sky-400 motion-safe:animate-spin"
+          aria-label="Loading"
+        />
       ) : visible.length === 0 ? (
         <div className="mt-8">
           <CoachingEmptyState
@@ -796,12 +811,15 @@ export function CoachingServicesPage() {
 export function CoachingTradeHallPage() {
   const { user, coach, access } = useCoachingPortal();
   const meta = COACHING_PAGE_META.tradehall;
-  const periodStart = null;
+  const periodStart = access.subscription?.startedAt
+    ? new Date(access.subscription.startedAt)
+    : null;
   const passport = buildTradeHallPassport({
     memberDisplayName: user.displayName,
     coach,
     subscriptionStartedAt: periodStart,
   });
+  const seminars = tradeHallSeminarsForChapter(coach.chapterSlug);
   const memberSince = new Date(passport.memberSinceIso).toLocaleDateString('en-AU', {
     day: 'numeric',
     month: 'long',
@@ -820,15 +838,19 @@ export function CoachingTradeHallPage() {
       <CoachingSection title="Hall passport" testId="coaching-tradehall-passport">
         <p className={`flex flex-wrap items-center gap-2 ${coachingMuted}`}>
           <Ticket className="h-4 w-4 text-sky-400" aria-hidden />
-          Preview — in-portal seminar video ships with GP-636.
+          Hall access for {coach.chapterTitle}. {COACHING_RECORDS_DEFAULT.memberFacingSummary}
         </p>
         <dl className="mt-4 grid gap-4 sm:grid-cols-2">
           <div>
-            <dt className="text-xs font-semibold tracking-wide text-slate-500 uppercase">Passport</dt>
+            <dt className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+              Passport
+            </dt>
             <dd className="mt-1 font-mono text-sm text-white">{passport.passportId}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold tracking-wide text-slate-500 uppercase">Chapter</dt>
+            <dt className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+              Chapter
+            </dt>
             <dd className="mt-1 text-sm text-white">{passport.chapterSlug}</dd>
           </div>
           <div>
@@ -836,21 +858,32 @@ export function CoachingTradeHallPage() {
             <dd className="mt-1 text-sm text-white">{passport.coachName}</dd>
           </div>
           <div>
-            <dt className="text-xs font-semibold tracking-wide text-slate-500 uppercase">Member since</dt>
+            <dt className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+              Member since
+            </dt>
             <dd className="mt-1 text-sm text-white">{memberSince}</dd>
           </div>
         </dl>
       </CoachingSection>
 
       <CoachingSection title="Seminar room" testId="coaching-tradehall-room">
-        <CoachingEmptyState
-          icon={Video}
-          title="Seminar room (coming next)"
-          description="Live supplier briefings and chapter workshops will open here. Until then, join Owner Circle or book a Business Growth Day."
-          testId="coaching-tradehall-room-empty"
-        />
-        <div className="mt-4 flex flex-wrap gap-3">
-          <Link href="/programs/owner-circle" className={coachingPrimaryBtn}>
+        {seminars.length > 0 ? (
+          <span className="sr-only">Seminar replays</span>
+        ) : (
+          <CoachingEmptyState
+            icon={Video}
+            title="No seminars yet for your chapter"
+            description="Your coach will publish replays here. Meanwhile, join Owner Circle or book a Business Growth Day."
+            testId="coaching-tradehall-room-empty"
+          />
+        )}
+        <div className="mt-4 space-y-6">
+          {seminars.map((seminar) => (
+            <CoachingTradeHallSeminarPlayer key={seminar.id} seminar={seminar} />
+          ))}
+        </div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/programs/owner-circle" className={coachingSecondaryBtn}>
             Owner Circle
           </Link>
           <Link href="/ccw-training#booking" className={coachingSecondaryBtn}>

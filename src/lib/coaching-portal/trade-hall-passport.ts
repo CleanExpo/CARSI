@@ -1,5 +1,5 @@
 /**
- * GP-636 (A9) — member TradeHall passport (preview). Full seminar video ships later.
+ * GP-636 (A9) — member TradeHall passport.
  */
 import type { CoachingCoachProfile } from '@/lib/coaching-portal/coach-routing';
 
@@ -22,7 +22,10 @@ export function buildTradeHallPassport(input: {
   const now = input.now ?? new Date();
   const since = input.subscriptionStartedAt ?? now;
   const slug = input.coach.chapterSlug;
-  const short = slug.replace(/[^a-z0-9]+/gi, '-').slice(0, 12).toUpperCase();
+  const short = slug
+    .replace(/[^a-z0-9]+/gi, '-')
+    .slice(0, 12)
+    .toUpperCase();
   const passportId = `TH-${short}-${since.getUTCFullYear()}`;
   return {
     memberDisplayName: input.memberDisplayName,

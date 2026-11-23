@@ -97,8 +97,7 @@ export const COACHING_PAGE_META = {
     id: 'tradehall',
     eyebrow: 'Advantage A9',
     title: 'TradeHall',
-    description:
-      'Your hall passport and seminar room — preview while in-portal video ships (GP-636).',
+    description: 'Your hall passport and on-demand chapter seminar replays.',
     supportSubject: 'Business Coaching — TradeHall',
     supportTips: [
       'Owner Circle and Growth Days are live peer touchpoints until the hall video room opens.',

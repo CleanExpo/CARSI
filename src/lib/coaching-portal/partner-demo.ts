@@ -1,5 +1,5 @@
-import type { CoachingPortalWorkspace } from '@/lib/coaching-portal/types';
 import type { CoachingOnboardingSnapshot } from '@/lib/coaching-portal/onboarding-snapshot';
+import type { CoachingPortalWorkspace } from '@/lib/coaching-portal/types';
 
 /**
  * Seeded demo accounts live on this reserved, non-deliverable domain (RFC 2606 `.invalid`), so
@@ -208,6 +208,6 @@ export const PARTNER_DEMO_WALKTHROUGH_STEPS: readonly PartnerDemoWalkthroughStep
     advantage: 'A3 Ask coach, A5 chapter and A9 TradeHall preview',
     status: 'live',
     shows:
-      'Your coach chapter on home, session receipts, Ask my coach when enabled, and the TradeHall preview in Resources. Full in-portal seminar video ships with GP-636.',
+      'Your coach chapter on home, session receipts, Ask my coach when enabled, TradeHall replays in the portal, and community links in Resources.',
   },
 ];
