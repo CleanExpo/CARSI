@@ -1,9 +1,9 @@
 /**
  * The browser tab's purchase-survey keys (Authority Machine slice 1b, GP-662). Browser only.
  *
- * Every checkout makes a fresh random 128-bit key, keeps it at the front of a short list in
- * sessionStorage (newest five), and sends it with that checkout request; the server stores
- * only a binding of it on the new Stripe session. The same tab comes back from Stripe to the
+ * Every checkout makes a fresh random 128-bit key and sends it with that checkout request. Only
+ * when checkout answers with a `checkout_url` is the key kept at the front of a short list in
+ * sessionStorage (newest five, GP-694). The server stores only a binding of it on the new Stripe session. The same tab comes back from Stripe to the
  * payment-success page with the same sessionStorage, and the survey sends the list to prove it
  * is the tab that started the checkout.
  *
@@ -46,24 +46,58 @@ export function readPurchaseSurveyKeys(storage: Storage | null = tabStorage()): 
   }
 }
 
-/** A fresh key for one checkout, stored first in this tab's list. Null when storage or crypto is unavailable. */
-export function purchaseSurveyKeyForCheckout(storage: Storage | null = tabStorage()): string | null {
+/**
+ * A fresh key for one checkout. It is NOT stored yet: the caller sends it with the checkout
+ * request and calls `rememberPurchaseSurveyKey` only once checkout answers with a
+ * `checkout_url` (GP-694). A failed, refused or free (`enrolled`) attempt therefore never takes
+ * a place in the five-key list, so it cannot push out an earlier paid checkout's key before
+ * that survey is answered. Null when storage or crypto is unavailable, so no key is sent that
+ * the success page could never read back.
+ */
+export function newPurchaseSurveyKey(storage: Storage | null = tabStorage()): string | null {
   if (!storage) return null;
   try {
+    // Reading first proves the storage is usable (blocked storage throws here).
+    storage.getItem(PURCHASE_SURVEY_KEY_STORAGE_NAME);
     const bytes = new Uint8Array(16);
     globalThis.crypto.getRandomValues(bytes);
-    const key = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
-    const keys = [key, ...readPurchaseSurveyKeys(storage)].slice(0, PURCHASE_SURVEY_KEY_LIMIT);
-    storage.setItem(PURCHASE_SURVEY_KEY_STORAGE_NAME, keys.join(','));
-    // A storage that silently drops writes would leave a key the success page cannot read back.
-    return readPurchaseSurveyKeys(storage)[0] === key ? key : null;
+    return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
   } catch {
     return null;
   }
 }
 
-/** `{ survey_key }` for a checkout request body, or nothing when there is no key. */
-export function purchaseSurveyCheckoutField(): { survey_key?: string } {
-  const key = purchaseSurveyKeyForCheckout();
+/**
+ * Stores `key` at the front of this tab's list (newest five). Call it only when the checkout it
+ * was sent with returned a `checkout_url`. True when the key reads back; false (never a throw)
+ * when the key is missing or malformed, or storage is unavailable or drops writes.
+ */
+export function rememberPurchaseSurveyKey(
+  key: string | null | undefined,
+  storage: Storage | null = tabStorage()
+): boolean {
+  if (!storage || typeof key !== 'string' || !KEY_SHAPE.test(key)) return false;
+  try {
+    const keys = [key, ...readPurchaseSurveyKeys(storage).filter((k) => k !== key)].slice(
+      0,
+      PURCHASE_SURVEY_KEY_LIMIT
+    );
+    storage.setItem(PURCHASE_SURVEY_KEY_STORAGE_NAME, keys.join(','));
+    // A storage that silently drops writes would leave a key the success page cannot read back.
+    return readPurchaseSurveyKeys(storage)[0] === key;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * `{ survey_key }` for a checkout request body, or nothing when there is no key. Nothing is
+ * stored here: pass `field.survey_key` to `rememberPurchaseSurveyKey` once the checkout returns
+ * a `checkout_url`.
+ */
+export function purchaseSurveyCheckoutField(
+  storage: Storage | null = tabStorage()
+): { survey_key?: string } {
+  const key = newPurchaseSurveyKey(storage);
   return key ? { survey_key: key } : {};
 }

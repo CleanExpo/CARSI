@@ -105,3 +105,24 @@ test('concurrent owner change holding a real row lock denies the waiting stale w
   assert.equal((await outcome).denied, true);
   assert.equal(await prisma.margotMessage.count({ where: { conversationId: id } }), 1);
 });
+
+test('concurrent appends to two conversations all persist, each in its own conversation', { timeout: 15000 }, async () => {
+  // Appends are separate message rows behind an owner-checked row lock, not a
+  // read-modify-write of a transcript, so racing turns must neither lose a
+  // message nor land in the other conversation.
+  const anon = await anonymousConversation();
+  const authed = { id: randomUUID(), access: { userId: owner } as const }; ids.push(authed.id);
+  await appendMargotUserTurn({ conversationId: authed.id, access: authed.access, userMessage: 'Initial private message' });
+  const turns = 6;
+  const results = await Promise.allSettled([anon, authed].flatMap(({ id, access }) =>
+    Array.from({ length: turns }, (_, n) => appendMargotTurn({ conversationId: id, access,
+      userMessage: `${id} user ${n}`, assistantMessage: `${id} reply ${n}` }))));
+  assert.deepEqual(results.filter((r) => r.status === 'rejected'), [], 'no concurrent append may be refused');
+  for (const { id } of [anon, authed]) {
+    const rows = await prisma.margotMessage.findMany({ where: { conversationId: id }, select: { content: true } });
+    assert.equal(rows.length, 1 + 2 * turns, 'every racing turn must persist');
+    const expected = Array.from({ length: turns }, (_, n) => [`${id} user ${n}`, `${id} reply ${n}`]).flat();
+    assert.deepEqual(rows.map((r) => r.content).filter((c) => c !== 'Initial private message').sort(), expected.sort(),
+      'no turn may be lost or cross-wired into the other conversation');
+  }
+});

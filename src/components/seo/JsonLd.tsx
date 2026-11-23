@@ -4,6 +4,7 @@
 // Content is server-generated from controlled objects, not user input.
 
 import { CARSI_SOCIAL_PROFILE_URLS } from '@/lib/brand/social-profiles';
+import { CARSI_PROVIDER_STATUS } from '@/lib/iicrc/approved-wording';
 import { buildFounderPersonSchema } from '@/lib/schema/founder';
 import { CARSI_ENTITY, entityAreaServed, entityPostalAddress } from '@/lib/seo/carsi-entity';
 import { serializeJsonLd } from '@/lib/seo/json-ld';
@@ -120,6 +121,12 @@ interface CourseSchemaProps {
    * Omitted for courses with no registry entry — absent rather than guessed.
    */
   credentialAwarded?: string;
+  /**
+   * True only for a course approved in data/seed/cec-approvals.json (isCecApprovedCourse).
+   * Every other course's credential description names no IICRC (founder ruling, GP-748).
+   * Absent means not approved: fail closed.
+   */
+  cecApproved?: boolean;
 }
 
 /**
@@ -135,10 +142,21 @@ export const CREDENTIAL_DISCLAIMER =
   // the schema test (which rejects numeric CEC and provider identifiers) passed it, and it
   // never says "CEC", so the terminology guard's CEC rule did not see it either.
   // Provider standing is true and stays; course-level eligibility now depends on approval.
-  'A CARSI-issued credential — not an IICRC certification. CARSI is an IICRC CEC Accredited ' +
-  'provider; a course displays IICRC CECs only where that course holds IICRC ' +
+  'A CARSI-issued credential — not an IICRC certification. ' +
+  `${CARSI_PROVIDER_STATUS.replace(/\.$/, '')}; a course displays IICRC CECs only where that course holds IICRC ` +
   'approval. IICRC certification itself is obtained through a school and examination ' +
   'approved by the IICRC.';
+
+/**
+ * The credential statement for a course that is NOT CEC-approved (GP-748, founder ruling
+ * 21/11/2026: "Drop IICRC entirely"). It says only that this is a CARSI course and credential.
+ */
+export const CARSI_CREDENTIAL_STATEMENT = 'A CARSI course and a CARSI-issued credential.';
+
+/** The credential sentence for a course page: the GP-704 disclaimer only on a CEC-approved course. */
+export function courseCredentialStatement(cecApproved: boolean | undefined): string {
+  return cecApproved === true ? CREDENTIAL_DISCLAIMER : CARSI_CREDENTIAL_STATEMENT;
+}
 
 function normalizeCoursePrice(price: number | undefined): number | undefined {
   if (typeof price !== 'number' || !Number.isFinite(price) || price < 0) return undefined;
@@ -185,6 +203,7 @@ export function CourseSchema({
   aggregateRating,
   credentialAwarded,
   authoredCourseJsonLd,
+  cecApproved,
 }: CourseSchemaProps) {
   const authoredDescription = authoredCourseJsonLd?.description;
   const authoredLanguage = authoredCourseJsonLd?.inLanguage;
@@ -256,7 +275,7 @@ export function CourseSchema({
       //
       // No new assertion: this is the sentence already published above the fold, and a link to the
       // already-public verification surface. Still no CEC hour count and no IICRC provider number.
-      description: CREDENTIAL_DISCLAIMER,
+      description: courseCredentialStatement(cecApproved),
       url: 'https://carsi.com.au/verify/training-record',
     };
   }

@@ -2,10 +2,12 @@ import { Prisma } from '@/generated/prisma/client';
 import { NextRequest } from 'next/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mocks = vi.hoisted(() => ({ queryRaw: vi.fn(), findMany: vi.fn() }));
+const mocks = vi.hoisted(() => ({ queryRaw: vi.fn(), findMany: vi.fn(), claims: vi.fn() }));
 vi.mock('@/lib/prisma', () => ({
   prisma: { $queryRaw: mocks.queryRaw, lmsUser: { findMany: mocks.findMany } },
 }));
+// The board is for signed-in learners only (GP-775).
+vi.mock('@/lib/server/auth-from-request', () => ({ getSessionClaimsFromRequest: mocks.claims }));
 
 import { getDesignationDefinition } from '@/lib/designations/registry';
 
@@ -32,7 +34,16 @@ function req(query: string) {
 beforeEach(() => {
   captured = [];
   vi.stubEnv('DATABASE_URL', 'postgresql://synthetic:synthetic@localhost/unused-no-connect');
-  mocks.findMany.mockResolvedValue([]);
+  mocks.claims.mockResolvedValue({ sub: 'aaaa-1111' });
+  // The one learner with XP has opted in to the board (GP-775 consent).
+  mocks.findMany.mockResolvedValue([
+    {
+      id: 'aaaa-1111',
+      leaderboardShowDisplayName: true,
+      leaderboardDisplayName: null,
+      fullName: null,
+    },
+  ]);
   mocks.queryRaw.mockImplementation((strings: TemplateStringsArray, ...values: unknown[]) => {
     const q = Prisma.sql(strings, ...(values as Prisma.Sql[]));
     captured.push({ sql: q.sql, values: q.values });

@@ -148,10 +148,9 @@ describe('a learner with no membership', () => {
     expect(params.metadata.plan).toBe('pro_annual');
     // AC-4 / AC-8: bound to the authenticated learner, never a supplied email.
     expect(params.metadata.carsi_user_id).toBe('user-1');
-    // Public checkout: promotion codes ARE allowed here. The attendee branch
-    // had to omit this because Stripe rejects a session carrying both it and
-    // `discounts`; with that branch gone, the ordinary behaviour stands.
-    expect(params.allow_promotion_codes).toBe(true);
+    // GP-773: no promotion codes on a membership (founder ruling, 22/11/2026:
+    // "no further discounts").
+    expect(params).not.toHaveProperty('allow_promotion_codes');
   });
 });
 

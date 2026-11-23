@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 import { adminGlassCard } from '@/components/admin/admin-learner-ui';
 import { Button } from '@/components/ui/button';
+import { INDIVIDUAL_MEMBERSHIP, membershipAmountAud } from '@/lib/lms/membership-prices';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
@@ -35,7 +36,7 @@ export function AdminYearlyMembershipClient() {
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [pricingMode, setPricingMode] = useState<'free' | 'custom'>('free');
-  const [priceAud, setPriceAud] = useState('795');
+  const [priceAud, setPriceAud] = useState(String(membershipAmountAud(INDIVIDUAL_MEMBERSHIP)));
   const [userQuery, setUserQuery] = useState('');
   const [userHits, setUserHits] = useState<UserOpt[]>([]);
   const [searching, setSearching] = useState(false);

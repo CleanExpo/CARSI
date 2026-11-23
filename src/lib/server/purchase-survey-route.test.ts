@@ -32,13 +32,24 @@ const TAB_KEY = '00112233445566778899aabbccddeeff';
 const OTHER_TAB_KEY = 'ffeeddccbbaa99887766554433221100';
 const BINDING = purchaseSurveyBinding(TAB_KEY);
 
+/**
+ * The route's per-IP limiter is the real one, so each test posts from its own client IP and
+ * no test spends another's allowance.
+ */
+let ipCounter = 0;
+let clientIp = '';
+
 /** A survey POST. `key` is sent in survey_keys (a lone value is wrapped) unless it is null. */
-function post(body: unknown, key: unknown = TAB_KEY, cookie?: string): NextRequest {
+function post(body: unknown, key: unknown = TAB_KEY, cookie?: string, ip: string = clientIp): NextRequest {
   const keys = Array.isArray(key) ? key : [key];
   const withKey = key === null || typeof body !== 'object' || body === null ? body : { ...body, survey_keys: keys };
   return new NextRequest('https://carsi.example.test/api/lms/checkout/survey', {
     method: 'POST',
-    headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
+    headers: {
+      'content-type': 'application/json',
+      'x-forwarded-for': ip,
+      ...(cookie ? { cookie } : {}),
+    },
     body: JSON.stringify(withKey),
   });
 }
@@ -60,6 +71,8 @@ const GOOD = { session_id: SESSION, industry: 'commercial_cleaning', found_via: 
 let errorSpy: ReturnType<typeof vi.spyOn>;
 
 beforeEach(() => {
+  ipCounter += 1;
+  clientIp = `198.51.100.${ipCounter}`;
   process.env[FLAG] = 'true';
   process.env.STRIPE_SECRET_KEY = 'sk_test_synthetic';
   stripe.retrieveSession.mockReset();
@@ -150,6 +163,42 @@ describe('authorisation: the browser tab that started checkout', () => {
       const res = await POST(post(GOOD, null, cookie));
       expect(res.status).toBe(403);
     }
+  });
+});
+
+describe('rate limit: a flood stops before Stripe (GP-694)', () => {
+  it('ten well-formed attempts from one IP reach Stripe; the eleventh is 429 with Retry-After and no Stripe call', async () => {
+    // Well-formed keys that match nothing: each one still costs a sessions.retrieve call.
+    for (let i = 0; i < 10; i++) {
+      const res = await POST(post(GOOD, OTHER_TAB_KEY));
+      expect(res.status).toBe(403);
+    }
+    expect(stripe.retrieveSession).toHaveBeenCalledTimes(10);
+
+    const blocked = await POST(post(GOOD, OTHER_TAB_KEY));
+    expect(blocked.status).toBe(429);
+    expect(Number(blocked.headers.get('retry-after'))).toBeGreaterThan(0);
+    expect(stripe.retrieveSession).toHaveBeenCalledTimes(10);
+
+    // The genuine buyer on the same IP is also held until the window resets, before Stripe.
+    const genuine = await POST(post(GOOD));
+    expect(genuine.status).toBe(429);
+    expect(stripe.retrieveSession).toHaveBeenCalledTimes(10);
+    expect(stripe.updatePI).not.toHaveBeenCalled();
+  });
+
+  it('a flood from one IP does not hold back a buyer on another IP', async () => {
+    for (let i = 0; i < 11; i++) await POST(post(GOOD, OTHER_TAB_KEY));
+    const res = await POST(post(GOOD, TAB_KEY, undefined, '203.0.113.250'));
+    expect(res.status).toBe(200);
+    expect(stripe.updatePI).toHaveBeenCalledTimes(1);
+  });
+
+  it('with the flag off the route stays a plain 404 and spends no allowance', async () => {
+    delete process.env[FLAG];
+    for (let i = 0; i < 12; i++) expect((await POST(post(GOOD))).status).toBe(404);
+    process.env[FLAG] = 'true';
+    expect((await POST(post(GOOD))).status).toBe(200);
   });
 });
 

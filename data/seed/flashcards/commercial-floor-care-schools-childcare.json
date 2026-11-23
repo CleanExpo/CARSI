@@ -34,8 +34,8 @@
           "back": "Select lower-tox products, dilute per the label (no stronger 'to be sure'), ventilate while working and while products dry, and isolate wet or treated areas from children until they are genuinely ready."
         },
         {
-          "front": "Is this course IICRC CEC accredited or does it award CECs?",
-          "back": "No. It is professional development and contract-readiness training; it is not an IICRC CEC accredited course and it does not award IICRC Continuing Education Credits."
+          "front": "What kind of course is this?",
+          "back": "It is professional development and contract-readiness training: a CARSI course and a CARSI credential."
         }
       ]
     },
@@ -43,8 +43,8 @@
       "module": "Module 2: Carpet Cleaning for Occupied Facilities",
       "cards": [
         {
-          "front": "What is the recognised standard of care for textile floor coverings?",
-          "back": "ANSI/IICRC S100 (current edition S100-2021). It is a standard of care that supports your judgement, not law; the IICRC is an industry certification body, not a government regulator."
+          "front": "What does professional cleaning of textile floor coverings draw together?",
+          "back": "Chemistry, fibre and construction knowledge, soil management, equipment, methods, safety and pre and post inspection, and it accommodates more than one cleaning method."
         },
         {
           "front": "How does hot water extraction (HWE) compare with encapsulation?",
@@ -67,7 +67,7 @@
           "back": "Read the current SDS and dilute strictly per the product label. The AP-code only tells you which sheet to read, not how to use the product."
         },
         {
-          "front": "Why does pre-inspection matter under S100?",
+          "front": "Why does pre-inspection matter?",
           "back": "It lets you identify fibre and construction, read the soil load, find pre-existing damage or staining and set realistic client expectations - and it protects you commercially so pre-existing problems are not later blamed on your visit."
         },
         {

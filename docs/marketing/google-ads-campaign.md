@@ -215,7 +215,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 4 | FIFO-Friendly — Study Between Shifts |
 | Headline 5 | Reduce Mould Liability on Site |
 | Description 1 | Mould in FIFO accommodation is a costly liability. Train your team in IICRC CEC Accredited mould assessment and remediation — fully online, no roster disruption. |
-| Description 2 | WHS compliance training designed for mining professionals. Earn verifiable IICRC credentials your HSE team can audit. Digital certificates with public verification URL. |
+| Description 2 | WHS compliance training designed for mining professionals. Earn verifiable CARSI credentials your HSE team can audit. Digital certificates with public verification URL. |
 
 **Variation B — ROI**
 | Element | Copy |
@@ -285,20 +285,20 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 4 | Digital Certificates Included |
 | Headline 5 | Self-Paced — No Roster Disruption |
 | Description 1 | Healthcare facilities face strict indoor air quality standards. Train your maintenance team in IICRC CEC Accredited mould remediation and water damage response. 100% online. |
-| Description 2 | From hospitals to medical centres — mould is a patient safety issue. Earn IICRC credentials your compliance team can verify. Group enrolment rates available. |
+| Description 2 | From hospitals to medical centres — mould is a patient safety issue. Earn verifiable CARSI credentials your compliance team can check. Group enrolment rates available. |
 
 ### Campaign 5: Commercial Cleaning
 
 **Variation A**
 | Element | Copy |
 |---------|------|
-| Headline 1 | IICRC Cleaning Certification — Online |
+| Headline 1 | IICRC CEC Accredited Cleaning Courses |
 | Headline 2 | Upskill Your Cleaning Business |
 | Headline 3 | carpet cleaning and water damage restoration & Mould Courses Available |
-| Headline 4 | Win More Contracts with IICRC Creds |
+| Headline 4 | Win More Contracts with CARSI Creds |
 | Headline 5 | Australian-Owned Training Platform |
-| Description 1 | Stand out from competitors with IICRC certifications. Carpet cleaning, mould remediation, water damage — all available online. Build recognised skills and grow your business. |
-| Description 2 | Cleaning franchise owners and operators — add IICRC credentials to your business. Online courses and verifiable certificates that prove your expertise. |
+| Description 1 | Stand out from competitors with verifiable CARSI credentials. Carpet cleaning, mould remediation, water damage — all available online from an IICRC CEC Accredited provider. Build recognised skills and grow your business. |
+| Description 2 | Cleaning franchise owners and operators — add CARSI credentials to your business. Online courses and verifiable certificates that prove your expertise. |
 
 ### Campaign 6: Construction
 
@@ -311,7 +311,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 4 | Protect Your Builds from Mould |
 | Headline 5 | Digital Certificate on Completion |
 | Description 1 | Water ingress and mould during construction cause costly delays. Train your site team in IICRC CEC Accredited structural drying and mould prevention. Fully online. |
-| Description 2 | Builders and project managers — reduce defect liability with IICRC credentials. Self-paced courses in water damage, mould assessment and restoration. Start today. |
+| Description 2 | Builders and project managers — reduce defect liability with verifiable CARSI credentials. Self-paced courses in water damage, mould assessment and restoration. Start today. |
 
 ---
 

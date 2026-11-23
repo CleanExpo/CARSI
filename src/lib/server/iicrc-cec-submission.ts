@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { prisma } from '@/lib/prisma';
+import { getAppOrigin } from '@/lib/server/app-url';
 import { canIssueCertificate, certificateHolderDisplayName } from '@/lib/server/certificate-name';
 import {
   buildCompletionCertificatePdf,
@@ -78,14 +79,6 @@ function formatAuDate(d: Date): string {
   });
 }
 
-function appOrigin(): string {
-  return (
-    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
-    process.env.NEXT_PUBLIC_FRONTEND_URL?.trim() ||
-    'https://carsi.com.au'
-  ).replace(/\/$/, '');
-}
-
 async function loadEnrollmentForSubmission(enrollmentId: string) {
   return prisma.lmsEnrollment.findUnique({
     where: { id: enrollmentId },
@@ -120,7 +113,7 @@ function emailContentFromEnrollment(
   completedAt: Date,
   cecHoursOverride?: number | null
 ): IicrcCecSubmissionEmailContent {
-  const origin = appOrigin();
+  const origin = getAppOrigin();
   const studentName = certificateHolderDisplayName(row.student);
   const cecHours = resolvedCecHoursForCourse(row.course, cecHoursOverride) ?? 0;
   return {
@@ -421,7 +414,7 @@ export async function processIicrcCecSubmissionForEnrollment(
             level: enrollment.course.level,
           },
         },
-        appOrigin()
+        getAppOrigin()
       )
     );
 

@@ -6,12 +6,15 @@
  * selects, non-trivial boolean eligibility) — and stays SILENT on the legitimate resolved
  * reads it must not touch. If someone makes the guard inert, this test goes red.
  */
+import { execFileSync } from 'node:child_process';
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { evaluateFile, scanFiles } from './check-cec-surfaces.mjs';
 import { IICRC_CODES } from './iicrc-codes.mjs';
+
+const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 // Each MUST_BLOCK case (scanned as its own source) must produce at least one finding.
 const MUST_BLOCK = [
@@ -276,6 +279,40 @@ for (const [name, src] of MUST_PASS) {
   if (findings.length > 0) {
     console.error(
       `✖ MUST PASS but blocked: ${name}\n    ${src.replace(/\n/g, ' ')}\n    ${findings.join('\n    ')}`
+    );
+    failed++;
+  }
+}
+
+// GP-570: the ACCESSOR_ALLOWLIST exemption for live-cec-check.ts is justified by where its output
+// goes. Keep that justification true: the library is imported only by the authenticated cron route
+// and the CLI script, and the allowlist comment names all three outputs, including the cron JSON body.
+{
+  const LIVE = 'src/lib/server/live-cec-check.ts';
+  const EXPECTED_IMPORTERS = ['app/api/cron/live-cec-check/route.ts', 'scripts/check-live-cec.ts'];
+  const importers = execFileSync(
+    'git',
+    ['grep', '-l', '-E', String.raw`from ['"][^'"]*lib/server/live-cec-check['"]`, '--', '*.ts', '*.tsx', '*.mjs', '*.js'],
+    { cwd: REPO_ROOT, encoding: 'utf8' }
+  )
+    .split('\n')
+    .filter(Boolean)
+    .filter((f) => !/\.test\.[cm]?[jt]sx?$/.test(f))
+    .sort();
+  if (JSON.stringify(importers) !== JSON.stringify(EXPECTED_IMPORTERS)) {
+    console.error(
+      `✖ ${LIVE} has a new importer. Its allowlist exemption assumes it feeds no public surface; ` +
+        `review the exemption and update its comment.\n    expected ${EXPECTED_IMPORTERS.join(', ')}\n    found    ${importers.join(', ')}`
+    );
+    failed++;
+  }
+  const guardSrc = readFileSync(join(REPO_ROOT, 'scripts/check-cec-surfaces.mjs'), 'utf8');
+  const entry = guardSrc.indexOf(`'${LIVE}'`);
+  const comment = entry < 0 ? '' : guardSrc.slice(Math.max(0, entry - 900), entry);
+  if (!/exit code/.test(comment) || !/CI log/.test(comment) || !/app\/api\/cron\/live-cec-check/.test(comment) || !/JSON/.test(comment)) {
+    console.error(
+      `✖ the ACCESSOR_ALLOWLIST comment for ${LIVE} must name all of its outputs: an exit code, a CI log, ` +
+        'and the JSON body of the authenticated cron route app/api/cron/live-cec-check/route.ts.'
     );
     failed++;
   }

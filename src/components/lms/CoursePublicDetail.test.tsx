@@ -24,6 +24,9 @@ vi.mock('next/navigation', () => ({
 
 import { getCourseAudienceItems } from '@/lib/lms/course-audience';
 
+import { CARSI_PROVIDER_STATUS, IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
+import { CREDENTIAL_DISCLAIMER } from '@/components/seo/JsonLd';
+
 import { CoursePublicDetail, cecEarnsLabel } from './CoursePublicDetail';
 
 function renderCourse(cec_hours: string | null): string {
@@ -42,7 +45,9 @@ function renderCourse(cec_hours: string | null): string {
       priceLabel: '$29',
       priceNum: 29,
       learningOutcomes: [],
-      audienceItems: getCourseAudienceItems(course, null),
+      // An in-force approval is what gives a course CEC hours; the page passes both (GP-748).
+      audienceItems: getCourseAudienceItems(course, null, cec_hours !== null),
+      cecApproved: cec_hours !== null,
     })
   );
 }
@@ -79,6 +84,22 @@ describe('CoursePublicDetail — CEC', () => {
  * opportunities" panel, fetched after load, rendered an <h3> straight after the page <h1>.
  * Mount the page, let that panel load, then walk every heading in document order.
  */
+// Built from parts so this file does not itself carry the retired phrase.
+const RETIRED = 'CEC ' + 'Accredited';
+
+describe('CoursePublicDetail — GP-704 provider wording', () => {
+  it('describes CARSI only as an IICRC Approved CEC Provider, never the retired phrase', () => {
+    const html = renderCourse('1');
+    expect(html).toContain(CARSI_PROVIDER_STATUS);
+    expect(html).not.toContain(RETIRED);
+  });
+
+  it('the JSON-LD credential disclaimer says the same', () => {
+    expect(CREDENTIAL_DISCLAIMER).toContain(IICRC_APPROVED_CEC_PROVIDER);
+    expect(CREDENTIAL_DISCLAIMER).not.toContain(RETIRED);
+  });
+});
+
 describe('CoursePublicDetail — heading order', () => {
   it('never skips a heading level once the sidebar career panel has loaded', async () => {
     (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;

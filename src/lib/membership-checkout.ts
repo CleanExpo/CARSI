@@ -3,9 +3,10 @@
 import { analyticsConsentCheckoutField } from '@/lib/analytics/consent-client';
 import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { apiClient } from '@/lib/api/client';
+import { INDIVIDUAL_MEMBERSHIP, membershipAmountAud } from '@/lib/lms/membership-prices';
 
 /** The one membership price (A$795/yr, GST included). */
-export const MEMBERSHIP_PRICE_AUD = 795;
+export const MEMBERSHIP_PRICE_AUD = membershipAmountAud(INDIVIDUAL_MEMBERSHIP);
 
 /**
  * The single boundary where a yearly-membership checkout really starts (V6). Every entry point

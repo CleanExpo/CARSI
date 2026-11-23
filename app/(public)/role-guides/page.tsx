@@ -1,10 +1,13 @@
+import { RoleGuideHubViewTracker } from '@/components/analytics/RoleGuideHubViewTracker';
 import { PlatformContextualNext } from '@/components/marketing/platform/PlatformPagePattern';
+import { RoleGuidesHubPathfinder } from '@/components/marketing/RoleGuidesHubPathfinder';
 import { RoleGuidesHubGrid, RoleGuidesHubHero } from '@/components/marketing/RoleGuidesHub';
 import { StaticMarketingClosingCta } from '@/components/marketing/StaticMarketingClosingCta';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
 import { ROLE_GUIDES_HUB_PATH } from '@/lib/marketing/role-guides-path';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 import type { Metadata } from 'next';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 const siteUrl = getPublicSiteUrl();
 
@@ -14,6 +17,7 @@ export const metadata: Metadata = {
     'Source-backed CARSI guides for builders, insurers, facility teams, healthcare, strata and cleaning contractors — each linking live courses for that job.',
   alternates: { canonical: `${siteUrl}${ROLE_GUIDES_HUB_PATH}` },
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     title: 'Role-specific training guides | CARSI',
     description:
       'Source-backed guides that connect each audience to live CARSI courses and Australian primary sources.',
@@ -26,7 +30,9 @@ export const metadata: Metadata = {
 export default function ForRoleGuidesHubPage() {
   return (
     <>
+      <RoleGuideHubViewTracker />
       <RoleGuidesHubHero />
+      <RoleGuidesHubPathfinder />
       <RoleGuidesHubGrid />
       <PlatformContextualNext current={ROLE_GUIDES_HUB_PATH} />
       <StaticMarketingClosingCta />

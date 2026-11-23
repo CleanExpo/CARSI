@@ -10,6 +10,7 @@
  * duplicated here deliberately — keep the two lists in sync. This scanner is a
  * REPORTER (it lists hits) and does not replace the guard's release gate.
  */
+import { APPROVED_FOR_IICRC_CECS, IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 
 export interface BannedPhraseRule {
   re: RegExp;
@@ -42,17 +43,17 @@ export const BANNED_PHRASE_RULES: BannedPhraseRule[] = [
   {
     re: /\bIICRC[\s-]*Accredited\b/i,
     allow: null,
-    message: 'Say "IICRC CEC Accredited", never bare "IICRC Accredited".',
+    message: `Say "${IICRC_APPROVED_CEC_PROVIDER}" (GP-704); never call CARSI or a course accredited.`,
   },
   {
     re: /\bIICRC[\s-]*accredited[\s-]+courses?\b/i,
     allow: null,
-    message: 'CARSI courses are not "IICRC-accredited" — say "IICRC CEC Accredited course(s)".',
+    message: `CARSI courses are not accredited by the IICRC — a single approved class is "${APPROVED_FOR_IICRC_CECS}".`,
   },
   {
     re: /\bIICRC[\s-]+courses?[\s-]+accredit\w*\b/i,
     allow: null,
-    message: 'Do not imply IICRC accredits CARSI\'s courses — say "IICRC CEC Accredited course(s)".',
+    message: `Do not imply that the IICRC approves CARSI's courses as a whole — a single approved class is "${APPROVED_FOR_IICRC_CECS}".`,
   },
   {
     re: /\bIICRC[\s-]+Approved[\s-]+(School|Instructor)\b/i,

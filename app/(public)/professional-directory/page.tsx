@@ -8,6 +8,7 @@ import {
   getProfessionalDirectoryStatus,
   getVerifiedProfessionals,
 } from '@/lib/server/professional-directory';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 /**
  * Professional Directory — honest gate until NRPG registry sync (GitHub #298 / GP-449).
@@ -25,6 +26,7 @@ const BASE_METADATA: Metadata = {
     'CARSI professional directory',
   ],
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     images: OG_IMAGES,
     title: 'Professional Directory — Coming Soon | CARSI Industry Hub',
     description:

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
 import { apiClient } from '@/lib/api/client';
+import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
 
 interface LeaderboardEntry {
   rank: number;
@@ -19,6 +20,8 @@ interface LeaderboardResponse {
   period_label: string;
   period_timezone: string;
   items: LeaderboardEntry[];
+  /** The server could not read the board; never shown as an empty month. */
+  unavailable?: boolean;
 }
 
 interface LevelData {
@@ -63,6 +66,7 @@ export default function LeaderboardPage() {
   const [certificateCount, setCertificateCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [boardUnavailable, setBoardUnavailable] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -79,6 +83,9 @@ export default function LeaderboardPage() {
           .catch(() => [] as EnrollmentHint[]),
       ]);
       setEntries(normalizeLeaderboardPayload(boardRes));
+      setBoardUnavailable(
+        !Array.isArray(boardRes) && (boardRes as LeaderboardResponse)?.unavailable === true
+      );
       if (
         boardRes &&
         typeof boardRes === 'object' &&
@@ -88,7 +95,7 @@ export default function LeaderboardPage() {
         setMeta({ period_label: boardRes.period_label, period_timezone: boardRes.period_timezone });
       }
       setLevel(levelData);
-      const done = enrollments.filter((e) => e.status === 'completed' || e.all_lessons_complete);
+      const done = enrollments.filter((e) => isEnrollmentCompleted(e.status));
       setCompletedCount(done.length);
       setCertificateCount(done.filter((e) => e.certificate_issued_at).length);
     } catch {
@@ -236,48 +243,59 @@ export default function LeaderboardPage() {
         </section>
       ) : null}
 
-      {!loading && !error && entries.length > 0 ? (
+      {!loading && !error ? (
         <section>
           <div className="mb-5">
             <h2 className="text-[1.4rem] font-semibold tracking-tight text-slate-950">
               This month
             </h2>
             <p className="mt-1 text-[14px] text-slate-500">
-              {meta?.period_label ?? 'Current month'} · completion-based activity.{' '}
+              {meta?.period_label ?? 'Current month'} · completion-based activity. Taking part is
+              optional and only learners who choose to appear are listed.{' '}
               <Link
                 href="/dashboard/student/profile#recognition"
                 className="text-[#146fc2] hover:underline"
               >
-                Choose how you appear
+                Choose whether you appear
               </Link>
               .
             </p>
           </div>
-          <ol className={`${surface} divide-y divide-white/10`}>
-            {entries.map((entry, index) => (
-              <li
-                key={`${entry.rank}-${index}`}
-                className="flex items-center justify-between gap-4 px-5 py-4"
-              >
-                <div className="flex min-w-0 items-center gap-4">
-                  <span
-                    className={`${inset} inline-flex h-10 w-10 items-center justify-center rounded-xl text-sm font-semibold text-sky-100 tabular-nums`}
-                  >
-                    {entry.rank}
-                  </span>
-                  <div className="min-w-0">
-                    <p className={`truncate text-[15px] ${heading}`}>{entry.display_name}</p>
-                    <p className={`text-[13px] ${muted}`}>
-                      Level {entry.current_level} · {entry.level_title}
-                    </p>
+          {boardUnavailable ? (
+            <p className={`${surface} px-5 py-5 text-[14px] ${muted}`} role="status">
+              The monthly board could not be loaded. Your own record above is not affected.
+            </p>
+          ) : entries.length === 0 ? (
+            <p className={`${surface} px-5 py-5 text-[14px] ${muted}`}>
+              Nothing to show on this month&apos;s board yet.
+            </p>
+          ) : (
+            <ol className={`${surface} divide-y divide-white/10`}>
+              {entries.map((entry, index) => (
+                <li
+                  key={`${entry.rank}-${index}`}
+                  className="flex items-center justify-between gap-4 px-5 py-4"
+                >
+                  <div className="flex min-w-0 items-center gap-4">
+                    <span
+                      className={`${inset} inline-flex h-10 w-10 items-center justify-center rounded-xl text-sm font-semibold text-sky-100 tabular-nums`}
+                    >
+                      {entry.rank}
+                    </span>
+                    <div className="min-w-0">
+                      <p className={`truncate text-[15px] ${heading}`}>{entry.display_name}</p>
+                      <p className={`text-[13px] ${muted}`}>
+                        Level {entry.current_level} · {entry.level_title}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <p className="text-sm text-sky-100 tabular-nums">
-                  {entry.total_xp.toLocaleString()} XP
-                </p>
-              </li>
-            ))}
-          </ol>
+                  <p className="text-sm text-sky-100 tabular-nums">
+                    {entry.total_xp.toLocaleString()} XP
+                  </p>
+                </li>
+              ))}
+            </ol>
+          )}
         </section>
       ) : null}
     </div>

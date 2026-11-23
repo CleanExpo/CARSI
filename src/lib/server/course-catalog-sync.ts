@@ -116,6 +116,12 @@ export async function getOrCreateCourseBySlug(slug: string): Promise<CourseWithC
       return existing;
     }
 
+    // GP-776: a live course's content changes only through review, a recorded approval and the
+    // publish gate. Seed resync never rewrites it.
+    if (existing && (existing.status?.toLowerCase() === 'published' || existing.isPublished === true)) {
+      return existing;
+    }
+
     if (existing && needsResync) {
       await prisma.$transaction(async (tx) => {
         await tx.lmsModule.deleteMany({ where: { courseId: existing.id } });
@@ -126,13 +132,13 @@ export async function getOrCreateCourseBySlug(slug: string): Promise<CourseWithC
             description: wp.description ?? null,
             shortDescription: wp.short_description ?? null,
             thumbnailUrl: wp.thumbnail_url ?? null,
-            status: 'published',
+            status: 'draft',
             priceAud: new Prisma.Decimal(isFree ? 0 : priceNum),
             isFree,
             level: wp.level ?? null,
             category: wp.category ?? null,
             iicrcDiscipline: wp.iicrc_discipline ?? null,
-            isPublished: true,
+            isPublished: false,
             meta: wp.meta === undefined ? undefined : (wp.meta as Prisma.InputJsonValue),
           },
         });
@@ -155,14 +161,15 @@ export async function getOrCreateCourseBySlug(slug: string): Promise<CourseWithC
           shortDescription: wp.short_description ?? null,
           thumbnailUrl: wp.thumbnail_url ?? null,
           instructorId: DEFAULT_INSTRUCTOR_ID,
-          status: 'published',
+          // GP-776: seed courses are created as drafts; publishing goes through the gate.
+          status: 'draft',
           priceAud: new Prisma.Decimal(isFree ? 0 : priceNum),
           isFree,
           level: wp.level ?? null,
           category: wp.category ?? null,
           iicrcDiscipline: wp.iicrc_discipline ?? null,
           meta: wp.meta === undefined ? undefined : (wp.meta as Prisma.InputJsonValue),
-          isPublished: true,
+          isPublished: false,
         },
       });
       await insertSeedModulesTx(tx, courseId, seedFull.modules);

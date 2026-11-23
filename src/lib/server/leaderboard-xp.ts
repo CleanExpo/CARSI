@@ -7,25 +7,28 @@ export const XP_LESSON_COMPLETE = 10;
 export const XP_COURSE_COMPLETE = 100;
 
 /** Per-student XP in GROUP BY — COUNT * literal avoids PostgreSQL `sum(unknown)` (42725). */
-const SQL_LESSON_XP_TOTAL = Prisma.raw(
-  `(COUNT(*)::bigint * ${XP_LESSON_COMPLETE}::bigint)`
-);
-const SQL_COURSE_XP_TOTAL = Prisma.raw(
-  `(COUNT(*)::bigint * ${XP_COURSE_COMPLETE}::bigint)`
-);
+const SQL_LESSON_XP_TOTAL = Prisma.raw(`(COUNT(*)::bigint * ${XP_LESSON_COMPLETE}::bigint)`);
+const SQL_COURSE_XP_TOTAL = Prisma.raw(`(COUNT(*)::bigint * ${XP_COURSE_COMPLETE}::bigint)`);
 
+/**
+ * Engagement labels only (GP-775). XP counts activity, not competence, so a level must never read
+ * as a trade, occupational or qualification title.
+ */
 const LEVEL_TITLES = [
-  'Apprentice',
-  'Trainee',
-  'Technician',
-  'Senior Technician',
-  'Specialist',
-  'Master Restorer',
+  'Getting started',
+  'Building momentum',
+  'Steady learner',
+  'Consistent learner',
+  'Dedicated learner',
+  'Committed learner',
 ] as const;
 
 const LEVEL_THRESHOLDS = [0, 500, 1500, 3500, 7000, 12000] as const;
 
-export function levelTitleFromLifetimeXp(totalXp: number): { current_level: number; level_title: string } {
+export function levelTitleFromLifetimeXp(totalXp: number): {
+  current_level: number;
+  level_title: string;
+} {
   let level = 1;
   for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
     if (totalXp >= LEVEL_THRESHOLDS[i]) {
@@ -49,25 +52,22 @@ export function anonymousLeaderboardLabel(userId: string): string {
 
 const DISPLAY_NAME_MAX = 48;
 
+/**
+ * The rule for a stored (legacy) leaderboard label, applied only when it is saved
+ * (PATCH /api/lms/auth/me). The board never reads stored labels; it shows only the anonymous
+ * label (founder ruling 22/11/2026). NFKC folds look-alike characters first, so a full-width or
+ * small at sign (U+FF20, U+FE6B) is caught by the same '@' check as the ASCII one (GP-775 r1).
+ */
 export function sanitizeLeaderboardDisplayName(raw: string | null | undefined): string | null {
   if (raw == null) return null;
-  let s = raw.replace(/[\u0000-\u001F\u007F]/g, '').trim();
+  let s = raw
+    .normalize('NFKC')
+    .replace(/[\u0000-\u001F\u007F]|\p{Cf}/gu, '')
+    .trim();
   if (s.length === 0) return null;
   if (s.includes('@')) return null;
   if (s.length > DISPLAY_NAME_MAX) s = s.slice(0, DISPLAY_NAME_MAX).trim();
   return s.length > 0 ? s : null;
-}
-
-export function publicLeaderboardDisplayName(
-  userId: string,
-  showName: boolean,
-  storedName: string | null | undefined
-): string {
-  if (showName) {
-    const cleaned = sanitizeLeaderboardDisplayName(storedName ?? null);
-    if (cleaned) return cleaned;
-  }
-  return anonymousLeaderboardLabel(userId);
 }
 
 type MonthBounds = { start: Date; end: Date };
@@ -264,48 +264,45 @@ export async function getMonthlyLeaderboard(params: {
   const course = await courseXpGrouped(start, end, params.courseSlugs);
   const periodTotals = mergeXpMaps(lesson, course);
 
-  const sorted = [...periodTotals.entries()]
-    .filter(([, xp]) => xp > 0)
+  const withXp = [...periodTotals.entries()].filter(([, xp]) => xp > 0);
+  const empty = {
+    period_label,
+    period_timezone: 'Australia/Sydney',
+    start,
+    end,
+    items: [] as LeaderboardPeriodRow[],
+  };
+  if (withXp.length === 0) return empty;
+
+  // Consent (GP-775): only learners who opted in are ranked. The column defaults to false, so a
+  // learner who never chose is not on the board, and opting out removes them on the next read.
+  // Filter before ranking and the limit, so excluded learners take no slot and leave no rank gap.
+  // Founder ruling 22/11/2026, "Anonymous label only": an entry shows only the anonymous label, so
+  // no name, chosen label or email is even read here.
+  const users = await prisma.lmsUser.findMany({
+    where: { id: { in: withXp.map(([id]) => id) }, leaderboardShowDisplayName: true },
+    select: { id: true, leaderboardShowDisplayName: true },
+  });
+  const userMap = new Map(
+    users.filter((u) => u.leaderboardShowDisplayName === true).map((u) => [u.id, u])
+  );
+
+  const sorted = withXp
+    .filter(([id]) => userMap.has(id))
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .slice(0, params.limit);
-
-  const ids = sorted.map(([id]) => id);
-  if (ids.length === 0) {
-    return {
-      period_label,
-      period_timezone: 'Australia/Sydney',
-      start,
-      end,
-      items: [],
-    };
-  }
-
-  const users = await prisma.lmsUser.findMany({
-    where: { id: { in: ids } },
-    select: {
-      id: true,
-      leaderboardShowDisplayName: true,
-      leaderboardDisplayName: true,
-    },
-  });
-  const userMap = new Map(users.map((u) => [u.id, u]));
+  if (sorted.length === 0) return empty;
 
   const lifetimeLessonAll = await lessonXpGrouped(null, null, null);
   const lifetimeCourseAll = await courseXpGrouped(null, null, null);
   const lifetimeAllCourses = mergeXpMaps(lifetimeLessonAll, lifetimeCourseAll);
 
   const items: LeaderboardPeriodRow[] = sorted.map(([studentId, periodXp], index) => {
-    const u = userMap.get(studentId);
-    const displayName = publicLeaderboardDisplayName(
-      studentId,
-      u?.leaderboardShowDisplayName ?? false,
-      u?.leaderboardDisplayName
-    );
     const lifetime = lifetimeAllCourses.get(studentId) ?? periodXp;
     const { current_level, level_title } = levelTitleFromLifetimeXp(lifetime);
     return {
       rank: index + 1,
-      display_name: displayName,
+      display_name: anonymousLeaderboardLabel(studentId),
       total_xp: periodXp,
       current_level,
       level_title,

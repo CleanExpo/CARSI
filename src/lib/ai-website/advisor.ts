@@ -1,7 +1,8 @@
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 /**
  * CARSI Course Advisor — the "employee" behind the AI Website.
  *
- * Grounded on the real CARSI disciplines and licence-correct wording (IICRC CEC Accredited,
+ * Grounded on the real CARSI disciplines and licence-correct wording (IICRC Approved CEC Provider,
  * CARSI Southern Hemisphere Restoration Designations — always keep the "CEC" qualifier, never drop it).
  *
  * This is a DETERMINISTIC knowledge-base responder: it needs no external LLM key, so it works in
@@ -111,7 +112,7 @@ export function answer(message: string): AdvisorReply {
   if (/\b(cec|credit|continuing)\b/.test(q)) {
     return {
       text:
-        'Every CARSI course earns a CARSI Southern Hemisphere Restoration Designation. CARSI is an accredited IICRC CEC provider; it does not issue IICRC certification itself. Which discipline are you tracking CECs in?',
+        `Every CARSI course earns a CARSI Southern Hemisphere Restoration Designation. CARSI is an ${IICRC_APPROVED_CEC_PROVIDER}; it does not issue IICRC certification itself. Which discipline are you tracking CECs in?`,
       recommendations: none, pathway: null,
     };
   }

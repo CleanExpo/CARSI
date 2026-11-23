@@ -20,7 +20,7 @@ export const revalidate = 0;
 
 export default function PrivacyPage() {
   return (
-    <LegalDocumentShell title="Privacy Policy" updated="16 November 2026">
+    <LegalDocumentShell title="Privacy Policy" updated="22 November 2026">
       <section>
         <h2 className={marketingLegalH2}>1. Overview</h2>
         <p>
@@ -166,6 +166,12 @@ export default function PrivacyPage() {
         <p>
           You can control cookies through your browser settings. Disabling cookies may affect the
           functionality of the Service.
+        </p>
+        <h3 className={marketingLegalH3}>Partner referral links</h3>
+        <p>
+          If you arrive through a CARSI partner&rsquo;s link, we set a first-party cookie,{' '}
+          <code>carsi_ref</code>, for 30 days recording which partner referred you, so we can credit
+          them for a purchase. It is not shared with the partner or anyone else.
         </p>
         <h3 className={marketingLegalH3}>Google Analytics</h3>
         <p>
