@@ -21,7 +21,10 @@
  * committed.
  */
 import { getAdminEmail } from '@/lib/admin/admin-panel-access';
-import { pickSessionRole } from '@/lib/server/lms-auth';
+import { isCurrentGeneration } from '@/lib/auth/session-generation';
+import { pickSessionRole, readLmsUserNow, type RawQueryClient } from '@/lib/server/lms-auth';
+
+export { readLmsUserNow, type LmsUserNow, type RawQueryClient } from '@/lib/server/lms-auth';
 
 export type CurrentAdmin = {
   kind: 'bootstrap_admin' | 'admin_user' | 'lms_admin';
@@ -41,11 +44,6 @@ export class NotCurrentAdminError extends Error {
     this.name = 'NotCurrentAdminError';
   }
 }
-
-/** A Prisma client or interactive transaction (anything that can run a tagged raw query). */
-export type RawQueryClient = {
-  $queryRaw: <T>(strings: TemplateStringsArray, ...values: unknown[]) => Promise<T>;
-};
 
 export async function resolveCurrentAdmin(
   db: RawQueryClient,
@@ -85,6 +83,23 @@ export async function resolveCurrentAdmin(
     ) === 'admin';
   if (isAdminRole) return { kind: 'lms_admin', ref: user.id, email };
   return null;
+}
+
+/**
+ * GP-760: the admin-panel gate for an LMS session, read from the database on every request
+ * (readLmsUserNow, no cache). True only when the user is active now, the session carries the
+ * user's current session generation (a password reset ends older sessions), and the user's
+ * effective role is 'admin' now. The token's role claim is never consulted.
+ */
+export async function isLmsAdminNow(
+  db: RawQueryClient,
+  userId: string,
+  sessionGeneration: number | undefined
+): Promise<boolean> {
+  const user = await readLmsUserNow(db, userId);
+  if (!user || !user.active) return false;
+  if (!isCurrentGeneration(sessionGeneration, user.generation)) return false;
+  return user.role === 'admin';
 }
 
 /** resolveCurrentAdmin, or throw NotCurrentAdminError (use inside the action's transaction). */

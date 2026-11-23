@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
   title: 'Training record',
-  description: 'CARSI learner training and IICRC CEC summary (shared link).',
+  description: 'CARSI learner training record (shared link).',
   robots: { index: false, follow: false },
 };
 

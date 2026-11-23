@@ -1,12 +1,18 @@
 import { SignJWT, jwtVerify } from 'jose';
 
 import { getSessionSecretBytes } from '@/lib/auth/jwt-secret';
+import { generationClaim } from '@/lib/auth/session-generation';
 
 export interface SessionClaims {
   sub: string;
   email: string;
   full_name: string;
   role: string;
+  /**
+   * GP-760: the user's session generation when the session was issued (claim `sg`; see
+   * session-generation.ts). Claims built from the database carry it; a token without it reads as 0.
+   */
+  sg?: number;
 }
 
 export async function signSessionToken(claims: SessionClaims): Promise<string> {
@@ -14,6 +20,7 @@ export async function signSessionToken(claims: SessionClaims): Promise<string> {
     email: claims.email,
     full_name: claims.full_name,
     role: claims.role,
+    sg: generationClaim(claims.sg),
   })
     .setProtectedHeader({ alg: 'HS256' })
     .setSubject(claims.sub)
@@ -35,14 +42,15 @@ export async function verifySessionToken(token: string): Promise<SessionClaims |
     const full_name = typeof payload.full_name === 'string' ? payload.full_name : 'User';
     const role = typeof payload.role === 'string' ? payload.role : 'student';
     if (!sub || !email) return null;
-    return { sub, email, full_name, role };
+    return { sub, email, full_name, role, sg: generationClaim(payload.sg) };
   } catch {
     return null;
   }
 }
 
-export async function signPasswordResetToken(userId: string): Promise<string> {
-  return new SignJWT({ purpose: 'password_reset' })
+/** GP-760: the link carries the user's session generation now; a reset spends that generation. */
+export async function signPasswordResetToken(userId: string, generation: number): Promise<string> {
+  return new SignJWT({ purpose: 'password_reset', sg: generationClaim(generation) })
     .setProtectedHeader({ alg: 'HS256' })
     .setSubject(userId)
     .setIssuedAt()
@@ -50,12 +58,20 @@ export async function signPasswordResetToken(userId: string): Promise<string> {
     .sign(getSessionSecretBytes());
 }
 
-export async function verifyPasswordResetToken(token: string): Promise<string | null> {
+/**
+ * GP-760: returns the user and the session generation the link was issued under (0 for a link
+ * issued before generations existed). The signature alone does not make a link usable:
+ * consumePasswordReset (lms-auth) spends it only while that generation is still the user's.
+ */
+export async function verifyPasswordResetToken(
+  token: string,
+): Promise<{ userId: string; generation: number } | null> {
   try {
     const { payload } = await jwtVerify(token, getSessionSecretBytes());
     if (payload.purpose !== 'password_reset') return null;
     const sub = typeof payload.sub === 'string' ? payload.sub : '';
-    return sub || null;
+    if (!sub) return null;
+    return { userId: sub, generation: generationClaim(payload.sg) };
   } catch {
     return null;
   }

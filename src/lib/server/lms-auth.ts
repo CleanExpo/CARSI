@@ -3,10 +3,41 @@ import { randomUUID } from 'node:crypto';
 import bcrypt from 'bcryptjs';
 
 import { isReservedStaffEmail } from '@/lib/admin/admin-panel-access';
+import { isCurrentGeneration } from '@/lib/auth/session-generation';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { prisma } from '@/lib/prisma';
 
 const BCRYPT_ROUNDS = 12;
+
+/**
+ * GP-760: spend a password-reset link and set the new password in ONE conditional UPDATE.
+ *
+ * The link carries the session generation it was issued under (session-generation.ts). It is
+ * usable only while that is still the user's generation, and the same statement adds one. So:
+ *   - the link works once: a second use, even concurrent, re-reads the row after the first commits
+ *     and no longer matches (Postgres re-checks the WHERE on the updated row), so it updates 0 rows;
+ *   - every other link of the same generation dies with it; a link requested after the reset
+ *     carries the new generation and works, even in the same clock second;
+ *   - every session of the old generation is refused, which ends the user's other sessions. The
+ *     caller then mints the new session from the database, so it carries the new generation.
+ * A deactivated account cannot reset. Returns true only when exactly this request spent the link.
+ */
+export async function consumePasswordReset(
+  userId: string,
+  generation: number,
+  hashedPassword: string
+): Promise<boolean> {
+  const updated = await prisma.$executeRaw`
+    UPDATE "lms_users"
+       SET "hashed_password" = ${hashedPassword},
+           "is_verified" = true,
+           "session_generation" = "session_generation" + 1,
+           "updated_at" = now()
+     WHERE "id" = ${userId}::uuid
+       AND "is_active" = true
+       AND "session_generation" = ${generation}::integer`;
+  return updated === 1;
+}
 
 /** Rows created only for JWT sync (e.g. ensureLmsUserFromClaims) are not password-login accounts. */
 function isJwtProvisionedPasswordHash(hash: string): boolean {
@@ -96,30 +127,92 @@ export function pickSessionRole(roleNames: Iterable<string>, columnRole: string 
   return 'student';
 }
 
-export async function resolveSessionRole(
-  userId: string,
-  columnRole: string | null
-): Promise<string> {
-  const rows = await prisma.lmsUserRole.findMany({
-    where: { userId },
-    include: { role: true },
-  });
-  return pickSessionRole(
-    rows.map((r) => r.role.name),
-    columnRole
-  );
+/** A Prisma client or interactive transaction (anything that can run a tagged raw query). */
+export type RawQueryClient = {
+  $queryRaw: <T>(strings: TemplateStringsArray, ...values: unknown[]) => Promise<T>;
+};
+
+/** An LMS user as the database has them now (GP-760). */
+export type LmsUserNow = {
+  id: string;
+  email: string;
+  fullName: string | null;
+  active: boolean;
+  /** Effective role: pickSessionRole over lms_user_roles, then the lms_users.role column. */
+  role: string;
+  /** lms_users.session_generation (session-generation.ts). */
+  generation: number;
+};
+
+/**
+ * GP-760: read one LMS user's identity, active flag, effective role and session generation in ONE
+ * statement (primary-key lookup on lms_users plus its lms_user_roles rows). The role is computed by
+ * pickSessionRole, exactly as resolveCurrentAdmin computes it. Null when the user does not exist.
+ * No row locks: this gates a request or mints a session, it does not order an action; actions that
+ * must be ordered against a demotion use resolveCurrentAdmin inside their transaction.
+ */
+export async function readLmsUserNow(db: RawQueryClient, userId: string): Promise<LmsUserNow | null> {
+  if (!userId) return null;
+  const rows = await db.$queryRaw<
+    Array<{
+      id: string;
+      email: string;
+      full_name: string | null;
+      is_active: boolean;
+      role: string | null;
+      session_generation: number | string | null;
+      role_names: string[] | null;
+    }>
+  >`
+    SELECT u."id", u."email", u."full_name", u."is_active", u."role", u."session_generation",
+           array_remove(array_agg(r."name"), NULL) AS "role_names"
+      FROM "lms_users" u
+      LEFT JOIN "lms_user_roles" ur ON ur."user_id" = u."id"
+      LEFT JOIN "lms_roles" r ON r."id" = ur."role_id"
+     WHERE u."id" = ${userId}::uuid
+     GROUP BY u."id"`;
+  const user = rows[0];
+  if (!user) return null;
+  return {
+    id: user.id,
+    email: user.email,
+    fullName: user.full_name,
+    active: user.is_active === true,
+    role: pickSessionRole(user.role_names ?? [], user.role),
+    generation: Number(user.session_generation ?? 0),
+  };
 }
 
-export async function sessionClaimsForUserId(userId: string): Promise<SessionClaims | null> {
-  const user = await prisma.lmsUser.findUnique({ where: { id: userId } });
-  if (!user || !user.isActive) return null;
-  const role = await resolveSessionRole(user.id, user.role);
+/** Session claims for a user read by readLmsUserNow: the current role and session generation. */
+function claimsFromUser(user: LmsUserNow): SessionClaims {
   return {
     sub: user.id,
     email: user.email,
     full_name: user.fullName?.trim() || user.email,
-    role,
+    role: user.role,
+    sg: user.generation,
   };
+}
+
+/**
+ * Claims for a new session, read from the database now in one statement (readLmsUserNow): the user
+ * must be active, the role is the current database role and the session generation is the current
+ * one. With `sessionGeneration` (GP-760, token refresh), the session being renewed must also carry
+ * the user's current generation, so a session ended by a password reset cannot be renewed.
+ */
+export async function sessionClaimsForUserId(
+  userId: string,
+  options: { sessionGeneration?: number } = {}
+): Promise<SessionClaims | null> {
+  const user = await readLmsUserNow(prisma, userId);
+  if (!user || !user.active) return null;
+  if (
+    options.sessionGeneration !== undefined &&
+    !isCurrentGeneration(options.sessionGeneration, user.generation)
+  ) {
+    return null;
+  }
+  return claimsFromUser(user);
 }
 
 export async function authenticateWithPassword(
@@ -135,13 +228,10 @@ export async function authenticateWithPassword(
   const ok = await verifyPassword(password, user.hashedPassword);
   if (!ok) return null;
 
-  const role = await resolveSessionRole(user.id, user.role);
-  return {
-    sub: user.id,
-    email: user.email,
-    full_name: user.fullName?.trim() || user.email,
-    role,
-  };
+  // GP-760: mint only for the generation the checked password belongs to. If a password reset
+  // committed between reading the hash and here, the generation has moved on and the old
+  // password must not produce a session of the new generation.
+  return sessionClaimsForUserId(user.id, { sessionGeneration: user.sessionGeneration });
 }
 
 export type RegisterPrismaResult =

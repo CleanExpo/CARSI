@@ -1,10 +1,12 @@
 'use client';
 
+import { analyticsConsentCheckoutField } from '@/lib/analytics/consent-client';
 import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { apiClient } from '@/lib/api/client';
+import { INDIVIDUAL_MEMBERSHIP, membershipAmountAud } from '@/lib/lms/membership-prices';
 
 /** The one membership price (A$795/yr, GST included). */
-export const MEMBERSHIP_PRICE_AUD = 795;
+export const MEMBERSHIP_PRICE_AUD = membershipAmountAud(INDIVIDUAL_MEMBERSHIP);
 
 /**
  * The single boundary where a yearly-membership checkout really starts (V6). Every entry point
@@ -18,12 +20,16 @@ export const MEMBERSHIP_PRICE_AUD = 795;
  * The event carries the price only, never whether this buyer is new or renewing: renewal state
  * is account state and stays out of third-party analytics (see funnel-events.ts).
  *
+ * The request carries the visitor's analytics choice (GP-732) so the server-side subscription
+ * events follow the same yes or no as the browser.
+ *
  * Returns the Stripe URL, or null when the server answered without one. The caller navigates.
  */
 export async function createMembershipCheckout(): Promise<string | null> {
   const data = await apiClient.post<{ url?: string; checkout_url?: string }>(
     '/api/lms/subscription/checkout',
-    {}
+    // GP-732: the server sends its GA4 subscription events only after a yes recorded here.
+    analyticsConsentCheckoutField()
   );
   const url = data.url ?? data.checkout_url;
   if (!url) return null;

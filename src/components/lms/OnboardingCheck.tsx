@@ -9,6 +9,11 @@ import {
   rememberSkipped,
   shouldShowOnboardingWizard,
 } from '@/lib/onboarding/wizard-gate';
+import {
+  isDashboardPageReady,
+  onDashboardPageReady,
+  PAGE_READY_FALLBACK_MS,
+} from '@/lib/onboarding/page-ready';
 
 interface UserProfile {
   onboarding_completed: boolean;
@@ -19,6 +24,8 @@ export function OnboardingCheck() {
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [skipped, setSkipped] = useState(false);
   const [checked, setChecked] = useState(false);
+  // GP-627: wait for the page's first loaded view (or the fallback) before opening the modal.
+  const [pageReady, setPageReady] = useState(isDashboardPageReady);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -47,6 +54,16 @@ export function OnboardingCheck() {
     };
   }, []);
 
+  useEffect(() => {
+    if (pageReady) return;
+    const timer = window.setTimeout(() => setPageReady(true), PAGE_READY_FALLBACK_MS);
+    const stop = onDashboardPageReady(() => setPageReady(true));
+    return () => {
+      window.clearTimeout(timer);
+      stop();
+    };
+  }, [pageReady]);
+
   // GP-593: never over a lesson, and not again once skipped this session.
   const show =
     checked &&
@@ -54,6 +71,7 @@ export function OnboardingCheck() {
       onboardingCompleted: !needsOnboarding,
       pathname,
       skippedThisSession: skipped,
+      pageReady,
     });
 
   if (!show) return null;

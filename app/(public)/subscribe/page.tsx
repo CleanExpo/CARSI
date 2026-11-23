@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { MembershipViewTracker } from '@/components/analytics/MembershipViewTracker';
-import { verifySessionToken } from '@/lib/auth/session-jwt';
+import { verifyActiveSession } from '@/lib/server/user-active-cache';
 import { getEntitlements, type Entitlements } from '@/lib/server/entitlements';
 import { formatAnchorAud, getPaidCatalogueValue } from '@/lib/server/membership-value-anchor';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
@@ -14,6 +14,8 @@ import {
   MembershipLibrary,
   MembershipSteps,
 } from '@/components/membership/MembershipLanding';
+import { INDIVIDUAL_MEMBERSHIP, membershipAmountAud } from '@/lib/lms/membership-prices';
+
 import { SubscribeCta } from './SubscribeCta';
 
 import { APPROVED_FOR_IICRC_CECS } from '@/lib/iicrc/approved-wording';
@@ -32,9 +34,9 @@ export const metadata: Metadata = {
 
 const PLAN = {
   name: 'Yearly membership',
-  price: 795,
+  price: membershipAmountAud(INDIVIDUAL_MEMBERSHIP),
   suffix: 'AUD / year',
-  helper: 'That is about $66/month · GST included',
+  helper: `That is about $${Math.round(membershipAmountAud(INDIVIDUAL_MEMBERSHIP) / 12)}/month · GST included`,
 };
 
 export const PRO_FEATURES = [
@@ -60,7 +62,8 @@ async function loadMembership(): Promise<Entitlements | null> {
   const jar = await cookies();
   const token = jar.get('auth_token')?.value ?? jar.get('carsi_token')?.value;
   if (!token) return null;
-  const claims = await verifySessionToken(token);
+  // GP-760: a session ended by a password reset (or a deactivated user) shows no membership.
+  const claims = await verifyActiveSession(token);
   if (!claims?.sub) return null;
   return getEntitlements(claims.sub);
 }

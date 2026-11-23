@@ -20,7 +20,8 @@ import {
 import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { purchaseSurveyCheckoutField } from '@/lib/marketing/purchase-survey-key';
+import { purchaseSurveyCheckoutField, rememberPurchaseSurveyKey } from '@/lib/marketing/purchase-survey-key';
+import { analyticsConsentCheckoutField } from '@/lib/analytics/consent-client';
 
 /**
  * Full-page sign-in redirect for a logged-out Enrol click. Always on the current origin, with the
@@ -236,6 +237,7 @@ export function EnrolButton({
         undefined,
         buyMode === 'team' ? { teamSeats } : undefined,
       );
+      const surveyField = purchaseSurveyCheckoutField();
       const data = await apiClient.post<CheckoutResponse>('/api/lms/checkout', {
         slug,
         success_url,
@@ -243,7 +245,8 @@ export function EnrolButton({
         purchase_mode: buyMode,
         ...(buyMode === 'team' ? { team_seat_count: teamSeats } : {}),
         ...(currentUser.email ? { customer_email: currentUser.email } : {}),
-        ...purchaseSurveyCheckoutField(),
+        ...surveyField,
+        ...analyticsConsentCheckoutField(),
       });
 
       if (data.enrolled) {
@@ -259,6 +262,8 @@ export function EnrolButton({
       }
 
       if (data.checkout_url) {
+        // Only a checkout that reached Stripe keeps its survey key (GP-694).
+        rememberPurchaseSurveyKey(surveyField.survey_key);
         trackFunnelEvent({
           name: 'checkout_started',
           course_slug: slug,

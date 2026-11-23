@@ -1,13 +1,22 @@
 import type { AdminDashboardUserEntry } from '@/lib/admin/admin-dashboard-data';
 
 export type AdminUserSegment =
-  'all' | 'new' | 'active' | 'never_started' | 'in_progress' | 'completed' | 'paid' | 'inactive';
+  | 'all'
+  | 'new'
+  | 'active'
+  | 'never_started'
+  | 'enrolled_not_started'
+  | 'in_progress'
+  | 'completed'
+  | 'paid'
+  | 'inactive';
 
 export const ADMIN_USER_SEGMENTS: { id: AdminUserSegment; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'new', label: 'New this month' },
   { id: 'active', label: 'Active learners' },
   { id: 'never_started', label: 'Bought, not started' },
+  { id: 'enrolled_not_started', label: 'Enrolled, not started' },
   { id: 'in_progress', label: 'In progress' },
   { id: 'completed', label: 'Completed a course' },
   { id: 'paid', label: 'Has a payment' },
@@ -41,8 +50,18 @@ export function isActiveLearner(
   return u.enrollmentCount > 0 && pct >= 1 && pct <= 99;
 }
 
-/** Enrolled and still at 0% overall. */
+/**
+ * Holds at least one Stripe-bought seat that is active with no lessons done (GP-766).
+ * Free, admin, team and membership enrolments never count: see `enrollmentIsStripePaid`.
+ */
 export function isBoughtNotStarted(
+  u: Pick<AdminDashboardUserEntry, 'boughtNotStartedCount'>
+): boolean {
+  return u.boughtNotStartedCount > 0;
+}
+
+/** Enrolled in anything, paid or not, and still at 0% overall. */
+export function isEnrolledNotStarted(
   u: Pick<AdminDashboardUserEntry, 'overallCompletionPct' | 'enrollmentCount'>
 ): boolean {
   return u.enrollmentCount > 0 && progressPct(u) === 0;
@@ -68,6 +87,7 @@ export function matchesAdminUserSegment(
   if (segment === 'inactive') return !u.isActive;
   if (segment === 'paid') return u.paidEnrollmentCount > 0;
   if (segment === 'never_started') return isBoughtNotStarted(u);
+  if (segment === 'enrolled_not_started') return isEnrolledNotStarted(u);
   if (segment === 'in_progress' || segment === 'active') return isActiveLearner(u);
   if (segment === 'completed') return u.enrollmentCount > 0 && pct === 100;
   if (segment === 'new') {

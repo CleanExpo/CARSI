@@ -164,6 +164,143 @@ if (evaluateContent(NON_APPROVED, spacedVariant, allowG).length > 0) fail('white
 if (evaluateContent(NON_APPROVED, 'This course awards 4 IICRC CECs.', EMPTY).length === 0) fail('planted "awards 4 IICRC CECs" did not fire.');
 if (evaluateContent(NON_APPROVED, 'This course is Australian-produced. Ten-question knowledge check.', EMPTY).length > 0) fail('clean line fired the guard.');
 
+// (6b) GP-753 — copy implying CARSI delivers or grants IICRC certification, or that the IICRC
+// approved ("board-approved") the course. The first three lines are the GP-525 breaches verbatim
+// from docs/marketing; this guard exited 0 on all three before GP-753. Dynamic import so the
+// static import line above stays untouched (open PR #1190 edits it).
+{
+  const guard = await import('./check-iicrc-compliance.mjs');
+  const MARKETING = 'docs/marketing/google-ads-campaign.md';
+  const ctxOf = (entries = []) =>
+    typeof guard.newCertificationContext === 'function' ? guard.newCertificationContext(entries) : undefined;
+  const run = (line, ctx = ctxOf()) => guard.evaluateContent(MARKETING, line, EMPTY, ctx);
+  const CERT_MUST_BLOCK = [
+    ['GP-525 E1: product headline', '| Headline 1 | IICRC Cleaning Certification — Online |'],
+    ['GP-525 E3: board-approved',
+      `| "Online training isn't as good as hands-on" | "CARSI's courses are IICRC board-approved — the same credential standard as any classroom course. Plus, your crew gets hands-on experience on real job sites, which no classroom can replicate." |`],
+    ['GP-525 E1: "with IICRC certifications" as a benefit',
+      '| Description 1 | Stand out from competitors with IICRC certifications. Carpet cleaning, mould remediation, water damage — all available online. Build recognised skills and grow your business. |'],
+    ['discipline certification as a product', 'IICRC Water Damage Certification'],
+    ['multi-word discipline certification', 'Enrol in the IICRC Mould Remediation Certification today.'],
+    ['ampersand discipline certification', 'IICRC Fire & Smoke Certifications'],
+    ['online label, lower case', 'IICRC certification - online'],
+    ['online prefix', 'Online IICRC Certification for cleaners'],
+    ['board-approved, hyphen variant', 'Every module is IICRC-board-approved.'],
+    ['board-approved, reordered', 'Board-approved by the IICRC and ready to start.'],
+    ['board approved, spaced', 'CARSI courses: IICRC board approved.'],
+    ['"with IICRC Creds" headline', '| Headline 4 | Win More Contracts with IICRC Creds |'],
+    ['"with IICRC credentials" benefit', 'Builders and project managers — reduce defect liability with IICRC credentials.'],
+    ['"companies with IICRC certifications win"', 'Cleaning companies with IICRC certifications win 3x more remediation contracts.'],
+    ['grant verb "add"', 'Cleaning franchise owners and operators — add IICRC credentials to your business.'],
+    ['grant verb "earn verifiable"', 'Earn verifiable IICRC credentials your HSE team can audit.'],
+    ['grant verb "get your"', 'Get your IICRC certification in a weekend.'],
+    ['grant verb "gain"', 'Gain IICRC qualifications without leaving the job site.'],
+    ['slang "IICRC certs"', 'The 3 IICRC certs that unlock restoration revenue'],
+  ];
+  const CERT_MUST_PASS = [
+    ['third-person: FSRT is an IICRC certification', 'FSRT is an IICRC certification covering fire and smoke restoration.'],
+    ['third-person: obtained only through approved schools', 'IICRC certification is obtained only through IICRC-approved schools and examinations.'],
+    ['denial: not accredited by the IICRC', 'CARSI courses are not accredited by the IICRC.'],
+    ['denial: CARSI does not deliver', 'CARSI does not deliver IICRC certification.'],
+    ['denial: courses do not grant', 'CARSI courses do not grant IICRC certification.'],
+    ['denial: no CARSI course will get you', 'No CARSI course will get you IICRC credentials.'],
+    ["student's own recert tracking", 'Track your IICRC WRT certification renewal and CEC hours.'],
+    ["student's own designation, title case", 'Your IICRC Water Restoration Technician Certification is due for renewal.'],
+    ['CEC toward an existing certification', 'Earn IICRC CECs toward maintaining your existing IICRC certification.'],
+    ['third-person route to certification', 'Earn IICRC certification through an IICRC-approved school; CARSI CECs help keep it current.'],
+    ['holders earn CECs', 'Technicians with IICRC certifications earn CECs through approved courses.'],
+    ['learner brings own credentials', 'Bring your IICRC credentials, CEC records, and equipment inventory.'],
+    ['provider standing', 'CARSI is an IICRC Approved CEC Provider — CEC hours are shown only on classes approved for IICRC CECs.'],
+    ['industry fact', 'IICRC certification is required for many insurance panels.'],
+  ];
+  for (const [name, line] of CERT_MUST_BLOCK) {
+    if (run(line).length === 0) fail(`GP-753 MUST BLOCK but passed: ${name}\n    ${line}`);
+  }
+  for (const [name, line] of CERT_MUST_PASS) {
+    const f = run(line);
+    if (f.length > 0) fail(`GP-753 MUST PASS but blocked: ${name}\n    ${line}\n    ${f.join('\n    ')}`);
+  }
+  // Known-findings baseline: a pinned exact (file, text) line is reported, not blocked; a near-miss
+  // or the same text in another file still blocks; a pinned entry whose line is gone is stale.
+  const pinnedLine = 'Win insurance work with IICRC credentials';
+  if (typeof guard.newCertificationContext !== 'function' || typeof guard.staleCertificationEntries !== 'function') {
+    fail('GP-753 baseline API (newCertificationContext / staleCertificationEntries) is not exported');
+  } else {
+    const ctx = ctxOf([{ file: MARKETING, text: pinnedLine }]);
+    if (run(`   ${pinnedLine}  `, ctx).length > 0) fail('GP-753 pinned line (whitespace variant) should not block');
+    if (ctx.known.size !== 1) fail('GP-753 pinned line should be recorded as a known finding');
+    if (guard.staleCertificationEntries(ctx).length !== 0) fail('GP-753 matched pinned entry reported stale');
+    if (run('Win more insurance work with IICRC credentials', ctx).length === 0) fail('GP-753 near-miss of pinned line should BLOCK');
+    if (guard.evaluateContent('docs/marketing/other.md', pinnedLine, EMPTY, ctx).length === 0) fail('GP-753 pinned text in another file should BLOCK');
+    const staleCtx = ctxOf([{ file: MARKETING, text: 'a line that is not there' }]);
+    run('Clean copy.', staleCtx);
+    if (guard.staleCertificationEntries(staleCtx).length !== 1) fail('GP-753 unmatched pinned entry should be STALE (baseline only shrinks)');
+  }
+  console.log(`  GP-753 certification-phrase cases: ${CERT_MUST_BLOCK.length} block, ${CERT_MUST_PASS.length} pass, baseline controls.`);
+}
+
+// (6c) GP-753 follow-up — the certification promise WITHOUT the word "IICRC" ("get certified",
+// "certification course", "earn your certification"). Every CERT_BARE_MUST_BLOCK line exited 0
+// against the guard as of PR #1201's head (81a73f91); the rules after it block them. Run the
+// same plant against that guard to see it pass (vacuity check for this block).
+{
+  const guard = await import('./check-iicrc-compliance.mjs');
+  const MARKETING = 'docs/marketing/google-ads-campaign.md';
+  const ctx = () => (typeof guard.newCertificationContext === 'function' ? guard.newCertificationContext([]) : undefined);
+  const run = (line) => guard.evaluateContent(MARKETING, line, EMPTY, ctx());
+  const CERT_BARE_MUST_BLOCK = [
+    ['podcast CTA (docs/content, fixed here)', '"💧 The 3 water categories every restorer must know (IICRC S500). Get certified → carsi.com.au #waterdamage"'],
+    ['get certified, lower case', 'get certified fast and win more jobs'],
+    ['become certified', 'Become certified in water restoration in a weekend.'],
+    ['become a certified technician', 'Complete this course to become a certified technician.'],
+    ['become fully certified', 'Our learners become fully certified online.'],
+    ['getting certified', 'Getting certified has never been easier.'],
+    ['certification course', 'Enrol in our certification course today.'],
+    ['certification courses, hyphen', 'Online certification-courses for carpet cleaners.'],
+    ['certification training', 'IICRC certification training online.'],
+    ['certification program', 'Join the CARSI certification program.'],
+    ['certification programme', 'A 12-week certification programme for technicians.'],
+    ['certification class', 'Book a certification class near you.'],
+    ['earn your certification', 'Earn your certification online with CARSI.'],
+    ['achieve certification', 'Achieve certification in mould remediation.'],
+    ['gain an industry certification', 'Gain an industry certification without leaving the job site.'],
+    ['obtain your certification', 'Obtain your certification in three days.'],
+    ['receive certification', 'Receive certification on completion.'],
+    // GP-584: a school route elsewhere on the line excuses nothing.
+    ['get certified + unrelated school route', 'Get certified online with us. Others go through an IICRC-approved school.'],
+    ['earn certification + unrelated school route', 'Earn your certification here. Others earn it through an IICRC-approved exam.'],
+    ['certification course + school in another sentence', 'Enrol in our certification course. We also list IICRC-approved schools.'],
+  ];
+  const CERT_BARE_MUST_PASS = [
+    ['provider standing', 'CARSI is an IICRC Approved CEC Provider.'],
+    ['tagline: from an approved provider', 'Restoration training from an IICRC Approved CEC Provider.'],
+    ['third-person: FSRT', 'FSRT is an IICRC certification covering fire and smoke restoration.'],
+    ['third-person: obtained through schools', 'IICRC certification is obtained only through IICRC-approved schools and examinations.'],
+    ['third-person: route through school', 'Technicians get certified through an IICRC-approved school, then keep it current with CECs.'],
+    ['third-person requirement ("be certified")', 'Technicians must be certified by the IICRC to join many insurance panels.'],
+    ["student's own recert", 'Your IICRC recertification is due in March.'],
+    ["student's own renewal", 'Track the CECs you need to renew your IICRC certification.'],
+    ["student's own: keep current", 'Keep your IICRC certification current with CEC courses.'],
+    ["student's own: maintain", 'Earn IICRC CECs toward maintaining your existing certification.'],
+    ['member number', 'Enter your IICRC member number to log CECs.'],
+    ['CEC tracking', 'Your CEC hours this cycle: 4 of 14 logged.'],
+    ['CARSI designation', 'Earn your CARSI Water Restoration Practitioner designation.'],
+    ['completion certificate', 'Download your certificate of completion.'],
+    ['denial: not a certification course', 'This is not a certification course.'],
+    ['denial: paired adjective (ccw-truckmount-assessment)', 'It is a manufacturer/operator competency assessment, not an accredited or certification course.'],
+    ['denial: does not get you certified', 'A CARSI course does not get you certified by the IICRC.'],
+    ['denial: cannot become certified here', 'You cannot become certified through a CARSI course.'],
+  ];
+  for (const [name, line] of CERT_BARE_MUST_BLOCK) {
+    if (run(line).length === 0) fail(`GP-753 (bare) MUST BLOCK but passed: ${name}\n    ${line}`);
+  }
+  for (const [name, line] of CERT_BARE_MUST_PASS) {
+    const f = run(line);
+    if (f.length > 0) fail(`GP-753 (bare) MUST PASS but blocked: ${name}\n    ${line}\n    ${f.join('\n    ')}`);
+  }
+  console.log(`  GP-753 bare certification cases: ${CERT_BARE_MUST_BLOCK.length} block, ${CERT_BARE_MUST_PASS.length} pass.`);
+}
+
 // (7) IICRC-free files (public review policy): planted IICRC/CEC wording fires, neutral copy is
 // silent, and every listed file exists and is currently clean.
 for (const planted of [
@@ -295,6 +432,34 @@ if (CEC_APPROVED_SLUGS.includes('hard-floor-care')) fail('fixture slug hard-floo
     if (!hits.some((h) => h.text === normaliseLine(e.text))) fail(`baseline entry is stale: ${e.file}`);
     if (/^(public\/courses|data\/courses)\//.test(e.file)) fail(`baseline must not pin course-tree files: ${e.file}`);
   }
+}
+
+// (8) GP-584 — an allow excuses only the ban occurrence it overlaps, never a ban elsewhere on the
+// same line. Before the fix, a legitimate phrase anywhere on a line suppressed a violation anywhere
+// else on it (`Buy our IICRC courses today. We are an IICRC CEC provider.` -> 0 findings).
+const SPAN_MUST_BLOCK = [
+  ['rule 1: violation beside an IICRC CEC phrase', 'Buy our IICRC courses today. We are an IICRC CEC provider.'],
+  ['rule 1: IICRC CEC phrase first, violation after', 'We are an IICRC CEC provider. Buy our IICRC courses today.'],
+  ['IICRC-approved: violation beside a CEC-provider phrase', 'Our IICRC-approved courses get you certified. CARSI is a CEC provider.'],
+  ['IICRC-approved: violation after an approved-school phrase', 'Study at IICRC-approved schools. Our IICRC-approved courses are better.'],
+  ['IICRC Accredited: bare claim beside the CEC form', 'CARSI is IICRC Accredited and offers IICRC CEC Accredited training.'],
+  ['CEC-accredited training: claim beside a denial', 'This is CEC-accredited training. The other one is not CEC accredited.'],
+];
+const SPAN_MUST_PASS = [
+  ['approved provider wording (GP-704)', 'CARSI is an IICRC Approved CEC Provider.'],
+  ['approved provider wording, hyphenated', 'CARSI is an IICRC-approved CEC provider for restoration teams.'],
+  ['approved CE provider', 'CARSI is an IICRC-approved CE provider.'],
+  ['third-person schools and exams', 'IICRC certification comes only from IICRC-approved schools and IICRC-approved examinations.'],
+  ['board approval process', 'Each class goes through the IICRC board approval process.'],
+  ['negated CEC-accredited denial', 'It is not CEC accredited training.'],
+  ['sanctioned CEC Accredited training', 'CARSI provides IICRC CEC Accredited training for aged care teams.'],
+];
+for (const [name, line] of SPAN_MUST_BLOCK) {
+  if (evaluateContent(NON_APPROVED, line, EMPTY).length === 0) fail(`GP-584 span: MUST BLOCK but passed: ${name}\n    ${line}`);
+}
+for (const [name, line] of SPAN_MUST_PASS) {
+  const f = evaluateContent(NON_APPROVED, line, EMPTY);
+  if (f.length > 0) fail(`GP-584 span: MUST PASS but blocked: ${name}\n    ${line}\n    ${f.join('\n    ')}`);
 }
 
 if (failed > 0) {

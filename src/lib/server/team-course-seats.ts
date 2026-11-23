@@ -5,6 +5,7 @@ import {
   insertTeamCoursePurchase,
 } from '@/lib/server/team-course-purchase-db';
 import { readTeamCourseSlug } from '@/lib/server/team-course-slug-db';
+import { teamPaidSeatHolders } from '@/lib/server/team-seat-refund';
 
 export type TeamCoursePurchaseRow = {
   id: string;
@@ -16,12 +17,26 @@ export type TeamCoursePurchaseRow = {
   purchased_at: string;
 };
 
-/** Team members with an active enrolment in this course (includes owner). */
+/**
+ * Seats in use in this course. Teams with seat blocks count only seats the team paid for
+ * (GP-759, Phill's ruling 22/11/2026, one owner: `teamPaidSeatHolders`), so refunded seats and
+ * members paid for elsewhere do not use up the team's paid seats. Older teams without seat blocks
+ * keep the previous count (members' non-cancelled enrolments, owner included).
+ */
 export async function countSeatsUsedForTeamCourse(
   teamId: string,
   courseSlug: string,
 ): Promise<number> {
   const slug = courseSlug.trim().toLowerCase();
+  const blocks = (await findTeamCoursePurchasesByTeamId(teamId)).filter(
+    (p) => p.courseSlug.trim().toLowerCase() === slug,
+  );
+  if (blocks.length > 0) {
+    const course = await prisma.lmsCourse.findUnique({ where: { slug }, select: { id: true } });
+    if (!course) return 0;
+    return (await teamPaidSeatHolders(prisma, teamId, course.id, slug)).length;
+  }
+
   const members = await prisma.lmsTeamMember.findMany({
     where: { teamId },
     select: { userId: true },

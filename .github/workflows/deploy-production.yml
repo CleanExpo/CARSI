@@ -5,7 +5,13 @@ name: Deploy Production
 # DigitalOcean auto-deploy (deploy_on_push in app.yaml and the live app spec) is OFF, so
 # this workflow is the only automatic path to production. After the CI workflow finishes
 # on a push to main it:
-#   1. deploys only if that commit is still the head of main (a newer commit gets its own run),
+#   1. deploys only if that commit is still the head of main. If main has moved on, nothing is
+#      deployed and the run FAILS with a "NOT DEPLOYED" summary (GP-779, 23/11/2026: eight runs in
+#      a row refused this way and each reported success, so live sat on an old commit while the
+#      runs looked green). The newer commit deploys when its own CI run completes; while merges
+#      land faster than CI takes (about 25 minutes), every run refuses and live stays where it is,
+#      and the red runs show that plainly. DigitalOcean always builds the head of main, so an
+#      older commit can never be put live over a newer one.
 #   2. deploys only if main's own push CI run for that exact commit succeeded and every
 #      required check in that run passed (PR or branch runs on the same SHA do not count),
 #   3. asks DigitalOcean to build main and watches the deployment: if DigitalOcean resolved
@@ -38,6 +44,11 @@ name: Deploy Production
 # scripts/ci/production-deploy-gate.mjs (deploymentDecision) and are unit-tested.
 # The deployment JSON from doctl carries the app spec, which holds env values; only single
 # fields are extracted from it here and it is never printed.
+
+# The run's own head is always the head of main (workflow_run runs on the default branch), so the
+# title names the commit whose CI finished: that is the commit this run decides about.
+run-name: >-
+  Deploy Production for ${{ github.event.workflow_run.head_sha || 'main (manual)' }}
 
 on:
   workflow_run:
@@ -102,13 +113,28 @@ jobs:
           set -euo pipefail
           main_sha=$(gh api "repos/${GITHUB_REPOSITORY}/commits/main" --jq .sha)
           sha="${RUN_SHA:-$main_sha}"
+          echo "main_sha=$main_sha" >> "$GITHUB_OUTPUT"
+          echo "run_sha=$sha" >> "$GITHUB_OUTPUT"
           if [ "$sha" != "$main_sha" ]; then
-            echo "::notice::$sha is no longer the head of main ($main_sha); that commit's own CI run will deploy it."
             echo "deploy=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
           echo "deploy=true" >> "$GITHUB_OUTPUT"
+
+      # A refusal is not a pass (GP-779): the run fails with one plain summary line, so a list of
+      # runs can never show green while nothing was deployed. Last check of the job, so it also
+      # catches a refusal added to any step above that sets deploy=false.
+      - name: Not deployed - the gate refused
+        if: steps.target.outputs.deploy != 'true'
+        env:
+          RUN_SHA: ${{ steps.target.outputs.run_sha }}
+          MAIN_SHA: ${{ steps.target.outputs.main_sha }}
+        run: |
+          msg="NOT DEPLOYED: CI finished for ${RUN_SHA:-unknown}, but main is now ${MAIN_SHA:-unknown}. Nothing was sent to DigitalOcean; live is unchanged. ${MAIN_SHA:-the newer commit} deploys when its own CI run completes."
+          echo "### $msg" >> "$GITHUB_STEP_SUMMARY"
+          echo "::error::$msg"
+          exit 1
 
       - name: Require every required check to have passed
         if: steps.target.outputs.deploy == 'true'
@@ -129,8 +155,18 @@ jobs:
           SHA: ${{ steps.target.outputs.sha }}
           FORCE: ${{ inputs.force == true }}
           DO_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          # Main may have moved while the checks were read; DigitalOcean would build the newer,
+          # unchecked head. Refuse before asking for a build.
+          main_now=$(gh api "repos/${GITHUB_REPOSITORY}/commits/main" --jq .sha)
+          if [ "$main_now" != "$SHA" ]; then
+            msg="NOT DEPLOYED: main moved to $main_now after $SHA was checked. Nothing was sent to DigitalOcean; $main_now deploys when its own CI run completes."
+            echo "### $msg" >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::$msg"
+            exit 1
+          fi
           app=$(doctl apps get "$DO_APP_ID" -o json)
           live=$(jq -r '.[0].active_deployment.services[0].source_commit_hash // ""' <<<"$app")
           # Recorded for the live smoke's rollback instructions: what was live before this run.
@@ -138,6 +174,7 @@ jobs:
           echo "previous_deployment=$(jq -r '.[0].active_deployment.id // ""' <<<"$app")" >> "$GITHUB_OUTPUT"
           if [ "$live" = "$SHA" ] && [ "$FORCE" != "true" ]; then
             echo "::notice::$SHA is already live; nothing to deploy."
+            echo "### ALREADY LIVE: $SHA was live before this run; no new deployment was made." >> "$GITHUB_STEP_SUMMARY"
           else
             dep=$(doctl apps create-deployment "$DO_APP_ID" --format ID --no-header)
             echo "deployment $dep created"
@@ -171,6 +208,7 @@ jobs:
             done
           fi
           node scripts/ci/production-deploy-gate.mjs wait-health "$SHA" 600
+          echo "### LIVE: https://carsi.com.au/api/health reports $SHA." >> "$GITHUB_STEP_SUMMARY"
 
   live-smoke:
     name: Live smoke (Playwright, read-only)
@@ -187,7 +225,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '22'
           cache: 'npm'
@@ -220,7 +258,7 @@ jobs:
         id: upload
         if: always()
         continue-on-error: true
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: live-smoke-${{ needs.deploy.outputs.sha }}
           path: test-results/live-smoke/

@@ -148,11 +148,36 @@ describe('a learner with no membership', () => {
     expect(params.metadata.plan).toBe('pro_annual');
     // AC-4 / AC-8: bound to the authenticated learner, never a supplied email.
     expect(params.metadata.carsi_user_id).toBe('user-1');
-    // Public checkout: promotion codes ARE allowed here. The attendee branch
-    // had to omit this because Stripe rejects a session carrying both it and
-    // `discounts`; with that branch gone, the ordinary behaviour stands.
-    expect(params.allow_promotion_codes).toBe(true);
+    // GP-773: no promotion codes on a membership (founder ruling, 22/11/2026:
+    // "no further discounts").
+    expect(params).not.toHaveProperty('allow_promotion_codes');
   });
+});
+
+describe('the visitor analytics choice (GP-732)', () => {
+  it('records a yes on the session and on the subscription the webhook reads later', async () => {
+    const res = await POST(request({ analytics_consent: 'granted' }));
+
+    expect(res.status).toBe(200);
+    const params = mocks.sessionsCreate.mock.calls[0][0];
+    expect(params.metadata.analytics_consent).toBe('granted');
+    expect(params.subscription_data.metadata.analytics_consent).toBe('granted');
+    expect(params.subscription_data.metadata.analytics_consent_version).toBe(
+      params.metadata.analytics_consent_version
+    );
+  });
+
+  it.each([['denied'], ['unset'], [undefined], [true]])(
+    'records a no for analytics_consent=%s',
+    async (sent) => {
+      const res = await POST(request(sent === undefined ? {} : { analytics_consent: sent }));
+
+      expect(res.status).toBe(200);
+      const params = mocks.sessionsCreate.mock.calls[0][0];
+      expect(params.metadata.analytics_consent).toBe('denied');
+      expect(params.subscription_data.metadata.analytics_consent).toBe('denied');
+    }
+  );
 });
 
 describe('the removed CCW attendee discount stays removed', () => {

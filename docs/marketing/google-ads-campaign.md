@@ -174,7 +174,7 @@ Apply across all campaigns to prevent wasted spend:
 **Variation A — Authority**
 | Element | Copy |
 |---------|------|
-| Headline 1 | IICRC CEC Accredited Restoration Courses |
+| Headline 1 | IICRC Approved CEC Provider |
 | Headline 2 | Online Training — Study at Your Pace |
 | Headline 3 | Earn CECs From Anywhere in Australia |
 | Headline 4 | water damage restoration, structural drying and mould remediation Certifications |
@@ -197,11 +197,11 @@ Apply across all campaigns to prevent wasted spend:
 | Element | Copy |
 |---------|------|
 | Headline 1 | Restoration Training Bundles from $295 |
-| Headline 2 | IICRC CEC Accredited — Earn Real CECs |
+| Headline 2 | IICRC Approved CEC Provider |
 | Headline 3 | 40+ Courses Available Online |
 | Headline 4 | Subscription Access — $795/Year |
 | Headline 5 | Upskill Without Leaving the Job Site |
-| Description 1 | Access our IICRC CEC Accredited catalogue — 80 courses with a CARSI subscription. Water damage, mould, fire restoration and more. $795 AUD/year. |
+| Description 1 | Training from an IICRC Approved CEC Provider — 80 courses with a CARSI subscription. Water damage, mould, fire restoration and more. $795 AUD/year. |
 | Description 2 | Save with course bundles or go all-in with annual subscription. Public credential URL included for contractor pre-qualification. |
 
 ### Campaign 2: Mining
@@ -214,8 +214,8 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 3 | IICRC Certifications for Mining Sites |
 | Headline 4 | FIFO-Friendly — Study Between Shifts |
 | Headline 5 | Reduce Mould Liability on Site |
-| Description 1 | Mould in FIFO accommodation is a costly liability. Train your team in IICRC CEC Accredited mould assessment and remediation — fully online, no roster disruption. |
-| Description 2 | WHS compliance training designed for mining professionals. Earn verifiable IICRC credentials your HSE team can audit. Digital certificates with public verification URL. |
+| Description 1 | Mould in FIFO accommodation is a costly liability. Train your team in mould assessment and remediation with an IICRC Approved CEC Provider — fully online, no roster disruption. |
+| Description 2 | WHS compliance training designed for mining professionals. Earn verifiable CARSI credentials your HSE team can audit. Digital certificates with public verification URL. |
 
 **Variation B — ROI**
 | Element | Copy |
@@ -225,7 +225,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 3 | Online IICRC CEC Courses for Mining Teams |
 | Headline 4 | Group Licensing Available |
 | Headline 5 | Trusted by WA & QLD Mining Sites |
-| Description 1 | One mould incident at a FIFO camp can cost $500K+. Train supervisors in IICRC CEC Accredited mould assessment for a fraction of the cost. Group rates available. |
+| Description 1 | One mould incident at a FIFO camp can cost $500K+. Train supervisors in mould assessment with an IICRC Approved CEC Provider for a fraction of the cost. Group rates available. |
 | Description 2 | Upskill your mining crew in water damage, mould and structural drying. Self-paced courses designed for shift workers. Bulk enrolment discounts for 10+ seats. |
 
 **Variation C — Speed**
@@ -236,7 +236,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 3 | No Classroom — No Roster Disruption |
 | Headline 4 | Certificate on Completion |
 | Headline 5 | WHS Mould & Water Damage Courses |
-| Description 1 | Enrol your team in minutes. IICRC CEC Accredited courses in mould assessment, water damage response and structural drying. Ideal for FIFO rosters — 100% online. |
+| Description 1 | Enrol your team in minutes. Courses from an IICRC Approved CEC Provider in mould assessment, water damage response and structural drying. Ideal for FIFO rosters — 100% online. |
 | Description 2 | Mining safety training that fits around shift work. Complete modules on any device, earn your certificate, and verify credentials via public URL. Start now. |
 
 ### Campaign 3: Aged Care
@@ -246,10 +246,10 @@ Apply across all campaigns to prevent wasted spend:
 |---------|------|
 | Headline 1 | Aged Care Mould Training — Online |
 | Headline 2 | Infection Control Certification |
-| Headline 3 | IICRC CEC Accredited for Facility Managers |
+| Headline 3 | IICRC Approved CEC Provider |
 | Headline 4 | Protect Residents & Staff |
 | Headline 5 | Comply with Aged Care Standards |
-| Description 1 | Mould and water damage in aged care facilities put vulnerable residents at risk. Train your team in IICRC CEC Accredited remediation — fully online, self-paced. |
+| Description 1 | Mould and water damage in aged care facilities put vulnerable residents at risk. Train your team in remediation with an IICRC Approved CEC Provider — fully online, self-paced. |
 | Description 2 | Meet facility compliance requirements with certified mould and infection control training. Digital certificates included. Group licensing for multi-site operators. |
 
 **Variation B — Risk**
@@ -261,7 +261,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 4 | Verifiable Digital Certificates |
 | Headline 5 | Group Rates for Multi-Site Operators |
 | Description 1 | Aged care quality standards require proactive mould management. Ensure your team holds IICRC-recognised credentials. Enrol online — no disruption to care rosters. |
-| Description 2 | From facility managers to maintenance staff — everyone handling mould should be trained. CARSI offers IICRC CEC Accredited courses tailored to aged care environments. |
+| Description 2 | From facility managers to maintenance staff — everyone handling mould should be trained. CARSI, an IICRC Approved CEC Provider, offers courses tailored to aged care environments. |
 
 **Variation C — Value**
 | Element | Copy |
@@ -271,33 +271,33 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 3 | Unlimited Access — $795/Year |
 | Headline 4 | Train Your Whole Team Online |
 | Headline 5 | Australian-Owned Training Platform |
-| Description 1 | Affordable IICRC CEC Accredited training for aged care teams. Individual courses from $79 or unlimited annual access at $795. Bulk discounts for 10+ staff. |
-| Description 2 | Australian-owned, IICRC CEC Accredited training designed for aged care. Mould assessment, remediation, indoor air quality. Start your team today — instant access. |
+| Description 1 | Affordable training for aged care teams from an IICRC Approved CEC Provider. Individual courses from $79 or unlimited annual access at $795. Bulk discounts for 10+ staff. |
+| Description 2 | Australian-owned IICRC Approved CEC Provider, with training designed for aged care. Mould assessment, remediation, indoor air quality. Start your team today — instant access. |
 
 ### Campaign 4: Healthcare
 
 **Variation A**
 | Element | Copy |
 |---------|------|
-| Headline 1 | Hospital Mould Training — IICRC CEC Accredited |
+| Headline 1 | Hospital Mould Training Online |
 | Headline 2 | Healthcare Remediation Courses Online |
 | Headline 3 | Protect Patients & Meet Compliance |
 | Headline 4 | Digital Certificates Included |
 | Headline 5 | Self-Paced — No Roster Disruption |
-| Description 1 | Healthcare facilities face strict indoor air quality standards. Train your maintenance team in IICRC CEC Accredited mould remediation and water damage response. 100% online. |
-| Description 2 | From hospitals to medical centres — mould is a patient safety issue. Earn IICRC credentials your compliance team can verify. Group enrolment rates available. |
+| Description 1 | Healthcare facilities face strict indoor air quality standards. Train your maintenance team in mould remediation and water damage response with an IICRC Approved CEC Provider. 100% online. |
+| Description 2 | From hospitals to medical centres — mould is a patient safety issue. Earn verifiable CARSI credentials your compliance team can check. Group enrolment rates available. |
 
 ### Campaign 5: Commercial Cleaning
 
 **Variation A**
 | Element | Copy |
 |---------|------|
-| Headline 1 | IICRC CEC Accredited Cleaning Courses |
+| Headline 1 | Cleaning Courses Online |
 | Headline 2 | Upskill Your Cleaning Business |
 | Headline 3 | carpet cleaning and water damage restoration & Mould Courses Available |
 | Headline 4 | Win More Contracts with CARSI Creds |
 | Headline 5 | Australian-Owned Training Platform |
-| Description 1 | Stand out from competitors with verifiable CARSI credentials. Carpet cleaning, mould remediation, water damage — all available online from an IICRC CEC Accredited provider. Build recognised skills and grow your business. |
+| Description 1 | Stand out from competitors with verifiable CARSI credentials. Carpet cleaning, mould remediation, water damage — all available online from an IICRC Approved CEC Provider. Build recognised skills and grow your business. |
 | Description 2 | Cleaning franchise owners and operators — add CARSI credentials to your business. Online courses and verifiable certificates that prove your expertise. |
 
 ### Campaign 6: Construction
@@ -310,8 +310,8 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 3 | Structural Drying Certification |
 | Headline 4 | Protect Your Builds from Mould |
 | Headline 5 | Digital Certificate on Completion |
-| Description 1 | Water ingress and mould during construction cause costly delays. Train your site team in IICRC CEC Accredited structural drying and mould prevention. Fully online. |
-| Description 2 | Builders and project managers — reduce defect liability with IICRC credentials. Self-paced courses in water damage, mould assessment and restoration. Start today. |
+| Description 1 | Water ingress and mould during construction cause costly delays. Train your site team in structural drying and mould prevention with an IICRC Approved CEC Provider. Fully online. |
+| Description 2 | Builders and project managers — reduce defect liability with verifiable CARSI credentials. Self-paced courses in water damage, mould assessment and restoration. Start today. |
 
 ---
 
@@ -357,8 +357,8 @@ Each landing page must include:
 - **No IICRC logo.** CLAUDE.md § "IICRC standards IP + AI use": logo rights attach to Certified
   Firms and Registrants under signed agreements, the IICRC publicly enforces violations, and CARSI
   holds no such agreement. The wordmark is nominative-use only. Use the text
-  "IICRC CEC Accredited provider" instead of a mark, and no approval badge — CARSI is an
-  accredited provider, and no course displays approved CEC hours until the IICRC approves that
+  "IICRC Approved CEC Provider" instead of a mark, and no approval badge — CARSI is an
+  IICRC Approved CEC Provider, and no course displays approved CEC hours until the IICRC approves that
   course
 - Relevant course cards for that vertical
 - Social proof (enrolment count, testimonials)

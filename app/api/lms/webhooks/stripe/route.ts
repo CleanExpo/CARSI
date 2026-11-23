@@ -26,10 +26,12 @@ import {
   persistAttributedRevenueReversal,
   recordAttributedStage,
 } from '@/lib/server/event-attribution';
+import { hasAnalyticsConsent } from '@/lib/server/analytics-consent';
 import { sendGa4PurchaseEvent } from '@/lib/server/ga4-measurement-protocol';
 import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { markOrgSubscriptionStatusBySubscriptionId } from '@/lib/server/org-subscription-store';
+import { recordPartnerReferralSale } from '@/lib/server/partner-referral-sales';
 import { captureServerError } from '@/lib/server/sentry';
 import { resolveStripePaymentReference } from '@/lib/server/stripe-payment-reference';
 import {
@@ -54,6 +56,7 @@ import {
 import { markSubscriptionStatusBySubscriptionId } from '@/lib/server/subscription-store';
 import { handleSubscriptionEvent, isSubscriptionEvent } from '@/lib/server/subscription-webhook';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
+import { revokeTeamSeatBlocksForRefund } from '@/lib/server/team-seat-refund';
 import { markTeamSubscriptionStatusBySubscriptionId } from '@/lib/server/team-subscription-store';
 
 /**
@@ -193,6 +196,10 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
     }
     if (revokeEntitlement) {
       await revokeEnrollmentsByPaymentReference(ref, reason, eventTimestamp);
+    }
+    // GP-759 (c): a refunded team seat checkout also takes its seats back.
+    if (revokeEntitlement && reason === 'refunded') {
+      await revokeTeamSeatBlocksForRefund(ref, eventTimestamp);
     }
   }
 }
@@ -424,6 +431,15 @@ export async function POST(request: NextRequest) {
       return await acknowledge();
     }
 
+    // GP-767: a paid sale through a partner link (?ref=ccw) is stored for settlement from the
+    // verified session, before learner resolution and fulfilment. An unresolved learner cannot
+    // drop it, and a failed write returns 500 before any enrolment side effect has run, so
+    // Stripe's retry repeats the whole event. Idempotent upsert on the checkout session id.
+    const partnerSaleRef = resolveStripePaymentReference(session.id);
+    if (partnerSaleRef) {
+      await recordPartnerReferralSale(session, partnerSaleRef, slug, new Date(event.created * 1000));
+    }
+
     const studentIdMeta = session.metadata?.student_id?.trim();
     const email =
       (session.customer_email ?? session.customer_details?.email)?.trim().toLowerCase() ?? '';
@@ -484,6 +500,10 @@ export async function POST(request: NextRequest) {
           studentId: claims.sub,
           courseSlug: slug,
           appOrigin: origin,
+          payment: {
+            amountTotalCents: session.amount_total,
+            seatCount: purchaseMode === 'team' ? teamSeatCount : undefined,
+          },
         }).catch((e) => console.error('[stripe webhook] email', e));
         notifyCrmEnrollmentCreated({
           enrollmentId: fulfilled.enrollmentId,
@@ -493,10 +513,12 @@ export async function POST(request: NextRequest) {
 
         // WS3 / GP-447: server-side `purchase` event (GA4 Measurement Protocol).
         // Never blocks fulfilment — the utility itself no-ops/swallows errors.
+        // GP-732: sent only when the session records the visitor's yes to
+        // analytics at checkout; never with the learner's account id.
         const valueAud = typeof session.amount_total === 'number' ? session.amount_total / 100 : 0;
         void sendGa4PurchaseEvent({
           clientId: ref,
-          userId: claims.sub,
+          analyticsConsent: hasAnalyticsConsent(session.metadata),
           courseSlug: slug,
           valueAud,
           transactionId: ref,

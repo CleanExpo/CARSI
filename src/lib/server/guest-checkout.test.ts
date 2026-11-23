@@ -76,6 +76,26 @@ vi.mock('@/lib/prisma', () => ({
         return data;
       }),
     },
+    // GP-760: sessionClaimsForUserId reads the user and role names in one statement
+    // (readLmsUserNow); the first bound value is the user id.
+    $queryRaw: vi.fn(async (_s: TemplateStringsArray, userId: string) => {
+      const user = db.users.find((u) => u.id === userId);
+      if (!user) return [];
+      return [
+        {
+          id: user.id,
+          email: user.email,
+          full_name: user.fullName,
+          is_active: user.isActive,
+          role: user.role,
+          session_generation: 0,
+          role_names: db.userRoles
+            .filter((ur) => ur.userId === user.id)
+            .map((ur) => db.roles.find((r) => r.id === ur.roleId)?.name)
+            .filter(Boolean),
+        },
+      ];
+    }),
   },
 }));
 

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
-import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { courseHasPrerequisites, parseCoursePrerequisites } from '@/lib/lms/course-prerequisites';
 import { prisma } from '@/lib/prisma';
 import { findCoursePrerequisiteBlock } from '@/lib/server/course-prerequisites';
 import { isEnrolmentAccessAllowed } from '@/lib/server/enrollment-access';
+import { verifyActiveSession } from '@/lib/server/user-active-cache';
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -36,7 +36,9 @@ export async function GET(request: NextRequest, context: Params) {
   }
 
   const token = request.cookies.get('auth_token')?.value;
-  const claims = token ? await verifySessionToken(token) : null;
+  // GP-760: the session reader that re-checks the database role, so a demoted admin's token no
+  // longer reports the admin exemption.
+  const claims = token ? await verifyActiveSession(token) : null;
   if (!claims?.sub) {
     return NextResponse.json({ has_prerequisites: true, locked: true, signed_in: false, prerequisites: [] });
   }

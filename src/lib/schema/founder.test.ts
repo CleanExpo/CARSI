@@ -39,6 +39,14 @@ describe('buildFounderPersonSchema', () => {
     }
   });
 
+  it('never claims the founder or CARSI is IICRC-certified (no proof; founder rule 25/10/2026)', () => {
+    // Walks every string in the published node, so a claim cannot return through any field.
+    expect(JSON.stringify(schema)).not.toMatch(/certified/i);
+    expect(schema.description).toBe(
+      'Restoration practitioner, Lead Instructor and founder of CARSI.'
+    );
+  });
+
   it('declares topical authority via knowsAbout', () => {
     expect(Array.isArray(schema.knowsAbout)).toBe(true);
     expect((schema.knowsAbout as string[]).join(' ').toLowerCase()).toContain('iicrc');

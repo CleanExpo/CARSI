@@ -1,4 +1,6 @@
-import { readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
@@ -203,6 +205,155 @@ describe('deploy-production workflow', () => {
       (j) => (j as { name?: string }).name,
     );
     for (const name of REQUIRED_CHECKS) expect(ciNames).toContain(name);
+  });
+});
+
+// GP-779 (23/11/2026): eight Deploy Production runs in a row found main had moved on, deployed
+// nothing, and still concluded success, so live sat on an old commit behind a list of green runs.
+// These tests RUN the deploy job's shell steps (stub `gh`, real bash) the way GitHub would on the
+// refusal path, and require the job to fail with a plain summary line. DEPLOY_WORKFLOW_PATH points
+// them at another copy of the workflow (the Done negative control runs them against the old one).
+describe('deploy job when the gate refuses', () => {
+  type Step = { id?: string; name?: string; if?: string; run?: string; uses?: string; env?: Record<string, string> };
+  const wfPath = process.env.DEPLOY_WORKFLOW_PATH ?? join(root, '.github/workflows/deploy-production.yml');
+  const wf = parse(readFileSync(wfPath, 'utf8'));
+  const steps: Step[] = wf.jobs.deploy.steps;
+
+  /** Run the deploy job's shell steps on GitHub's rules until a step fails or one needs the network. */
+  function simulate(runSha: string, mainSha: string) {
+    const dir = mkdtempSync(join(tmpdir(), 'deploy-gate-'));
+    const bin = join(dir, 'bin');
+    mkdirSync(bin);
+    writeFileSync(join(bin, 'gh'), `#!/bin/sh\necho ${mainSha}\n`, { mode: 0o755 });
+    const summary = join(dir, 'summary.md');
+    writeFileSync(summary, '');
+    const outputs: Record<string, Record<string, string>> = {};
+    const expr = (value: string) =>
+      value.replace(/\$\{\{\s*([^}]+?)\s*\}\}/g, (_, e: string) => {
+        if (e === 'github.event.workflow_run.head_sha') return runSha;
+        const m = /^steps\.(\w+)\.outputs\.(\w+)$/.exec(e);
+        return m ? (outputs[m[1]]?.[m[2]] ?? '') : '';
+      });
+    const ran: string[] = [];
+    for (const step of steps) {
+      if (step.uses) continue;
+      if (step.if) {
+        const m = /^steps\.(\w+)\.outputs\.(\w+) (==|!=) '([^']*)'$/.exec(step.if.trim());
+        if (!m) throw new Error(`unhandled if: ${step.if}`);
+        const actual = outputs[m[1]]?.[m[2]] ?? '';
+        if ((actual === m[4]) !== (m[3] === '==')) continue;
+        // A step on the deploy path needs GitHub, Node and DigitalOcean; the simulation stops here.
+        if (m[3] === '==' && m[4] === 'true') return { conclusion: 'reached-deploy', outputs, ran, summary: readFileSync(summary, 'utf8') };
+      }
+      const out = join(dir, `out-${ran.length}`);
+      writeFileSync(out, '');
+      const env: Record<string, string> = {
+        PATH: `${bin}:/usr/bin:/bin`,
+        GITHUB_OUTPUT: out,
+        GITHUB_STEP_SUMMARY: summary,
+        GITHUB_REPOSITORY: 'CleanExpo/CARSI',
+      };
+      for (const [k, v] of Object.entries(step.env ?? {})) env[k] = expr(String(v));
+      const result = spawnSync('bash', ['-e', '-c', expr(step.run ?? '')], { env, encoding: 'utf8' });
+      ran.push(step.name ?? step.id ?? '?');
+      if (step.id) {
+        outputs[step.id] = Object.fromEntries(
+          readFileSync(out, 'utf8')
+            .split('\n')
+            .filter((l) => l.includes('='))
+            .map((l) => [l.slice(0, l.indexOf('=')), l.slice(l.indexOf('=') + 1)]),
+        );
+      }
+      if (result.status !== 0) {
+        return { conclusion: 'failure', outputs, ran, summary: readFileSync(summary, 'utf8'), stdout: result.stdout };
+      }
+    }
+    return { conclusion: 'success', outputs, ran, summary: readFileSync(summary, 'utf8') };
+  }
+
+  const OLD = '6b9bf861a7f1b111b1e71df7ae796c16a3365036';
+  const HEAD = 'beb272505d9aa2e6f65ff340c014376508a87dee';
+
+  it('a refused deploy never concludes success', () => {
+    const job = simulate(OLD, HEAD);
+    expect(job.outputs.target?.deploy).toBe('false');
+    expect(job.conclusion).toBe('failure');
+  });
+
+  it('says plainly in the run summary that nothing was deployed, naming both commits', () => {
+    const job = simulate(OLD, HEAD);
+    expect(job.summary).toContain('NOT DEPLOYED');
+    expect(job.summary).toContain(OLD);
+    expect(job.summary).toContain(HEAD);
+    expect(job.stdout).toContain('::error::NOT DEPLOYED');
+  });
+
+  it('goes on to the checks and the deploy when the commit is still the head of main (refusal step skipped)', () => {
+    const job = simulate(HEAD, HEAD);
+    expect(job.conclusion).toBe('reached-deploy');
+    expect(job.outputs.target).toMatchObject({ deploy: 'true', sha: HEAD });
+    expect(job.summary).not.toContain('NOT DEPLOYED');
+  });
+
+  /**
+   * RUN the release step with stubs: `gh` answers the head of main, `doctl` records every call and
+   * reports `live` as already live (so a passing path makes no deployment), `node` (the health
+   * wait) succeeds. Nothing reaches GitHub or DigitalOcean.
+   */
+  function runRelease(sha: string, mainNow: string, live: string) {
+    const release = steps.find((s) => s.id === 'release');
+    expect(release?.run, 'the deploy job has a release step').toBeTruthy();
+    const dir = mkdtempSync(join(tmpdir(), 'deploy-release-'));
+    const bin = join(dir, 'bin');
+    mkdirSync(bin);
+    const calls = join(dir, 'doctl-calls');
+    writeFileSync(calls, '');
+    writeFileSync(join(bin, 'gh'), `#!/bin/sh\necho ${mainNow}\n`, { mode: 0o755 });
+    writeFileSync(
+      join(bin, 'doctl'),
+      `#!/bin/sh\necho "$*" >> '${calls}'\n` +
+        `case "$*" in "apps get "*) echo '[{"active_deployment":{"id":"dep-1","services":[{"source_commit_hash":"${live}"}]}}]' ;; *) echo dep-2 ;; esac\n`,
+      { mode: 0o755 },
+    );
+    writeFileSync(join(bin, 'node'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+    const summary = join(dir, 'summary.md');
+    const output = join(dir, 'output');
+    writeFileSync(summary, '');
+    writeFileSync(output, '');
+    const result = spawnSync('bash', ['-e', '-c', release!.run!], {
+      encoding: 'utf8',
+      env: {
+        PATH: `${bin}:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin`,
+        SHA: sha,
+        FORCE: 'false',
+        DO_TOKEN: 'not-a-token',
+        GH_TOKEN: 'not-a-token',
+        DO_APP_ID: 'app-under-test',
+        GITHUB_REPOSITORY: 'CleanExpo/CARSI',
+        GITHUB_OUTPUT: output,
+        GITHUB_STEP_SUMMARY: summary,
+      },
+    });
+    return { status: result.status, summary: readFileSync(summary, 'utf8'), doctl: readFileSync(calls, 'utf8') };
+  }
+
+  it('refuses before any DigitalOcean call when main moved after the checks (refusal reaches no build)', () => {
+    const run = runRelease(OLD, HEAD, OLD);
+    expect(run.status).not.toBe(0);
+    expect(run.summary).toContain(`NOT DEPLOYED: main moved to ${HEAD}`);
+    expect(run.doctl).toBe('');
+  });
+
+  it('carries on to DigitalOcean when main is still the checked commit', () => {
+    const run = runRelease(HEAD, HEAD, HEAD);
+    expect(run.status).toBe(0);
+    expect(run.summary).not.toContain('NOT DEPLOYED');
+    expect(run.doctl).toContain('apps get');
+    expect(run.doctl).not.toContain('create-deployment');
+  });
+
+  it('names the commit whose CI finished in the run title, not the head of main (refused runs were misread)', () => {
+    expect(String(wf['run-name'])).toContain('github.event.workflow_run.head_sha');
   });
 });
 

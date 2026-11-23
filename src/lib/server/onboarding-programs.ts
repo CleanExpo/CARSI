@@ -32,7 +32,7 @@ function onboardingWhere() {
 
 /**
  * Individual learners never see the organisation programmes: a learner with no team and no
- * enrolment gets nothing, which keeps the organisation spotlight (AUD 1,295 per month,
+ * enrolment gets nothing, which keeps the organisation spotlight (the business owner plan,
  * unlimited learners) off every surface that lists programmes (GP-546). A team member sees
  * every programme; anyone sees the programmes they are enrolled in.
  */

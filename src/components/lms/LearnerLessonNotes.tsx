@@ -91,6 +91,7 @@ export function LearnerLessonNotes({
           </div>
           <textarea
             ref={noteEditorRef}
+            aria-labelledby="lesson-notes-heading"
             value={noteText}
             onChange={(e) => onNoteChange(e.target.value)}
             rows={6}

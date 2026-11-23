@@ -109,7 +109,9 @@ describe('RegisterForm — resume membership checkout after registering', () => 
       finishRegistration();
       await new Promise((resolve) => setTimeout(resolve, 300));
     });
-    expect(mocks.post).toHaveBeenCalledWith('/api/lms/subscription/checkout', {});
+    expect(mocks.post).toHaveBeenCalledWith('/api/lms/subscription/checkout', {
+      analytics_consent: 'unset',
+    });
     expect(nav.href).toBe('https://checkout.stripe.test/cs_member');
   });
 
@@ -125,14 +127,18 @@ describe('RegisterForm — resume membership checkout after registering', () => 
     );
     // Checkout is opened only after registration has set the new session.
     expect(mocks.calls).toEqual(['register', 'post /api/lms/subscription/checkout']);
-    expect(mocks.post).toHaveBeenCalledWith('/api/lms/subscription/checkout', {});
+    expect(mocks.post).toHaveBeenCalledWith('/api/lms/subscription/checkout', {
+      analytics_consent: 'unset',
+    });
     expect(nav.href).toBe('https://checkout.stripe.test/cs_member');
   });
 
   it('falls back to /subscribe when the checkout call fails', async () => {
     mocks.post.mockRejectedValue(new Error('checkout unavailable'));
     await registerFromSubscribe();
-    expect(mocks.post).toHaveBeenCalledWith('/api/lms/subscription/checkout', {});
+    expect(mocks.post).toHaveBeenCalledWith('/api/lms/subscription/checkout', {
+      analytics_consent: 'unset',
+    });
     expect(nav.href).toBe('/subscribe');
   });
 

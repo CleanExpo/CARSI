@@ -72,7 +72,7 @@ independent of this letter. Whichever is right, they cannot both be. The live pa
 courses, and offered co-branded certificates on the same footing. Both assert course-level CEC
 approval.
 `data/seed/cec-approvals.json` contains `"approvals": []` — no CARSI course has been approved. The
-correct framing is the one the live site uses: CARSI is an IICRC CEC Accredited **provider**, and
+correct framing is the one the live site uses: CARSI is an **IICRC Approved CEC Provider**, and
 per-course approval is applied for course by course.
 
 The letter below is written to that standard.
@@ -107,7 +107,7 @@ technician's record without contacting us and without taking your word for it. F
 work, that is an evidence trail rather than a training certificate in a filing cabinet.
 
 To be straight with you about what CARSI is and is not. CARSI issues its own credentials, the
-CARSI Southern Hemisphere Restoration Designations. We are an IICRC CEC Accredited provider. We do
+CARSI Southern Hemisphere Restoration Designations. We are an IICRC Approved CEC Provider. We do
 not deliver IICRC certification and we do not claim to — that comes from a school and examination
 approved by the IICRC. Per-course CEC approval is applied for course by course, and I would rather tell
 you that now than have you discover it later.

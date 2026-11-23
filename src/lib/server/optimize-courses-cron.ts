@@ -3,9 +3,10 @@ import { resolveAnthropicConfig } from '@/lib/server/anthropic-client';
 import { isEmailConfigured, sendEmail } from '@/lib/server/email';
 import {
   freeCourseNeedsOptimize,
+  draftCourseOptimizationForReview,
   isAiRewriteLocked,
-  optimizeAndApplyCourse,
   OptimizeCourseError,
+  hasPendingOptimizeDraft,
   paidCourseNeedsOptimize,
 } from '@/lib/server/optimize-course-content';
 
@@ -18,13 +19,13 @@ export type OptimizeCronRow = {
   title: string;
   previousModuleCount?: number;
   moduleCount?: number;
-  summary?: string;
+  reviewPath?: string;
   error?: string;
 };
 
 export type OptimizeCronResult = {
   processed: number;
-  updated: number;
+  drafted: number;
   skipped: number;
   failed: number;
   remaining: number;
@@ -54,14 +55,16 @@ export function buildOptimizeCronEmail(result: OptimizeCronResult): {
   const paid = result.scope !== 'free';
   const label = paid ? 'Paid' : 'Free';
   const skippedHint = paid
-    ? 'Skipped (free, already done, or unchanged)'
-    : 'Skipped (paid, already done, or unchanged)';
-  const subject = `${label} course optimisation: ${result.updated} updated, ${result.failed} failed`;
+    ? 'Skipped (free, locked, draft already waiting, already done, or unchanged)'
+    : 'Skipped (paid, locked, draft already waiting, already done, or unchanged)';
+  const subject = `${label} course optimisation: ${result.drafted} drafts to review, ${result.failed} failed`;
   const lines = [
     `${label} course optimisation summary`,
     '',
+    'Live courses were not changed. Each draft waits for an admin to review and apply it by hand.',
+    '',
     `${label} courses processed: ${result.processed}`,
-    `Successfully updated: ${result.updated}`,
+    `Drafts ready for review: ${result.drafted}`,
     `${skippedHint}: ${result.skipped}`,
     `Failed: ${result.failed}`,
     `Still waiting: ${result.remaining}`,
@@ -73,14 +76,15 @@ export function buildOptimizeCronEmail(result: OptimizeCronResult): {
       continue;
     }
     lines.push(
-      `UPDATED ${row.title}: ${row.previousModuleCount ?? '?'} modules -> ${row.moduleCount ?? '?'} modules. ${row.summary ?? ''}`
+      `DRAFT ${row.title}: ${row.previousModuleCount ?? '?'} modules -> ${row.moduleCount ?? '?'} modules in the draft. Review at ${row.reviewPath ?? '?'}`
     );
   }
   const text = lines.join('\n');
   const html = `<p>${label} course optimisation summary</p>
+<p>Live courses were not changed. Each draft waits for an admin to review and apply it by hand.</p>
 <ul>
 <li>${label} courses processed: ${result.processed}</li>
-<li>Successfully updated: ${result.updated}</li>
+<li>Drafts ready for review: ${result.drafted}</li>
 <li>${escapeHtml(skippedHint)}: ${result.skipped}</li>
 <li>Failed: ${result.failed}</li>
 <li>Still waiting: ${result.remaining}</li>
@@ -89,7 +93,7 @@ ${result.results
   .map((row) =>
     row.error
       ? `<p><strong>FAILED</strong> ${escapeHtml(row.title)}: ${escapeHtml(row.error)}</p>`
-      : `<p><strong>UPDATED</strong> ${escapeHtml(row.title)}: ${row.previousModuleCount ?? '?'} modules → ${row.moduleCount ?? '?'} modules. ${escapeHtml(row.summary ?? '')}</p>`
+      : `<p><strong>DRAFT</strong> ${escapeHtml(row.title)}: ${row.previousModuleCount ?? '?'} modules → ${row.moduleCount ?? '?'} modules in the draft. Review at ${escapeHtml(row.reviewPath ?? '?')}</p>`
   )
   .join('\n')}`;
   return { subject, text, html };
@@ -110,7 +114,10 @@ type OptimizeCandidate = {
   meta: unknown;
 };
 
-/** Pure course selection for the cron: scope filter, AI-rewrite lock, needs-optimise, limit. */
+/**
+ * Pure course selection for the cron: scope filter, AI-rewrite lock, no draft already waiting
+ * for review, needs-optimise, limit.
+ */
 export function selectOptimizeBatch<T extends OptimizeCandidate>(
   courses: T[],
   scope: OptimizeCronScope,
@@ -119,6 +126,7 @@ export function selectOptimizeBatch<T extends OptimizeCandidate>(
   const pending = courses
     .filter((c) => (scope === 'free' ? c.isFree : !c.isFree))
     .filter((c) => !isAiRewriteLocked({ slug: c.slug, meta: c.meta }))
+    .filter((c) => !hasPendingOptimizeDraft(c.meta))
     .filter((c) =>
       scope === 'free'
         ? freeCourseNeedsOptimize({ isFree: c.isFree, updatedAt: c.updatedAt, meta: c.meta })
@@ -150,7 +158,7 @@ export async function runOptimizeCoursesCron(opts?: {
       `[cron/optimize-course-content] ${scope} ${index + 1}/${batch.length} ${course.title}`
     );
     try {
-      results.push(await optimizeAndApplyCourse(course.id, { allowFree }));
+      results.push(await draftCourseOptimizationForReview(course.id, { allowFree }));
     } catch (e) {
       results.push({
         courseId: course.id,
@@ -160,11 +168,11 @@ export async function runOptimizeCoursesCron(opts?: {
     }
   }
 
-  const updated = results.filter((r) => !r.error).length;
+  const drafted = results.filter((r) => !r.error).length;
   const failed = results.filter((r) => r.error).length;
   const result: OptimizeCronResult = {
     processed: batch.length,
-    updated,
+    drafted,
     skipped: courses.length - pending.length,
     failed,
     remaining: Math.max(0, pending.length - batch.length),
@@ -202,7 +210,7 @@ export function startOptimizeCoursesCron(opts?: { limit?: number; scope?: Optimi
       console.info('[cron/optimize-course-content] finished', {
         scope: result.scope,
         processed: result.processed,
-        updated: result.updated,
+        drafted: result.drafted,
         failed: result.failed,
         remaining: result.remaining,
       });

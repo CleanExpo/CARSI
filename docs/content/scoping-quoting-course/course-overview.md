@@ -1,6 +1,6 @@
 # Course Overview — Scoping & Quoting for Restoration Professionals
 
-> GP-131 | 8 Modules | 32 Lessons | IICRC CEC Accredited | $349 AUD
+> GP-131 | 8 Modules | 32 Lessons | From an IICRC Approved CEC Provider | $349 AUD
 
 ---
 
@@ -59,7 +59,7 @@ Upon successful completion of this course, students will be able to:
 
 ---
 
-## Accreditation
+## Credential and CECs
 
 This course awards a CARSI Southern Hemisphere Restoration Designation. It carries IICRC CECs only if and when the IICRC approves it. CECs contribute to the maintenance of IICRC certifications including WRT (Water Damage Restoration Technician), ASD (Applied Structural Drying) and related designations.
 

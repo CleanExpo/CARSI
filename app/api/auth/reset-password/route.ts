@@ -5,13 +5,33 @@ import { isSafeInternalPath } from '@/lib/auth/guest-recovery-path';
 import { SESSION_SENTINEL_COOKIE } from '@/lib/auth/session-sentinel';
 import { signSessionToken, verifyPasswordResetToken } from '@/lib/auth/session-jwt';
 import { validateNewPassword } from '@/lib/auth/password-policy';
-import { hashPassword, sessionClaimsForUserId } from '@/lib/server/lms-auth';
-import { prisma } from '@/lib/prisma';
+import { clientIpFrom } from '@/lib/rate-limit';
+import { applyDurableRateLimit, retryAfterSeconds } from '@/lib/server/durable-rate-limit';
+import { consumePasswordReset, hashPassword, sessionClaimsForUserId } from '@/lib/server/lms-auth';
+import { forgetSessionState } from '@/lib/server/user-active-cache';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
+// GP-760: each attempt costs a bcrypt hash and a database write, and the token is the only secret.
+const IP_LIMIT = 10;
+const IP_WINDOW_MS = 15 * 60 * 1000;
+
+const INVALID_LINK = 'Invalid or expired reset link';
+
 export async function POST(request: NextRequest) {
   try {
+    const ip = clientIpFrom(
+      request.headers.get('x-forwarded-for'),
+      request.headers.get('x-real-ip')
+    );
+    const rl = await applyDurableRateLimit(`auth-reset-pw-ip:${ip}`, IP_LIMIT, IP_WINDOW_MS);
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: 'Too many attempts. Please wait and try again.' },
+        { status: 429, headers: { 'Retry-After': retryAfterSeconds(rl.resetAt) } }
+      );
+    }
+
     const body = await request.json();
     const token = typeof body.token === 'string' ? body.token.trim() : '';
     const newPassword = typeof body.new_password === 'string' ? body.new_password : '';
@@ -33,24 +53,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
     }
 
-    const userId = await verifyPasswordResetToken(token);
-    if (!userId) {
-      return NextResponse.json({ error: 'Invalid or expired reset link' }, { status: 400 });
+    const resetToken = await verifyPasswordResetToken(token);
+    if (!resetToken) {
+      return NextResponse.json({ error: INVALID_LINK }, { status: 400 });
     }
+    const { userId, generation } = resetToken;
 
-    const user = await prisma.lmsUser.findUnique({ where: { id: userId } });
-    if (!user) {
-      return NextResponse.json({ error: 'Invalid or expired reset link' }, { status: 400 });
+    // GP-760: one conditional UPDATE spends the link, sets the password and ends every other
+    // session (it adds one to the user's session generation). A used, superseded or concurrent
+    // second use matches no row.
+    // GP-699: the same write marks the email verified, because the reset link is only ever
+    // emailed to the account address (forgot-password is its sole issuer).
+    const consumed = await consumePasswordReset(userId, generation, await hashPassword(newPassword));
+    if (!consumed) {
+      return NextResponse.json({ error: INVALID_LINK }, { status: 400 });
     }
-
-    await prisma.lmsUser.update({
-      where: { id: userId },
-      // GP-699: the reset link is only ever emailed to the account address
-      // (forgot-password is its sole issuer), so completing a reset proves the
-      // person can read that mailbox. Same write as the password, so the two
-      // can never disagree.
-      data: { hashedPassword: await hashPassword(newPassword), isVerified: true },
-    });
+    forgetSessionState(userId);
 
     const claims = await sessionClaimsForUserId(userId);
     if (!claims) {

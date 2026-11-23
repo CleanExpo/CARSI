@@ -10,7 +10,9 @@
  * Rules:
  *  - never over a learning page: the lesson opens first, and the wizard waits
  *    for the next ordinary dashboard page;
- *  - once skipped, not again in the same browser session.
+ *  - once skipped, not again in the same browser session;
+ *  - not before the page under it has shown its first loaded view (GP-627), so the
+ *    modal never covers a blank, still-loading dashboard.
  */
 
 export const ONBOARDING_SKIP_KEY = 'carsi:onboarding-skipped';
@@ -25,8 +27,11 @@ export function shouldShowOnboardingWizard(input: {
   onboardingCompleted: boolean;
   pathname: string | null | undefined;
   skippedThisSession: boolean;
+  /** The page has loaded its first view, or the fallback wait has run out. */
+  pageReady: boolean;
 }): boolean {
   if (input.onboardingCompleted) return false;
+  if (!input.pageReady) return false;
   if (input.skippedThisSession) return false;
   if (isLearningRoute(input.pathname)) return false;
   return true;

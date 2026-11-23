@@ -33,7 +33,10 @@ export async function generateMetadata(): Promise<Metadata> {
       : 'Published courses';
   const discPhrase = `${t} restoration discipline${t === 1 ? '' : 's'}`;
   return {
-    title: 'About CARSI | Centre for Australian Restoration and Standards Information',
+    // `absolute` skips the root layout's '%s | CARSI' template, which would name the brand twice.
+    title: {
+      absolute: 'About CARSI | Centre for Australian Restoration and Standards Information',
+    },
     description: `CARSI is an Australian online training platform for cleaning and restoration professionals. ${coursePhrase} across ${discPhrase}. 50+ years of combined industry experience.`,
   };
 }
@@ -236,9 +239,9 @@ export default async function AboutPage() {
           <p className="max-w-3xl text-xs leading-relaxed text-slate-500">
             The IICRC does not endorse any educational provider, product, offering, or service. The
             Institute expressly disclaims responsibility, endorsement or warranty for third-party
-            publications, products, certifications, or instruction. The approved status does not award
-            IICRC Certification, only qualified continuing education hours. Where the IICRC has
-            approved a course, its CEC hours are shown on the course page.
+            publications, products, certifications, or instruction. The approved status does not
+            award IICRC Certification, only qualified continuing education hours. Where the IICRC
+            has approved a course, its CEC hours are shown on the course page.
           </p>
         </div>
       </section>

@@ -10,6 +10,7 @@ import {
   startSmartBasePath,
   startSmartPages,
 } from '@/lib/marketing/start-smart';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 const siteUrl = getPublicSiteUrl();
 
@@ -36,6 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     keywords: page.keywords,
     openGraph: {
+      ...OG_LOCALE_FIELDS,
       title: page.title,
       description: page.description,
       url: canonical,
