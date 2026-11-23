@@ -16,6 +16,13 @@ Product engineering skills (specialised workflows — not always-on):
 Skill system completion receipt:
 @.agents/SKILLS-COMPLETE.md
 
+## Merges are Phill's only (ruled 23/11/2026)
+
+Agents never run `gh pr ready` (except `gh pr ready --undo`, back to draft) or `gh pr merge`
+on this repository, by any route (GitHub API, a script, auto-merge). Only Phill readies and
+merges CARSI PRs: open a draft and leave it. `.claude/hooks/founder-merge-only.mjs` refuses
+both commands in every Claude Code session that loads this checkout, including cloud sessions.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know
