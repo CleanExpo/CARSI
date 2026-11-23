@@ -90,6 +90,11 @@ jobs:
       - name: Seed and media-input guard tests
         run: npm run test:seed-guards
 
+      # node_modules must never be committed, not even as a symlink (beb27250 committed a
+      # self-referencing one; a `node_modules/` rule only matches directories).
+      - name: node_modules is not tracked
+        run: npm run test:node-modules-untracked
+
       # CARSI designation registry validity. This script existed but was run by NO workflow
       # (audited 2026-08-07) — a guard nothing invokes is not a guard. It validates that every
       # designation resolves to a real catalogue course, so a renamed or removed course cannot
