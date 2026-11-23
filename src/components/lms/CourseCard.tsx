@@ -10,6 +10,7 @@ import { catalogueCourseCta } from '@/lib/learner-course-cta';
 import { isOnboardingCourse, ONBOARDING_BRAND } from '@/lib/onboarding/enterprise';
 import { getOnboardingLearnPath, resolveDashboardCourseHref } from '@/lib/onboarding/navigation';
 
+import { COURSE_CTA_EVENT } from '@/lib/analytics/carsi-events';
 import { APPROVED_FOR_IICRC_CECS_LABEL } from '@/lib/iicrc/approved-wording';
 interface CourseCardProps {
   /** First visible cards: eager load + higher fetch priority (catalog / home grids). */
@@ -198,6 +199,8 @@ export function CourseCard({ course, priorityImage, variant = 'catalog' }: Cours
           <Link
             href={href}
             aria-label={`${cta}: ${course.title}`}
+            data-carsi-event={COURSE_CTA_EVENT}
+            data-carsi-context={`catalogue:${course.slug}`}
             className={
               isPremium
                 ? 'inline-flex shrink-0 items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-950 shadow-[0_8px_20px_-10px_rgba(56,189,248,0.7)] transition hover:bg-sky-50'
