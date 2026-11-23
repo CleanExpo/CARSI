@@ -48,7 +48,13 @@ test.describe('membership checkout events (membership switched on)', () => {
   });
 
   // Review r1 P1-V6-GUEST-CHECKOUT-UNTRACKED: the real guest path, through /register.
-  test('a guest who registers in-flow sends membership_checkout_started once', async ({ page }) => {
+  // Reversed for GA4 by P1-5 (force-push review, 23/11/2026): the resumed checkout runs on
+  // /register, and the privacy policy says Google Analytics "is never used on your dashboard,
+  // account, administration or sign-in pages". GA4 now applies consent.isCountedPath, as PostHog
+  // already did, so the guest still reaches Stripe but no GA4 event is sent from /register.
+  test('a guest who registers in-flow reaches Stripe; no GA4 event is sent from /register', async ({
+    page,
+  }) => {
     await acceptAnalytics(page);
     const calls = await recordGtag(page);
     const statuses: number[] = [];
@@ -107,10 +113,6 @@ test.describe('membership checkout events (membership switched on)', () => {
 
     await expect(page).toHaveURL(STRIPE_URL, { timeout: 20_000 });
     expect(statuses).toEqual([401, 200]);
-    expect(events(calls, 'membership_checkout_started')).toHaveLength(1);
-    expect(events(calls, 'membership_checkout_started')[0].params).toEqual({
-      value: 795,
-      currency: 'AUD',
-    });
+    expect(events(calls, 'membership_checkout_started')).toHaveLength(0);
   });
 });
