@@ -44,7 +44,10 @@ const tree = () => {
 };
 
 try {
-  check(NEEDLES.length >= 5, 'needle list is not emptied');
+  // The required needles are listed here independently of the scanner, so dropping or swapping
+  // one there fails here (GP-793, review P2: a same-length swap passed a length check).
+  const REQUIRED = ['reticlehq', 'ReticleDev', 'reticle-dev', 'NEXT_PUBLIC_RETICLE', 'carsi-0f3ff945'];
+  for (const n of REQUIRED) check(NEEDLES.includes(n), `needle list includes "${n}"`);
   check(SCAN_DIRS.includes('.next/static') && SCAN_DIRS.includes('.next/server'), 'scans both static and server');
 
   // A clean tree passes and counts its files.
@@ -79,6 +82,38 @@ try {
       'Promise.resolve().then(n.bind(n,"@reticlehq/react")).then(({reticle:e})=>e.install({projectId:"carsi-0f3ff945"}))'
     );
     check(scanBuild(root).hits.length === 2, 'catches a dynamic @reticlehq import with the project id');
+  }
+
+  // Source maps: the compiled code is scanned in the .js file beside the map, so a map's
+  // `sourcesContent` (copies of the original source, comments included) is not scanned. The
+  // first real CI-equivalent build hit "carsi-0f3ff945" in a comment of PricingTiers.tsx inside
+  // a server map. A map that names a Reticle file in `sources`, or carries it in generated
+  // code fields, is still caught, in a plain map and in an index map with sections.
+  {
+    const comment = '/** The Reticle flow .reticle/flows/carsi-0f3ff945/x.json pins this. */\nexport const a = 1;';
+    const plain = { version: 3, sources: ['../src/a.tsx'], sourcesContent: [comment], names: [], mappings: 'AAAA' };
+    const indexed = { version: 3, sections: [{ offset: { line: 0, column: 0 }, map: plain }] };
+    for (const [label, map] of [['plain', plain], ['index', indexed]]) {
+      const root = tree();
+      writeFileSync(join(root, '.next/server/app/pricing/page.js.map'), JSON.stringify(map));
+      check(scanBuild(root).hits.length === 0, `ignores a needle only in sourcesContent (${label} map)`);
+    }
+    const leakMap = { ...plain, sources: ['../node_modules/@reticlehq/react/dist/index.js'] };
+    for (const [label, map] of [
+      ['plain', leakMap],
+      ['index', { version: 3, sections: [{ offset: { line: 0, column: 0 }, map: leakMap }] }],
+    ]) {
+      const root = tree();
+      writeFileSync(join(root, '.next/static/chunks/main.js.map'), JSON.stringify(map));
+      check(
+        scanBuild(root).hits.some((h) => h.needle === 'reticlehq'),
+        `catches a Reticle path in sources (${label} map)`
+      );
+    }
+    // A map that is not valid JSON is scanned raw, so it cannot hide a hit.
+    const root = tree();
+    writeFileSync(join(root, '.next/static/chunks/main.js.map'), '{"sources":["@reticlehq/react"');
+    check(scanBuild(root).hits.length === 1, 'scans an unparseable map raw');
   }
 
   // A missing directory fails, rather than reading as clean.

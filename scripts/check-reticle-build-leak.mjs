@@ -10,7 +10,8 @@
  * change to either guard, or a package update that stops tree-shaking it, cannot ship silently.
  *
  * It reads every file under .next/static (what the browser downloads) and .next/server (what the
- * server runs), as raw bytes, and looks for each NEEDLE. It fails when:
+ * server runs), as raw bytes (source maps without their copied `sourcesContent`; see
+ * scanBytes), and looks for each NEEDLE. It fails when:
  *   - any file contains a needle (each hit is printed with its file), or
  *   - a scan directory is missing, or holds no files. A scan that read nothing is not a pass.
  *
@@ -51,6 +52,31 @@ function listFiles(dir) {
 }
 
 /**
+ * Bytes to scan for one file. For a source map, the `sourcesContent` arrays are removed first:
+ * they are copies of the original source files, comments included, while the compiled code is
+ * scanned in the .js file beside the map. The first CI-equivalent build hit "carsi-0f3ff945" in
+ * a comment of src/components/pricing/PricingTiers.tsx inside a server map. Everything else in
+ * the map (`sources` paths, `names`, `mappings`, index-map sections) is still scanned, and a
+ * map that is not valid JSON is scanned raw, so this cannot hide a real hit.
+ */
+export function scanBytes(file, bytes) {
+  if (!file.endsWith('.map')) return bytes;
+  let map;
+  try {
+    map = JSON.parse(bytes.toString('utf8'));
+  } catch {
+    return bytes;
+  }
+  const strip = (m) => {
+    if (!m || typeof m !== 'object') return;
+    delete m.sourcesContent;
+    if (Array.isArray(m.sections)) for (const s of m.sections) strip(s && s.map);
+  };
+  strip(map);
+  return Buffer.from(JSON.stringify(map), 'utf8');
+}
+
+/**
  * Scan the build output under `root`.
  * @returns {{ scanned: Record<string, number>, hits: {file: string, needle: string}[], errors: string[] }}
  */
@@ -73,7 +99,7 @@ export function scanBuild(root) {
       continue;
     }
     for (const file of files) {
-      const bytes = readFileSync(file);
+      const bytes = scanBytes(file, readFileSync(file));
       for (const [needle, buf] of needles) {
         if (bytes.indexOf(buf) !== -1) hits.push({ file: relative(root, file), needle });
       }
