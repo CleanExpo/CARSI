@@ -34,7 +34,7 @@ vi.mock('@/lib/prisma', () => ({
   prisma: { lmsEnrollment: { findUnique: vi.fn(async () => null) } },
 }));
 vi.mock('@/lib/server/org-subscription-price', () => ({
-  resolveOrgMonthlyPriceId: vi.fn(async () => 'price_org_monthly'),
+  resolveOrgAnnualPriceId: vi.fn(async () => 'price_org_monthly'),
 }));
 vi.mock('@/lib/server/org-subscription-provision', () => ({
   provisionOrgSubscriptionContainer: mocks.provision,

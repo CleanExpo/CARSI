@@ -1,0 +1,66 @@
+name: Main Rewrite Guard
+
+# GP-780. On 22/11/2026 main was force-pushed from f4df903e to 5593ab7e and 16 merged PRs
+# vanished from main without any alert (repaired by hand in #1274). This workflow runs on every
+# push to main and fails red when the update was not a fast-forward: a force push, a history
+# rewrite or a deletion. The job summary names the before and after SHAs, the pusher, the
+# commits no longer reachable from main (git log after..before) and the PRs they came from.
+# A fast-forward that did not come from a merged PR is reported as a warning, not a failure.
+#
+# It only REPORTS. It never pushes, reverts, resets or changes a ref or a setting, and its token
+# is read-only. Repairing main is a human decision; preventing a rewrite is the branch rules'
+# job (docs/governance/BRANCH-RULES-PROPOSAL.md). Detection logic and its self-test:
+# scripts/ci/check-main-rewrite.mjs, scripts/ci/check-main-rewrite.test.mjs.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: main-rewrite-guard-${{ github.event.after }}
+  cancel-in-progress: false
+
+jobs:
+  main-rewrite-guard:
+    name: Main Rewrite Guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+
+      # After a rewrite the old head is reachable from no branch, so a full clone does not
+      # contain it. GitHub still serves it by SHA until it is garbage-collected. A failed fetch
+      # is not an error here: the detector treats an unfetchable old head as a rewrite.
+      - name: Fetch the previous head by SHA
+        if: github.event.before != '0000000000000000000000000000000000000000'
+        env:
+          BEFORE: ${{ github.event.before }}
+          TOKEN: ${{ github.token }}
+        run: |
+          git -c "http.extraheader=AUTHORIZATION: basic $(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)" \
+            fetch --no-tags --quiet origin "$BEFORE" || echo "::notice::Could not fetch $BEFORE by SHA."
+
+      - name: Detect a non-fast-forward update of main
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+          FORCED: ${{ github.event.forced }}
+          PUSHER: ${{ github.event.pusher.name }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/ci/check-main-rewrite.mjs \
+            --before "$BEFORE" --after "$AFTER" --forced "$FORCED" \
+            --pusher "$PUSHER" --repo "$GITHUB_REPOSITORY"

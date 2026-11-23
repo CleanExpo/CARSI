@@ -12,7 +12,6 @@ import {
 import { StudentJourneyMap } from '@/components/lms/diagrams/StudentJourneyMap';
 import { AboutMissionPillars } from '@/components/marketing/about/AboutMissionPillars';
 import { MeetTheBoard } from '@/components/marketing/about/MeetTheBoard';
-import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { getBoardMembers } from '@/lib/board-members';
 import { disciplinePillsFromCodes } from '@/lib/iicrc-discipline-display';
 import {
@@ -21,6 +20,7 @@ import {
   restorationTopicCount,
 } from '@/lib/server/public-catalogue-facts';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -33,7 +33,10 @@ export async function generateMetadata(): Promise<Metadata> {
       : 'Published courses';
   const discPhrase = `${t} restoration discipline${t === 1 ? '' : 's'}`;
   return {
-    title: 'About CARSI | Centre for Australian Restoration and Standards Information',
+    // `absolute` skips the root layout's '%s | CARSI' template, which would name the brand twice.
+    title: {
+      absolute: 'About CARSI | Centre for Australian Restoration and Standards Information',
+    },
     description: `CARSI is an Australian online training platform for cleaning and restoration professionals. ${coursePhrase} across ${discPhrase}. 50+ years of combined industry experience.`,
   };
 }
@@ -96,7 +99,7 @@ export default async function AboutPage() {
             Australia&apos;s online training platform for cleaning and restoration professionals.
             Beginner, intermediate and advanced courses for people starting out, updating their
             knowledge, or maintaining continuing education without leaving the job site, from an{' '}
-            <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" /> Accredited provider.
+            {IICRC_APPROVED_CEC_PROVIDER}.
           </p>
         </div>
       </section>
@@ -236,9 +239,9 @@ export default async function AboutPage() {
           <p className="max-w-3xl text-xs leading-relaxed text-slate-500">
             The IICRC does not endorse any educational provider, product, offering, or service. The
             Institute expressly disclaims responsibility, endorsement or warranty for third-party
-            publications, products, certifications, or instruction. CEC accreditation does not award
-            IICRC Certification; it only qualifies continuing education hours where applicable. CARSI
-            courses are IICRC CEC Accredited courses where stated.
+            publications, products, certifications, or instruction. The approved status does not
+            award IICRC Certification, only qualified continuing education hours. Where the IICRC
+            has approved a course, its CEC hours are shown on the course page.
           </p>
         </div>
       </section>

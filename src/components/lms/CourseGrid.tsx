@@ -444,6 +444,7 @@ export function CourseGrid({
         >
           <div className="relative">
             <Search
+              aria-hidden
               className="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2"
               style={{ color: isDark ? 'rgba(255,255,255,0.35)' : '#64748b' }}
             />
@@ -536,8 +537,9 @@ export function CourseGrid({
               isDark ? 'text-white/55' : 'text-slate-600'
             }`}
           >
-            <SlidersHorizontal className="h-3.5 w-3.5" />
-            <span>
+            <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden />
+            {/* Announced as it changes: a screen-reader user cannot see the grid shrink. */}
+            <span role="status">
               {filtered.length} course{filtered.length !== 1 ? 's' : ''}
             </span>
           </div>

@@ -24,6 +24,7 @@ import { StaticMarketingClosingCta } from '@/components/marketing/StaticMarketin
 import { BreadcrumbSchema, PodcastSeriesSchema } from '@/components/seo';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { OG_IMAGES } from '@/lib/seo/og-image';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 const siteUrl = getPublicSiteUrl();
 
@@ -44,6 +45,7 @@ export const metadata: Metadata = {
     'CARSI podcast',
   ],
   openGraph: {
+    ...OG_LOCALE_FIELDS,
     images: OG_IMAGES,
     title: 'Podcast Directory | CARSI Industry Hub',
     description:

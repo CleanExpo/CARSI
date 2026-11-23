@@ -12,12 +12,12 @@
       "attemptsAllowed": 3,
       "questions": [
         {
-          "questionText": "S520:2024 §1 sets out five principles for every remediation. Which list states them correctly?",
+          "questionText": "What is the right way to deal with mould that has grown into porous material?",
           "options": [
-            "Test, spray, seal, paint, invoice",
-            "Provide for safety and health; document; control contamination; remove contamination; prevent recontamination",
-            "Contain, sample, disinfect, deodorise, verify",
-            "Inspect, quote, demolish, rebuild, guarantee"
+            "Wipe the surface, then paint over it",
+            "Remove it under containment and controlled conditions",
+            "Spray it and leave it in place",
+            "Ignore it until it spreads further"
           ],
           "correctIndex": 1,
           "points": 1,
@@ -27,7 +27,7 @@
           "questionText": "Why does physically removing mould-affected porous material take priority over treating it in place?",
           "options": [
             "Because chemicals are more expensive than demolition",
-            "Because S520 principle §1.4 is contamination removal — remediation physically removes the contamination rather than treating it in situ",
+            "Because remediation physically removes the contamination rather than treating it in place",
             "Because insurers will not pay for cleaning",
             "Because antimicrobials are banned in Australia"
           ],
@@ -72,7 +72,7 @@
           "sourceRef": "Course module 2; WHS Act 2011 and Regulations"
         },
         {
-          "questionText": "Which cleaning approach does S520:2024 §9.3.8 support for salvageable non-porous surfaces and framing?",
+          "questionText": "Which cleaning approach suits salvageable non-porous surfaces and framing?",
           "options": [
             "Painting over the mould with a sealer",
             "HEPA vacuuming to capture residue, followed by damp wiping with detergent solution",
@@ -84,7 +84,7 @@
           "sourceRef": "Course module 6; S520:2024 §9.3.8, §9.1.5"
         },
         {
-          "questionText": "What is the correct view of antimicrobials and fungicidal/mould-resistant coatings under S520:2024?",
+          "questionText": "What is the correct view of antimicrobials and fungicidal/mould-resistant coatings?",
           "options": [
             "They replace the need for physical removal",
             "They have a limited, defined role and are never a substitute for physical removal or moisture correction",
@@ -96,7 +96,7 @@
           "sourceRef": "Course module 6; S520:2024 §2.1.2, §2.2"
         },
         {
-          "questionText": "A reverse-cycle split system served the affected room. Following S520:2024 §10.2, what should you do?",
+          "questionText": "A reverse-cycle split system served the affected room. What should you do?",
           "options": [
             "Run it on high to dry the room quickly",
             "Isolate or shut it down during works, protect/seal returns and supplies, and assess whether it is contaminated",
@@ -120,7 +120,7 @@
           "sourceRef": "Course module 8; S520:2024 §1.5"
         },
         {
-          "questionText": "What does post-remediation verification (S520:2024 §9.3.13 / §12) confirm?",
+          "questionText": "What does post-remediation verification confirm?",
           "options": [
             "That the invoice has been paid",
             "That the work area has been returned to Condition 1",
@@ -144,10 +144,10 @@
           "sourceRef": "Course module 9; S520:2024 §7.1, §12"
         },
         {
-          "questionText": "Which document set best reflects the S520:2024 §6.3 expectation for closing out a residential job?",
+          "questionText": "Which document set best closes out a residential job?",
           "options": [
             "A single after photo",
-            "Scope, before/after photos, moisture logs, equipment used, any deviations with rationale, and the verification result",
+            "Scope, before/after photos, moisture logs, equipment used and the verification result",
             "A verbal summary to the occupant only",
             "The insurer's claim number written on the invoice"
           ],

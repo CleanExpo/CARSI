@@ -93,4 +93,49 @@ describe('site locale: en-AU pages, also meant for New Zealand', () => {
       expect(rel).toContain(expected);
     }
   });
+
+  // Next replaces the root `openGraph` wholesale, so an object literal that neither spreads
+  // OG_LOCALE_FIELDS nor extends an openGraph that already does drops og:locale:alternate.
+  it('every openGraph object literal carries the en_NZ alternate', () => {
+    const files = [...sourceFiles(join(ROOT, 'app')), ...sourceFiles(join(ROOT, 'src'))];
+    const offenders: string[] = [];
+    let scanned = 0;
+    for (const file of files) {
+      const text = readFileSync(file, 'utf8');
+      for (const match of text.matchAll(/\bopenGraph:\s*\{/g)) {
+        scanned += 1;
+        const body = openGraphLiteral(text, match.index + match[0].length - 1);
+        const carries =
+          body.includes('...OG_LOCALE_FIELDS') || /\.\.\.[\w.?]+\.openGraph\b/.test(body);
+        if (!carries) {
+          const line = text.slice(0, match.index).split('\n').length;
+          offenders.push(`${relative(ROOT, file)}:${line}`);
+        }
+      }
+    }
+    // A scan that finds nothing proves nothing (CLAUDE.md: a guard's silence is not a pass).
+    expect(scanned).toBeGreaterThan(30);
+    expect(offenders).toEqual([]);
+  });
+
+  it('the shared metadata builders carry the en_NZ alternate', async () => {
+    const { buildIndustryMetadata } = await import('../marketing/industry-metadata');
+    expect(buildIndustryMetadata('mould', 'Mould', 'About mould').openGraph).toMatchObject({
+      locale: 'en_AU',
+      alternateLocale: ['en_NZ'],
+    });
+  });
 });
+
+/** The text of the object literal whose `{` is at `open`, braces balanced. */
+function openGraphLiteral(text: string, open: number): string {
+  let depth = 0;
+  for (let i = open; i < text.length; i += 1) {
+    if (text[i] === '{') depth += 1;
+    else if (text[i] === '}') {
+      depth -= 1;
+      if (depth === 0) return text.slice(open, i + 1);
+    }
+  }
+  return text.slice(open);
+}

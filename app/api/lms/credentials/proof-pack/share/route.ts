@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { signProofPackShareToken } from '@/lib/auth/session-jwt';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { getAppOrigin } from '@/lib/server/app-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
   }
 
   const token = await signProofPackShareToken(claims.sub);
-  const origin = request.nextUrl.origin;
+  const origin = getAppOrigin(request);
   const url = `${origin}/verify/training-record?t=${encodeURIComponent(token)}`;
 
   return NextResponse.json({

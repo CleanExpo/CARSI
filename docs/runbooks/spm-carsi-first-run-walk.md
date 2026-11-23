@@ -9,7 +9,7 @@ Stranger → first course. Run this against **staging or local** with a fresh em
 
 ## Walk (≈15 min)
 
-1. **Landing** — Open `/`. Confirm hero says “IICRC CEC Accredited provider” (provider standing, not “7 IICRC disciplines”).
+1. **Landing** — Open `/`. Confirm hero says “IICRC Approved CEC Provider” (provider standing, not “7 IICRC disciplines”).
 2. **Pathways** — `/onboarding` → redirects to `/pathways`. Heading: “A structured path, not a pile of courses”. Click **Courses** → `/courses`.
 3. **Catalogue** — Filters update the list; pick a **free** course or cheapest paid course for the test.
 4. **Register** — `/signup?next=/courses/<slug>` → `/register` with `next` preserved. Create account (unique email).

@@ -32,7 +32,7 @@ export function OnboardingProgramHero({
   onCtaClick,
   ctaLoading = false,
 }: Props) {
-  const price = pricingNote ?? formatOnboardingPrice({ amountAud: 1295, billingCycle: 'monthly', gst: 'exclusive', seats: 'unlimited' });
+  const price = pricingNote ?? formatOnboardingPrice({ seats: 'unlimited' });
 
   return (
     <section className={`${dash.hero} relative overflow-hidden`}>

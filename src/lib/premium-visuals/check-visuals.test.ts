@@ -589,3 +589,220 @@ describe('(6) mode labelling, config, workflow and docs', () => {
     expect(body).not.toContain("'@/media.manifest.json'");
   });
 });
+
+/**
+ * GP-669: non-blocking review findings from PR #995 (Codex P2 1-3, CodeRabbit 4-13).
+ * Every test here failed against the pre-GP-669 scanner and passes after the fix; run them
+ * against an old copy with CHECK_VISUALS_SCRIPT=<path> to see that.
+ */
+describe('(7) GP-669 review findings', () => {
+  const img = (src: string) => ({
+    src,
+    kind: 'image',
+    source: 'client',
+    credit: 'CARSI client photo',
+    alt: 'Technician',
+  });
+  const hero = img('/media/hero.webp');
+  const video = (poster: string) => ({
+    ...img('/media/v.mp4'),
+    kind: 'video',
+    poster,
+  });
+  const manifest = (...entries: unknown[]) => JSON.stringify({ version: 1, entries });
+  const videoFiles = (entries: unknown[], extra: Files = {}) =>
+    cleanFiles({
+      'config/media.manifest.json': manifest(...entries),
+      'public/media/v.mp4': Buffer.alloc(1024),
+      'public/media/p.webp': Buffer.alloc(1024),
+      ...extra,
+    });
+
+  it('1. nonMarketing matches whole segments: /auth excludes /auth/... but not /authority', () => {
+    const r = runJson(
+      fixture(
+        cleanFiles({
+          'app/(public)/authority/page.tsx': GOOD_PAGE,
+          'app/auth/login/page.tsx': BARE_PAGE,
+          'app/settings/page.tsx': BARE_PAGE,
+        })
+      )
+    );
+    expect(r.json.marketingPages.sort()).toEqual([
+      'app/(public)/authority/page.tsx',
+      'app/page.tsx',
+    ]);
+    expect(r.status).toBe(0);
+  });
+
+  it('2. a poster with its own image entry passes in either entry order (no false duplicate)', () => {
+    for (const entries of [
+      [hero, video('/media/p.webp'), img('/media/p.webp')],
+      [hero, img('/media/p.webp'), video('/media/p.webp')],
+    ]) {
+      const r = runJson(fixture(videoFiles(entries)));
+      expect(r.json.violations).toEqual([]);
+      expect(r.status).toBe(0);
+    }
+    // Control: a genuine duplicate src is still rejected.
+    const dup = runJson(
+      fixture(cleanFiles({ 'config/media.manifest.json': manifest(hero, hero) }))
+    );
+    expect(dup.json.violations.map((v) => v.detail).join('\n')).toMatch(/duplicate entry/);
+    expect(dup.status).toBe(2);
+  });
+
+  it('3. a trailing // comment after a comma is a comment, not rendered art', () => {
+    const r = runJson(
+      fixture(
+        cleanFiles({
+          'components/a.tsx':
+            'export const flags = {\n  old: false, // previously <svg /> with radial-gradient(red, blue)\n};\n',
+        })
+      )
+    );
+    expect(r.json.violations).toEqual([]);
+  });
+
+  it('4. a budgets value that is not an object is a configuration error (exit 2)', () => {
+    for (const budgets of [[], 'small', null, 5]) {
+      const cfg = JSON.stringify({ mode: 'report', budgets });
+      const r = run(fixture(cleanFiles({ 'config/visuals.config.json': cfg })));
+      expect(r.status, JSON.stringify(budgets)).toBe(2);
+      expect(r.stderr).toMatch(/configuration error: budgets must be an object/);
+    }
+    // Control: an object budgets value still loads.
+    const ok = JSON.stringify({ mode: 'report', budgets: { imageMaxKB: 300 } });
+    expect(run(fixture(cleanFiles({ 'config/visuals.config.json': ok }))).status).toBe(0);
+  });
+
+  it('5. an invalid glob in allowlist or marketingPages is a configuration error (exit 2)', () => {
+    for (const extra of [
+      { allowlist: ['**/{ui,icons/**'] },
+      { marketingPages: ['**/app/{page.tsx'] },
+    ]) {
+      const cfg = JSON.stringify({ mode: 'report', ...extra });
+      const r = run(fixture(cleanFiles({ 'config/visuals.config.json': cfg })));
+      expect(r.status, JSON.stringify(extra)).toBe(2);
+      expect(r.stderr).toMatch(/configuration error: invalid glob .*unmatched "\{"/);
+    }
+  });
+
+  it('6. a video poster must be an image file, not a video', () => {
+    const r = runJson(
+      fixture(
+        videoFiles([hero, video('/media/p.mp4')], { 'public/media/p.mp4': Buffer.alloc(1024) })
+      )
+    );
+    expect(r.json.violations.map((v) => v.detail).join('\n')).toMatch(
+      /poster \(absolute public path to an image file\)/
+    );
+    expect(r.status).toBe(2);
+  });
+
+  it('7. a poster needs its own image entry; the video entry does not cover its provenance', () => {
+    const r = runJson(fixture(videoFiles([hero, video('/media/p.webp')])));
+    expect(r.json.violations.map((v) => v.detail).join('\n')).toMatch(
+      /\/media\/p\.webp: poster of \/media\/v\.mp4 has no image entry of its own/
+    );
+    expect(r.status).toBe(2);
+  });
+
+  it('8. an oversize PNG is reported against both the image budget and the PNG/JPG budget', () => {
+    const r = runJson(
+      fixture(
+        cleanFiles({
+          'config/media.manifest.json': manifest(hero, img('/media/big.png')),
+          'public/media/big.png': Buffer.alloc(500 * 1024),
+        })
+      )
+    );
+    const details = r.json.violations.filter((v) => v.rule === 'media-budget').map((v) => v.detail);
+    expect(details).toHaveLength(2);
+    expect(details.some((d) => /image budget/.test(d))).toBe(true);
+    expect(details.some((d) => /PNG\/JPG/.test(d))).toBe(true);
+  });
+
+  it('9. a brand-like file name never exempts media from the manifest, only SVGs from svg-asset', () => {
+    const r = runJson(
+      fixture(
+        cleanFiles({
+          'public/media/campaign-logo-video.mp4': Buffer.alloc(1024),
+          'public/brand-logo.svg': '<svg />',
+          'components/a.tsx':
+            'export const A = () => <video src="/media/campaign-logo-video.mp4" />;\n',
+        })
+      )
+    );
+    expect(rules(r.json).sort()).toEqual(['unmanifested-media', 'unmanifested-public-media']);
+  });
+
+  it('10. /* in rendered JSX text does not hide an inline svg, and an unclosed /* does not blank the file', () => {
+    const r = runJson(
+      fixture(
+        cleanFiles({
+          'components/a.tsx': 'export const A = () => <p>/* <svg viewBox="0 0 1 1" /> */</p>;\n',
+          'components/b.tsx':
+            'export const B = () => <p>5 /* 6</p>;\nexport const C = () => <svg viewBox="0 0 1 1" />;\n',
+          // Control: a real JSX comment still hides its contents.
+          'components/c.tsx': 'export const D = () => <p>{/* <svg viewBox="0 0 1 1" /> */}</p>;\n',
+        })
+      )
+    );
+    expect(
+      r.json.violations
+        .filter((v) => v.rule === 'inline-svg-art')
+        .map((v) => v.file)
+        .sort()
+    ).toEqual(['components/a.tsx', 'components/b.tsx']);
+  });
+
+  it('11. one comment rule for both views: a rendered MotionSection after JSX-text // is evidence', () => {
+    const page = GOOD_PAGE.replace(
+      '<MotionSection><p>Body</p></MotionSection>',
+      '<p>Docs // guide</p><MotionSection><p>Body</p></MotionSection>'
+    );
+    expect(page).not.toBe(GOOD_PAGE);
+    const r = runJson(fixture(cleanFiles({ 'app/page.tsx': page })));
+    expect(rules(r.json)).not.toContain('no-motion');
+    // Control: a // comment after code punctuation is still never evidence.
+    const commented = GOOD_PAGE.replace(
+      '<MotionSection><p>Body</p></MotionSection>',
+      '{x}, // <MotionSection />'
+    );
+    expect(rules(runJson(fixture(cleanFiles({ 'app/page.tsx': commented }))).json)).toContain(
+      'no-motion'
+    );
+  });
+
+  it('12. hero media must be a top-level PremiumHero attribute, not a nested prop value', () => {
+    const page = GOOD_PAGE.replace(
+      '<PremiumHero title="Real" media={{ src: \'/media/hero.webp\' }} />',
+      '<PremiumHero title="Real" slot={<Card media={m} />} />'
+    );
+    expect(page).not.toBe(GOOD_PAGE);
+    const r = runJson(fixture(cleanFiles({ 'app/page.tsx': page })));
+    expect(rules(r.json)).toContain('hero-missing-media');
+  });
+
+  it('13. the repo allowlist does not exempt every logo-named file from the art rules', () => {
+    const repoCfg = fs.readFileSync(path.join(REPO, 'config/visuals.config.json'), 'utf8');
+    const r = runJson(
+      fixture(
+        cleanFiles({
+          'config/visuals.config.json': repoCfg,
+          'components/geologo-banner.tsx':
+            'export const A = () => <div style={{ background: "radial-gradient(red, blue)" }} />;\n',
+          // Control: a logo marked data-pv-allow="logo" is still allowed.
+          'components/brand-logo.tsx':
+            'export const L = () => <svg data-pv-allow="logo" viewBox="0 0 1 1" />;\n',
+        })
+      )
+    );
+    expect(r.json.violations.map((v) => `${v.rule} ${v.file}`)).toEqual([
+      'css-art components/geologo-banner.tsx',
+    ]);
+    // GP-669 keeps the scanner in report mode; enforce is a separate, owner-approved change.
+    expect((JSON.parse(repoCfg) as { mode: string }).mode).toBe('report');
+  });
+});

@@ -104,7 +104,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "49",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -161,7 +161,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "149",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -408,8 +408,8 @@
   ],
   "faq": [
    {
-    "q": "Does this course award IICRC CECs?",
-    "a": "No. This is professional development and contract-readiness training. It is not accredited by the IICRC and does not award IICRC Continuing Education Credits (CECs). Where it references a standard such as ANSI/IICRC S100, it treats it as a recognised standard of care, not law."
+    "q": "What kind of course is this?",
+    "a": "This is professional development and contract-readiness training. It is a CARSI course and a CARSI credential."
    },
    {
     "q": "What floor-care services does the course cover?",
@@ -428,7 +428,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Commercial Floor Care for Schools & Childcare Contracts",
-   "description": "A CARSI professional-development course taking experienced cleaners to a contract-ready floor-care service for Australian schools and childcare centres, covering carpet, tile and grout, vinyl strip and seal, and pressure washing, each paired with the WHS, SDS, child-safety, slip-resistance and run-off requirements a contract expects. This is contract-readiness training; it is not accredited by the IICRC and does not award IICRC Continuing Education Credits (CECs).",
+   "description": "A CARSI professional-development course taking experienced cleaners to a contract-ready floor-care service for Australian schools and childcare centres, covering carpet, tile and grout, vinyl strip and seal, and pressure washing, each paired with the WHS, SDS, child-safety, slip-resistance and run-off requirements a contract expects. This is a CARSI course and a CARSI credential.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -437,7 +437,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "99",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -490,7 +490,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "28.98",
+    "price": "29",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -597,7 +597,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "49",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -629,8 +629,8 @@
     "a": "It is the internal induction for CARSI Maintenance Company floor-care technicians, supervisors and facilities staff who deliver cleaning, polishing, sealing, maintenance and hygiene services across schools, childcare, education, public buildings and high-traffic commercial sites."
    },
    {
-    "q": "Does this course award IICRC CECs?",
-    "a": "No. It is an internal operational-readiness induction and does not award continuing education credits. It supports good judgement and does not replace the SDS/TDS, standards, or a site's own rules."
+    "q": "What kind of course is this?",
+    "a": "It is an internal operational-readiness induction, and a CARSI course and a CARSI credential. It supports good judgement and does not replace the SDS/TDS, standards, or a site's own rules."
    },
    {
     "q": "What does the final assessment involve?",
@@ -645,7 +645,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "CARSI Maintenance Company Onboarding — Professional Floor Care & Operational Readiness",
-   "description": "CARSI Maintenance Company's internal onboarding for floor-care technicians and supervisors, covering health and hygiene, WHS and chemical safety, surface identification, cleaning and sealing methods, machinery, site setup, conduct and a final practical assessment. This is an internal induction and does not award continuing education credits (CECs).",
+   "description": "CARSI Maintenance Company's internal onboarding for floor-care technicians and supervisors, covering health and hygiene, WHS and chemical safety, surface identification, cleaning and sealing methods, machinery, site setup, conduct and a final practical assessment. This is an internal induction: a CARSI course and a CARSI credential.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -654,7 +654,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "99",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -812,7 +812,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "49",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -1027,7 +1027,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "28.97",
+    "price": "29",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -1084,7 +1084,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "49",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -1141,7 +1141,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "49",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -1198,7 +1198,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "29",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -1255,7 +1255,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "29",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -1312,7 +1312,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "29",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -1483,7 +1483,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "29",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -1540,7 +1540,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "29",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -1597,7 +1597,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "29",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -1654,7 +1654,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "29",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -1711,7 +1711,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "29",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -1768,7 +1768,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "49",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -1825,7 +1825,7 @@
    "inLanguage": "en-AU",
    "offers": {
     "@type": "Offer",
-    "price": "0",
+    "price": "49",
     "priceCurrency": "AUD",
     "availability": "https://schema.org/InStock"
    },
@@ -2054,7 +2054,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Insurance Adjusters and Their Roles",
-   "description": "This course explains who insurance adjusters are, what their role is in the water damage restoration process, how restoration businesses interact with them professionally, and what documentation and communication practices support a productive working relationship. Understanding the adjuster's role and perspective allows restoration professionals to work more efficiently within the insurance process, reduce delays in claim authorisation, and build credibility with insurers as a preferred restoration provider.\n\nAn insurance adjuster (also known as a loss adjuster or claims assessor) is a professional engaged by an insurance company to investigate, assess, and determine the appropriate settlement for an insurance claim. In water damage restoration, the adjuster's role is to: confirm that the event is covered by the policy, assess the scope and quantum of the loss, review and authorise the proposed restoration scope and cost, and manage the claim to settlement.\n\nThere are three primary types of adjusters relevant to restoration professionals. Staff adjusters are employed directly by the insurance company and manage claims as part of their regular employment. Independent adjusters are engaged by insurance companies on a contract basis to handle specific claims — often used for claims requiring specialist assessment or for surge capacity after major weather events. Public adjusters are engaged by the policyholder (your client) rather than the insurer, to advocate for the policyholder's interests in the claim. Understanding which type of adjuster you are dealing with clarifies their obligations and loyalties within the claims process.\n\nThe first interaction with an adjuster on a water damage job is typically the scope review — the adjuster reviews your proposed restoration scope and cost estimate to determine whether it is reasonable and covered by the policy. A clearly written, well-documented scope with supporting moisture data, photographs, and IICRC-referenced methodology is far easier for an adjuster to approve than a poorly documented scope with vague descriptions and no supporting data.\n\nCommon reasons adjusters request revisions or additional information: scope items without adequate justification (why is this area included in the drying scope?), quantities without supporting measurements, product costs without line-item detail, labour rates without reference to the applicable award or schedule, and completion claims without documentation of dry standard achievement.\n\nThe restoration professional's documentation is the adjuster's primary evidence base for approving the claim. Comprehensive, accurate documentation — consistent with IICRC S500 methodology and Australian insurance documentation standards — reduces revision requests, speeds claim approval, and builds the adjuster's confidence in the restoration business as a reliable provider.\n\nSpecific documentation that adjusters require: initial inspection report with water category and class determination, moisture readings at initial assessment and at each monitoring visit, equipment deployment records (what equipment, deployed where, for how long), daily site attendance records, photographic evidence at each stage, and completion report with final moisture readings confirming dry standard achievement.",
+   "description": "This course explains who insurance adjusters are, what their role is in the water damage restoration process, how restoration businesses interact with them professionally, and what documentation and communication practices support a productive working relationship. Understanding the adjuster's role and perspective allows restoration professionals to work more efficiently within the insurance process, reduce delays in claim authorisation, and build credibility with insurers as a preferred restoration provider.\n\nAn insurance adjuster (also known as a loss adjuster or claims assessor) is a professional engaged by an insurance company to investigate, assess, and determine the appropriate settlement for an insurance claim. In water damage restoration, the adjuster's role is to: confirm that the event is covered by the policy, assess the scope and quantum of the loss, review and authorise the proposed restoration scope and cost, and manage the claim to settlement.\n\nThere are three primary types of adjusters relevant to restoration professionals. Staff adjusters are employed directly by the insurance company and manage claims as part of their regular employment. Independent adjusters are engaged by insurance companies on a contract basis to handle specific claims — often used for claims requiring specialist assessment or for surge capacity after major weather events. Public adjusters are engaged by the policyholder (your client) rather than the insurer, to advocate for the policyholder's interests in the claim. Understanding which type of adjuster you are dealing with clarifies their obligations and loyalties within the claims process.\n\nThe first interaction with an adjuster on a water damage job is typically the scope review — the adjuster reviews your proposed restoration scope and cost estimate to determine whether it is reasonable and covered by the policy. A clearly written, well-documented scope with supporting moisture data, photographs, and a clearly stated drying methodology is far easier for an adjuster to approve than a poorly documented scope with vague descriptions and no supporting data.\n\nCommon reasons adjusters request revisions or additional information: scope items without adequate justification (why is this area included in the drying scope?), quantities without supporting measurements, product costs without line-item detail, labour rates without reference to the applicable award or schedule, and completion claims without documentation of dry standard achievement.\n\nThe restoration professional's documentation is the adjuster's primary evidence base for approving the claim. Comprehensive, accurate documentation — consistent with recognised drying methodology and Australian insurance documentation standards — reduces revision requests, speeds claim approval, and builds the adjuster's confidence in the restoration business as a reliable provider.\n\nSpecific documentation that adjusters require: initial inspection report with water category and class determination, moisture readings at initial assessment and at each monitoring visit, equipment deployment records (what equipment, deployed where, for how long), daily site attendance records, photographic evidence at each stage, and completion report with final moisture readings confirming dry standard achievement.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -3525,7 +3525,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Moisture Meter Course",
-   "description": "Moisture meters are the primary measurement instrument in structural drying. Every drying decision, every drying goal, every insurance documentation entry, and every clearance determination in water damage restoration depends on accurate moisture meter readings. This course covers the complete operational knowledge required to use moisture meters correctly in the field: how moisture content is measured, the reading process, accuracy assurance, reference scales, temperature effects, the relationship between moisture and wood warping, moisture testing protocols, prevention strategies, operational tips, accuracy factors, material-specific considerations, the types of meters available, maintenance requirements, and the common mistakes that produce unreliable results. All content is aligned with IICRC S500 drying standards and Australian insurance documentation requirements.",
+   "description": "Moisture meters are the primary measurement instrument in structural drying. Every drying decision, every drying goal, every insurance documentation entry, and every clearance determination in water damage restoration depends on accurate moisture meter readings. This course covers the complete operational knowledge required to use moisture meters correctly in the field: how moisture content is measured, the reading process, accuracy assurance, reference scales, temperature effects, the relationship between moisture and wood warping, moisture testing protocols, prevention strategies, operational tips, accuracy factors, material-specific considerations, the types of meters available, maintenance requirements, and the common mistakes that produce unreliable results. All content is aligned with Australian insurance documentation requirements.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -3559,7 +3559,7 @@
   "faq": [
    {
     "q": "What does the Refrigerant Dehumidifiers for Water Loss Restoration course cover?",
-    "a": "This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.\n\nTopics covered: refrigerant dehumidifier operating principles, low grain refrigerant technology, dehumidifier sizing calculations, temperature and efficiency relationships, refrigerant types and their implications, essential accessories, maintenance procedures, practical application scenarios, and safety requirements.\n\nStandards applied: IICRC S500, IICRC S520, Australian Refrigeration and Air Conditioning (RAC) regulations, Safe Work Australia."
+    "a": "This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.\n\nTopics covered: refrigerant dehumidifier operating principles, low grain refrigerant technology, dehumidifier sizing calculations, temperature and efficiency relationships, refrigerant types and their implications, essential accessories, maintenance procedures, practical application scenarios, and safety requirements.\n\nStandards applied: Australian Refrigeration and Air Conditioning (RAC) regulations, Safe Work Australia."
    },
    {
     "q": "What does the Refrigerant Dehumidifiers for Water Loss Restoration course help learners understand?",
@@ -3570,7 +3570,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Refrigerant Dehumidifiers for Water Loss Restoration",
-   "description": "The refrigerant dehumidifier is the primary moisture removal tool in structural drying. Understanding how it works, how to size it correctly, how to operate it at peak efficiency, and how to maintain it properly directly determines the speed and cost of every water loss restoration you attend. This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.\n\nTopics covered: refrigerant dehumidifier operating principles, low grain refrigerant technology, dehumidifier sizing calculations, temperature and efficiency relationships, refrigerant types and their implications, essential accessories, maintenance procedures, practical application scenarios, and safety requirements.\n\nStandards applied: IICRC S500, IICRC S520, Australian Refrigeration and Air Conditioning (RAC) regulations, Safe Work Australia.",
+   "description": "The refrigerant dehumidifier is the primary moisture removal tool in structural drying. Understanding how it works, how to size it correctly, how to operate it at peak efficiency, and how to maintain it properly directly determines the speed and cost of every water loss restoration you attend. This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.\n\nTopics covered: refrigerant dehumidifier operating principles, low grain refrigerant technology, dehumidifier sizing calculations, temperature and efficiency relationships, refrigerant types and their implications, essential accessories, maintenance procedures, practical application scenarios, and safety requirements.\n\nStandards applied: Australian Refrigeration and Air Conditioning (RAC) regulations, Safe Work Australia.",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",

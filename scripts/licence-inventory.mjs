@@ -276,7 +276,8 @@ export const LEGIT_RULES = [
   {
     name: 'provider-level CEC standing',
     terms: ['CEC', 'accredit', 'iicrc-offer'],
-    re: /CARSI (?:is an?|delivers|offers|provides)[^.]{0,60}IICRC CEC Accredited(?! (?:online )?(?:training|courses?) in )|IICRC CEC Accredited[\w -]{0,30}provider|accredited (?:IICRC )?CEC provider|CARSI is an accredited IICRC|IICRC CEC Platform|IICRC CEC Accredited ·|IICRC CEC Accredited<\/(?:b|strong)>|CEC accreditation and industry|from an IICRC CEC Accredited provider|CEC Accredited \*\*provider\*\*/i,
+    // GP-704: the IICRC's own provider term and the approved-wording module that owns it.
+    re: /\b(?:IICRC_APPROVED_CEC_PROVIDER|CARSI_PROVIDER_STATUS|FROM_IICRC_APPROVED_CEC_PROVIDER|APPROVED_FOR_IICRC_CECS(?:_LABEL)?)\b|IICRC Approved CEC Provider|approved for IICRC CECs|CARSI (?:is an?|delivers|offers|provides)[^.]{0,60}IICRC CEC Accredited(?! (?:online )?(?:training|courses?) in )|IICRC CEC Accredited[\w -]{0,30}provider|accredited (?:IICRC )?CEC provider|CARSI is an accredited IICRC|IICRC CEC Platform|IICRC CEC Accredited ·|IICRC CEC Accredited<\/(?:b|strong)>|CEC accreditation and industry|from an IICRC CEC Accredited provider|CEC Accredited \*\*provider\*\*/i,
   },
   {
     name: 'catalogue-wide CLAUDE.md descriptor (not scoped to a topic or audience)',
