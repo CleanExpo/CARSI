@@ -1,7 +1,14 @@
 {
   "mode": "report",
   "manifest": "config/media.manifest.json",
-  "allowlist": ["**/components/ui/**", "**/icons/**"],
+  "allowlist": [
+    "**/components/ui/**",
+    "public/courses/**/diagrams/**",
+    "public/icons/**",
+    "public/images/badges/**",
+    "src/lib/server/email-templates.ts",
+    "src/lib/coaching-portal/marketing-pack/__fixtures__/**"
+  ],
   "budgets": {
     "imageMaxKB": 450,
     "videoMaxKB": 6000,

@@ -11,6 +11,11 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 const STEPS = [
   {
+    label: 'agent skill system',
+    cmd: 'npm',
+    args: ['run', 'verify:agent-skills'],
+  },
+  {
     label: 'carsi product analytics',
     cmd: 'npx',
     args: [
@@ -59,6 +64,16 @@ const STEPS = [
       'src/components/coaching-portal/visual',
       'src/lib/coaching-portal/marketing-pack/marketing-pack-view.test.ts',
       'src/components/coaching-portal/CoachingMarketingPackPage.test.tsx',
+      'src/lib/coaching-portal/session-receipt.test.ts',
+      'src/lib/marketing/carsi-coaching-program.test.ts',
+      'src/lib/coaching-portal/partner-demo-page.test.tsx',
+      'src/lib/coaching-portal/onboarding-coach-brief.test.ts',
+      'src/lib/coaching-portal/trade-hall-passport.test.ts',
+      'src/lib/coaching-portal/coaching-chapters.test.ts',
+      'src/lib/coaching-portal/trade-hall-seminar.test.ts',
+      'src/components/admin/AdminCoachingChaptersClient.test.tsx',
+      'src/lib/server/carsi-coaching-member-workspace.test.ts',
+      'src/components/admin/AdminCoachingMemberWorkspaceClient.test.tsx',
     ],
   },
   {
