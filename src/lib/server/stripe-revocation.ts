@@ -1,4 +1,8 @@
+import type { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
+
+/** GP-759: called only by the seat step (`seat-state.ts`), with its transaction client. */
+type RevocationDb = Prisma.TransactionClient | typeof prisma;
 
 /**
  * Revoke course access when a payment is reversed (Phase 7, 2026-06-29 audit).
@@ -22,6 +26,7 @@ export async function revokeEnrollmentsByPaymentReference(
    * which is identical for a dispute's created and closed events.
    */
   eventTimestamp?: Date,
+  db: RevocationDb = prisma,
 ): Promise<{ revoked: number }> {
   const ref = paymentReference.trim();
   if (!ref) return { revoked: 0 };
@@ -50,7 +55,7 @@ export async function revokeEnrollmentsByPaymentReference(
       }
     : { paymentReference: ref, ...statusCondition };
 
-  const result = await prisma.lmsEnrollment.updateMany({
+  const result = await db.lmsEnrollment.updateMany({
     where,
     // Clear completedAt too (WS3 / P0-C): the completion sync derives
     // `wasAlreadyCompleted` from a non-null completedAt, so leaving it set was the
@@ -110,13 +115,14 @@ export function isDisputeWon(status: string | null | undefined): boolean {
 export async function reactivateDisputeWonEnrollmentsByPaymentReference(
   paymentReference: string,
   eventTimestamp?: Date,
+  db: RevocationDb = prisma,
 ): Promise<{ reactivated: number }> {
   const ref = paymentReference.trim();
   if (!ref) return { reactivated: 0 };
 
   if (!eventTimestamp) {
     // Legacy path: flip disputed-revoked rows back to active, no ordering guard.
-    const result = await prisma.lmsEnrollment.updateMany({
+    const result = await db.lmsEnrollment.updateMany({
       where: { paymentReference: ref, status: 'revoked', revokedReason: 'disputed' },
       data: { status: 'active', revokedReason: null },
     });
@@ -130,7 +136,7 @@ export async function reactivateDisputeWonEnrollmentsByPaymentReference(
 
   // Step A: flip the rows THIS dispute revoked (not stale), stamping the event
   // time. `lte` keeps a replay idempotent (an already-active row matches nothing).
-  const flipped = await prisma.lmsEnrollment.updateMany({
+  const flipped = await db.lmsEnrollment.updateMany({
     where: {
       paymentReference: ref,
       status: 'revoked',
@@ -143,7 +149,7 @@ export async function reactivateDisputeWonEnrollmentsByPaymentReference(
   // Step B: stamp rows still ACTIVE here (a delayed `created` has not revoked them
   // yet) so that stale created's not-stale guard skips the revoke. `lt` excludes
   // the rows step A just stamped to exactly this timestamp.
-  await prisma.lmsEnrollment.updateMany({
+  await db.lmsEnrollment.updateMany({
     where: {
       paymentReference: ref,
       status: 'active',

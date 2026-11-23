@@ -53,6 +53,8 @@ vi.mock('@/lib/server/stripe-revocation', async (importOriginal) => ({
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     lmsUser: { findUnique: vi.fn(async () => null) },
+    // GP-759: the refund step looks for team seat blocks on its transaction; these sessions have none.
+    lmsTeamCoursePurchase: { findMany: vi.fn(async () => []) },
     stripeWebhookEvent: {
       upsert: vi.fn(
         async (args: {
@@ -148,14 +150,10 @@ vi.mock('@/lib/server/ga4-measurement-protocol', () => ({
   sendGa4PurchaseEvent: vi.fn(async () => {}),
 }));
 vi.mock('@/lib/server/sentry', () => ({ captureServerError: vi.fn(async () => {}) }));
-// GP-759 (c) team seat revocation on refund: team tables, covered by team-seat-refund.test.ts.
-vi.mock('@/lib/server/team-seat-refund', () => ({
-  revokeTeamSeatBlocksForRefund: vi.fn(async () => {}),
-  teamCourseSeatIsFree: vi.fn(async () => true),
-}));
 
 const { POST } = await import('../../../app/api/lms/webhooks/stripe/route');
 const { isCheckoutPaymentReversed } = await import('./payment-integrity-ledger');
+const { prisma: prismaForLedger } = await import('@/lib/prisma');
 
 let eventSeq = 0;
 
@@ -460,7 +458,7 @@ describe('GP-759 (a): the refund handler records the reversal before any success
     };
     expect((await deliver()).status).toBe(200);
 
-    expect(await isCheckoutPaymentReversed('cs_test_reversed')).toBe(false);
+    expect(await isCheckoutPaymentReversed(prismaForLedger as never, 'cs_test_reversed')).toBe(false);
   });
 
   it('control: a NEW dispute after an earlier won one still locks', async () => {
@@ -483,7 +481,7 @@ describe('GP-759 (a): the refund handler records the reversal before any success
     };
     await deliver();
 
-    expect(await isCheckoutPaymentReversed('cs_test_reversed')).toBe(true);
+    expect(await isCheckoutPaymentReversed(prismaForLedger as never, 'cs_test_reversed')).toBe(true);
   });
 });
 

@@ -67,7 +67,9 @@ vi.mock('@/lib/prisma', () => {
     COURSES.find((c) =>
       'id' in where ? c.id === where.id : 'slug' in where ? c.slug === where.slug : false
     ) ?? null;
-  const tx = {
+  // GP-759: the seat step runs every seat read and write on its transaction; reads it does not
+  // fake here fall through to the client below.
+  const txOwn: Record<string, unknown> = {
     lmsTeamMember: { findFirst: vi.fn(async () => null) },
     lmsTeam: {
       create: vi.fn(async () => ({ id: 'team-1', slug: 'my-team' })),
@@ -75,12 +77,16 @@ vi.mock('@/lib/prisma', () => {
     },
     lmsTeamCoursePurchase: {
       findFirst: vi.fn(async () => null),
+      findMany: vi.fn(async () => []),
       create: vi.fn(async () => ({})),
+      aggregate: vi.fn(async () => ({ _sum: { seatLimit: 0 } })),
     },
+    stripeWebhookEvent: { findUnique: vi.fn(async () => null) },
     $executeRaw: vi.fn(async () => 0),
   };
-  return {
-    prisma: {
+  const client: Record<string, unknown> = {};
+  const tx = new Proxy(txOwn, { get: (t, k: string) => (k in t ? t[k] : client[k]) });
+  Object.assign(client, {
       $transaction: vi.fn(async (fn: (t: typeof tx) => unknown) => fn(tx)),
       lmsUser: {
         findUnique: vi.fn(async ({ where }: { where: { id: string } }) => {
@@ -166,17 +172,12 @@ vi.mock('@/lib/prisma', () => {
           }
         ),
       },
-    },
-  };
+  });
+  return { prisma: client };
 });
 
-// GP-759 reversal ledger (a database read), covered by payment-reversal-sticky.test.ts.
-vi.mock('@/lib/server/payment-integrity-ledger', () => ({
-  PAYMENT_REVERSED: 'PAYMENT_REVERSED',
-  isCheckoutPaymentReversed: vi.fn(async () => false),
-}));
-// GP-759 paid-seat check (database reads), covered by team-seat-refund.test.ts.
-vi.mock('@/lib/server/team-seat-refund', () => ({ teamCourseSeatIsFree: vi.fn(async () => true) }));
+// GP-759 paid-seat counting is covered by team-seat-refund.test.ts and seat-state-races.test.ts;
+// here the team has no seat blocks, so every seat is free.
 vi.mock('@/lib/server/lms-user-sync', () => ({ ensureLmsUserFromClaims: vi.fn(async () => {}) }));
 vi.mock('@/lib/server/course-catalog-sync', () => ({
   getOrCreateCourseBySlug: vi.fn(async (slug: string) => {
