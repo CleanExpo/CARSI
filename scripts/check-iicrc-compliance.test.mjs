@@ -266,6 +266,10 @@ if (evaluateContent(NON_APPROVED, 'This course is Australian-produced. Ten-quest
     ['gain an industry certification', 'Gain an industry certification without leaving the job site.'],
     ['obtain your certification', 'Obtain your certification in three days.'],
     ['receive certification', 'Receive certification on completion.'],
+    // GP-584: a school route elsewhere on the line excuses nothing.
+    ['get certified + unrelated school route', 'Get certified online with us. Others go through an IICRC-approved school.'],
+    ['earn certification + unrelated school route', 'Earn your certification here. Others earn it through an IICRC-approved exam.'],
+    ['certification course + school in another sentence', 'Enrol in our certification course. We also list IICRC-approved schools.'],
   ];
   const CERT_BARE_MUST_PASS = [
     ['provider standing', 'CARSI is an IICRC Approved CEC Provider.'],
