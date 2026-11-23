@@ -38,7 +38,7 @@ export function isReservedStaffEmail(email: string): boolean {
 }
 
 /**
- * LMS admin: the session role, which `resolveSessionRole` mints from the database
+ * LMS admin: the session role, which `sessionClaimsForUserId` mints from the database
  * (lms_user_roles, then lms_users.role) at sign-in. Never an email list, env var or constant.
  */
 export function isLmsClaimsAllowedAdminPanel(claims: SessionClaims): boolean {

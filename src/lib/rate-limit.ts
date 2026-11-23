@@ -5,10 +5,10 @@
 // the cheap second gate (no Cloudflare round-trip needed for the limit
 // check itself).
 //
-// Limitation: stateless serverless functions reset memory per cold
-// start, so the window is best-effort across invocations on the same
-// worker. CARSI runs on Vercel only (no Redis) — this in-process
-// window is the intentional rate-limiting approach, not a stopgap.
+// Limitation: the window lives in one process, so it resets on every
+// deploy and each instance counts separately. The auth endpoints use the
+// Postgres-backed applyDurableRateLimit (src/lib/server/durable-rate-limit.ts,
+// GP-760) instead, which falls back to this limiter if the database fails.
 //
 // In practice, Cloudflare Turnstile + an instance-local memory window
 // blocks the abuse class this fix targets (anonymous bots filling the
