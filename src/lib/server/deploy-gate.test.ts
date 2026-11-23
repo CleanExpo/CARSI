@@ -129,6 +129,73 @@ describe('deploy-production workflow', () => {
       );
       expect(upload?.if).toBe('always()');
     });
+
+    // Force-push review P2: a smoke that passed, followed by a failed screenshot upload, made the
+    // job print "the live site was NOT checked" and go red. The job's result must follow the
+    // smoke's result only. This walks the real steps with GitHub's step rules: a step runs when
+    // its `if` holds (default `success()`), a failed step fails the job unless it has
+    // `continue-on-error`, and a step skipped by its `if` has outcome `skipped`.
+    type Outcome = 'success' | 'failure';
+    function runJob(fail: (step: Step) => boolean) {
+      let jobFailed = false;
+      const outcomes: Record<string, string> = {};
+      const ran: string[] = [];
+      for (const step of steps as Array<Step & { 'continue-on-error'?: boolean }>) {
+        const cond = (step.if ?? 'success()')
+          .replace(/\bfailure\(\)/g, String(jobFailed))
+          .replace(/\bsuccess\(\)/g, String(!jobFailed))
+          .replace(/\balways\(\)/g, 'true')
+          .replace(/steps\.(\w+)\.outcome/g, (_m, id: string) => JSON.stringify(outcomes[id] ?? 'skipped'))
+          .replace(/==/g, '===')
+          .replace(/!===/g, '!==');
+        expect(cond, `unsupported expression in step "${step.name}"`).toMatch(
+          /^[\s\w"'!=&|()]+$/
+        );
+        const runs = Function(`return (${cond});`)() as boolean;
+        if (!runs) {
+          if (step.id) outcomes[step.id] = 'skipped';
+          continue;
+        }
+        ran.push(step.name ?? '');
+        // A report step always ends in `exit 1`: running it fails the job.
+        const outcome: Outcome =
+          fail(step) || /^\s*exit 1\s*$/m.test(step.run ?? '') ? 'failure' : 'success';
+        if (step.id) outcomes[step.id] = outcome;
+        if (outcome === 'failure' && !step['continue-on-error']) jobFailed = true;
+      }
+      return { result: jobFailed ? 'failure' : 'success', ran };
+    }
+    const isUpload = (s: Step) =>
+      Boolean((s as { uses?: string }).uses?.startsWith('actions/upload-artifact'));
+    const notChecked = (ran: string[]) => ran.some((n) => n.startsWith('Report that the live site was not checked'));
+    const rollback = (ran: string[]) => ran.some((n) => n.startsWith('Print rollback steps'));
+
+    it('smoke passed but the screenshot upload failed: job is green and does not say "not checked"', () => {
+      const { result, ran } = runJob(isUpload);
+      expect(notChecked(ran)).toBe(false);
+      expect(rollback(ran)).toBe(false);
+      expect(result).toBe('success');
+    });
+
+    it('a setup step failed before the smoke: reports "not checked" and the job is red', () => {
+      const { result, ran } = runJob((s) => s.run === 'npm ci');
+      expect(notChecked(ran)).toBe(true);
+      expect(rollback(ran)).toBe(false);
+      expect(result).toBe('failure');
+    });
+
+    it('the smoke failed: prints rollback steps, not "not checked", and the job is red', () => {
+      const { result, ran } = runJob((s) => s.id === 'smoke');
+      expect(rollback(ran)).toBe(true);
+      expect(notChecked(ran)).toBe(false);
+      expect(result).toBe('failure');
+    });
+
+    it('everything passed: the job is green and no report step runs', () => {
+      const { result, ran } = runJob(() => false);
+      expect(notChecked(ran) || rollback(ran)).toBe(false);
+      expect(result).toBe('success');
+    });
   });
 
   it('requires exactly the check names the CI workflow produces', () => {

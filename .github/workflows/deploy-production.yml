@@ -214,17 +214,26 @@ jobs:
           LIVE_SMOKE_BASE_URL: https://carsi.com.au
           LIVE_SMOKE_EXPECT_COMMIT: ${{ needs.deploy.outputs.sha }}
 
+      # The job's result follows the smoke only: a failed upload is a warning, never a red job and
+      # never "the site was not checked" (the smoke's own outcome already says whether it was).
       - name: Upload screenshots and failure traces
+        id: upload
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: live-smoke-${{ needs.deploy.outputs.sha }}
           path: test-results/live-smoke/
           retention-days: 30
 
-      # The site was never checked: setup (checkout, npm ci, Chromium) failed before the smoke ran.
+      - name: Warn that the screenshots were not uploaded
+        if: always() && steps.upload.outcome == 'failure'
+        run: echo "::warning::The live-smoke screenshots could not be uploaded. The smoke result above still stands."
+
+      # The site was never checked: setup (checkout, npm ci, Chromium) failed before the smoke ran,
+      # so the smoke step has neither a pass nor a fail.
       - name: Report that the live site was not checked
-        if: failure() && steps.smoke.outcome != 'failure'
+        if: failure() && steps.smoke.outcome != 'failure' && steps.smoke.outcome != 'success'
         run: |
           echo "::error::The live smoke did not run (a setup step failed), so https://carsi.com.au was NOT checked after this deploy. Re-run this job; this is not evidence the site is broken or healthy."
           exit 1
