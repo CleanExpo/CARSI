@@ -47,6 +47,10 @@ Portable Agent Skills for Cursor (`.agents/skills/`; mirror via `npm run sync:cu
 
 - `carsi-seo`, `carsi-localization-au`, `carsi-conversion-optimization`, `carsi-product-analytics`, `carsi-content-strategy`, `carsi-geo`
 
+### Workflow (`workflow/`)
+
+- `carsi-git-commit-engineering` — **use for every commit** (changelog-style messages)
+
 ## Regenerating skills
 
 After editing `scripts/bootstrap-carsi-agent-skills.mjs` manifest:

@@ -449,6 +449,17 @@ const MANIFEST = [
     when: ['production', 'release', 'deploy', 'readiness'],
     focus: ['docs/agent-framework/CARSI_VERIFICATION_GATE.md', 'npm run audit:verify'],
   },
+  // workflow
+  {
+    id: 'carsi-git-commit-engineering',
+    category: 'workflow',
+    skipBootstrap: true,
+    title: 'CARSI Git Commit Engineering',
+    description:
+      'Authors CARSI git commits as readable engineering changelog entries with context, implementation, verification, and customer impact. Use when creating commits, drafting commit messages, preparing PRs, reviewing git history, or any time the user asks to commit changes.',
+    when: ['commit', 'git commit', 'commit message', 'changelog', 'git history'],
+    focus: [],
+  },
   // growth
   {
     id: 'carsi-seo',
@@ -550,6 +561,10 @@ mkdirSync(SKILLS_ROOT, { recursive: true });
 
 let count = 0;
 for (const entry of MANIFEST) {
+  if (entry.skipBootstrap) {
+    count++;
+    continue;
+  }
   const dir = join(SKILLS_ROOT, entry.category, entry.id);
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, 'SKILL.md'), renderSkill(entry), 'utf8');

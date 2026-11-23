@@ -7,6 +7,7 @@ Do not duplicate these in skills — link to them.
 | Agent entry (Codex/Cursor) | `AGENTS.md`, `.claude/CLAUDE.md` |
 | Skill system receipt | `.agents/SKILLS-COMPLETE.md` |
 | Skill catalogue | `.agents/skills/README.md` |
+| Git commits (changelog) | `.agents/skills/workflow/carsi-git-commit-engineering/SKILL.md` |
 | Premium visuals, motion, media | `docs/agents/AGENTS.md` |
 | Licence, courses, IICRC terminology | `docs/agents/CLAUDE.md` |
 | Verification gate | `docs/agent-framework/CARSI_VERIFICATION_GATE.md` |

@@ -13,7 +13,7 @@ SDA_FULL=1 npm run quality:sda-gate
 
 ## Catalogue
 
-- **44 skills** in `.agents/skills/` (regenerate: `node scripts/bootstrap-carsi-agent-skills.mjs`)
+- **45 skills** in `.agents/skills/` (regenerate: `node scripts/bootstrap-carsi-agent-skills.mjs`; `carsi-git-commit-engineering` is hand-maintained)
 - **8 shared references** in `.agents/references/`
 - **Entrypoints:** `AGENTS.md`, `.claude/CLAUDE.md`, `docs/agents/*`
 
