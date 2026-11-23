@@ -11,10 +11,7 @@ import type {
   ScenarioActivity,
   SequenceActivity,
 } from '@/lib/lms/interactive-experience-types';
-import {
-  InteractiveChoiceButton,
-  InteractiveFeedbackPanel,
-} from '@/components/lms/interactive/interactive-primitives';
+import { InteractiveFeedbackPanel } from '@/components/lms/interactive/interactive-primitives';
 import { cn } from '@/lib/utils';
 
 interface ActivityViewProps {

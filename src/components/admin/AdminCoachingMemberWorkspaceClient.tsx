@@ -87,8 +87,9 @@ export function AdminCoachingMemberWorkspaceClient() {
   useEffect(() => {
     if (!selected) return;
     selectedRef.current = selected;
-    setNotice('');
-    void loadWorkspace(selected);
+    void (async () => {
+      await loadWorkspace(selected);
+    })();
   }, [selected, loadWorkspace]);
 
   async function post(op: string, extra: Record<string, unknown> = {}) {
@@ -151,7 +152,12 @@ export function AdminCoachingMemberWorkspaceClient() {
           id="coaching-member-select"
           className={`${field} mt-2`}
           value={selected}
-          onChange={(e) => setSelected(e.target.value)}
+          onChange={(e) => {
+            // Clear the last save notice when the admin picks another member (was in the
+            // selection effect; a setState there trips react-hooks/set-state-in-effect).
+            setNotice('');
+            setSelected(e.target.value);
+          }}
         >
           {members.length === 0 ? <option value="">No coaching subscribers yet</option> : null}
           {members.map((m) => (
