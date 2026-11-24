@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getStripeClient } from '@/lib/api/stripe';
+import type { TaxInvoiceCheckout } from '@/lib/billing/tax-invoice';
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { confirmEmailOwnershipOk, resolveAccountEmail } from '@/lib/server/enrollment-confirm-guard';
@@ -43,8 +44,8 @@ export async function POST(request: NextRequest) {
   let paymentReference: string;
   let purchaseMode: 'self' | 'team' = 'self';
   let teamSeatCount: number | undefined;
-  /** GST-inclusive amount Stripe charged; set only for a paid Stripe session (GP-761). */
-  let paidAmountTotalCents: number | null = null;
+  /** The retrieved Checkout session; the tax-invoice owner reads its paid status and amount (GP-761). */
+  let paidCheckout: TaxInvoiceCheckout | null = null;
 
   if (sessionId) {
     if (!process.env.STRIPE_SECRET_KEY?.trim()) {
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
       if (!confirmEmailOwnershipOk(sessionEmail, accountEmail)) {
         return NextResponse.json({ detail: 'Session email does not match account' }, { status: 403 });
       }
-      paidAmountTotalCents = session.amount_total ?? null;
+      paidCheckout = session;
     } catch (e) {
       console.error('[enrollments/confirm] stripe', e);
       void captureServerError(e, { route: '/api/lms/enrollments/confirm' });
@@ -156,9 +157,9 @@ export async function POST(request: NextRequest) {
         studentId: claims.sub,
         courseSlug: slug,
         appOrigin: getAppOrigin(request),
-        payment: sessionId
+        payment: paidCheckout
           ? {
-              amountTotalCents: paidAmountTotalCents,
+              checkout: paidCheckout,
               seatCount: purchaseMode === 'team' ? teamSeatCount : undefined,
             }
           : undefined,

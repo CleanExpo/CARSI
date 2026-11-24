@@ -3,9 +3,11 @@
  * All project emails should use buildCarsiEmailHtml / render* helpers below.
  */
 import {
+  TaxInvoiceBuyerIdentityError,
   TaxInvoiceConfigError,
   formatAudCents,
   isValidAbn,
+  taxInvoiceBuyerRuleMet,
   type TaxInvoice,
 } from '@/lib/billing/tax-invoice';
 import type { CcwAttendeeOffer } from '@/lib/marketing/ccw-roadshow-offers';
@@ -51,17 +53,25 @@ export function formatPlainMessageAsHtml(message: string): string {
 /**
  * The tax invoice block for a paid purchase email (GP-761). Every paid confirmation
  * renders this one block, so the wording and GST line cannot drift between emails.
- * Refuses an invoice whose ABN is not valid: no placeholder ABN ever renders.
+ * Refuses an invoice whose ABN is not valid (no placeholder ABN ever renders), and
+ * one of $1,000 or more that does not identify the buyer (ATO requirement).
  */
 export function renderTaxInvoiceSection(invoice: TaxInvoice): RenderedEmail {
   if (!isValidAbn(invoice.abn)) {
     throw new TaxInvoiceConfigError('Tax invoice has no valid ABN; refusing to render it');
+  }
+  if (!taxInvoiceBuyerRuleMet(invoice)) {
+    throw new TaxInvoiceBuyerIdentityError(
+      'Tax invoice of $1,000 or more has no buyer identity or ABN; refusing to render it'
+    );
   }
   const total = formatAudCents(invoice.totalCents);
   const gst = formatAudCents(invoice.gstCents);
   const rows: Array<[string, string]> = [
     ['Seller', `${invoice.sellerName}, ABN ${invoice.abn}`],
     ['Date', invoice.issuedOn],
+    ...(invoice.buyerIdentity ? [['Buyer', invoice.buyerIdentity] as [string, string]] : []),
+    ...(invoice.buyerAbn ? [['Buyer ABN', invoice.buyerAbn] as [string, string]] : []),
     ['Item', invoice.item],
     ['Total (GST included)', total],
     ['GST included in total', gst],

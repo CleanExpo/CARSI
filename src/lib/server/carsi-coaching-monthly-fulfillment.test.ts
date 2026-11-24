@@ -236,4 +236,41 @@ describe('CARSI coaching monthly fulfillment', () => {
     expect(mocks.sendEmail).not.toHaveBeenCalled();
     expect(mocks.sendNotice).not.toHaveBeenCalled();
   });
+
+  // GP-761 review P1: the tax invoice names the buyer from real data only, never the
+  // greeting fallback (the email local part).
+  it('names the Checkout customer as the tax invoice buyer', async () => {
+    vi.stubEnv('CARSI_ABN', '10000000000');
+    await processCarsiCoachingMonthlyCheckoutCompleted(paidSession(), OPTS);
+    const { text } = mocks.sendEmail.mock.calls[0]![0] as { text: string };
+    expect(text).toContain('Tax invoice');
+    expect(text).toContain('Buyer: Test Member');
+    vi.unstubAllEnvs();
+  });
+
+  it('never uses the email local part as the tax invoice buyer', async () => {
+    vi.stubEnv('CARSI_ABN', '10000000000');
+    const session = paidSession();
+    session.customer_details = { email: 'Member@Example.com', name: null } as never;
+    await processCarsiCoachingMonthlyCheckoutCompleted(session, OPTS);
+    const { text } = mocks.sendEmail.mock.calls[0]![0] as { text: string };
+    expect(text).toContain('Hi member');
+    expect(text).toContain('Tax invoice');
+    expect(text).not.toContain('Buyer');
+    vi.unstubAllEnvs();
+  });
+
+  // GP-761 review round 2 P1: a completed subscription Checkout can be unpaid
+  // (funds not yet available). The welcome email goes, but no tax invoice.
+  it('an unpaid completed subscription session gets no tax invoice and a NOT ISSUED log', async () => {
+    vi.stubEnv('CARSI_ABN', '10000000000');
+    const session = paidSession();
+    session.payment_status = 'unpaid';
+    await processCarsiCoachingMonthlyCheckoutCompleted(session, OPTS);
+    expect(mocks.sendEmail).toHaveBeenCalledTimes(1);
+    const { text } = mocks.sendEmail.mock.calls[0]![0] as { text: string };
+    expect(text).not.toContain('Tax invoice');
+    expect(console.error).toHaveBeenCalledWith(expect.stringContaining('NOT ISSUED'));
+    vi.unstubAllEnvs();
+  });
 });
