@@ -172,8 +172,9 @@ describe('AdminShell responsive navigation', () => {
     expect(sidebar.classList.contains('md:flex')).toBe(true);
     const links = sidebar.querySelectorAll('nav a');
     // Main's shared sidebar, plus GP-634's Coaching approvals, GP-759's Unfulfilled Payments,
-    // and the coaching admin's Coach chapters and Coaching members (GP-632, GP-561).
-    expect(links).toHaveLength(23);
+    // the coaching admin's Coach chapters and Coaching members (GP-632, GP-561), and the
+    // Learning OS retention report.
+    expect(links).toHaveLength(24);
     expect(sidebar.querySelector('a[href="/admin/unfulfilled-payments"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/admin/coaching-chapters"]')?.textContent).toContain(
       'Coach chapters'
@@ -181,6 +182,7 @@ describe('AdminShell responsive navigation', () => {
     expect(sidebar.querySelector('a[href="/admin/coaching-members"]')?.textContent).toContain(
       'Coaching members'
     );
+    expect(sidebar.querySelector('a[href="/admin/retention"]')?.textContent).toContain('Retention');
     expect(sidebar.querySelector('a[href="/admin/coaching-actions"]')?.textContent).toContain(
       'Coaching approvals'
     );

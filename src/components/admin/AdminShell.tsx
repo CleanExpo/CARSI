@@ -117,6 +117,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const coachKnowledgeActive = pathname.startsWith('/admin/coaching-knowledge');
   const accountabilityActive = pathname.startsWith('/admin/coaching-accountability');
   const analyticsActive = pathname.startsWith('/admin/analytics');
+  const retentionActive = pathname.startsWith('/admin/retention');
   const yearlyMembershipActive = pathname.startsWith('/admin/yearly-membership');
   const unfulfilledPaymentsActive = pathname.startsWith('/admin/unfulfilled-payments');
   const iicrcCecActive = pathname.startsWith('/admin/iicrc-cec');
@@ -265,6 +266,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           label="Analytics"
           icon={BarChart3}
           active={analyticsActive}
+        />
+        <NavButton
+          href="/admin/retention"
+          label="Retention"
+          icon={LineChart}
+          active={retentionActive}
         />
       </nav>
 
