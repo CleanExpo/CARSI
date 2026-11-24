@@ -24,6 +24,13 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isEntryPoint } from './lib/is-entry-point.mjs';
+import {
+  CARSI_ACCREDITED_CLAIM,
+  CERTIFICATION_GRANT,
+  CERTIFICATION_GRANT_ALLOW,
+  RETIRED_PROVIDER_WORDING,
+  retiredWordingExemption,
+} from './iicrc-claim-rules.mjs';
 
 /** GP-673 reviews r1 and r2 (Codex, P1). Course descriptions reach learners through the React
  *  component CourseFormattedBody: stripLegacyPurchaseCta, then sourceToStudentHtml
@@ -233,6 +240,38 @@ const BANNED = [
     baselined: true,
     message:
       'CARSI does not grant certification — do not say "earn / achieve / get your certification". Say "earn your CARSI designation" or "verifiable CARSI credentials".',
+  },
+  // GAP CLOSED (GP-586) — CARSI or its training makes the learner certified, in any word order:
+  // "CARSI courses get you certified.", "This course certifies technicians.", "You will be certified
+  // after this course." The rule above only knew a fixed list of words between "get" and
+  // "certified". The shapes live in scripts/iicrc-claim-rules.mjs (one owner; see there).
+  {
+    re: CERTIFICATION_GRANT,
+    allow: CERTIFICATION_GRANT_ALLOW,
+    baselined: true,
+    message:
+      'CARSI certifies no one — do not say CARSI or its courses get / make you certified, or that you will be certified. Say "earn a CARSI designation" or "earn IICRC CECs toward your existing certification".',
+  },
+  // GAP CLOSED (GP-599) — the provider wording GP-704 retired ("IICRC CEC Accredited", "accredited
+  // provider", "accredited by the IICRC") and GP-771's unqualified "CARSI is accredited". Before this,
+  // only the vitest guard (approved-provider-wording.test.tsx) caught them, and the allows in this
+  // file still treated "IICRC CEC Accredited" as CARSI's approved standing. Same patterns as that
+  // test, from the same owner.
+  {
+    re: RETIRED_PROVIDER_WORDING,
+    allow: null,
+    // Not enforced in the files the owner's exemption lists name (dated records, detectors, files
+    // another open change owns): the same lists the vitest guard uses, so the two cannot disagree.
+    retiredWording: true,
+    message:
+      'Retired provider wording (GP-704). CARSI is an "IICRC Approved CEC Provider" (src/lib/iicrc/approved-wording.ts); never call CARSI, a course or its training accredited.',
+  },
+  {
+    re: CARSI_ACCREDITED_CLAIM,
+    allow: null,
+    retiredWording: true,
+    message:
+      'CARSI is not accredited by anyone (GP-771). Say "CARSI is an IICRC Approved CEC Provider" (src/lib/iicrc/approved-wording.ts).',
   },
   // GAP CLOSED — "IICRC-approved" as a CARSI offering. Legitimate uses (real IICRC schools /
   // exams / the CE-provider program / board-approval process) are allowed.
@@ -519,8 +558,10 @@ function scanLine(file, lineNo, content, findings, allowlist, certCtx = CERT_CTX
   // course — i.e. its path contains a slug listed in CEC_APPROVED_SLUGS (empty = none approved).
   const nf = file.replace(/\\/g, '/');
   const cecApproved = CEC_APPROVED_SLUGS.some((slug) => nf.includes(slug));
+  const retiredExempt = retiredWordingExemption(nf) !== null;
   for (const rule of [...BANNED, CEC_NUMBER]) {
     if (rule === CEC_NUMBER && cecApproved) continue;
+    if (rule.retiredWording && retiredExempt) continue;
     if (!rule.re.test(content)) continue;
     let flagged;
     if (rule.allowlisted) {

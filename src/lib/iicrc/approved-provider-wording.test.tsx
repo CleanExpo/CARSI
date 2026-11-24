@@ -32,6 +32,13 @@ import {
   FROM_IICRC_APPROVED_CEC_PROVIDER,
   IICRC_APPROVED_CEC_PROVIDER,
 } from './approved-wording';
+import {
+  CARSI_ACCREDITED_CLAIM as CARSI_ACCREDITED_CLAIM_RULE,
+  RETIRED_PROVIDER_WORDING as RETIRED_PROVIDER_WORDING_RULE,
+  RETIRED_WORDING_DETECTORS,
+  RETIRED_WORDING_HISTORICAL,
+  RETIRED_WORDING_PENDING,
+} from '../../../scripts/iicrc-claim-rules.mjs';
 import { readingViews, sourceLine } from './reading-view';
 
 vi.mock('@/lib/brand/fonts', () => ({
@@ -54,123 +61,13 @@ vi.mock('@/hooks/use-toast', async (importOriginal) => ({
 
 const ROOT = process.cwd();
 
-/**
- * The retired wording: an "accredit" word directly beside IICRC or CEC, "accredited provider", or
- * "accredited" followed within four words by IICRC or CEC ("accredited as an IICRC CEC provider",
- * "accredited by the IICRC"). A negation in the two words before "accredited" ("not accredited by
- * the IICRC", "not nationally accredited and awards no IICRC CECs") is a true statement and passes.
- * Reverse forms are caught too: IICRC or CEC followed within three words by an "accredit" word ("the
- * IICRC has accredited", "IICRC CEC provider accreditation"), and "accreditation from/by the IICRC".
- * "nationally accredited" (VET qualifications) is a different claim and passes.
- */
-export const RETIRED_PROVIDER_WORDING =
-  /\b(?:IICRC|CECs?)[\s-]+accredit\w*|\baccredit\w*[\s-]+(?:IICRC|CECs?)\b|\baccredited[\s-]+provider\b|(?<!\b(?:not|never)(?:[\s-]+\w+)?[\s-]+)\baccredited(?:[\s-]+[\w'’]+){0,4}?[\s-]+(?:IICRC|CECs?)\b|\b(?:IICRC|CECs?)(?:[\s-]+[\w'’]+){0,3}?[\s-]+(?<!nationally[\s-]+)accredit\w*|\baccreditation[\s-]+(?:from|by|with)[\s-]+(?:the[\s-]+)?(?:IICRC|CECs?)\b/gi;
-
-/**
- * GP-771: an unqualified "accredited" claim about CARSI, with no IICRC or CEC named ("CARSI is fully
- * accredited."). CARSI is not accredited by anyone; it is an IICRC Approved CEC Provider and issues
- * its own designations. The proximity rule is grammatical, not a word window: the "accredit" word
- * must be said OF CARSI (or "we" / "our courses") in one of four shapes, with nothing between them
- * except words from the closed lists below:
- *   1. attached: "CARSI accreditation", "CARSI's accreditation", "CARSI-accredited";
- *   2. a linking verb: "CARSI (courses) is/are/'s (an/fully/nationally/...) accredited",
- *      "we are / we're (an) accredited", "our courses are accredited";
- *   3. possession: "CARSI holds/has/earned (full/national) accreditation", "our accreditation";
- *   4. agent: "accredited by/through/with CARSI".
- * So a negation ("CARSI is not accredited", "does not award nationally accredited VET
- * qualifications"), a question ("Is CARSI accredited?": shape 1 does not match after an auxiliary
- * that opens a question, and the others need CARSI before the verb) and "accredited" about another body
- * ("CARSI recommends a NATA-accredited laboratory") do not match. "nationally accredited" is not
- * exempt here: "CARSI courses are nationally accredited" is false (CARSI is not an RTO).
- */
-const SEP = '[\\s-]+';
-const CARSI_THING =
-  '(?:own[\\s-]+)?(?:courses?|training|programs?|programmes?|classes|designations?|credentials?|certificates?|qualifications?)';
-const SUBJECT = `(?:CARSI(?:['’]s)?(?:${SEP}${CARSI_THING})?|we|our${SEP}${CARSI_THING})`;
-const LINK = `(?:${SEP}(?:is|are|was|were|has${SEP}been|have${SEP}been|remains?|becomes?|became)|['’](?:s|re))`;
-const MODIFIER =
-  '(?:an?|the|now|also|fully|officially|nationally|internationally|formally|properly|independently|government|industry|and)';
-export const CARSI_ACCREDITED_CLAIM = new RegExp(
-  [
-    // Not after an auxiliary that opens a question ("Is CARSI accredited?").
-    `(?<!\\b(?:is|are|was|were|isn['’]t|aren['’]t|wasn['’]t)${SEP})\\bCARSI(?:['’]s)?${SEP}accredit\\w*`,
-    `\\b${SUBJECT}${LINK}(?:${SEP}${MODIFIER})*${SEP}accredit\\w*`,
-    `\\b(?:CARSI|we)${SEP}(?:holds?|has|have|gained|earned|received|achieved|obtained)${SEP}(?:(?:full|national|formal|official|government)${SEP})?accreditations?\\b`,
-    `\\bour${SEP}accreditations?\\b`,
-    `\\baccredit\\w*${SEP}(?:by|through|with)${SEP}CARSI\\b`,
-  ].join('|'),
-  'gi'
-);
-
-/**
- * Dated records of the past: audits, handoffs, session notes, specs, decision logs and applied
- * database migrations. They describe what was true or what was found then; rewriting them would
- * falsify the record. A path ending in "/" matches by prefix; any other path matches exactly.
- */
-const HISTORICAL = [
-  'docs/audit/',
-  'docs/session-handoffs/',
-  'docs/sessions/',
-  'docs/plans/archive/',
-  'docs/specs/',
-  'docs/ai-demonstration/source-of-truth/history/',
-  'docs/superpowers/specs/',
-  'docs/agent-framework/GAP-BACKLOG-2026-08-07.md',
-  'docs/agent-framework/PIPELINE.md',
-  'docs/governance/BACKLOG.md',
-  'docs/governance/DECISIONS.md',
-  'docs/governance/GOAL.md',
-  'docs/CONTENT_PARITY_AUDIT.md',
-  'docs/runbooks/course-go-live.md',
-  'docs/compliance/licence-inventory.csv',
-  'prisma/migrations/',
-  'db/ops/',
-  'scripts/audit/',
-];
-
-/**
- * Detectors: guard scripts and tests that must spell the retired wording to catch it. None of them
- * is served. Exact paths only.
- */
-const DETECTORS = [
-  // Dated record that quotes the retired wording as its "before" text.
-  'docs/governance/reports/gp-525-carpet-cec-reconciliation.md',
-  // Header comment quotes the founder rule, which uses the retired phrase.
-  'scripts/check-iicrc-scope.mjs',
-  'scripts/check-iicrc-compliance.mjs',
-  'scripts/check-iicrc-compliance.test.mjs',
-  'scripts/check-iicrc-terminology.mjs',
-  'scripts/check-iicrc-terminology.test.mjs',
-  'scripts/check-live-catalogue.mjs',
-  'scripts/check-live-catalogue.test.mjs',
-  'scripts/check-live-courses-money-path.test.mjs',
-  'scripts/check-live-guards.fixture-test.mjs',
-  'scripts/licence-inventory.mjs',
-  'scripts/probe-iicrc-guard-allows.mjs',
-  'src/components/pricing/PricingTiers.test.tsx',
-  'src/lib/course-kit/iicrc-phrases.test.ts',
-  'src/lib/marketing/industry-faq-licence.test.ts',
-  'src/lib/marketing/licence-copy-sweep.test.ts',
-  'src/lib/marketing/licence-inventory.test.ts',
-  'src/lib/marketing/public-claims-guard.test.ts',
-  'src/lib/seo/neosan-claims.test.ts',
-  'src/lib/server/public-catalogue-facts.branding.test.ts',
-  // This guard: its pattern controls spell the retired wording on purpose.
-  'src/lib/iicrc/approved-provider-wording.test.tsx',
-];
-
-/**
- * Files owned by another open change. The owner removes the wording; this test then fails until
- * the entry is deleted, so the list only shrinks. A prefix entry stays only while at least one
- * file under it still matches.
- */
-const PENDING: Record<string, string> = {
-  'data/seed/': 'GP-748 (PR #1205): seed copy; the founder runs the seed',
-  'data/courses/': 'GP-748 (PR #1205): course research and drafts',
-  'data/course-content/': 'GP-749: lesson content',
-  'data/CARSI_Specialty_Courses_Collection.txt': 'GP-749: legacy course text',
-  'docs/course-content/': 'GP-749: workshop course content',
-};
+// The rules and their exemption lists have one owner, shared with check:iicrc-compliance (GP-599).
+// Each rule is exported without the `g` flag; this test needs every match, so it builds its own.
+const RETIRED_PROVIDER_WORDING = new RegExp(RETIRED_PROVIDER_WORDING_RULE.source, 'gi');
+const CARSI_ACCREDITED_CLAIM = new RegExp(CARSI_ACCREDITED_CLAIM_RULE.source, 'gi');
+const HISTORICAL = RETIRED_WORDING_HISTORICAL;
+const DETECTORS = RETIRED_WORDING_DETECTORS;
+const PENDING: Record<string, string> = RETIRED_WORDING_PENDING;
 
 /** Served PDFs whose text still carries the wording, with the owner who regenerates them. */
 const PENDING_PDFS: Record<string, string> = {};
