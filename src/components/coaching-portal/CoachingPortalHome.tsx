@@ -170,6 +170,10 @@ function AssessmentPendingHome() {
   );
 }
 
+function formatActionDueDate(dueDate: string | Date): string {
+  return new Date(dueDate).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+}
+
 function ActiveHome() {
   const { user, welcomeMessage, plan, actions, sessions, marketing } = useCoachingPortal();
   const monthSummary = buildCoachingHomeMonthSummary({
@@ -179,6 +183,9 @@ function ActiveHome() {
     marketingHasPack: marketing.hasPack,
     profileReady: marketing.profileReady,
     nextActionTitle: actions.nextAction?.title ?? null,
+    nextActionDueLabel: actions.nextAction?.dueDate
+      ? formatActionDueDate(actions.nextAction.dueDate)
+      : null,
   });
 
   return (
@@ -272,11 +279,7 @@ function ActiveHome() {
                 <p className="mt-2 text-lg font-semibold text-white">{actions.nextAction.title}</p>
                 {actions.nextAction.dueDate ? (
                   <p className={`mt-1 text-xs text-slate-500`}>
-                    Due{' '}
-                    {new Date(actions.nextAction.dueDate).toLocaleDateString('en-AU', {
-                      day: 'numeric',
-                      month: 'short',
-                    })}
+                    Due {formatActionDueDate(actions.nextAction.dueDate)}
                   </p>
                 ) : null}
                 <Link
