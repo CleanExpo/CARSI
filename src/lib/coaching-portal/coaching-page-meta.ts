@@ -93,6 +93,17 @@ export const COACHING_PAGE_META = {
       'Email us if your site blocks our checker.',
     ],
   },
+  tradehall: {
+    id: 'tradehall',
+    eyebrow: 'Advantage A9',
+    title: 'TradeHall',
+    description: 'Your hall passport and on-demand chapter seminar replays.',
+    supportSubject: 'Business Coaching — TradeHall',
+    supportTips: [
+      'Owner Circle and Growth Days are live peer touchpoints until the hall video room opens.',
+      'Your passport links your chapter and coach for supplier workshops.',
+    ],
+  },
 } as const satisfies Record<string, CoachingPageMeta>;
 
 export type CoachingPageMetaKey = keyof typeof COACHING_PAGE_META;

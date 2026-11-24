@@ -9,6 +9,9 @@ Licence, course production and IICRC terminology rules:
 Premium Visual & Motion Standard, verification gate and compound loop:
 @../docs/agents/AGENTS.md
 
+Product engineering skills (specialised workflows — not always-on):
+@../.agents/skills/README.md
+
 ## Merges are Phill's only (ruled 23/11/2026)
 
 Agents never run `gh pr ready` (except `gh pr ready --undo`, back to draft) or `gh pr merge`

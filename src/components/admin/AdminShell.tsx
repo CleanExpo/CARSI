@@ -8,19 +8,21 @@ import {
   CalendarDays,
   ClipboardCheck,
   GraduationCap,
+  Library,
+  LineChart,
   LogOut,
-  Menu,
-  Route,
   Mail,
   Megaphone,
+  Menu,
+  MessageCircleQuestion,
   NotebookPen,
   Percent,
   ReceiptText,
+  Route,
   Send,
+  UserCog,
   Users,
-  MessageCircleQuestion,
-  Library,
-  LineChart,
+  UsersRound,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -106,6 +108,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const contactsActive = pathname.startsWith('/admin/contacts');
   const marketingActive = pathname.startsWith('/admin/marketing');
   const businessCoachingAdminActive = pathname.startsWith('/admin/business-coaching');
+  const coachingChaptersActive = pathname.startsWith('/admin/coaching-chapters');
+  const coachingMembersActive = pathname.startsWith('/admin/coaching-members');
   const coachingActionsActive = pathname.startsWith('/admin/coaching-actions');
   const learningPathsActive = pathname.startsWith('/admin/coaching-learning-paths');
   const monthlyReviewActive = pathname.startsWith('/admin/coaching-monthly-review');
@@ -202,6 +206,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           label="Owner Circle"
           icon={Users}
           active={businessCoachingAdminActive}
+        />
+        <NavButton
+          href="/admin/coaching-chapters"
+          label="Coach chapters"
+          icon={UsersRound}
+          active={coachingChaptersActive}
+        />
+        <NavButton
+          href="/admin/coaching-members"
+          label="Coaching members"
+          icon={UserCog}
+          active={coachingMembersActive}
         />
         <NavButton
           href="/admin/coaching-actions"

@@ -42,8 +42,9 @@ export const marketingInput =
 export const marketingLabel =
   'mb-1.5 block text-xs font-medium tracking-wide text-slate-600 uppercase dark:text-white/70';
 
+/** Ambient page wash — token-only (no radial-gradient per premium-visuals scanner). */
 export const marketingPageGlow =
-  'pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(36,144,237,0.1),transparent_55%)] dark:bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(36,144,237,0.07),transparent_55%)]';
+  'pointer-events-none fixed inset-0 z-0 bg-[#f6f8fb] dark:bg-[#080c14]';
 
 export const marketingBody = 'text-base leading-relaxed text-slate-600 sm:text-lg dark:text-white/75';
 
