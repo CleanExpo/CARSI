@@ -42,11 +42,13 @@ export async function verifyAdminSessionToken(token: string): Promise<AdminSessi
     if (bootstrapEmail && emailLower === bootstrapEmail) return { email };
     try {
       const { prisma } = await import('@/lib/prisma');
+      // The same rule as resolveCurrentAdmin (src/lib/server/current-admin.ts): the row must be
+      // active AND hold the admin role now, so a demoted account loses the panel at once.
       const row = await prisma.adminUser.findUnique({
         where: { email: emailLower },
-        select: { isActive: true },
+        select: { isActive: true, role: true },
       });
-      if (row?.isActive) return { email };
+      if (row?.isActive && row.role.trim().toLowerCase() === 'admin') return { email };
     } catch {
       // DB unavailable — conservative reject.
     }
