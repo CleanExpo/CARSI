@@ -30,18 +30,21 @@ import { hasAnalyticsConsent } from '@/lib/server/analytics-consent';
 import { sendGa4PurchaseEvent } from '@/lib/server/ga4-measurement-protocol';
 import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
-import { markOrgSubscriptionStatusBySubscriptionId } from '@/lib/server/org-subscription-store';
 import {
   PAYMENT_REVERSED,
   recordUnfulfilledPayment,
   resolveUnfulfilledPayment,
+  type SubscriptionInvoiceRef,
 } from '@/lib/server/payment-integrity-ledger';
 import { recordPartnerReferralSale } from '@/lib/server/partner-referral-sales';
 import { captureServerError } from '@/lib/server/sentry';
 import { resolveStripePaymentReference } from '@/lib/server/stripe-payment-reference';
 import { isDisputeWon } from '@/lib/server/stripe-revocation';
 import {
+  readInvoiceCreatedAt,
+  readInvoiceCreatedAtFromPaymentIntent,
   readInvoiceIdFromPaymentIntent,
+  readInvoiceSubscriptionId,
   readSubscriptionIdFromPaymentIntent,
 } from '@/lib/server/stripe-subscription-map';
 import {
@@ -54,11 +57,21 @@ import {
   classifyStripeWebhookEnvelope,
   shouldRetryWebhookFulfillment,
 } from '@/lib/server/stripe-webhook-policy';
-import { markSubscriptionStatusBySubscriptionId } from '@/lib/server/subscription-store';
-import { handleSubscriptionEvent, isSubscriptionEvent } from '@/lib/server/subscription-webhook';
+import {
+  handleSubscriptionEvent,
+  isSubscriptionEvent,
+  refreshSubscriptionFromStripe,
+} from '@/lib/server/subscription-webhook';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
-import { applyCheckoutPaymentReversal, applyDisputeWon } from '@/lib/server/seat-state';
-import { markTeamSubscriptionStatusBySubscriptionId } from '@/lib/server/team-subscription-store';
+import {
+  applyCheckoutPaymentReversal,
+  applyDisputeWon,
+  applySubscriptionDisputeWon,
+  applySubscriptionEnded,
+  applySubscriptionInvoicePaid,
+  applySubscriptionPaymentReversal,
+  type SubscriptionReopen,
+} from '@/lib/server/seat-state';
 
 /**
  * WS3 / GP-447 boundary note: this handler only sends the one-off course
@@ -87,14 +100,15 @@ type StripeWebhookEventDelegate = {
  *     checkout session(s) whose id was stored as the enrollment paymentReference
  *     at fulfillment, and revoke those `LmsEnrollment` rows.
  *
- *  2. Individual annual membership (WS1-E1, GP-441) — a subscription invoice
- *     charge has NO checkout-session paymentReference, so path 1 is a no-op for
- *     it. Instead we follow the payment intent → invoice → subscription id and
- *     mark the `LmsSubscription` non-entitling (`canceled`), so a refunded /
- *     charged-back member loses catalogue access. Parity with the one-off lapse
- *     policy: existing progress and issued certificates are RETAINED — only NEW
- *     enrolment entitlement stops (the gate reads `getEntitlements`, which treats
- *     `canceled` as lapsed).
+ *  2. Subscriptions (individual, Teams, org and coaching) — a subscription
+ *     invoice charge has NO checkout-session paymentReference, so path 1 is a
+ *     no-op for it. Instead we follow the payment intent → invoice → subscription
+ *     id and record the reversed invoice in the seat step (GP-641). When it is
+ *     the member's latest payment, every linked row is written `unpaid`, and the
+ *     record holds when Stripe delivers the refund before the event that writes
+ *     the row, and against any later "active" snapshot, until a newer invoice is
+ *     paid. Existing progress and issued
+ *     certificates are RETAINED — only NEW enrolment entitlement stops.
  *
  * Idempotent under the existing StripeWebhookEvent claim: re-delivery re-applies
  * the same terminal states and never double-acts.
@@ -153,18 +167,21 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
     }
     const subscriptionId = readSubscriptionIdFromPaymentIntent(paymentIntent);
     if (subscriptionId && revokeEntitlement) {
-      // Terminal, non-entitling state. `canceled` is treated as lapsed by every
-      // entitlement decision (individual/team/org) → no new catalogue access.
-      // The subscription id is unique per table; each mark is a no-op when the id
-      // is not in that table, so we fan out to all three revenue paths (E1/E2/E3)
-      // without needing to know the plan up front.
-      await Promise.all([
-        markSubscriptionStatusBySubscriptionId(subscriptionId, 'canceled'),
-        markTeamSubscriptionStatusBySubscriptionId(subscriptionId, 'canceled'),
-        markOrgSubscriptionStatusBySubscriptionId(subscriptionId, 'canceled'),
-      ]);
+      // GP-641: one step records the reversed invoice and blocks every linked row (individual,
+      // Teams, org and coaching), whether or not the row exists yet.
+      const { blocked } = await applySubscriptionPaymentReversal(
+        subscriptionId,
+        reason,
+        subscriptionInvoiceRef(
+          invoiceTransactionId,
+          readInvoiceCreatedAtFromPaymentIntent(paymentIntent),
+          'event_time',
+          eventTimestamp,
+          subscriptionId,
+        ),
+      );
       console.warn(
-        `[stripe webhook] revoked subscription entitlement for subscription=${subscriptionId} (${reason})`
+        `[stripe webhook] subscription reversal for subscription=${subscriptionId} (${reason}): ${blocked ? 'access blocked' : 'access unchanged (a newer paid invoice, or a won dispute, decides)'}`
       );
     }
   } catch (error) {
@@ -214,14 +231,11 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
  * other close status ('lost'/'warning_closed'/…) leaves the enrolment revoked,
  * and a row a later refund downgraded to 'refunded' is never re-granted.
  *
- * SCOPE — one-off course enrolments only (reverses handleStripeRevocation's
- * PATH 1: checkout-session → enrolment). It does NOT re-entitle a subscription
- * membership that path 2 marked `canceled` on dispute.created: a dispute WIN
- * does not change the Stripe subscription status, so no subscription lifecycle
- * event fires to restore it. Subscription re-entitlement on a won dispute is a
- * KNOWN FOLLOW-UP owned by the subscription path (feat/gp-441-e1-annual-
- * entitlement; see the boundary note at the top of this file) — until then, an
- * annual member who wins a dispute stays lapsed until the next invoice.paid.
+ * SCOPE — one-off course enrolments (reverses PATH 1) and, GP-641, subscription
+ * payments: the subscription's dispute marker is lifted and, unless a refund or
+ * deletion still ends it, the subscription is re-read from Stripe and written
+ * through the guarded path, so the member's access returns straight away (a
+ * dispute win fires no subscription lifecycle event of its own).
  *
  * ORDERING — this and handleStripeRevocation are two independently-claimed
  * events with no Stripe delivery-order guarantee. The realistic hazard is a
@@ -236,6 +250,37 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
  * Idempotent under the StripeWebhookEvent claim + the reactivate query (an
  * already-active row matches nothing; `lte`/`lt` guards make replays no-ops).
  */
+/**
+ * GP-641: the subscription invoice an event is about, identified by its Stripe id (access is
+ * decided by invoice identity, see `subscriptionAccessBlock`). Stripe always sends the id and the
+ * creation time. A missing id is stored as unknown, which blocks until a strictly newer invoice
+ * is paid. A missing creation time must never help open access: a REVERSAL takes the event time
+ * (it can only count as newer, so it blocks); a payment or a won dispute takes the oldest
+ * possible time (it can never outrank a reversal; Stripe's latest invoice decides instead).
+ */
+function subscriptionInvoiceRef(
+  invoiceId: string | null,
+  invoiceCreatedAt: Date | null,
+  missingCreatedAt: 'event_time' | 'oldest',
+  eventTimestamp: Date,
+  subscriptionId: string,
+): SubscriptionInvoiceRef {
+  if (!invoiceId || !invoiceCreatedAt) {
+    console.warn(`[stripe webhook] invoice id or creation time missing for subscription=${subscriptionId}`);
+  }
+  const fallback = missingCreatedAt === 'event_time' ? eventTimestamp : new Date(0);
+  return { id: invoiceId, createdAt: invoiceCreatedAt ?? fallback };
+}
+
+/**
+ * GP-641: a step turned a blocked subscription back into one that gives access. While it was
+ * blocked, guarded writes stamped the row with newer event times, so the restore must not be
+ * ordered by this event's time: the subscription is re-read from Stripe and written as of now.
+ */
+async function restoreReopenedSubscription(subscriptionId: string, result: SubscriptionReopen): Promise<void> {
+  if (result.reopened) await refreshSubscriptionFromStripe(subscriptionId, new Date());
+}
+
 async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
   const dispute = event.data.object as Stripe.Dispute;
   if (!isDisputeWon(dispute.status)) return;
@@ -261,6 +306,20 @@ async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
       reversedRevenueCents: 0,
       currency: dispute.currency,
     });
+  }
+  const subscriptionId = readSubscriptionIdFromPaymentIntent(paymentIntent);
+  if (subscriptionId) {
+    const result = await applySubscriptionDisputeWon(
+      subscriptionId,
+      subscriptionInvoiceRef(
+        invoiceId,
+        readInvoiceCreatedAtFromPaymentIntent(paymentIntent),
+        'oldest',
+        eventTimestamp,
+        subscriptionId,
+      ),
+    );
+    await restoreReopenedSubscription(subscriptionId, result);
   }
   const sessions = await stripe.checkout.sessions.list({
     payment_intent: paymentIntentId,
@@ -379,6 +438,32 @@ export async function POST(request: NextRequest) {
     // failure throws and is caught below → 5xx → Stripe retries (single grant
     // guaranteed by the upsert keyed on the unique subscription id).
     if (isSubscriptionEvent(event.type)) {
+      if (event.type === 'customer.subscription.deleted') {
+        // GP-641: record the deletion before anything else, so it holds even when the row or its
+        // owner does not exist yet.
+        const deleted = event.data.object as Stripe.Subscription;
+        await applySubscriptionEnded(deleted.id, new Date(event.created * 1000));
+      }
+      if (event.type === 'invoice.paid') {
+        // GP-641: record the paid invoice before the snapshot is written. An invoice newer than
+        // the latest refunded or charged-back one is a fresh payment and gives access again. A $0
+        // invoice (trial, full discount) pays nothing and records nothing.
+        const invoice = event.data.object as Stripe.Invoice;
+        const paidSubscriptionId = readInvoiceSubscriptionId(invoice);
+        if (paidSubscriptionId && typeof invoice.amount_paid === 'number' && invoice.amount_paid > 0) {
+          const result = await applySubscriptionInvoicePaid(
+            paidSubscriptionId,
+            subscriptionInvoiceRef(
+              typeof invoice.id === 'string' ? invoice.id : null,
+              readInvoiceCreatedAt(invoice),
+              'oldest',
+              new Date(event.created * 1000),
+              paidSubscriptionId,
+            ),
+          );
+          await restoreReopenedSubscription(paidSubscriptionId, result);
+        }
+      }
       await handleSubscriptionEvent(event);
       return await acknowledge();
     }

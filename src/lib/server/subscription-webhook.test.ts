@@ -6,11 +6,10 @@ import type Stripe from 'stripe';
  * access. FINDING 2 parity: the `customer.subscription.deleted` handler must
  * write a sticky terminal state.
  *
- * These tests prove the end-to-end intent of Finding 1 without a live DB or
- * Stripe: the revocation reader resolves a subscription id from a refunded
- * payment intent, the store marks the membership `canceled`, and the
- * entitlement decision then reports the member as NOT entitled — exactly the
- * gate the refunded/charged-back learner hits when trying to enrol.
+ * These tests cover the revocation reader (which resolves a subscription id
+ * from a refunded payment intent) and the deletion handler. The reversal
+ * itself, and the entitlement it leaves, are tested end to end in
+ * subscription-reversal-before-row.test.ts.
  */
 
 import {
@@ -18,7 +17,6 @@ import {
   readSubscriptionIdFromPaymentIntent,
   readInvoiceSubscriptionId,
 } from './stripe-subscription-map';
-import { decideMembershipEntitlement } from './entitlements';
 
 function pi(overrides: Record<string, unknown>): Stripe.PaymentIntent {
   return overrides as unknown as Stripe.PaymentIntent;
@@ -59,27 +57,10 @@ describe('readSubscriptionIdFromPaymentIntent (Finding 1 — detect a subscripti
   });
 });
 
-describe('refund/dispute → membership revoked → NOT entitled (Finding 1 end-to-end)', () => {
-  it('a subscription refund marks the membership canceled, and canceled is NOT entitled', () => {
-    // The revocation path writes status='canceled' (via
-    // markSubscriptionStatusBySubscriptionId). The entitlement decision core is
-    // the single source of truth the enrol gate consults — prove it denies.
-    const afterRevocation = decideMembershipEntitlement(
-      { status: 'canceled', currentPeriodEnd: new Date('2099-01-01T00:00:00.000Z') },
-      new Date('2026-07-04T00:00:00.000Z'),
-    );
-    // Even with a period end far in the future, canceled = lapsed = no new access.
-    expect(afterRevocation).toEqual({ entitled: false, reason: 'lapsed' });
-  });
-
-  it('contrast: before revocation an active membership IS entitled', () => {
-    const beforeRevocation = decideMembershipEntitlement(
-      { status: 'active', currentPeriodEnd: new Date('2099-01-01T00:00:00.000Z') },
-      new Date('2026-07-04T00:00:00.000Z'),
-    );
-    expect(beforeRevocation).toEqual({ entitled: true, reason: 'active' });
-  });
-});
+// Finding 1 end-to-end (refund or chargeback → row written `unpaid` → NOT entitled) is driven
+// through the real webhook and reversal step over a stateful fake database in
+// subscription-reversal-before-row.test.ts ("Finding 1 end-to-end"). This file mocks the
+// subscription store, so it cannot exercise that path; it keeps the reader and deletion tests.
 
 /**
  * Store-integration for the webhook deleted handler and the refund revocation
@@ -89,15 +70,12 @@ describe('refund/dispute → membership revoked → NOT entitled (Finding 1 end-
  */
 
 const upsertTerminalSubscriptionStatus = vi.fn(async () => {});
-const markSubscriptionStatusBySubscriptionId = vi.fn(async () => {});
 const upsertSubscription = vi.fn(async () => {});
 const resolveUserIdForStripeSubscription = vi.fn(async () => 'user-42');
 
 vi.mock('./subscription-store', () => ({
   upsertTerminalSubscriptionStatus: (...a: unknown[]) =>
     upsertTerminalSubscriptionStatus(...(a as [])),
-  markSubscriptionStatusBySubscriptionId: (...a: unknown[]) =>
-    markSubscriptionStatusBySubscriptionId(...(a as [])),
   upsertSubscription: (...a: unknown[]) => upsertSubscription(...(a as [])),
   resolveUserIdForStripeSubscription: (...a: unknown[]) =>
     resolveUserIdForStripeSubscription(...(a as [])),
@@ -147,14 +125,12 @@ describe('customer.subscription.deleted → sticky terminal write (Finding 2 par
     expect(arg.stripeSubscriptionId).toBe('sub_795');
     expect(arg.status).toBe('canceled');
     expect(arg.eventTimestamp).toEqual(new Date(DELETED_AT * 1000));
-    // It must NOT silently no-op via the id-keyed legacy path.
-    expect(markSubscriptionStatusBySubscriptionId).not.toHaveBeenCalled();
   });
 
-  it('falls back to the id-keyed write when the user cannot be resolved', async () => {
+  it('writes no row itself when the user cannot be resolved (GP-641: the route records the deletion marker first)', async () => {
     resolveUserIdForStripeSubscription.mockResolvedValueOnce(null as unknown as string);
     await handleSubscriptionEvent(deletedEvent());
     expect(upsertTerminalSubscriptionStatus).not.toHaveBeenCalled();
-    expect(markSubscriptionStatusBySubscriptionId).toHaveBeenCalledWith('sub_795', 'canceled');
+    expect(upsertSubscription).not.toHaveBeenCalled();
   });
 });

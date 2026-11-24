@@ -92,20 +92,17 @@ vi.mock('@/lib/api/stripe', () => ({
 }));
 vi.mock('./subscription-store', () => ({
   upsertSubscription: vi.fn(async () => {}),
-  markSubscriptionStatusBySubscriptionId: vi.fn(async () => {}),
   upsertTerminalSubscriptionStatus: vi.fn(async () => {}),
   resolveUserIdForStripeSubscription: () => h.resolveUserId(),
 }));
 vi.mock('./team-subscription-store', () => ({
   readSubscriptionSeatQuantity: vi.fn(() => 5),
   upsertTeamSubscription: vi.fn(async () => {}),
-  markTeamSubscriptionStatusBySubscriptionId: vi.fn(async () => {}),
   upsertTerminalTeamSubscriptionStatus: vi.fn(async () => {}),
   resolveTeamIdForStripeSubscription: () => h.resolveTeamId(),
 }));
 vi.mock('./org-subscription-store', () => ({
   updateOrgSubscriptionFromStripe: vi.fn(async () => true),
-  markOrgSubscriptionStatusBySubscriptionId: vi.fn(async () => {}),
   resolveTeamIdForOrgSubscription: vi.fn(async () => 'team-org-1'),
 }));
 vi.mock('./event-attribution', () => ({

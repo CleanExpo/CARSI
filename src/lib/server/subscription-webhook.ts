@@ -34,26 +34,22 @@ import {
 } from '@/lib/server/stripe-subscription-map';
 import { CARSI_COACHING_MONTHLY_CHECKOUT_SOURCE } from '@/lib/server/carsi-coaching-monthly-checkout';
 import {
-  markCoachingSubscriptionStatusBySubscriptionId,
   resolveUserIdForCoachingSubscription,
   upsertCoachingMonthlySubscription,
   upsertTerminalCoachingSubscriptionStatus,
 } from '@/lib/server/carsi-coaching-subscription-store';
 import {
-  markSubscriptionStatusBySubscriptionId,
   resolveUserIdForStripeSubscription,
   upsertSubscription,
   upsertTerminalSubscriptionStatus,
 } from '@/lib/server/subscription-store';
 import {
-  markTeamSubscriptionStatusBySubscriptionId,
   readSubscriptionSeatQuantity,
   resolveTeamIdForStripeSubscription,
   upsertTeamSubscription,
   upsertTerminalTeamSubscriptionStatus,
 } from '@/lib/server/team-subscription-store';
 import {
-  markOrgSubscriptionStatusBySubscriptionId,
   resolveTeamIdForOrgSubscription,
   updateOrgSubscriptionFromStripe,
 } from '@/lib/server/org-subscription-store';
@@ -64,6 +60,7 @@ import {
 } from '@/lib/server/payment-integrity-ledger';
 import { sendUpcomingRenewalReminder } from '@/lib/server/renewal-reminder';
 import { trackSubscriptionLifecycleEvent } from '@/lib/server/subscription-analytics';
+import { runWithSubscriptionInvoiceView } from '@/lib/server/subscription-invoice-view';
 
 /** Stripe subscription lifecycle + invoice events this module owns. */
 export const SUBSCRIPTION_EVENT_TYPES = new Set<string>([
@@ -192,8 +189,13 @@ async function holdUnownedEntitlingSubscription(
   mode: 'retry' | 'acknowledge',
 ): Promise<void> {
   if (subscription.status !== 'active' && subscription.status !== 'trialing') return;
-  await recordUnfulfilledPayment(subscription.id, reason);
-  if (mode === 'retry') throw new Error(SUBSCRIPTION_OWNER_PENDING);
+  // GP-641: a subscription whose latest payment was reversed, or which Stripe deleted, is owed
+  // nothing: it is recorded closed and not retried while its owner is still unknown. The ledger
+  // decides that on the same transaction as the record, with Stripe's latest invoice read first.
+  const owed = await runWithSubscriptionInvoiceView(subscription.id, {}, (view) =>
+    recordUnfulfilledPayment(subscription.id, reason, { subscription: view }),
+  );
+  if (owed && mode === 'retry') throw new Error(SUBSCRIPTION_OWNER_PENDING);
 }
 
 /**
@@ -323,6 +325,19 @@ async function applySubscriptionSnapshot(
 }
 
 /**
+ * GP-641: re-read a subscription from Stripe and write it through the normal guarded path. Used
+ * when a won dispute lifts a dispute marker, so the member's access is restored straight away
+ * instead of waiting for the next invoice.
+ */
+export async function refreshSubscriptionFromStripe(
+  stripeSubscriptionId: string,
+  eventTimestamp: Date,
+): Promise<void> {
+  const subscription = await getStripeClient().subscriptions.retrieve(stripeSubscriptionId);
+  await applySubscriptionSnapshot(subscription, eventTimestamp);
+}
+
+/**
  * Handle one subscription/invoice event. MUST be called only for event types in
  * `SUBSCRIPTION_EVENT_TYPES`. Throws on transient failure so the caller can
  * return a 5xx and let Stripe retry; returns normally on terminal/no-op cases.
@@ -364,8 +379,6 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
             plan,
             eventTimestamp,
           });
-        } else {
-          await markTeamSubscriptionStatusBySubscriptionId(subscription.id, status);
         }
         return;
       }
@@ -386,8 +399,6 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
             cancelAtPeriodEnd: readCancelAtPeriodEnd(subscription),
             eventTimestamp,
           });
-        } else {
-          await markOrgSubscriptionStatusBySubscriptionId(subscription.id, status);
         }
         return;
       }
@@ -403,8 +414,6 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
             status,
             eventTimestamp,
           });
-        } else {
-          await markCoachingSubscriptionStatusBySubscriptionId(subscription.id, status);
         }
         return;
       }
@@ -416,11 +425,10 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
         return;
       }
 
-      // Individual membership (E1) — unchanged behaviour.
-      // Resolve the user so the cancellation is STICKY even when this deleted
-      // event arrives before `created` (row absent) — a plain updateMany would
-      // no-op and lose the cancel. Falls back to the plain status write only if
-      // the user cannot be resolved (no row to create against safely).
+      // Individual membership (E1). Resolve the user so the cancelled row is
+      // written even when this deleted event arrives before `created`. When the
+      // user cannot be resolved, the route's `subscription-ended` marker (GP-641)
+      // still makes any later write of this subscription `canceled`.
       const email = await emailForSubscriptionCustomer(subscription);
       const userId = await resolveUserIdForStripeSubscription(subscription, email);
       if (userId && eventTimestamp) {
@@ -431,8 +439,6 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
           status,
           eventTimestamp,
         });
-      } else {
-        await markSubscriptionStatusBySubscriptionId(subscription.id, status);
       }
       return;
     }

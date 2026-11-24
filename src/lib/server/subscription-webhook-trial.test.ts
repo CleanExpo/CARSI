@@ -19,14 +19,16 @@ const resolveUserIdForStripeSubscription = vi.fn(async () => 'user-trial-1');
 
 // GP-759 unfulfilled-payment ledger (a database write), covered by stripe-webhook-unfulfilled.test.ts.
 vi.mock('./payment-integrity-ledger', () => ({
-  recordUnfulfilledPayment: vi.fn(async () => {}),
+  recordUnfulfilledPayment: vi.fn(async () => true),
   resolveUnfulfilledPayment: vi.fn(async () => {}),
+  // GP-641: no reversal recorded, so Stripe's latest invoice is never read.
+  subscriptionAccessNeedsLatestInvoice: vi.fn(async () => false),
+  StaleSubscriptionInvoiceView: class extends Error {},
 }));
 vi.mock('./subscription-store', () => ({
   upsertSubscription: (...a: unknown[]) => upsertSubscription(...(a as [])),
   resolveUserIdForStripeSubscription: (...a: unknown[]) =>
     resolveUserIdForStripeSubscription(...(a as [])),
-  markSubscriptionStatusBySubscriptionId: vi.fn(async () => {}),
   upsertTerminalSubscriptionStatus: vi.fn(async () => {}),
 }));
 

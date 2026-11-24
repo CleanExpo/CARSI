@@ -13,6 +13,7 @@ import {
   reserveOrgCheckout,
   reserveTeamCheckout,
 } from './membership-checkout-reservation';
+import { PAST_DUE_GRACE_DAYS } from './entitlements';
 
 const mocks = vi.hoisted(() => ({
   create: vi.fn(),
@@ -249,6 +250,10 @@ describe('a payer whose subscription lapsed can buy again', () => {
     // Both forms: unknown period end (unprovable, so lapsed) and beyond grace.
     expect(pastDue).toHaveLength(2);
     expect(pastDue.some((b) => b.currentPeriodEnd === null)).toBe(true);
+    // The dated form, exactly: a past-due row whose period ended inside the grace window is
+    // still entitled, so offering it would open a second checkout for a paying member.
+    const graceCutoff = new Date(NOW.getTime() - PAST_DUE_GRACE_DAYS * 24 * 60 * 60 * 1000);
+    expect(pastDue).toContainEqual({ status: 'past_due', currentPeriodEnd: { lt: graceCutoff } });
   });
 
   it('never offers a live status as claimable', async () => {
@@ -372,8 +377,8 @@ describe('a takeover detaches the row from the subscription it used to describe'
       () => mocks.orgUpdateMany,
     ],
   ])('nulls the old stripeSubscriptionId on the %s path', async (_label, run, updater) => {
-    // `markSubscriptionStatusBySubscriptionId` updates by stripeSubscriptionId
-    // with no status filter and no ordering guard, so leaving the old id on the
+    // The GP-641 reversal step cancels rows by stripeSubscriptionId with no
+    // status filter and no ordering guard, so leaving the old id on the
     // row lets ANY late event for the old subscription overwrite the claim —
     // dropping the reservation and reopening the duplicate checkout.
     mocks.create.mockRejectedValue(uniqueViolation());

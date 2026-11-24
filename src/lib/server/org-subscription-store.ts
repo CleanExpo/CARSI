@@ -2,7 +2,9 @@
  * Persistence for the organisation monthly subscription (`LmsOrgSubscription`,
  * WS1-E3). Mirrors the individual `subscription-store.ts` idempotent upsert and
  * `statusEventAt` out-of-order guard, keyed on the unique `teamId` (the org
- * container) and the unique `stripeSubscriptionId`.
+ * container) and the unique `stripeSubscriptionId`. GP-641: every write runs in
+ * `runGuardedSubscriptionWrite`, so a subscription whose latest payment was
+ * reversed is written as `unpaid`, and a deleted one as `canceled`.
  *
  * The Stripe subscription is mapped to a CARSI org (team) by, in order:
  *  1. the `carsi_team_id` metadata set at checkout / ops provisioning, then
@@ -12,6 +14,10 @@
 import type Stripe from 'stripe';
 
 import { prisma } from '@/lib/prisma';
+import {
+  runGuardedSubscriptionWrite,
+  type SubscriptionRowLink,
+} from '@/lib/server/subscription-access-guard';
 
 export interface OrgSubscriptionUpsertInput {
   teamId: string;
@@ -30,35 +36,47 @@ export interface OrgSubscriptionUpsertInput {
  * Idempotent and guarded by `statusEventAt`. No-op if the row is absent (the
  * webhook cannot invent an org's name/contact) — logged by the caller.
  */
+/** The org's row link, for `runGuardedSubscriptionWrite`. */
+function linkedTo<T>(teamId: string, skipped: T): SubscriptionRowLink<T> {
+  return {
+    linkedSubscriptionId: async (tx) =>
+      (await tx.lmsOrgSubscription.findUnique({ where: { teamId }, select: { stripeSubscriptionId: true } }))
+        ?.stripeSubscriptionId,
+    skipped,
+  };
+}
+
 export async function updateOrgSubscriptionFromStripe(
   input: OrgSubscriptionUpsertInput,
 ): Promise<boolean> {
-  const existing = await prisma.lmsOrgSubscription.findUnique({
-    where: { teamId: input.teamId },
-    select: { statusEventAt: true },
-  });
-  if (!existing) return false;
+  return runGuardedSubscriptionWrite(input.stripeSubscriptionId, input.status, linkedTo(input.teamId, true), async (tx, status) => {
+    const existing = await tx.lmsOrgSubscription.findUnique({
+      where: { teamId: input.teamId },
+      select: { statusEventAt: true },
+    });
+    if (!existing) return false;
 
-  if (
-    input.eventTimestamp &&
-    existing.statusEventAt &&
-    existing.statusEventAt > input.eventTimestamp
-  ) {
-    return true; // stale event ignored, but the row exists — treat as handled.
-  }
+    if (
+      input.eventTimestamp &&
+      existing.statusEventAt &&
+      existing.statusEventAt > input.eventTimestamp
+    ) {
+      return true; // stale event ignored, but the row exists — treat as handled.
+    }
 
-  await prisma.lmsOrgSubscription.update({
-    where: { teamId: input.teamId },
-    data: {
-      stripeCustomerId: input.stripeCustomerId,
-      stripeSubscriptionId: input.stripeSubscriptionId,
-      status: input.status,
-      currentPeriodEnd: input.currentPeriodEnd,
-      cancelAtPeriodEnd: input.cancelAtPeriodEnd,
-      statusEventAt: input.eventTimestamp ?? null,
-    },
+    await tx.lmsOrgSubscription.update({
+      where: { teamId: input.teamId },
+      data: {
+        stripeCustomerId: input.stripeCustomerId,
+        stripeSubscriptionId: input.stripeSubscriptionId,
+        status,
+        currentPeriodEnd: input.currentPeriodEnd,
+        cancelAtPeriodEnd: input.cancelAtPeriodEnd,
+        statusEventAt: input.eventTimestamp ?? null,
+      },
+    });
+    return true;
   });
-  return true;
 }
 
 /**
@@ -78,43 +96,34 @@ export async function upsertOrgSubscription(input: {
   entitledCategory?: string;
   eventTimestamp?: Date | null;
 }): Promise<void> {
-  if (input.eventTimestamp) {
-    const existing = await prisma.lmsOrgSubscription.findUnique({
-      where: { teamId: input.teamId },
-      select: { statusEventAt: true },
-    });
-    if (existing?.statusEventAt && existing.statusEventAt > input.eventTimestamp) {
-      return;
+  await runGuardedSubscriptionWrite(input.stripeSubscriptionId, input.status, linkedTo(input.teamId, undefined), async (tx, status) => {
+    if (input.eventTimestamp) {
+      const existing = await tx.lmsOrgSubscription.findUnique({
+        where: { teamId: input.teamId },
+        select: { statusEventAt: true },
+      });
+      if (existing?.statusEventAt && existing.statusEventAt > input.eventTimestamp) {
+        return;
+      }
     }
-  }
 
-  const data = {
-    organisationName: input.organisationName,
-    contactEmail: input.contactEmail.trim().toLowerCase(),
-    stripeCustomerId: input.stripeCustomerId,
-    stripeSubscriptionId: input.stripeSubscriptionId,
-    status: input.status,
-    currentPeriodEnd: input.currentPeriodEnd,
-    cancelAtPeriodEnd: input.cancelAtPeriodEnd,
-    statusEventAt: input.eventTimestamp ?? null,
-    ...(input.entitledCategory ? { entitledCategory: input.entitledCategory } : {}),
-  };
+    const data = {
+      organisationName: input.organisationName,
+      contactEmail: input.contactEmail.trim().toLowerCase(),
+      stripeCustomerId: input.stripeCustomerId,
+      stripeSubscriptionId: input.stripeSubscriptionId,
+      status,
+      currentPeriodEnd: input.currentPeriodEnd,
+      cancelAtPeriodEnd: input.cancelAtPeriodEnd,
+      statusEventAt: input.eventTimestamp ?? null,
+      ...(input.entitledCategory ? { entitledCategory: input.entitledCategory } : {}),
+    };
 
-  await prisma.lmsOrgSubscription.upsert({
-    where: { teamId: input.teamId },
-    create: { teamId: input.teamId, seatModel: 'unlimited', ...data },
-    update: data,
-  });
-}
-
-/** Force an org subscription to a terminal status by subscription id. */
-export async function markOrgSubscriptionStatusBySubscriptionId(
-  stripeSubscriptionId: string,
-  status: string,
-): Promise<void> {
-  await prisma.lmsOrgSubscription.updateMany({
-    where: { stripeSubscriptionId },
-    data: { status },
+    await tx.lmsOrgSubscription.upsert({
+      where: { teamId: input.teamId },
+      create: { teamId: input.teamId, seatModel: 'unlimited', ...data },
+      update: data,
+    });
   });
 }
 

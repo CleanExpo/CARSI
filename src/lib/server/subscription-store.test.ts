@@ -72,6 +72,8 @@ const db = vi.hoisted(() => {
   return { store, findUnique, upsert, updateMany };
 });
 
+const markers = vi.hoisted(() => new Map<string, { id: string; type: string }>());
+
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     lmsSubscription: {
@@ -79,11 +81,15 @@ vi.mock('@/lib/prisma', () => ({
       upsert: db.upsert,
       updateMany: db.updateMany,
     },
+    // GP-641: the guarded write reads the reversal markers on its own transaction.
+    stripeWebhookEvent: {
+      findUnique: async (args: { where: { id: string } }) => markers.get(args.where.id) ?? null,
+    },
+    $transaction: async (fn: (tx: unknown) => Promise<unknown>) => fn((await import('@/lib/prisma')).prisma),
   },
 }));
 
 import {
-  markSubscriptionStatusBySubscriptionId,
   upsertSubscription,
   upsertTerminalSubscriptionStatus,
 } from './subscription-store';
@@ -208,15 +214,24 @@ describe('upsertTerminalSubscriptionStatus — sticky cancel (deleted-before-cre
   });
 });
 
-describe('markSubscriptionStatusBySubscriptionId — legacy id-keyed write', () => {
-  it('updates an existing row by subscription id', async () => {
+describe('GP-641: a reversal or deletion marker makes the write membership canceled', () => {
+  beforeEach(() => markers.clear());
+
+  it('writes unpaid (no paid-through access) when the latest payment was refunded', async () => {
+    markers.set(`payment-reversed:${SUB}`, { id: `payment-reversed:${SUB}`, type: 'payment_reversed:refunded' });
     await upsertSubscription(activeInput(T1));
-    await markSubscriptionStatusBySubscriptionId(SUB, 'canceled');
+    expect(row()?.status).toBe('unpaid');
+  });
+
+  it('writes canceled when Stripe deleted the subscription before this write', async () => {
+    markers.set(`subscription-ended:${SUB}`, { id: `subscription-ended:${SUB}`, type: 'subscription_ended:deleted' });
+    await upsertSubscription(activeInput(T1));
     expect(row()?.status).toBe('canceled');
   });
 
-  it('is a no-op when no row matches the subscription id', async () => {
-    await markSubscriptionStatusBySubscriptionId('sub_absent', 'canceled');
-    expect(row()).toBeNull();
+  it('control: a lifted dispute (won) does not cancel', async () => {
+    markers.set(`payment-reversed:${SUB}`, { id: `payment-reversed:${SUB}`, type: 'payment_reversal_lifted:dispute_won' });
+    await upsertSubscription(activeInput(T1));
+    expect(row()?.status).toBe('active');
   });
 });

@@ -18,11 +18,22 @@ import {
 import { readTeamCourseSlug } from '@/lib/server/team-course-slug-db';
 import {
   clearDisputedCheckoutReversal,
+  clearSubscriptionDisputedReversal,
+  closeUnfulfilledPayment,
   isCheckoutPaymentReversed,
   PAYMENT_REVERSED,
   recordCheckoutPaymentReversed,
+  recordSubscriptionEnded,
+  recordSubscriptionInvoicePaid,
+  recordSubscriptionPaymentReversed,
+  subscriptionAccessBlock,
   type PaymentReversalReason,
+  type SubscriptionAccessBlock,
+  type SubscriptionInvoiceRef,
+  type SubscriptionInvoiceView,
 } from '@/lib/server/payment-integrity-ledger';
+import { blockedSubscriptionStatus } from '@/lib/server/subscription-access-guard';
+import { runWithSubscriptionInvoiceView } from '@/lib/server/subscription-invoice-view';
 import { countTeamPaidSeatsUsed, teamPaidSeatHolders } from '@/lib/server/team-seat-refund';
 
 /**
@@ -43,6 +54,11 @@ import { countTeamPaidSeatsUsed, teamPaidSeatHolders } from '@/lib/server/team-s
  * `seat-state-owner.test.ts` fails if another file writes a seat block or a reversal marker, or
  * calls a revocation writer. Slow or side-effecting work (user lookup, password hash, course and
  * prerequisite reads) is done before the step, because the step may be retried.
+ *
+ * GP-641: what decides a subscription's access (refunded or charged-back invoices, paid invoices,
+ * deletion, dispute won) is recorded here too, under the Stripe subscription id, with the linked
+ * subscription rows blocked in the same step. Subscription row writers read the marker through
+ * `runGuardedSubscriptionWrite` (`subscription-access-guard.ts`).
  *
  * Teams subscription seats (`lmsTeamSubscription.seatLimit`, expand-seats) are not changed here.
  * A future seat-limit write can call in with `runSeatStateStep` and read
@@ -390,6 +406,132 @@ export function applyCheckoutPaymentReversal(
       reason === 'refunded' ? await revokeSeatBlocksForRefund(tx, ref, eventTimestamp) : { blocks: 0, seatsRevoked: 0 };
     return { revoked, ...seats };
   });
+}
+
+// ---------------------------------------------------------------------------------------------
+// Subscription reversals (GP-641).
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * Write the blocked status on every subscription row already linked to this Stripe subscription
+ * id: individual, Teams, organisation and coaching. A row not written yet (or a checkout
+ * reservation not yet linked) is covered by the ledger rows, which `runGuardedSubscriptionWrite`
+ * reads. A subscription that is owed nothing is also taken off the unfulfilled list.
+ */
+async function blockSubscriptionRows(
+  tx: SeatTx,
+  stripeSubscriptionId: string,
+  block: SubscriptionAccessBlock,
+): Promise<void> {
+  const where = { stripeSubscriptionId };
+  const data = { status: blockedSubscriptionStatus(block) };
+  await tx.lmsSubscription.updateMany({ where, data });
+  await tx.lmsTeamSubscription.updateMany({ where, data });
+  await tx.lmsOrgSubscription.updateMany({ where, data });
+  await tx.carsiCoachingMonthlySubscription.updateMany({ where, data });
+  await closeUnfulfilledPayment(tx, stripeSubscriptionId);
+}
+
+/**
+ * Decide access after a ledger write and, when it is blocked, rewrite every linked row to the
+ * CURRENT block's status (a deletion's `canceled` replaces a lifted reversal's `unpaid`). Every
+ * subscription step ends here, so no step leaves a status the decision no longer gives.
+ */
+async function settleSubscriptionRows(
+  tx: SeatTx,
+  stripeSubscriptionId: string,
+  view: SubscriptionInvoiceView,
+): Promise<SubscriptionAccessBlock | null> {
+  const block = await subscriptionAccessBlock(tx, stripeSubscriptionId, view);
+  if (block) await blockSubscriptionRows(tx, stripeSubscriptionId, block);
+  return block;
+}
+
+/** Whether a step turned a blocked subscription back into one that gives access. */
+export type SubscriptionReopen = { blocked: boolean; reopened: boolean };
+
+/**
+ * A step that may lift a block (a paid invoice, a won dispute): decide before and after the
+ * ledger write, settle the rows, and tell the caller when access came back, so it re-reads the
+ * subscription from Stripe and writes it through the guarded path.
+ */
+function runReopeningSubscriptionStep(
+  stripeSubscriptionId: string,
+  record: (tx: SeatTx) => Promise<void>,
+): Promise<SubscriptionReopen> {
+  const id = stripeSubscriptionId.trim();
+  return runWithSubscriptionInvoiceView(id, {}, (view) =>
+    runSeatStateStep(async (tx) => {
+      const before = await subscriptionAccessBlock(tx, id, view);
+      await record(tx);
+      const after = await settleSubscriptionRows(tx, id, view);
+      return { blocked: after !== null, reopened: before !== null && after === null };
+    }),
+  );
+}
+
+/**
+ * A full refund or a chargeback of one subscription invoice. Records it by invoice id and, when
+ * it is the member's latest payment, writes the blocked status on the linked rows, in one step,
+ * so it holds whether Stripe delivers it before or after the event that writes the row, and
+ * against any later "active" snapshot. Stripe's latest invoice is always read first: a reversal
+ * of an invoice that a newer paid invoice has replaced takes nothing away.
+ */
+export function applySubscriptionPaymentReversal(
+  stripeSubscriptionId: string,
+  reason: PaymentReversalReason,
+  invoice: SubscriptionInvoiceRef,
+): Promise<{ blocked: boolean }> {
+  const id = stripeSubscriptionId.trim();
+  return runWithSubscriptionInvoiceView(id, { force: true }, (view) =>
+    runSeatStateStep(async (tx) => {
+      await recordSubscriptionPaymentReversed(tx, id, reason, invoice);
+      return { blocked: (await settleSubscriptionRows(tx, id, view)) !== null };
+    }),
+  );
+}
+
+/**
+ * Stripe deleted the subscription (`customer.subscription.deleted`). Records the terminal row and
+ * writes the blocked status on the linked rows, so a deletion delivered before the row exists, or
+ * before its owner can be matched, is not lost.
+ */
+export function applySubscriptionEnded(
+  stripeSubscriptionId: string,
+  eventTimestamp: Date,
+): Promise<void> {
+  const id = stripeSubscriptionId.trim();
+  return runWithSubscriptionInvoiceView(id, {}, (view) =>
+    runSeatStateStep(async (tx) => {
+      await recordSubscriptionEnded(tx, id, eventTimestamp);
+      await settleSubscriptionRows(tx, id, view);
+    }),
+  );
+}
+
+/**
+ * An invoice paid with money. When it replaces the reversed invoice as the member's latest
+ * payment the subscription gives access again (`reopened`); a deletion stays terminal, and its
+ * status is written on the rows.
+ */
+export function applySubscriptionInvoicePaid(
+  stripeSubscriptionId: string,
+  invoice: SubscriptionInvoiceRef,
+): Promise<SubscriptionReopen> {
+  const id = stripeSubscriptionId.trim();
+  return runReopeningSubscriptionStep(id, (tx) => recordSubscriptionInvoicePaid(tx, id, invoice));
+}
+
+/**
+ * A dispute of one subscription invoice, won by the merchant: that invoice's dispute is lifted.
+ * A refund, another invoice's reversal or a deletion still blocks, and its status is written.
+ */
+export function applySubscriptionDisputeWon(
+  stripeSubscriptionId: string,
+  invoice: SubscriptionInvoiceRef,
+): Promise<SubscriptionReopen> {
+  const id = stripeSubscriptionId.trim();
+  return runReopeningSubscriptionStep(id, (tx) => clearSubscriptionDisputedReversal(tx, id, invoice));
 }
 
 /** A dispute won by the merchant: lift the dispute marker and restore the access it revoked. */
