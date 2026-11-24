@@ -29,6 +29,7 @@ import {
 import { parseAssessmentResponsesJson } from '@/lib/coaching-portal/assessment-schema';
 import type { CoachingActionStatus } from '@/lib/coaching-portal/types';
 import { prisma } from '@/lib/prisma';
+import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
 import { loadGapCourseMap, prismaGapMapStoreFor } from '@/lib/server/carsi-coaching-gap-map';
 
@@ -537,7 +538,7 @@ function prismaStoreFor(db: LearningPathDb): LearningPathStore {
     },
     async completedCourseIds(userId) {
       const rows = await db.lmsEnrollment.findMany({
-        where: { studentId: userId, completedAt: { not: null }, status: { not: 'revoked' } },
+        where: { studentId: userId, completedAt: { not: null }, status: { in: [...ACCESS_GRANTING_STATUS_LIST] } },
         select: { courseId: true },
       });
       return new Set(rows.map((r) => r.courseId));
@@ -547,7 +548,7 @@ function prismaStoreFor(db: LearningPathDb): LearningPathStore {
       if (courseIds.length === 0) return out;
       const [enrolments, lessons, done] = await Promise.all([
         db.lmsEnrollment.findMany({
-          where: { studentId: userId, courseId: { in: courseIds }, status: { not: 'revoked' } },
+          where: { studentId: userId, courseId: { in: courseIds }, status: { in: [...ACCESS_GRANTING_STATUS_LIST] } },
           select: { courseId: true, completedAt: true },
         }),
         db.lmsLesson.findMany({

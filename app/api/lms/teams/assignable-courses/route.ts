@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
+import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
 import { getTeamCourseSeatPools } from '@/lib/server/team-course-seats';
@@ -25,7 +26,9 @@ export async function GET(request: NextRequest) {
     const rows = await prisma.lmsEnrollment.findMany({
       where: {
         studentId: claims.sub,
-        status: { notIn: ['cancelled'] },
+        // GP-787: offer only courses the owner still has access to (the one access rule). The
+        // invite's own owner check follows the same rule once GP-787 item 1 lands.
+        status: { in: [...ACCESS_GRANTING_STATUS_LIST] },
         // `status` is the canonical publication flag (#137); `isPublished` is the legacy
         // dual-write column. Filtering on the legacy field here split the product in two: 20
         // courses currently carry status='published' with isPublished=false, so a learner could
