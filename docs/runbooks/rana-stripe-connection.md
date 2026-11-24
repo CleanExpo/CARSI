@@ -267,9 +267,14 @@ Notes:
   expansion raises its quantity (or adds it) and never changes the base item. Expansion is
   charged first (`always_invoice` + `error_if_incomplete`): the prorated amount is charged at
   once and seats are granted only when that payment succeeds.
-  The webhook counts seats as included seats + extra-seat quantity, matching items by the
-  Price ids the checkout stamps into the subscription metadata (`base_price_id`,
-  `seat_price_id`).
+  The webhook counts seats as included seats + extra-seat quantity. One rule
+  (`classifyTeamSubscription`) identifies each item by its own Price, never by metadata, and
+  accepts only exactly the owner plan item (quantity 1) plus at most one seat item. **Do not add
+  any other item to a Teams subscription in the Stripe dashboard** (a one-off add-on, a second
+  seat item, a coupon item): the webhook then grants the team no seats and seat expansion
+  answers 409 until the extra item is removed. Archiving a Price is safe: existing subscriptions
+  keep billing on it and keep their seats, but new Teams checkouts and seat expansion need the
+  active verified Price.
 - Every Teams Price is checked against amount, AUD, yearly and per-unit shape. A missing or
   mismatched base **or** seat Price makes the Teams checkout answer 503 ("not yet available")
   and seat expansion answer 503; nothing is charged. A Teams checkout that names a retired

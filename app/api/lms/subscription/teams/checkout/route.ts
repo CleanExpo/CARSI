@@ -9,9 +9,10 @@
  * A$1,295 yearly owner Price at quantity 1 (it includes the owner's seat), plus a SEPARATE item
  * on the verified A$695 yearly extra-seat Price whose quantity is the extra staff bought, each
  * with their own login. The retired A$299 / A$799 / A$2,499 bundle tiers answer 400. With no extra seats the seat item is left out (Stripe Checkout is never
- * sent a zero quantity); the seat-expansion route adds it later. Both verified Price ids are
- * stamped into the subscription metadata (`base_price_id`, `seat_price_id`) so the webhook and
- * seat expansion tell the items apart by id, not by amount. Both Prices must resolve and
+ * sent a zero quantity); the seat-expansion route adds it later. The line items come from
+ * `teamCheckoutLineItems`, the shape the one Teams rule (`classifyTeamSubscription`) accepts; the
+ * webhook and seat expansion identify each item by its own Price through that rule. The verified
+ * Price ids are also stamped into metadata as an operator record only. Both Prices must resolve and
  * verify, or the checkout answers 503 and opens nothing.
  *
  * Ships DARK behind SUBSCRIPTIONS_ENABLED + TEAMS_SUBSCRIPTIONS_ENABLED and FAILS CLOSED at every uncertain
@@ -35,6 +36,7 @@ import {
   resolveTeamOwnerPlanPriceId,
   resolveTeamSeatPriceId,
 } from '@/lib/server/team-subscription-price';
+import { teamCheckoutLineItems } from '@/lib/server/team-subscription-store-pure';
 import { ensureContainerTeamForOwner, getTeamForUser } from '@/lib/server/teams';
 import {
   checkoutSessionIdempotencyKey,
@@ -148,8 +150,11 @@ export async function POST(request: NextRequest) {
   }
 
   const seats = tier.seatsIncluded + extraSeats;
-  const lineItems: Array<{ price: string; quantity: number }> = [{ price: basePriceId, quantity: 1 }];
-  if (extraSeats > 0) lineItems.push({ price: seatPriceId, quantity: extraSeats });
+  // The shape the one Teams rule (classifyTeamSubscription) accepts: owner plan x1, plus the seat
+  // item only when extra seats are bought.
+  const lineItems = teamCheckoutLineItems(basePriceId, seatPriceId, extraSeats);
+  // Record for operators only: nothing reads these ids to identify items (the rule matches each
+  // item by its own Price).
   const seatMetadata = {
     base_price_id: basePriceId,
     seat_price_id: seatPriceId,

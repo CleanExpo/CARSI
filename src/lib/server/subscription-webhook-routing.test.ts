@@ -118,13 +118,15 @@ describe('subscriptionKindFromPlan (pure)', () => {
 });
 
 describe('readSubscriptionSeatQuantity (pure)', () => {
-  it('reads the item quantity, then metadata seat_count, else 0 (fail closed)', () => {
+  // GP-773 round 4: seats come only from the classified items (owner plan + seat item). The old
+  // fallbacks (first item quantity, then metadata seat_count) are gone: they grant 0.
+  it('never reads a bare item quantity or metadata seat_count; an unclassifiable subscription is 0', () => {
     expect(
       realReadSeatQuantity({ items: { data: [{ quantity: 7 }] }, metadata: {} } as unknown as Stripe.Subscription),
-    ).toBe(7);
+    ).toBe(0);
     expect(
       realReadSeatQuantity({ items: { data: [] }, metadata: { seat_count: '9' } } as unknown as Stripe.Subscription),
-    ).toBe(9);
+    ).toBe(0);
     expect(
       realReadSeatQuantity({ items: { data: [] }, metadata: {} } as unknown as Stripe.Subscription),
     ).toBe(0);

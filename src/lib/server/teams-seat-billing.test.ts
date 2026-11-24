@@ -184,6 +184,8 @@ describe('Teams checkout: the A$1,295 owner plan plus a separate A$695 seat item
   for (const [label, wrong] of [
     ['the old $49 seat', price('price_extra_seat', 4_900)],
     ['a monthly A$695', price('price_extra_seat', 69_500, 'month')],
+    // Selling never uses an archived Price; only reading an existing subscription's items does.
+    ['an archived A$695', { ...price('price_extra_seat', 69_500), active: false }],
   ] as const) {
     it(`seat Price that is ${label}: 503 and no checkout`, async () => {
       catalogue.price_extra_seat = wrong;
@@ -196,6 +198,7 @@ describe('Teams checkout: the A$1,295 owner plan plus a separate A$695 seat item
   for (const [label, wrong] of [
     ['a monthly A$1,295', price('price_owner', 129_500, 'month')],
     ['an old bundle amount', price('price_owner', 249_900)],
+    ['an archived A$1,295', { ...price('price_owner', 129_500), active: false }],
   ] as const) {
     it(`owner Price that is ${label}: 503 and no checkout`, async () => {
       catalogue.price_owner = wrong;
@@ -385,70 +388,146 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
     expect(res.status).toBe(409);
     expect(mocks.subsUpdate).not.toHaveBeenCalled();
   });
+
+  // Round 4 design fix (kinds C and E): the subscription's ITEMS decide what it holds, never its
+  // metadata. One rule (classifyTeamSubscription) refuses anything other than exactly the owner
+  // plan item plus at most one verified seat item.
+  const SEAT_ITEM = { id: 'si_seat', quantity: 2, price: price('price_extra_seat', 69_500) };
+  const refusedUntouched = async (sub: Record<string, unknown>) => {
+    mocks.subsRetrieve.mockResolvedValue(sub);
+    const res = await expandSeats(request({ additional_seats: 1 }));
+    expect(res.status).toBe(409);
+    expect(mocks.subsUpdate).not.toHaveBeenCalled();
+    expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
+  };
+
+  it('Codex repro: seat item on another Price while metadata still names the verified seat Price: 409, no second item', async () => {
+    // Before the fix the route matched the seat item by metadata.seat_price_id, missed it, and
+    // added a SECOND billed seat item while the first kept billing.
+    await refusedUntouched(
+      live({ items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_old_seat', 4_900) }] } }),
+    );
+  });
+
+  it('Codex repro, lookalike: A$695 seat item on an unverified Price, metadata names the verified one: 409', async () => {
+    await refusedUntouched(
+      live({ items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_lookalike', 69_500) }] } }),
+    );
+  });
+
+  it('metadata naming another seat Price never hides the real seat item: it is raised, no second item', async () => {
+    mocks.subsRetrieve.mockResolvedValue(
+      live({ metadata: { ...META, seat_price_id: 'price_old_seat' }, items: { data: [BASE_ITEM, SEAT_ITEM] } }),
+    );
+    const res = await expandSeats(request({ additional_seats: 1 }));
+    expect(res.status).toBe(200);
+    const [, params] = mocks.subsUpdate.mock.calls[0];
+    expect(params.items).toEqual([{ id: 'si_seat', quantity: 3 }]);
+  });
+
+  it('an extra unknown item beside the owner plan and seat items: 409, nothing charged', async () => {
+    await refusedUntouched(
+      live({ items: { data: [BASE_ITEM, SEAT_ITEM, { id: 'si_addon', quantity: 1, price: price('price_addon', 4_900) }] } }),
+    );
+  });
+
+  it('two seat items on the verified seat Price: 409, nothing charged', async () => {
+    await refusedUntouched(
+      live({ items: { data: [BASE_ITEM, SEAT_ITEM, { ...SEAT_ITEM, id: 'si_seat_2', quantity: 1 }] } }),
+    );
+  });
+
+  it('two owner plan items: 409, nothing charged', async () => {
+    await refusedUntouched(live({ items: { data: [BASE_ITEM, { ...BASE_ITEM, id: 'si_base_2' }] } }));
+  });
+
+  it('owner plan item at quantity 2: 409, nothing charged', async () => {
+    await refusedUntouched(live({ items: { data: [{ ...BASE_ITEM, quantity: 2 }, SEAT_ITEM] } }));
+  });
+
+  it('a partial item list (has_more): 409, because an extra item cannot be ruled out', async () => {
+    await refusedUntouched(live({ items: { data: [BASE_ITEM, SEAT_ITEM], has_more: true } }));
+  });
+
+  it('metadata without the old Price stamps does not matter: the items decide (200)', async () => {
+    mocks.subsRetrieve.mockResolvedValue(
+      live({ metadata: { plan: 'business_owner' }, items: { data: [BASE_ITEM, SEAT_ITEM] } }),
+    );
+    const res = await expandSeats(request({ additional_seats: 1 }));
+    expect(res.status).toBe(200);
+    const [, params] = mocks.subsUpdate.mock.calls[0];
+    expect(params.items).toEqual([{ id: 'si_seat', quantity: 3 }]);
+    expect(mocks.teamSubUpdate).toHaveBeenCalledWith(expect.objectContaining({ data: { seatLimit: 4 } }));
+  });
 });
 
-describe('webhook seat count across both items', () => {
-  const sub = (metadata: Record<string, string>, items: Array<{ quantity: number; price: { id: string } }>) =>
-    ({ metadata, items: { data: items } }) as unknown as Stripe.Subscription;
+describe('webhook seat count: the items decide, never the metadata', () => {
+  const OWNER = price('price_owner', 129_500);
+  const SEAT = price('price_extra_seat', 69_500);
+  const sub = (
+    metadata: Record<string, string>,
+    items: Array<{ quantity: number; price: unknown }>,
+    extra: Record<string, unknown> = {},
+  ) => ({ id: 'sub_1', metadata, items: { data: items, ...extra } }) as unknown as Stripe.Subscription;
   const META = { plan: 'business_owner', base_price_id: 'price_owner', seat_price_id: 'price_extra_seat' };
 
   it('owner plan + 3 extra staff = 4 seats', () => {
-    expect(
-      readSubscriptionSeatQuantity(
-        sub(META, [
-          { quantity: 1, price: { id: 'price_owner' } },
-          { quantity: 3, price: { id: 'price_extra_seat' } },
-        ]),
-      ),
-    ).toBe(4);
+    expect(readSubscriptionSeatQuantity(sub(META, [{ quantity: 1, price: OWNER }, { quantity: 3, price: SEAT }]))).toBe(4);
   });
 
   it('item order does not matter', () => {
+    expect(readSubscriptionSeatQuantity(sub(META, [{ quantity: 3, price: SEAT }, { quantity: 1, price: OWNER }]))).toBe(4);
+  });
+
+  it('owner plan only = the owner seat', () => {
+    expect(readSubscriptionSeatQuantity(sub(META, [{ quantity: 1, price: OWNER }]))).toBe(1);
+  });
+
+  it('metadata naming another seat Price does not hide the paid seat item', () => {
     expect(
       readSubscriptionSeatQuantity(
-        sub(META, [
-          { quantity: 3, price: { id: 'price_extra_seat' } },
-          { quantity: 1, price: { id: 'price_owner' } },
-        ]),
+        sub({ ...META, seat_price_id: 'price_old_seat' }, [{ quantity: 1, price: OWNER }, { quantity: 3, price: SEAT }]),
       ),
     ).toBe(4);
   });
 
-  it('a base item quantity above 1 grants no extra seats (only seat item units are seats)', () => {
+  it('no Price stamps in metadata: still counted from the items', () => {
+    expect(
+      readSubscriptionSeatQuantity(sub({ plan: 'business_owner' }, [{ quantity: 1, price: OWNER }, { quantity: 2, price: SEAT }])),
+    ).toBe(3);
+  });
+
+  it('an archived owner or seat Price still bills, so its seats still count', () => {
     expect(
       readSubscriptionSeatQuantity(
         sub(META, [
-          { quantity: 3, price: { id: 'price_owner' } },
-          { quantity: 2, price: { id: 'price_extra_seat' } },
+          { quantity: 1, price: { ...OWNER, active: false } },
+          { quantity: 2, price: { ...SEAT, active: false } },
         ]),
       ),
     ).toBe(3);
   });
 
-  it('owner plan only = the owner seat', () => {
-    expect(readSubscriptionSeatQuantity(sub(META, [{ quantity: 1, price: { id: 'price_owner' } }]))).toBe(1);
-  });
-
-  it('an unrecognised item grants nothing; a missing base grants no included seats', () => {
-    expect(
-      readSubscriptionSeatQuantity(
-        sub(META, [
-          { quantity: 9, price: { id: 'price_something_else' } },
-          { quantity: 2, price: { id: 'price_extra_seat' } },
-        ]),
-      ),
-    ).toBe(2);
-  });
+  const refused: Array<[string, Stripe.Subscription]> = [
+    ['an unknown extra item', sub(META, [{ quantity: 1, price: OWNER }, { quantity: 2, price: SEAT }, { quantity: 9, price: price('price_addon', 4_900) }])],
+    ['two seat items', sub(META, [{ quantity: 1, price: OWNER }, { quantity: 2, price: SEAT }, { quantity: 1, price: SEAT }])],
+    ['two owner plan items', sub(META, [{ quantity: 1, price: OWNER }, { quantity: 1, price: OWNER }])],
+    ['an owner plan item at quantity 3', sub(META, [{ quantity: 3, price: OWNER }, { quantity: 2, price: SEAT }])],
+    ['no owner plan item', sub(META, [{ quantity: 2, price: SEAT }])],
+    ['a partial item list (has_more)', sub(META, [{ quantity: 1, price: OWNER }], { has_more: true })],
+    ['a Price given only as an id', sub(META, [{ quantity: 1, price: 'price_owner' }])],
+    ['the old single per-unit item, no stamps', sub({ plan: 'business_owner', seat_count: '5' }, [{ quantity: 5, price: price('price_team', 5_980) }])],
+  ];
+  for (const [label, subscription] of refused) {
+    it(`${label}: grants 0 (fail closed)`, () => {
+      expect(readSubscriptionSeatQuantity(subscription)).toBe(0);
+    });
+  }
 
   for (const plan of ['platinum', 'starter', 'full_library']) {
-    it(`plan "${plan}" on a two-item subscription grants 0 (fail closed)`, () => {
+    it(`plan "${plan}" grants 0 (fail closed)`, () => {
       expect(
-        readSubscriptionSeatQuantity(
-          sub({ ...META, plan }, [
-            { quantity: 1, price: { id: 'price_owner' } },
-            { quantity: 3, price: { id: 'price_extra_seat' } },
-          ]),
-        ),
+        readSubscriptionSeatQuantity(sub({ ...META, plan }, [{ quantity: 1, price: OWNER }, { quantity: 3, price: SEAT }])),
       ).toBe(0);
     });
   }

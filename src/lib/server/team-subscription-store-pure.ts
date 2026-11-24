@@ -6,61 +6,123 @@
 
 import type Stripe from 'stripe';
 
+import { BUSINESS_OWNER_PLAN, EXTRA_STAFF_SEAT, type MembershipPrice } from '@/lib/lms/membership-prices';
 import { teamTierById, type TeamTier } from '@/lib/lms/pricing-tiers';
+import { stripePriceMatches, type StripePriceLike } from '@/lib/server/membership-price-check';
 
-type ItemLike = { id?: string; quantity?: number | null; price?: { id?: string } | string | null };
-
-function itemPriceId(item: ItemLike): string {
-  const p = item.price;
-  if (typeof p === 'string') return p;
-  return typeof p?.id === 'string' ? p.id : '';
-}
+type ItemLike = {
+  id?: string;
+  quantity?: number | null;
+  price?: StripePriceLike | string | null;
+};
 
 function itemQuantity(item: ItemLike): number {
   const qty = item.quantity;
   return typeof qty === 'number' && Number.isFinite(qty) && qty > 0 ? Math.floor(qty) : 0;
 }
 
-function metaString(subscription: Pick<Stripe.Subscription, 'metadata'>, key: string): string {
-  const v = subscription.metadata?.[key];
-  return typeof v === 'string' ? v.trim() : '';
-}
+/** Why a subscription is not the Teams shape. Every one of these means: no change, no grant. */
+export type TeamShapeRefusal =
+  | 'unknown_plan'
+  | 'items_incomplete'
+  | 'unknown_item'
+  | 'no_base_item'
+  | 'extra_base_item'
+  | 'base_quantity_not_one'
+  | 'extra_seat_item';
 
-/** The items of a two-item Teams subscription (GP-773 seat billing), told apart by Price id. */
-export interface TeamSubscriptionItems<T extends ItemLike = ItemLike> {
-  /** The tier from metadata `plan`, or null when the plan is not a Teams tier. */
-  tier: TeamTier | null;
-  /** The flat tier base Price id stamped at checkout (metadata `base_price_id`). */
-  basePriceId: string;
-  /** The extra-seat Price id stamped at checkout or seat expansion (metadata `seat_price_id`). */
-  seatPriceId: string;
-  /** The item on the base Price, if present. */
-  base: T | null;
-  /** The item on the seat Price, if present. */
-  seat: T | null;
+export type TeamSubscriptionShape<T extends ItemLike = ItemLike> =
+  | {
+      ok: true;
+      tier: TeamTier;
+      /** The owner plan item (A$1,295 yearly, quantity 1). */
+      base: T;
+      /** The extra-seat item (A$695 yearly), or null when no extra seat was bought. */
+      seat: T | null;
+      extraSeats: number;
+      /** Included seats + extra seats: what the team has paid for. */
+      seatLimit: number;
+    }
+  | { ok: false; reason: TeamShapeRefusal };
+
+/** A Price id the caller has just resolved and verified, which a matched item must also carry. */
+export interface ExpectedTeamPrices {
+  basePriceId?: string | null;
+  seatPriceId?: string | null;
 }
 
 /**
- * THE one owner of "which item is the base and which is the seat item" (GP-773). Items are
- * matched by the verified Price ids the checkout stamped into the subscription metadata, not by
- * amount, so a later reprice of either Price never strips a paying team's seats. Returns null
- * for a subscription made before seat billing (no `base_price_id` stamp).
+ * THE one rule for what a Teams subscription holds (GP-773, design fix for review kinds C and E).
+ * Checkout builds its line items with `teamCheckoutLineItems` (the shape this rule accepts), seat
+ * expansion classifies before it changes anything, and the webhook's seat count reads it. Nothing
+ * else decides which item is which.
+ *
+ * A Teams subscription holds EXACTLY the owner plan item (its Price matches BUSINESS_OWNER_PLAN,
+ * quantity 1) and AT MOST ONE extra-seat item (its Price matches EXTRA_STAFF_SEAT). Items are
+ * identified by their own Price, checked by `stripePriceMatches`, never by metadata: metadata can
+ * drift from what Stripe bills, and an item the code fails to recognise would otherwise be treated
+ * as absent and billed twice. Anything else (an unknown item, a second seat or owner item, an
+ * owner item at another quantity, a Price given only as an id, a partial item list, a plan that is
+ * not a Teams tier) is refused: routes answer 409 and change nothing, the webhook grants no seats.
+ *
+ * `expected` narrows a match to a Price id the caller has just verified; seat expansion passes the
+ * verified seat Price so a lookalike A$695 Price is refused, not topped up. An archived Price still
+ * matches here because Stripe keeps billing it.
  */
-export function teamSubscriptionItems<T extends ItemLike>(
-  subscription: Pick<Stripe.Subscription, 'metadata'> & { items?: { data?: T[] } | null },
-): TeamSubscriptionItems<T> | null {
-  const basePriceId = metaString(subscription, 'base_price_id');
-  if (!basePriceId) return null;
-  const seatPriceId = metaString(subscription, 'seat_price_id');
-  const items = subscription.items?.data ?? [];
-  const plan = metaString(subscription, 'plan').toLowerCase();
-  return {
-    tier: teamTierById(plan) ?? null,
-    basePriceId,
-    seatPriceId,
-    base: items.find((i) => itemPriceId(i) === basePriceId) ?? null,
-    seat: seatPriceId ? (items.find((i) => itemPriceId(i) === seatPriceId) ?? null) : null,
+export function classifyTeamSubscription<T extends ItemLike>(
+  subscription: Pick<Stripe.Subscription, 'metadata'> & {
+    items?: { data?: T[] | null; has_more?: boolean | null } | null;
+  },
+  expected: ExpectedTeamPrices = {},
+): TeamSubscriptionShape<T> {
+  const rawPlan = subscription.metadata?.plan;
+  const plan = typeof rawPlan === 'string' ? rawPlan.trim().toLowerCase() : '';
+  const tier = teamTierById(plan);
+  if (!tier) return { ok: false, reason: 'unknown_plan' };
+
+  const list = subscription.items;
+  if (!list || !Array.isArray(list.data) || list.has_more === true) {
+    return { ok: false, reason: 'items_incomplete' };
+  }
+
+  const matches = (item: T, spec: MembershipPrice, id: string | null | undefined): boolean => {
+    const p = item.price;
+    if (!p || typeof p !== 'object') return false;
+    if (id && p.id !== id) return false;
+    return stripePriceMatches(p, spec, { allowArchived: true });
   };
+
+  const bases: T[] = [];
+  const seats: T[] = [];
+  for (const item of list.data) {
+    if (matches(item, BUSINESS_OWNER_PLAN, expected.basePriceId)) bases.push(item);
+    else if (matches(item, EXTRA_STAFF_SEAT, expected.seatPriceId)) seats.push(item);
+    else return { ok: false, reason: 'unknown_item' };
+  }
+
+  if (bases.length === 0) return { ok: false, reason: 'no_base_item' };
+  if (bases.length > 1) return { ok: false, reason: 'extra_base_item' };
+  if (bases[0].quantity !== 1) return { ok: false, reason: 'base_quantity_not_one' };
+  if (seats.length > 1) return { ok: false, reason: 'extra_seat_item' };
+
+  const seat = seats[0] ?? null;
+  const extraSeats = seat ? itemQuantity(seat) : 0;
+  return { ok: true, tier, base: bases[0], seat, extraSeats, seatLimit: tier.seatsIncluded + extraSeats };
+}
+
+/**
+ * The line items a Teams checkout sends: the owner plan at quantity 1, plus the seat item only
+ * when extra seats are bought (Stripe Checkout is never sent a zero quantity). This is the shape
+ * `classifyTeamSubscription` accepts; `team-subscription-items.test.ts` round-trips it.
+ */
+export function teamCheckoutLineItems(
+  basePriceId: string,
+  seatPriceId: string,
+  extraSeats: number,
+): Array<{ price: string; quantity: number }> {
+  const lineItems = [{ price: basePriceId, quantity: 1 }];
+  if (extraSeats > 0) lineItems.push({ price: seatPriceId, quantity: extraSeats });
+  return lineItems;
 }
 
 /**
@@ -92,35 +154,19 @@ export const SEAT_CHARGE_FIRST = {
 } as const;
 
 /**
- * Read the paid seat count of a Teams subscription.
- *
- * Seat billing (GP-773): the tier's included seats when the base item is present (quantity at
- * least 1), plus the quantity of the extra-seat item. An item on any other Price grants nothing,
- * and an unknown plan grants 0 (fail closed: no seats rather than a guessed grant). The webhook's
- * snapshot and terminal handlers both read this.
- *
- * A subscription without the seat-billing stamp (the earlier single-item model, never sold:
- * Teams has stayed behind TEAMS_SUBSCRIPTIONS_ENABLED) keeps the old reading: the first item's
- * quantity, then metadata `seat_count`, then 0.
+ * Read the paid seat count of a Teams subscription for the webhook (snapshot and terminal
+ * writes): `classifyTeamSubscription`'s seat limit, or 0 when the subscription is not the Teams
+ * shape (fail closed: no seats rather than a guessed grant). The earlier fallbacks (first item's
+ * quantity, metadata `seat_count`) are gone; Teams was never sold on that model.
  */
 export function readSubscriptionSeatQuantity(subscription: Stripe.Subscription): number {
-  const twoItem = teamSubscriptionItems(subscription as unknown as Parameters<typeof teamSubscriptionItems>[0]);
-  if (twoItem) {
-    if (!twoItem.tier) return 0;
-    const included = twoItem.base && itemQuantity(twoItem.base) >= 1 ? twoItem.tier.seatsIncluded : 0;
-    const extra = twoItem.seat ? itemQuantity(twoItem.seat) : 0;
-    return included + extra;
-  }
-
-  const items = subscription.items?.data ?? [];
-  for (const item of items) {
-    const qty = itemQuantity(item as unknown as ItemLike);
-    if (qty > 0) return qty;
-  }
-  const metaSeats = subscription.metadata?.seat_count;
-  if (typeof metaSeats === 'string') {
-    const n = Number.parseInt(metaSeats, 10);
-    if (Number.isFinite(n) && n > 0) return n;
-  }
+  const shape = classifyTeamSubscription(
+    subscription as unknown as Parameters<typeof classifyTeamSubscription>[0],
+  );
+  if (shape.ok) return shape.seatLimit;
+  console.error('[team-subscription] not the Teams owner plan + seat shape; no seats granted', {
+    subscriptionId: subscription.id,
+    reason: shape.reason,
+  });
   return 0;
 }

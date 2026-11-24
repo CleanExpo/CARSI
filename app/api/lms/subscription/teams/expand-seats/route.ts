@@ -4,10 +4,11 @@
  *
  * Body: { additional_seats: number }  (1..50)
  *
- * Seat billing (see the checkout route): the subscription has a flat tier base item (quantity
- * 1, includes the tier's seats) and a separate A$695 yearly extra-seat item. Expansion raises
- * the seat item's quantity, or adds the seat item at the verified seat Price when there is
- * none. The base item is never changed.
+ * Seat billing (see the checkout route): the subscription has the owner plan item (quantity 1,
+ * includes the owner's seat) and at most one A$695 yearly extra-seat item. Expansion first
+ * classifies the subscription with the one shared rule (`classifyTeamSubscription`), then raises
+ * the seat item's quantity, or adds the seat item at the verified seat Price when the rule proved
+ * there is none. The base item is never changed.
  *
  * Charge first (Phill 23/11/2026): the update uses `always_invoice` + `error_if_incomplete`,
  * so Stripe invoices the prorated seats immediately and applies the change only when that
@@ -17,8 +18,9 @@
  *
  * Owner-only. FAILS CLOSED: flag off / not signed in / not the owner / no active
  * subscription → no expansion, no charge. Seat Price missing or mismatched → 503; a
- * subscription not on the seat-billing model, not charged automatically, or with a seat item
- * on another Price → 409; payment declined, incomplete or unconfirmed → 402.
+ * subscription that is not exactly the owner plan item plus at most one verified seat item (an
+ * unknown item, a second seat item, a seat item on another Price), or not charged
+ * automatically → 409; payment declined, incomplete or unconfirmed → 402.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -28,13 +30,11 @@ import { prisma } from '@/lib/prisma';
 import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { decideTeamSeatSubscription } from '@/lib/server/entitlements';
-import { EXTRA_STAFF_SEAT } from '@/lib/lms/membership-prices';
-import { stripePriceMatches, type StripePriceLike } from '@/lib/server/membership-price-check';
 import { resolveTeamSeatPriceId } from '@/lib/server/team-subscription-price';
 import {
   SEAT_CHARGE_FIRST,
+  classifyTeamSubscription,
   seatChargePaid,
-  teamSubscriptionItems,
 } from '@/lib/server/team-subscription-store-pure';
 import { getTeamForUser } from '@/lib/server/teams';
 import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
@@ -140,10 +140,12 @@ export async function POST(request: NextRequest) {
     const stripe = getStripeClient();
     const stripeSub = await stripe.subscriptions.retrieve(sub.stripeSubscriptionId);
 
-    // The subscription must be on the seat-billing model: a recognised tier and its base item
-    // (stamped at checkout). An older single-item subscription is refused, never re-priced.
-    const items = teamSubscriptionItems(stripeSub);
-    if (!items || !items.tier || !items.base) return refuse();
+    // The one Teams rule (classifyTeamSubscription): exactly the owner plan item plus at most one
+    // seat item, told apart by their own Prices, never by metadata. Any other shape (an unknown
+    // item, a second seat item, a seat item on a Price other than the verified one) is refused
+    // before any change, so an item is never treated as absent and billed twice.
+    const shape = classifyTeamSubscription(stripeSub, { seatPriceId });
+    if (!shape.ok) return refuse();
 
     // Charge first: only an automatically charged subscription can be made to pay for the seats
     // before they are added. An invoiced (send_invoice) subscription would add them unpaid.
@@ -151,21 +153,17 @@ export async function POST(request: NextRequest) {
 
     let update: Stripe.SubscriptionUpdateParams;
     let newExtraSeats: number;
-    if (items.seat) {
-      // Only add seats to an item already on the verified A$695 seat Price.
-      const seatPrice = items.seat.price as unknown as StripePriceLike;
-      if (items.seat.price?.id !== seatPriceId || !stripePriceMatches(seatPrice, EXTRA_STAFF_SEAT)) {
-        return refuse();
-      }
-      newExtraSeats = (items.seat.quantity ?? 0) + additional;
+    if (shape.seat) {
+      // The seat item is on the verified A$695 seat Price (the rule checked it): raise it.
+      newExtraSeats = shape.extraSeats + additional;
       update = {
-        items: [{ id: items.seat.id, quantity: newExtraSeats }],
+        items: [{ id: shape.seat.id, quantity: newExtraSeats }],
         ...SEAT_CHARGE_FIRST,
         expand: [...SEAT_CHARGE_FIRST.expand],
       };
     } else {
-      // No seat item yet (the team bought no extra seats at checkout): add it at the verified
-      // seat Price and stamp its id so the webhook counts it.
+      // No seat item (the rule proved there is none): add it at the verified seat Price. The
+      // metadata stamp is a record for operators only; nothing reads it to identify items.
       newExtraSeats = additional;
       update = {
         items: [{ price: seatPriceId, quantity: newExtraSeats }],
@@ -199,7 +197,7 @@ export async function POST(request: NextRequest) {
 
     // Paid: reflect the new seat limit (included seats + extra seats); the
     // customer.subscription.updated webhook re-confirms it from the paid items.
-    const newSeatLimit = items.tier.seatsIncluded + newExtraSeats;
+    const newSeatLimit = shape.tier.seatsIncluded + newExtraSeats;
     await prisma.lmsTeamSubscription.update({
       where: { teamId: team.id },
       data: { seatLimit: newSeatLimit },

@@ -32,10 +32,18 @@ export type PriceSpec = Pick<MembershipPrice, 'amountCents' | 'currency' | 'inte
  * this; nothing re-implements it. True only for an active, per-unit Price with no quantity
  * transform, billed at exactly `spec`'s amount, currency and interval (interval count 1), so
  * `quantity x spec.amountCents` is exactly what Stripe charges.
+ *
+ * `allowArchived` is for reading an item an existing subscription already bills on: Stripe keeps
+ * billing an archived Price, so its seats still count. Selling (checkout, adding an item) never
+ * passes it, so a new charge is only ever on an active Price.
  */
-export function stripePriceMatches(price: StripePriceLike | null | undefined, spec: PriceSpec): boolean {
+export function stripePriceMatches(
+  price: StripePriceLike | null | undefined,
+  spec: PriceSpec,
+  options: { allowArchived?: boolean } = {},
+): boolean {
   if (!price) return false;
-  if (price.active === false) return false;
+  if (price.active === false && !options.allowArchived) return false;
   if (price.billing_scheme !== 'per_unit') return false;
   if (price.transform_quantity != null) return false;
   if ((price.currency ?? '').toLowerCase() !== spec.currency) return false;
