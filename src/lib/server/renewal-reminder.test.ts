@@ -22,7 +22,7 @@ type NotificationRow = {
 };
 type NotificationWhere = {
   dedupeKey: string;
-  type?: string;
+  type?: string | { in: string[] };
   createdAt?: Date | { lt: Date };
 };
 
@@ -31,7 +31,9 @@ const h = vi.hoisted(() => {
   /** True when a row satisfies a Prisma-style `where` (dedupeKey, type, createdAt equals / lt). */
   const matches = (row: NotificationRow, where: NotificationWhere): boolean => {
     if (row.dedupeKey !== where.dedupeKey) return false;
-    if (where.type !== undefined && row.type !== where.type) return false;
+    const t = where.type;
+    if (typeof t === 'string' && row.type !== t) return false;
+    if (t && typeof t === 'object' && !t.in.includes(row.type)) return false;
     const at = where.createdAt;
     if (at instanceof Date) return row.createdAt.getTime() === at.getTime();
     if (at && 'lt' in at) return row.createdAt.getTime() < at.lt.getTime();
@@ -56,6 +58,7 @@ const h = vi.hoisted(() => {
       reason?: string;
     }),
     subscriptionsRetrieve: vi.fn(),
+    captureServerError: vi.fn(async (..._a: unknown[]) => {}),
     resolveUserId: vi.fn(async () => 'user-ind-1' as string | null),
     resolveTeamId: vi.fn(async () => 'team-1' as string | null),
     prisma: {
@@ -143,6 +146,10 @@ const h = vi.hoisted(() => {
 });
 
 vi.mock('@/lib/prisma', () => ({ prisma: h.prisma }));
+vi.mock('@/lib/server/sentry', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/server/sentry')>()),
+  captureServerError: (...a: unknown[]) => h.captureServerError(...a),
+}));
 vi.mock('@/lib/server/email', () => ({
   sendEmail: (p: unknown) => h.sendEmail(p),
   isEmailConfigured: () => true,
@@ -180,6 +187,9 @@ vi.mock('./subscription-analytics', () => ({
 }));
 
 import { handleSubscriptionEvent, isSubscriptionEvent } from './subscription-webhook';
+
+/** The fixture's own updateMany, restored after tests that wrap it. */
+const realUpdateImpl = h.prisma.lmsNotification.updateMany.getMockImplementation()!;
 
 // 2026-10-17T00:00:00Z — 17 October 2026 in Australia/Sydney (AEDT, +11).
 const RENEWAL_AT = 1_792_195_200;
@@ -422,27 +432,26 @@ describe('GP-595: a claim left behind by a failed attempt never loses the remind
     warn.mockRestore();
   });
 
-  it('send failed and the claim could not be released: a later redelivery still sends once', async () => {
+  it('send failed and its record could not be removed: a redelivery never guesses, it throws and reports', async () => {
+    // Accepted limit, the same as main: the record is left as "sending", and a later
+    // delivery can not tell this case from "sent, but not marked sent", so it does not send.
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     h.sendEmail.mockResolvedValueOnce({ sent: false, reason: 'provider_error' });
-    h.prisma.lmsNotification.delete.mockRejectedValueOnce(new Error('db down'));
     h.prisma.lmsNotification.deleteMany.mockRejectedValueOnce(new Error('db down'));
     await expect(handleSubscriptionEvent(upcomingEvent('sub_ind_1'))).rejects.toThrow(
       /renewal reminder/i
     );
-    expect(h.notifications.has(KEY)).toBe(true); // the claim is stuck
+    expect(h.notifications.get(KEY)?.type).toBe('renewal_reminder_sending');
 
-    // Stripe redelivers after the stale window.
-    const row = h.notifications.get(KEY)!;
-    row.createdAt = new Date(Date.now() - 10 * MINUTE);
-    await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_retry_after_stuck'));
-
-    expect(h.sendEmail).toHaveBeenCalledTimes(2); // the failed try, then the one real email
-    expect(h.sendEmail.mock.results[1]?.type).toBe('return');
-    expect(h.notifications.get(KEY)?.type).toBe('renewal_reminder');
+    h.notifications.get(KEY)!.createdAt = new Date(Date.now() - 10 * MINUTE);
+    await expect(
+      handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_retry_after_stuck'))
+    ).rejects.toThrow(/renewal reminder/i);
+    expect(h.sendEmail).toHaveBeenCalledTimes(1); // only the failed try
+    expect(JSON.stringify(h.captureServerError.mock.calls)).toContain(
+      'renewal_reminder_send_unconfirmed'
+    );
     err.mockRestore();
-    warn.mockRestore();
   });
 
   it('two redeliveries that both find the same stale claim send one email', async () => {
@@ -481,25 +490,38 @@ describe('GP-595: a claim left behind by a failed attempt never loses the remind
     expect(h.notifications.get(KEY)?.id).toBe('n-orphan');
   });
 
-  it('a claim whose write took past the send deadline is released and nothing is sent', async () => {
+  it('a claim write so slow that another delivery took it over: the slow attempt sends nothing, the taker sends once', async () => {
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.useFakeTimers({ toFake: ['Date'] });
     try {
       const realCreate = h.prisma.lmsNotification.create.getMockImplementation()!;
-      // The database is slow: the claim lands six minutes after its claim time, already
-      // stale, so another delivery could take it over while this one sends.
+      let landed!: () => void;
+      let resume!: () => void;
+      const claimLanded = new Promise<void>((r) => (landed = r));
+      const gate = new Promise<void>((r) => (resume = r));
+      // A's claim is written, then A's database call stalls before returning.
       h.prisma.lmsNotification.create.mockImplementationOnce(async (args) => {
-        vi.setSystemTime(Date.now() + 6 * MINUTE);
-        return realCreate(args);
+        const out = await realCreate(args);
+        landed();
+        await gate;
+        return out;
       });
-      await expect(
-        handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_slow_claim')),
-      ).rejects.toThrow(/renewal reminder/i);
-      expect(h.sendEmail).not.toHaveBeenCalled();
-      expect(h.notifications.has(KEY)).toBe(false); // released, so the retry can send
+      const a = handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_slow_a')).then(
+        () => 'done',
+        () => 'threw'
+      );
+      await claimLanded;
+      vi.setSystemTime(Date.now() + 6 * MINUTE);
+      await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_slow_b'));
+      resume();
+      expect(await a).toBe('threw');
+      expect(h.sendEmail).toHaveBeenCalledTimes(1);
+      expect(h.notifications.get(KEY)?.type).toBe('renewal_reminder');
     } finally {
       vi.useRealTimers();
       err.mockRestore();
+      warn.mockRestore();
     }
   });
 
@@ -525,6 +547,155 @@ describe('GP-595: a claim left behind by a failed attempt never loses the remind
     );
     expect(h.notifications.get(KEY)?.id).toBe('n-other');
     err.mockRestore();
+  });
+});
+
+describe('GP-595 design: a send that has started is never sent again', () => {
+  const KEY = 'renewal_reminder:sub_ind_1:2026-10-17';
+  const MINUTE = 60_000;
+  type UpdateArgs = { where: NotificationWhere; data: { type?: string } };
+  const isConfirm = (args: UpdateArgs) => args.data.type === 'renewal_reminder';
+  const isMarkSending = (args: UpdateArgs) => args.data.type === 'renewal_reminder_sending';
+
+  /** The type of the record at the moment the email provider is called. */
+  function recordTypeAtSend(): { value?: string } {
+    const seen: { value?: string } = {};
+    h.sendEmail.mockImplementationOnce(async () => {
+      seen.value = h.notifications.get(KEY)?.type;
+      return { sent: true, messageId: 'msg_1' };
+    });
+    return seen;
+  }
+
+  it('send ok, confirm ok: the record says "sending" before the email call and "sent" after; one email', async () => {
+    const seen = recordTypeAtSend();
+    await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_ok'));
+    expect(seen.value).toBe('renewal_reminder_sending');
+    expect(h.sendEmail).toHaveBeenCalledTimes(1);
+    expect(h.notifications.get(KEY)?.type).toBe('renewal_reminder');
+  });
+
+  it('send ok, confirm FAILS: a live delivery after the stale window sends nothing (reviewer probe 1)', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      const realUpdate = h.prisma.lmsNotification.updateMany.getMockImplementation()!;
+      h.prisma.lmsNotification.updateMany.mockImplementation(async (args) => {
+        if (isConfirm(args as UpdateArgs)) throw new Error('transient confirm failure');
+        return realUpdate(args);
+      });
+      await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_confirm_fail_a'));
+      expect(h.sendEmail).toHaveBeenCalledTimes(1);
+
+      vi.setSystemTime(Date.now() + 6 * MINUTE);
+      await expect(
+        handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_confirm_fail_b'))
+      ).rejects.toThrow(/renewal reminder/i);
+      expect(h.sendEmail).toHaveBeenCalledTimes(1);
+      expect(JSON.stringify(h.captureServerError.mock.calls)).toContain(
+        'confirm_renewal_reminder_claim'
+      );
+      expect(JSON.stringify(h.captureServerError.mock.calls)).toContain(
+        'renewal_reminder_send_unconfirmed'
+      );
+    } finally {
+      h.prisma.lmsNotification.updateMany.mockReset();
+      h.prisma.lmsNotification.updateMany.mockImplementation(realUpdateImpl);
+      vi.useRealTimers();
+      err.mockRestore();
+    }
+  });
+
+  it('send ok, confirm STALLS past the stale window: a second live delivery sends nothing (reviewer probe 2)', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    const realUpdate = h.prisma.lmsNotification.updateMany.getMockImplementation()!;
+    let release!: () => void;
+    let parked!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const atConfirm = new Promise<void>((r) => (parked = r));
+    let firstConfirm = true;
+    h.prisma.lmsNotification.updateMany.mockImplementation(async (args) => {
+      // Park only the FIRST confirmation (delivery A's), before its condition is checked.
+      if (firstConfirm && isConfirm(args as UpdateArgs)) {
+        firstConfirm = false;
+        parked();
+        await gate;
+      }
+      return realUpdate(args);
+    });
+    const a = handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_slow_confirm_a'));
+    try {
+      await atConfirm;
+      expect(h.sendEmail).toHaveBeenCalledTimes(1);
+      vi.setSystemTime(Date.now() + 6 * MINUTE);
+      await expect(
+        handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_slow_confirm_b'))
+      ).rejects.toThrow(/renewal reminder/i);
+      expect(h.sendEmail).toHaveBeenCalledTimes(1);
+    } finally {
+      release();
+      await a;
+      h.prisma.lmsNotification.updateMany.mockReset();
+      h.prisma.lmsNotification.updateMany.mockImplementation(realUpdateImpl);
+      vi.useRealTimers();
+    }
+    expect(h.notifications.get(KEY)?.type).toBe('renewal_reminder');
+  });
+
+  it('send FAILS: the record was "sending" during the call, is removed after, and the retry sends once', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const seen: { value?: string } = {};
+    h.sendEmail.mockImplementationOnce(async () => {
+      seen.value = h.notifications.get(KEY)?.type;
+      return { sent: false, reason: 'provider_error' };
+    });
+    await expect(handleSubscriptionEvent(upcomingEvent('sub_ind_1'))).rejects.toThrow(
+      /renewal reminder/i
+    );
+    expect(seen.value).toBe('renewal_reminder_sending');
+    expect(h.notifications.has(KEY)).toBe(false);
+    await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_retry'));
+    expect(h.sendEmail).toHaveBeenCalledTimes(2);
+    expect(h.notifications.get(KEY)?.type).toBe('renewal_reminder');
+    err.mockRestore();
+  });
+
+  it('the "about to send" write fails: nothing is sent, the claim is removed, and it throws', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const realUpdate = h.prisma.lmsNotification.updateMany.getMockImplementation()!;
+    let saw = false;
+    h.prisma.lmsNotification.updateMany.mockImplementation(async (args) => {
+      if (isMarkSending(args as UpdateArgs)) {
+        saw = true;
+        throw new Error('db down');
+      }
+      return realUpdate(args);
+    });
+    try {
+      await expect(handleSubscriptionEvent(upcomingEvent('sub_ind_1'))).rejects.toThrow('db down');
+      expect(saw).toBe(true);
+      expect(h.sendEmail).not.toHaveBeenCalled();
+      expect(h.notifications.has(KEY)).toBe(false);
+    } finally {
+      h.prisma.lmsNotification.updateMany.mockReset();
+      h.prisma.lmsNotification.updateMany.mockImplementation(realUpdateImpl);
+      err.mockRestore();
+    }
+  });
+
+  it('process killed while sending (record left "sending"): no delivery sends it again, however old', async () => {
+    h.notifications.set(KEY, {
+      id: 'n-sending',
+      userId: 'user-ind-1',
+      dedupeKey: KEY,
+      type: 'renewal_reminder_sending',
+      createdAt: new Date(Date.now() - 60 * MINUTE),
+    });
+    await expect(
+      handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_after_kill_mid_send'))
+    ).rejects.toThrow(/renewal reminder/i);
+    expect(h.sendEmail).not.toHaveBeenCalled();
+    expect(h.notifications.get(KEY)?.id).toBe('n-sending');
   });
 });
 

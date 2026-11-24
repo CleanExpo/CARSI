@@ -93,6 +93,9 @@ vi.mock('@/lib/prisma', () => ({
     lmsNotification: {
       findUnique: vi.fn(async () => null),
       create: vi.fn(async () => ({ id: 'n-1' })),
+      // Mark-sending and mark-sent each act on this attempt's own claim (GP-595).
+      updateMany: vi.fn(async () => ({ count: 1 })),
+      deleteMany: vi.fn(async () => ({ count: 1 })),
       delete: vi.fn(async () => ({})),
     },
     lmsUser: { findUnique: vi.fn(async () => h.user) },
