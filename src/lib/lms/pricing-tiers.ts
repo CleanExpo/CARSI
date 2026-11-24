@@ -1,9 +1,16 @@
 /** Individual vs Teams pricing (Phase 2) — aligned with /pricing and EnrolButton. */
 
-import { annualPriceLabel, extraSeatLabel, INDIVIDUAL_MEMBERSHIP } from '@/lib/lms/membership-prices';
+import {
+  annualPriceLabel,
+  BUSINESS_OWNER_PLAN,
+  extraSeatLabel,
+  INDIVIDUAL_MEMBERSHIP,
+  TEAMS_OWNER_PLAN_INCLUDED_SEATS,
+} from '@/lib/lms/membership-prices';
 
 export type IndividualTierId = 'per_course' | 'pro_annual';
-export type TeamBundleTierId = 'starter' | 'growth' | 'full_library';
+/** The one Teams plan (Phill 23/11/2026). Also the Stripe subscription `plan` metadata. */
+export type TeamBundleTierId = 'business_owner';
 
 export interface IndividualTier {
   id: IndividualTierId;
@@ -82,40 +89,27 @@ export const INDIVIDUAL_TIERS: IndividualTier[] = [
   },
 ];
 
+/**
+ * Teams is ONE plan (Phill 23/11/2026, "Your 20/10 prices only"): the business owner plan at
+ * A$1,295 a year, plus A$695 a year for each extra staff member, each with their own login.
+ * Every amount is read from `membership-prices.ts`. The earlier A$299 / A$799 / A$2,499 bundles
+ * (#825) were never ruled by the founder and are retired.
+ */
 export const TEAM_TIERS: TeamTier[] = [
   {
-    id: 'starter',
-    name: 'Teams Starter',
-    priceLabel: '$299 / year',
-    priceCents: 29900,
-    seatsIncluded: 5,
+    id: 'business_owner',
+    name: 'Business owner plan',
+    priceLabel: annualPriceLabel(BUSINESS_OWNER_PLAN),
+    priceCents: BUSINESS_OWNER_PLAN.amountCents,
+    seatsIncluded: TEAMS_OWNER_PLAN_INCLUDED_SEATS,
     perSeatExpansionLabel: extraSeatLabel(),
-    description: 'Small restoration crews — core water & mould pathways.',
-    features: ['5 seats included', 'Owner dashboard & invites', 'Progress across seats'],
-    cta: 'Coming soon',
-    comingSoon: true,
-  },
-  {
-    id: 'growth',
-    name: 'Teams Growth',
-    priceLabel: '$799 / year',
-    priceCents: 79900,
-    seatsIncluded: 15,
-    perSeatExpansionLabel: extraSeatLabel(),
-    description: 'Growing businesses training multiple technicians.',
-    features: ['15 seats included', 'All Starter features', 'Priority email support'],
-    cta: 'Coming soon',
-    comingSoon: true,
-  },
-  {
-    id: 'full_library',
-    name: 'Full library',
-    priceLabel: '$2,499 / year',
-    priceCents: 249900,
-    seatsIncluded: 25,
-    perSeatExpansionLabel: extraSeatLabel(),
-    description: 'Enterprise-style access to the full published catalogue.',
-    features: ['25 seats included', 'All Growth features', 'Dedicated onboarding call'],
+    description:
+      'For the business owner, with a dashboard to track staff training. Add each staff member with their own login.',
+    features: [
+      'The owner’s own login',
+      `${extraSeatLabel()} for each staff member, each with their own login`,
+      'Owner dashboard, invites and progress across staff',
+    ],
     cta: 'Coming soon',
     comingSoon: true,
   },
@@ -126,7 +120,7 @@ export function teamTierById(id: string): TeamTier | undefined {
 }
 
 export function teamSeatLimitForTier(tierId: TeamBundleTierId): number {
-  return teamTierById(tierId)?.seatsIncluded ?? 5;
+  return teamTierById(tierId)?.seatsIncluded ?? TEAMS_OWNER_PLAN_INCLUDED_SEATS;
 }
 
 /**

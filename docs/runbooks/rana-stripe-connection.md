@@ -249,21 +249,36 @@ webhook or new events are needed — the same five events from Step C cover E2/E
 
 | Plan | Product name | Amount | Recurring | Lookup key | Optional env override | Metadata `plan` the app sets at checkout |
 |---|---|---|---|---|---|---|
-| Teams Starter (5 seats) | CARSI Teams Starter | A$299.00 | Yearly | `carsi_teams_starter` | `STRIPE_PRICE_TEAMS_STARTER` | `starter` |
-| Teams Growth (15 seats) | CARSI Teams Growth | A$799.00 | Yearly | `carsi_teams_growth` | `STRIPE_PRICE_TEAMS_GROWTH` | `growth` |
-| Teams Full Library (25 seats) | CARSI Teams Full Library | A$2,499.00 | Yearly | `carsi_teams_full_library` | `STRIPE_PRICE_TEAMS_FULL_LIBRARY` | `full_library` |
-| Business owner plan (organisation; GP-773) | CARSI Business Owner Plan | A$1,295.00 GST included | **Yearly** | `carsi_org_annual` | `STRIPE_PRICE_ORG_ANNUAL` | `org_monthly` (stored plan id, unchanged) |
+| Business owner plan (organisation and Teams base; GP-773) | CARSI Business Owner Plan | A$1,295.00 GST included | **Yearly** | `carsi_org_annual` | `STRIPE_PRICE_ORG_ANNUAL` | `org_monthly` (organisation checkout) or `business_owner` (Teams checkout) |
+| Teams extra staff seat (GP-773 seat billing) | CARSI Teams Extra Staff Seat | A$695.00 | Yearly | `carsi_teams_extra_seat` | `STRIPE_PRICE_TEAMS_EXTRA_SEAT` | (same subscription as the owner plan) |
+
+Only these two Prices are needed for Teams. The earlier Teams bundles (A$299 Starter, A$799
+Growth, A$2,499 Full Library, lookup keys `carsi_teams_starter`, `carsi_teams_growth`,
+`carsi_teams_full_library`) are **superseded by Phill 23/11/2026: "Your 20/10 prices only"**.
+Do not create them; the app no longer reads them.
 
 Notes:
-- **Teams seat billing = subscription `quantity`.** Create ONE Price per tier as a
-  per-unit price; the app sets the `quantity` to the tier's included seats
-  (5 / 15 / 25) at checkout. Seat expansion increases the `quantity` with
-  proration — no separate per-seat Price is required. So set each Teams Price as
-  a **standard per-unit** price (e.g. Starter = A$299 ÷ 5 = A$59.80/seat). GP-773: the
-  Teams checkout refuses a Price unless unit amount × included seats equals the tier total
-  shown on /pricing (AUD, yearly), so a flat tier price is refused. Teams Growth
-  (A$799 ÷ 15) has no whole-cent unit amount, so it cannot go on sale until its price is
-  decided.
+- **Teams = the business owner plan + a separate seat item** (founder rulings 23/11/2026,
+  "Build seat billing now" and "Your 20/10 prices only"). The base item is the same A$1,295
+  yearly owner Price the organisation checkout uses, billed at quantity 1; it includes the
+  owner's own login (1 seat; UNVERIFIED with Phill, nothing records more). Create ONE
+  extra-seat Price at A$695.00 yearly; each extra staff member, with their own login, is one
+  unit of that separate subscription item. Checkout adds the seat item when the buyer chooses extra seats; seat
+  expansion raises its quantity (or adds it) and never changes the base item. Expansion is
+  charged first (`always_invoice` + `error_if_incomplete`): the prorated amount is charged at
+  once and seats are granted only when that payment succeeds.
+  The webhook counts seats as included seats + extra-seat quantity. One rule
+  (`classifyTeamSubscription`) identifies each item by its own Price, never by metadata, and
+  accepts only exactly the owner plan item (quantity 1) plus at most one seat item. **Do not add
+  any other item to a Teams subscription in the Stripe dashboard** (a one-off add-on, a second
+  seat item, a coupon item): the webhook then grants the team no seats and seat expansion
+  answers 409 until the extra item is removed. Archiving a Price is safe: existing subscriptions
+  keep billing on it and keep their seats, but new Teams checkouts and seat expansion need the
+  active verified Price.
+- Every Teams Price is checked against amount, AUD, yearly and per-unit shape. A missing or
+  mismatched base **or** seat Price makes the Teams checkout answer 503 ("not yet available")
+  and seat expansion answer 503; nothing is charged. A Teams checkout that names a retired
+  bundle (`starter`, `growth`, `full_library`) is refused (400).
 - **GST**: match E1's decision. E1's A$795 annual is **inclusive**. Confirm with
   the accountant whether Teams/org Prices are inclusive or use Stripe Tax. The org
   plan is quoted "$1,295/month **+ GST**" in the plan doc — if that means GST is
@@ -275,8 +290,8 @@ Notes:
 
 ## Env vars (DigitalOcean App-Level)
 Optional explicit bindings (the app resolves by lookup key without them):
-`STRIPE_PRICE_TEAMS_STARTER`, `STRIPE_PRICE_TEAMS_GROWTH`,
-`STRIPE_PRICE_TEAMS_FULL_LIBRARY`, `STRIPE_PRICE_ORG_ANNUAL`. (GP-773: `STRIPE_PRICE_ORG_MONTHLY`
+`STRIPE_PRICE_TEAMS_EXTRA_SEAT`, `STRIPE_PRICE_ORG_ANNUAL`. (The Teams bundle variables
+`STRIPE_PRICE_TEAMS_STARTER`, `_GROWTH` and `_FULL_LIBRARY` are no longer read.) (GP-773: `STRIPE_PRICE_ORG_MONTHLY`
 and the `carsi_org_monthly` lookup key are no longer read; a monthly Price is never sold as
 the yearly plan.)
 The go/no-go switch is `TEAMS_SUBSCRIPTIONS_ENABLED=true`, set only once
@@ -286,15 +301,15 @@ The go/no-go switch is `TEAMS_SUBSCRIPTIONS_ENABLED=true`, set only once
 **Founder prices (GP-773, 20/10/2026, ruled 22/11/2026).** Individual A$795/yr, business
 owner A$1,295/yr, each extra staff member A$695/yr, no promotion codes. The amounts live in
 `src/lib/lms/membership-prices.ts`, and the individual and business owner checkouts refuse any
-Price whose amount, currency or interval differs. Seat expansion refuses unless the
-subscription's seat Price is A$695 per year.
+Price whose amount, currency or interval differs. Teams is the business owner plan with extra
+staff billed on their own A$695 yearly seat item (see the notes above), so the "+$695/seat per
+year" on the Teams card is what Stripe charges.
 
-**Known gap before Teams goes on sale:** the Teams cards now advertise "+$695/seat per year"
-(GP-773; previously $49, $39 or $29). Seat expansion raises the subscription `quantity` on
-the tier's single Price, and it now refuses (409, nothing charged) unless that Price is
-exactly A$695 AUD yearly. A bundle tier Price is not, so online seat expansion stays refused
-until the founder decides how the A$695 extra seat is billed (a separate seat line item, or a
-different tier model). Decide this before setting `TEAMS_SUBSCRIPTIONS_ENABLED=true`.
+**Before Teams goes on sale:** confirm the A$1,295 owner Price exists (it is shared with the
+organisation checkout), create the A$695 seat Price (Test mode first), confirm with Phill how
+many staff the owner plan includes (the app assumes the owner only), run the Teams checks
+below, then set `TEAMS_SUBSCRIPTIONS_ENABLED=true`. The pricing card still shows the Teams
+plan as "Coming soon" until that UI flag is changed in `src/lib/lms/pricing-tiers.ts`.
 
 ## E3 — flip the onboarding course off `isFree` (ops, LAST)
 Once the org Price exists, the flag is on, and at least one org is provisioned
@@ -305,10 +320,14 @@ gated to active-org members (402 for everyone else), so this only removes the
 "free" affordance — it never strands an entitled org learner.
 
 ## Verify (Test mode), per plan
-- **Teams**: start a Starter checkout → 5 seats provisioned; invite 5 members →
-  all seated; the **6th invite is rejected 409 with a seat-expansion path**;
-  `POST /api/lms/subscription/teams/expand-seats {additional_seats:1}` raises the
-  quantity (proration) → the 6th can then join. Refund → seats revoked.
+- **Teams**: start a Teams checkout with 2 extra staff → Stripe shows A$1,295.00 per year
+  once plus A$695.00 x 2 → 3 seats provisioned (the owner + 2); invite 2 staff → both seated;
+  the **3rd staff invite is rejected 409 with a seat-expansion path**;
+  `POST /api/lms/subscription/teams/expand-seats {additional_seats:1}` charges the prorated
+  A$695 at once and, only when that payment succeeds, raises the seat item → seat limit 4 →
+  the 3rd can then join. Expand again → the seat item's quantity rises; the A$1,295 base item
+  is unchanged. With the test card `4000 0000 0000 0341` (attaches, then declines) the expansion
+  answers 402 "no seats were added" and the seat limit stays put. Refund → seats revoked.
 - **Org**: start an org checkout with an organisation name → subscription active →
   a member of that org can enrol in an onboarding-brand course; cancel/refund →
   new enrolment blocked, existing progress + certificates retained.

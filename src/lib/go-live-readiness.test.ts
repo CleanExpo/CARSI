@@ -114,8 +114,8 @@ describe('Teams checkout check', () => {
 });
 
 describe('Teams pricing card check', () => {
-  const planSoon = `<span data-testid="${tierCtaTestId('starter', true)}">Coming soon</span>`;
-  const planBuy = `<a data-testid="${tierCtaTestId('starter', false)}">Start Teams plan</a>`;
+  const planSoon = `<span data-testid="${tierCtaTestId('business_owner', true)}">Coming soon</span>`;
+  const planBuy = `<a data-testid="${tierCtaTestId('business_owner', false)}">Start Teams plan</a>`;
   const seats = `<a data-testid="${tierCtaTestId('team_seats', false)}">Buy seats</a>`;
   const run = (text: string, expectOnSale: boolean) =>
     checkTeamsPricingCard({ name: 'teams', res: { status: 200, text }, expectOnSale }).result;
@@ -235,7 +235,7 @@ describe('runChecks against a local stand-in site', () => {
           res.writeHead(200, { 'content-type': 'text/html' });
           res.end(
             `<span data-testid="pricing-pro_annual-coming-soon">Coming soon</span>` +
-              `<span data-testid="pricing-starter-coming-soon">Coming soon</span>`
+              `<span data-testid="pricing-business_owner-coming-soon">Coming soon</span>`
           );
           return;
         case '/api/lms/subscription/status':

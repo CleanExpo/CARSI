@@ -87,7 +87,9 @@ export function isSubscriptionEvent(type: string): boolean {
  */
 export type SubscriptionKind = 'individual' | 'team' | 'org' | 'coaching' | 'unknown';
 
-const TEAM_PLANS = new Set(['starter', 'growth', 'full_library', 'teams']);
+// 'business_owner' is the one Teams plan (GP-773, Phill 23/11/2026). The retired bundle ids stay
+// routed to the team store so a stray event is never mis-attached elsewhere; they grant 0 seats.
+const TEAM_PLANS = new Set(['business_owner', 'starter', 'growth', 'full_library', 'teams']);
 
 function planFromSubscription(subscription: Stripe.Subscription): string {
   const plan = subscription.metadata?.plan;
@@ -223,7 +225,7 @@ async function applySubscriptionSnapshot(
     const plan =
       typeof subscription.metadata?.plan === 'string'
         ? subscription.metadata.plan.trim().toLowerCase()
-        : 'starter';
+        : 'business_owner';
     await upsertTeamSubscription({
       teamId,
       stripeCustomerId: readCustomerId(subscription),
@@ -369,7 +371,7 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
           const plan =
             typeof subscription.metadata?.plan === 'string'
               ? subscription.metadata.plan.trim().toLowerCase()
-              : 'starter';
+              : 'business_owner';
           await upsertTerminalTeamSubscriptionStatus({
             teamId,
             stripeCustomerId: readCustomerId(subscription),

@@ -35,8 +35,8 @@ function resolveIndividualTiers(subscriptionsEnabled: boolean): IndividualTier[]
 /**
  * Lift the Teams coming-soon lock (WS1-E2, GP-442) only when `teamSubscriptionsEnabled()` is
  * true, which needs BOTH SUBSCRIPTIONS_ENABLED and TEAMS_SUBSCRIPTIONS_ENABLED. The CTA routes
- * owners to the team dashboard where they start the seat subscription checkout; the
- * full-library tier stays sales-led (contact) as before.
+ * owners to the team dashboard where they start the business owner plan checkout (the one
+ * Teams plan, GP-773).
  */
 function resolveTeamTiers(teamsEnabled: boolean): TeamTier[] {
   if (!teamsEnabled) return TEAM_TIERS;
@@ -117,22 +117,17 @@ export function PricingTiers({
           across your crew.
         </p>
         {teamsEnabled ? (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="mx-auto grid max-w-md grid-cols-1 gap-6">
           {resolveTeamTiers(teamsEnabled).map((tier) => (
             <div
               key={tier.id}
               className="flex flex-col rounded-lg border bg-white p-6 shadow-sm"
-              style={{
-                borderColor:
-                  tier.id === 'growth' ? 'rgba(15,95,168,0.35)' : 'rgba(15,23,42,0.1)',
-                background:
-                  tier.id === 'growth' ? '#eef7ff' : '#ffffff',
-              }}
+              style={{ borderColor: 'rgba(15,95,168,0.35)', background: '#eef7ff' }}
             >
               <h3 className="mb-1 text-lg font-bold text-slate-950">{tier.name}</h3>
               <p className="text-3xl font-bold text-slate-950">{tier.priceLabel}</p>
               <p className="mt-1 text-xs text-slate-600">
-                {tier.seatsIncluded} seats · {tier.perSeatExpansionLabel}
+                {tier.perSeatExpansionLabel} for each extra staff member
               </p>
               <p className="mt-3 text-sm text-slate-600">{tier.description}</p>
               <ul className="mt-4 flex flex-1 flex-col gap-2 text-sm text-slate-600">
@@ -154,17 +149,9 @@ export function PricingTiers({
               ) : (
                 <Link
                   data-testid={tierCtaTestId(tier.id, false)}
-                  href={
-                    tier.id === 'full_library'
-                      ? '/contact?subject=teams-full-library'
-                      : `/dashboard/team?create=${tier.id}`
-                  }
+                  href={`/dashboard/team?create=${tier.id}`}
                   className="mt-6 flex min-h-11 w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
-                  style={{
-                    background: tier.id === 'growth' ? '#0f5fa8' : 'transparent',
-                    color: tier.id === 'growth' ? '#ffffff' : '#146fc2',
-                    border: tier.id === 'growth' ? 'none' : '1px solid rgba(15,95,168,0.35)',
-                  }}
+                  style={{ background: '#0f5fa8', color: '#ffffff', border: 'none' }}
                 >
                   {tier.cta}
                 </Link>

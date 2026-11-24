@@ -46,12 +46,12 @@ const topics = [
   { label: 'Hotel crews', color: '#8e44ad' },
 ];
 
-const starter = TEAM_TIERS.find((tier) => tier.id === 'starter');
+const [teamsPlan] = TEAM_TIERS;
 
 const stats = [
   {
-    value: starter?.seatsIncluded != null ? String(starter.seatsIncluded) : '5',
-    label: 'Seats in the published Starter team price',
+    value: teamsPlan.perSeatExpansionLabel,
+    label: 'For each extra staff member on the business owner plan, each with their own login',
   },
   { value: 'IICRC CEC', label: 'Hours only on approved courses' },
   { value: 'Online', label: 'Self-paced study' },
@@ -151,9 +151,9 @@ export default async function FacilityManagementIndustryPage() {
 
       <IndustryCTA
         subtitle="Facility management training"
-        title="Start the crew from published team prices"
-        price={starter?.priceLabel ?? 'See pricing'}
-        description="Starter, Growth and Full library prices are on the pricing page. Contact CARSI to start seats. Technicians can still buy a single course."
+        title="Start the crew on the business owner plan"
+        price={teamsPlan.priceLabel}
+        description={`The business owner plan is ${teamsPlan.priceLabel}, plus ${teamsPlan.perSeatExpansionLabel} for each staff member, each with their own login. Contact CARSI to start. Technicians can still buy a single course.`}
         ctaText="Talk to CARSI"
         ctaHref={facilityManagementContactHref}
         secondaryHref="/pricing"

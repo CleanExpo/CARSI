@@ -33,7 +33,7 @@ describe('PricingTiers — switches', () => {
     const html = render({});
     expect(has(html, 'pricing-pro_annual-coming-soon')).toBe(true);
     expect(has(html, 'pricing-pro_annual-buy')).toBe(false);
-    for (const id of ['starter', 'growth', 'full_library']) {
+    for (const id of ['business_owner']) {
       expect(has(html, `pricing-${id}-coming-soon`)).toBe(false);
       expect(has(html, `pricing-${id}-buy`)).toBe(false);
     }
@@ -50,7 +50,7 @@ describe('PricingTiers — switches', () => {
     const yearly = html.match(/<a[^>]*data-testid="pricing-pro_annual-buy"[^>]*>([^<]*)<\/a>/);
     expect(yearly?.[1]).toBe('Start membership');
     expect(yearly?.[0]).toContain('href="/subscribe"');
-    for (const id of ['starter', 'growth', 'full_library']) {
+    for (const id of ['business_owner']) {
       expect(has(html, `pricing-${id}-coming-soon`)).toBe(false);
       expect(has(html, `pricing-${id}-buy`)).toBe(false);
     }
@@ -71,7 +71,7 @@ describe('PricingTiers — switches', () => {
   it('both on: yearly and Teams are on sale', () => {
     const html = render({ subscriptionsEnabled: true, teamsEnabled: true });
     expect(has(html, 'pricing-pro_annual-buy')).toBe(true);
-    for (const id of ['starter', 'growth', 'full_library']) {
+    for (const id of ['business_owner']) {
       expect(has(html, `pricing-${id}-buy`)).toBe(true);
       expect(has(html, `pricing-${id}-coming-soon`)).toBe(false);
     }

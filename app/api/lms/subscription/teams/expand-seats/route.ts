@@ -1,46 +1,96 @@
 /**
  * POST /api/lms/subscription/teams/expand-seats — buy additional seats on an
- * active Teams seat subscription (WS1-E2, GP-442) by increasing the Stripe
- * subscription `quantity` with proration.
+ * active Teams seat subscription (WS1-E2, GP-442; seat billing GP-773).
  *
  * Body: { additional_seats: number (1..50), request_id: string (one per click, GP-759) }
  *
- * Seat-billing decision (see the checkout route + PR body): seats are the
- * subscription `quantity`. Expansion updates the single subscription item's
- * quantity and lets Stripe prorate the mid-cycle difference
- * (`proration_behavior: 'create_prorations'`). The webhook
- * (customer.subscription.updated) then refreshes `seatLimit` from the new
- * quantity — so entitlement follows billing, server-side and fail-closed.
+ * Idempotent (GP-759): the page's per-click request id is the Stripe idempotency key, so a
+ * retried request never adds or charges the seats twice. A replay still running at Stripe, or
+ * arriving after the seat count moved, answers 409 with a code the page understands.
+ *
+ * Seat billing (see the checkout route): the subscription has the owner plan item (quantity 1,
+ * includes the owner's seat) and at most one A$695 yearly extra-seat item. Expansion first
+ * classifies the subscription with the one shared rule (`classifyTeamSubscription`), then raises
+ * the seat item's quantity, or adds the seat item at the verified seat Price when the rule proved
+ * there is none. The base item is never changed.
+ *
+ * Charge first (Phill 23/11/2026): the update uses `always_invoice` + `error_if_incomplete`,
+ * so Stripe invoices the prorated seats immediately and applies the change only when that
+ * invoice is paid. Seats are granted only after `seatChargePaid` confirms it; a declined or
+ * incomplete payment returns 402 and leaves seats unchanged. The webhook
+ * (customer.subscription.updated) then refreshes `seatLimit` from the paid items.
  *
  * Owner-only. FAILS CLOSED: flag off / not signed in / not the owner / no active
- * subscription → no expansion, no charge.
+ * subscription → no expansion, no charge. Seat Price missing or mismatched → 503; a
+ * subscription that is not exactly the owner plan item plus at most one verified seat item (an
+ * unknown item, a second seat item, a seat item on another Price), or not charged
+ * automatically → 409; payment declined, incomplete or unconfirmed → 402.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import type Stripe from 'stripe';
 
 import { prisma } from '@/lib/prisma';
 import { getStripeClient } from '@/lib/api/stripe';
-import { SEAT_ADD_IN_PROGRESS, SEATS_ALREADY_ADDED } from '@/lib/lms/seat-expansion-request';
+import {
+  SEAT_ADD_IN_PROGRESS,
+  SEAT_PAYMENT_DECLINED,
+  SEATS_ALREADY_ADDED,
+} from '@/lib/lms/seat-expansion-request';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { decideTeamSeatSubscription } from '@/lib/server/entitlements';
-import { EXTRA_STAFF_SEAT } from '@/lib/lms/membership-prices';
-import { stripePriceMatches, type StripePriceLike } from '@/lib/server/membership-price-check';
+import { resolveTeamSeatPriceId } from '@/lib/server/team-subscription-price';
+import {
+  SEAT_CHARGE_FIRST,
+  classifyTeamSubscription,
+  seatChargePaid,
+} from '@/lib/server/team-subscription-store-pure';
 import { getTeamForUser } from '@/lib/server/teams';
 import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
 const MAX_ADDITIONAL = 50;
 const REQUEST_ID_PATTERN = /^[A-Za-z0-9_-]{8,100}$/;
 
-/** Stripe is still executing an earlier request with the same idempotency key. */
+/** Stripe is still executing an earlier request with the same idempotency key (GP-759). */
 function isStripeKeyInUse(error: unknown): boolean {
   if (!error || typeof error !== 'object') return false;
   return (error as { code?: unknown }).code === 'idempotency_key_in_use';
 }
 
+/** The same idempotency key was already used with different parameters (GP-759). */
 function isStripeIdempotencyError(error: unknown): boolean {
   if (!error || typeof error !== 'object') return false;
   const e = error as { type?: unknown; rawType?: unknown };
   return e.type === 'StripeIdempotencyError' || e.rawType === 'idempotency_error';
+}
+
+/**
+ * Stripe refused to take the payment for the added seats: a card error, or HTTP 402 (what
+ * `error_if_incomplete` returns when the invoice cannot be paid, including when it needs the
+ * buyer's action). In every such case Stripe left the subscription unchanged.
+ */
+function isSeatPaymentRefused(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const e = error as { type?: unknown; statusCode?: unknown };
+  return e.type === 'StripeCardError' || e.statusCode === 402;
+}
+
+/**
+ * 402: no seats were added. `declined` is true only when Stripe refused the payment and applied
+ * nothing; then `error_code: SEAT_PAYMENT_DECLINED` tells the page that purchase is over, so its
+ * next try uses a new request id (Stripe replays a stored decline for a reused id). An
+ * unconfirmed payment carries no code, so the page keeps the id and cannot pay twice.
+ */
+function paymentRefused(declined: boolean) {
+  return NextResponse.json(
+    {
+      detail:
+        'Your payment for the extra seats did not go through, so no seats were added. Check your card details and try again.',
+      reason: 'seat_payment_failed',
+      ...(declined ? { error_code: SEAT_PAYMENT_DECLINED } : {}),
+    },
+    { status: 402 },
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -109,47 +159,99 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const newQuantity = sub.seatLimit + additional;
+  // GP-773: an extra staff seat is A$695 per year. Resolve and verify the seat Price before any
+  // Stripe change; a missing or mismatched Price fails closed (503, nothing charged).
+  const seatPriceId = await resolveTeamSeatPriceId();
+  if (!seatPriceId) {
+    return NextResponse.json(
+      { detail: 'Extra seats are not available to buy online just now. Please try again later.' },
+      { status: 503 },
+    );
+  }
+
+  const refuse = () =>
+    NextResponse.json(
+      {
+        detail:
+          'Extra seats cannot be added to this subscription online yet. Contact CARSI support to add staff.',
+        reason: 'seat_price_mismatch',
+      },
+      { status: 409 },
+    );
 
   try {
     const stripe = getStripeClient();
     const stripeSub = await stripe.subscriptions.retrieve(sub.stripeSubscriptionId);
-    const item = stripeSub.items?.data?.[0];
-    if (!item) {
-      return NextResponse.json({ detail: 'Subscription item not found.' }, { status: 500 });
+
+    // The one Teams rule (classifyTeamSubscription): exactly the owner plan item plus at most one
+    // seat item, told apart by their own Prices, never by metadata. Any other shape (an unknown
+    // item, a second seat item, a seat item on a Price other than the verified one) is refused
+    // before any change, so an item is never treated as absent and billed twice.
+    const shape = classifyTeamSubscription(stripeSub, { seatPriceId });
+    if (!shape.ok) return refuse();
+
+    // Charge first: only an automatically charged subscription can be made to pay for the seats
+    // before they are added. An invoiced (send_invoice) subscription would add them unpaid.
+    if (stripeSub.collection_method !== 'charge_automatically') return refuse();
+
+    let update: Stripe.SubscriptionUpdateParams;
+    let newExtraSeats: number;
+    if (shape.seat) {
+      // The seat item is on the verified A$695 seat Price (the rule checked it): raise it.
+      newExtraSeats = shape.extraSeats + additional;
+      update = {
+        items: [{ id: shape.seat.id, quantity: newExtraSeats }],
+        ...SEAT_CHARGE_FIRST,
+        expand: [...SEAT_CHARGE_FIRST.expand],
+      };
+    } else {
+      // No seat item (the rule proved there is none): add it at the verified seat Price. The
+      // metadata stamp is a record for operators only; nothing reads it to identify items.
+      newExtraSeats = additional;
+      update = {
+        items: [{ price: seatPriceId, quantity: newExtraSeats }],
+        metadata: { seat_price_id: seatPriceId },
+        ...SEAT_CHARGE_FIRST,
+        expand: [...SEAT_CHARGE_FIRST.expand],
+      };
     }
 
-    // GP-773: an extra staff seat is A$695 per year (founder ruling). A seat is billed at the
-    // subscription item's Price, so refuse, before any charge, unless that Price is exactly the
-    // extra-seat price. A tier bundle Price ($299, $799 or $2,499) would bill the wrong amount.
-    if (!stripePriceMatches(item.price as StripePriceLike, EXTRA_STAFF_SEAT)) {
-      return NextResponse.json(
-        {
-          detail:
-            'Extra seats cannot be added to this subscription online yet. Contact CARSI support to add staff.',
-          reason: 'seat_price_mismatch',
-        },
-        { status: 409 },
-      );
+    // The base item is never in the update: only the seat item changes. Stripe invoices the
+    // added seats now and applies the change only if that invoice is paid.
+    let updated: Stripe.Subscription;
+    try {
+      // GP-759: a retry of this click reuses the key. If the first attempt already added the
+      // seats, the retry's parameters differ (the seat item moved), so Stripe answers with an
+      // idempotency error and nothing is charged twice.
+      updated = await stripe.subscriptions.update(sub.stripeSubscriptionId, update, {
+        idempotencyKey: `carsi-expand-seats:${sub.stripeSubscriptionId}:${requestId}`,
+      });
+    } catch (error) {
+      if (isSeatPaymentRefused(error)) {
+        // Declined, or needs the buyer's action: Stripe applied nothing, so neither do we.
+        return paymentRefused(true);
+      }
+      throw error;
     }
 
-    await stripe.subscriptions.update(
-      sub.stripeSubscriptionId,
-      {
-        items: [{ id: item.id, quantity: newQuantity }],
-        proration_behavior: 'create_prorations',
-      },
-      { idempotencyKey: `carsi-expand-seats:${sub.stripeSubscriptionId}:${requestId}` },
-    );
+    if (!seatChargePaid(updated as unknown as Parameters<typeof seatChargePaid>[0])) {
+      // Not confirmed paid: grant nothing. Should not happen under error_if_incomplete; logged
+      // so an operator can reconcile the subscription by hand.
+      console.error('[subscription/teams/expand-seats] seat invoice not paid after update', {
+        subscriptionId: sub.stripeSubscriptionId,
+      });
+      return paymentRefused(false);
+    }
 
-    // Optimistically reflect the new seat limit; the customer.subscription.updated
-    // webhook re-confirms it authoritatively from the paid quantity.
+    // Paid: reflect the new seat limit (included seats + extra seats); the
+    // customer.subscription.updated webhook re-confirms it from the paid items.
+    const newSeatLimit = shape.tier.seatsIncluded + newExtraSeats;
     await prisma.lmsTeamSubscription.update({
       where: { teamId: team.id },
-      data: { seatLimit: newQuantity },
+      data: { seatLimit: newSeatLimit },
     });
 
-    return NextResponse.json({ ok: true, seat_limit: newQuantity, added: additional });
+    return NextResponse.json({ ok: true, seat_limit: newSeatLimit, added: additional });
   } catch (error) {
     if (isStripeKeyInUse(error)) {
       // The earlier attempt with this id is still running at Stripe: its outcome is unknown,

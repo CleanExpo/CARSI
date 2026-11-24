@@ -1,6 +1,4 @@
 import { getStripeClient } from '@/lib/api/stripe';
-import { BUSINESS_OWNER_PLAN } from '@/lib/lms/membership-prices';
-import { formatOnboardingPrice, parseOnboardingMeta } from '@/lib/onboarding/enterprise';
 
 export function buildOnboardingCheckoutUrls(origin: string, slug: string) {
   const base = origin.replace(/\/$/, '');
@@ -20,12 +18,15 @@ export async function createOnboardingStripeCheckout(params: {
   studentId: string;
   successUrl: string;
   cancelUrl: string;
+  /**
+   * GP-773: the Stripe Price id from resolveOrgAnnualPriceId, which has already checked it is
+   * the business owner plan (A$1,295 AUD, yearly, per unit). Required: this checkout never
+   * builds an inline price, so nothing can sell the plan at an amount or interval Stripe was
+   * not set up with.
+   */
+  priceId: string;
 }): Promise<{ checkout_url: string }> {
-  const meta = parseOnboardingMeta(params.meta);
-  // GP-773: the business owner plan, A$1,295 per YEAR, from the one price source. Course meta
-  // (amount, monthly cycle) is not read: the catalogue record is stale and must not set the bill.
-  const unitAmount = BUSINESS_OWNER_PLAN.amountCents;
-  const priceLabel = formatOnboardingPrice(meta?.pricing ?? { seats: 'unlimited' });
+  if (!params.priceId?.trim()) throw new Error('NO_VERIFIED_PRICE');
 
   const stripe = getStripeClient();
 
@@ -41,22 +42,7 @@ export async function createOnboardingStripeCheckout(params: {
       onboarding: 'true',
       purchase_mode: 'self',
     },
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: BUSINESS_OWNER_PLAN.currency,
-          unit_amount: unitAmount,
-          recurring: { interval: BUSINESS_OWNER_PLAN.interval },
-          product_data: {
-            name: params.title,
-            description:
-              params.shortDescription?.slice(0, 500) ||
-              `CARSI Maintenance Company Onboarding — ${priceLabel}`,
-          },
-        },
-      },
-    ],
+    line_items: [{ price: params.priceId, quantity: 1 }],
   });
 
   const url = session.url;

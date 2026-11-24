@@ -74,7 +74,7 @@ export async function upsertTeamSubscription(
       stripeCustomerId: input.stripeCustomerId,
       stripeSubscriptionId: input.stripeSubscriptionId,
       status,
-      plan: input.plan ?? 'starter',
+      plan: input.plan ?? 'business_owner',
       seatLimit: input.seatLimit,
       currentPeriodEnd: input.currentPeriodEnd,
       cancelAtPeriodEnd: input.cancelAtPeriodEnd,
@@ -116,7 +116,7 @@ export async function upsertTerminalTeamSubscriptionStatus(input: {
       stripeCustomerId: input.stripeCustomerId,
       stripeSubscriptionId: input.stripeSubscriptionId,
       status,
-      plan: input.plan ?? 'starter',
+      plan: input.plan ?? 'business_owner',
       seatLimit: input.seatLimit,
       statusEventAt: input.eventTimestamp,
     };

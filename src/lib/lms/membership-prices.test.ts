@@ -22,6 +22,7 @@ import {
   BUSINESS_OWNER_PLAN,
   EXTRA_STAFF_SEAT,
   INDIVIDUAL_MEMBERSHIP,
+  TEAMS_OWNER_PLAN_INCLUDED_SEATS,
   annualPriceLabel,
   extraSeatLabel,
 } from '@/lib/lms/membership-prices';
@@ -65,6 +66,19 @@ describe('every price reader uses the source', () => {
   it('every Teams tier quotes A$695 per extra seat, not $49, $39 or $29', () => {
     for (const tier of TEAM_TIERS) {
       expect(tier.perSeatExpansionLabel).toBe('+$695/seat per year');
+    }
+  });
+
+  // Phill 23/11/2026: "Your 20/10 prices only". Teams is the business owner plan plus A$695 seats;
+  // the A$299 / A$799 / A$2,499 bundles from #825 were never ruled and are gone.
+  it('Teams is only the business owner plan, priced from the source', () => {
+    expect(TEAM_TIERS.map((t) => t.id)).toEqual(['business_owner']);
+    const [plan] = TEAM_TIERS;
+    expect(plan.priceCents).toBe(BUSINESS_OWNER_PLAN.amountCents);
+    expect(plan.priceLabel).toBe(annualPriceLabel(BUSINESS_OWNER_PLAN));
+    expect(plan.seatsIncluded).toBe(TEAMS_OWNER_PLAN_INCLUDED_SEATS);
+    for (const cents of [29_900, 79_900, 249_900]) {
+      expect(TEAM_TIERS.some((t) => t.priceCents === cents)).toBe(false);
     }
   });
 
@@ -120,6 +134,9 @@ const PATTERNS: RegExp[] = [
   /\breturn\s+(?:795|1295|695)\b/,
   /['"`](?:795|1295|695)['"`]/,
   /=\s*(?:795|1295|695)\s*;/,
+  // The retired Teams bundles (#825; superseded by Phill 23/11/2026, "Your 20/10 prices only").
+  /\b(?:29_?900|79_?900|249_?900)\b/,
+  /\$\s?(?:299|799|2,499|2499)\b/,
 ];
 
 function walk(dir: string, out: string[]): void {

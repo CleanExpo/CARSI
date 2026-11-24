@@ -60,7 +60,7 @@ export const facilityManagementFaqs = [
   {
     question: 'Can a manager buy seats for a whole crew?',
     answer:
-      'Published team prices are on the pricing page (Starter, Growth and Full library). Contact CARSI to start a crew. Individual courses remain available per learner.',
+      'Yes. The business owner plan covers the owner, and each staff member is added with their own login. Prices are on the pricing page. Contact CARSI to start a crew. Individual courses remain available per learner.',
   },
   {
     question: 'What can we show a hospital or aged-care auditor?',

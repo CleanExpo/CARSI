@@ -456,8 +456,8 @@ function TeamDashboardPage() {
           </p>
           <h1 className="mt-2 text-2xl font-bold text-slate-900">Start {tierConfig.name}</h1>
           <p className="mt-2 text-sm text-slate-500">
-            {tierConfig.seatsIncluded} seats included · {tierConfig.priceLabel} ·{' '}
-            {tierConfig.perSeatExpansionLabel} for extra seats.
+            {tierConfig.priceLabel} · {tierConfig.perSeatExpansionLabel} for each extra staff
+            member, each with their own login.
           </p>
         </header>
         {error ? <ErrorBanner message={error} /> : null}

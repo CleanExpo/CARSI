@@ -17,8 +17,18 @@ const h = vi.hoisted(() => ({
   applied: [] as number[],
   keys: new Map<string, number>(),
   inFlight: new Set<string>(),
+  // GP-773 charge first: the card on file declines the next new request. Stripe stores the
+  // decline under that idempotency key and replays it for every reuse of the key.
+  declineNext: false,
+  declinedKeys: new Set<string>(),
   updateCalls: [] as Array<{ quantity: number; idempotencyKey?: string }>,
 }));
+const cardDeclined = () =>
+  Object.assign(new Error('Your card was declined.'), {
+    type: 'StripeCardError',
+    statusCode: 402,
+    code: 'card_declined',
+  });
 
 vi.mock('@/lib/server/subscriptions-flag', () => ({ teamSubscriptionsEnabled: () => true }));
 vi.mock('@/lib/server/auth-from-request', () => ({
@@ -38,25 +48,32 @@ vi.mock('@/lib/prisma', () => ({
     },
   },
 }));
+// GP-773 seat billing: a Teams subscription is the A$1,295 owner plan item (quantity 1, the
+// owner's seat) plus one A$695 extra-seat item. `h.stripeQuantity` stays the TOTAL seat count
+// (owner + extra seats), so this file's GP-759 expectations read unchanged; the fake converts.
+const yearly = (id: string, unit_amount: number) => ({
+  id,
+  active: true,
+  billing_scheme: 'per_unit',
+  currency: 'aud',
+  unit_amount,
+  recurring: { interval: 'year', interval_count: 1 },
+});
+const PAID = { id: 'sub_test_teams', latest_invoice: { id: 'in_test', status: 'paid' } };
 vi.mock('@/lib/api/stripe', () => ({
   getStripeClient: () => ({
+    prices: {
+      retrieve: vi.fn(async (id: string) => yearly(id, 69_500)),
+      list: vi.fn(async () => ({ data: [] })),
+    },
     subscriptions: {
-      // GP-773 (main): the route refuses unless the item's Price is the A$695/year extra-seat Price.
       retrieve: vi.fn(async () => ({
+        collection_method: 'charge_automatically',
+        metadata: { plan: 'business_owner' },
         items: {
           data: [
-            {
-              id: 'si_test',
-              quantity: h.stripeQuantity,
-              price: {
-                id: 'price_extra_seat',
-                active: true,
-                billing_scheme: 'per_unit',
-                currency: 'aud',
-                unit_amount: 69_500,
-                recurring: { interval: 'year', interval_count: 1 },
-              },
-            },
+            { id: 'si_owner', quantity: 1, price: yearly('price_owner', 129_500) },
+            { id: 'si_test', quantity: h.stripeQuantity - 1, price: yearly('price_extra_seat', 69_500) },
           ],
         },
       })),
@@ -66,7 +83,8 @@ vi.mock('@/lib/api/stripe', () => ({
           params: { items: Array<{ quantity: number }> },
           options?: { idempotencyKey?: string },
         ) => {
-          const quantity = params.items[0]!.quantity;
+          // Total seats after the update: the owner's seat + the seat item's new quantity.
+          const quantity = 1 + params.items[0]!.quantity;
           h.updateCalls.push({ quantity, idempotencyKey: options?.idempotencyKey });
           const key = options?.idempotencyKey;
           if (key && h.inFlight.has(key)) {
@@ -77,6 +95,12 @@ vi.mock('@/lib/api/stripe', () => ({
               code: 'idempotency_key_in_use',
             });
           }
+          if (key && h.declinedKeys.has(key)) throw cardDeclined(); // replayed decline
+          if (h.declineNext) {
+            h.declineNext = false;
+            if (key) h.declinedKeys.add(key);
+            throw cardDeclined(); // nothing applied
+          }
           if (key && h.keys.has(key)) {
             if (h.keys.get(key) !== quantity) {
               throw Object.assign(new Error('Keys for idempotent requests can only be used with the same parameters'), {
@@ -84,12 +108,12 @@ vi.mock('@/lib/api/stripe', () => ({
                 rawType: 'idempotency_error',
               });
             }
-            return { id: 'sub_test_teams' }; // replayed response, nothing applied
+            return PAID; // replayed response, nothing applied
           }
           if (key) h.keys.set(key, quantity);
           h.applied.push(quantity);
           h.stripeQuantity = quantity;
-          return { id: 'sub_test_teams' };
+          return PAID; // charge first: the seat invoice is paid
         },
       ),
     },
@@ -111,12 +135,42 @@ function expand(body: Record<string, unknown>) {
 
 beforeEach(() => {
   process.env.STRIPE_SECRET_KEY = 'gp759-test-placeholder-not-a-key';
+  process.env.STRIPE_PRICE_TEAMS_EXTRA_SEAT = 'price_extra_seat';
   h.sub.seatLimit = 5;
   h.stripeQuantity = 5;
   h.applied = [];
   h.keys.clear();
   h.inFlight.clear();
+  h.declineNext = false;
+  h.declinedKeys.clear();
   h.updateCalls = [];
+});
+
+describe('GP-773 charge first meets GP-759: a declined card', () => {
+  it('a decline ends that purchase: after the buyer fixes the card, the next try gets a new id and is applied once', async () => {
+    let n = 0;
+    const requests = createSeatExpansionRequests(() => `purchase-${String(++n).padStart(4, '0')}-id`);
+
+    h.declineNext = true;
+    const declined = await expand({ additional_seats: 2, request_id: requests.currentId() });
+    const declinedBody = (await declined.json()) as { error_code?: string };
+    expect(declined.status).toBe(402);
+    expect(h.applied).toEqual([]);
+    requests.settle(declined.status, declinedBody.error_code);
+
+    // The buyer updates the card and tries again. Reusing the declined id would replay the
+    // decline forever (Stripe keeps the result under the key); a new id reaches Stripe afresh.
+    const retry = await expand({ additional_seats: 2, request_id: requests.currentId() });
+    expect(retry.status).toBe(200);
+    expect(h.applied).toEqual([7]);
+  });
+
+  it('only a confirmed decline ends the purchase; an unconfirmed 402 or an error keeps the id', async () => {
+    const { isKnownSeatExpansionOutcome, SEAT_PAYMENT_DECLINED } = await import('@/lib/lms/seat-expansion-request');
+    expect(isKnownSeatExpansionOutcome(402, SEAT_PAYMENT_DECLINED)).toBe(true);
+    expect(isKnownSeatExpansionOutcome(402, undefined)).toBe(false);
+    expect(isKnownSeatExpansionOutcome(409, SEAT_PAYMENT_DECLINED)).toBe(false);
+  });
 });
 
 describe('GP-759 (c): Teams seat expansion is idempotent per click', () => {
@@ -187,6 +241,7 @@ describe('GP-759 (c): Teams seat expansion is idempotent per click', () => {
     h.inFlight.delete(key);
     h.keys.set(key, 7);
     h.applied.push(7);
+    h.stripeQuantity = 7; // GP-773: the route reads seats from the Stripe items, which moved
     h.sub.seatLimit = 7;
 
     // The buyer tries once more: same purchase id, so nothing is charged again.

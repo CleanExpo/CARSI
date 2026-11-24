@@ -30,7 +30,8 @@ vi.mock('@/lib/server/subscription-price', () => ({
   resolveProAnnualPriceId: async () => 'price_test_annual',
 }));
 vi.mock('@/lib/server/team-subscription-price', () => ({
-  resolveTeamTierPriceId: async () => 'price_test_team',
+  resolveTeamOwnerPlanPriceId: async () => 'price_test_org',
+  resolveTeamSeatPriceId: async () => 'price_test_team_seat',
 }));
 vi.mock('@/lib/server/org-subscription-price', () => ({
   resolveOrgAnnualPriceId: async () => 'price_test_org',
@@ -144,7 +145,7 @@ const routes = [
   {
     name: 'Teams membership',
     run: teams,
-    body: { tier: 'starter' },
+    body: { tier: 'business_owner' },
     mock: mocks.stripe,
     success: '/dashboard/team?membership=active',
     cancel: '/pricing?checkout=cancelled',

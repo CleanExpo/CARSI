@@ -118,13 +118,15 @@ describe('subscriptionKindFromPlan (pure)', () => {
 });
 
 describe('readSubscriptionSeatQuantity (pure)', () => {
-  it('reads the item quantity, then metadata seat_count, else 0 (fail closed)', () => {
+  // GP-773 round 4: seats come only from the classified items (owner plan + seat item). The old
+  // fallbacks (first item quantity, then metadata seat_count) are gone: they grant 0.
+  it('never reads a bare item quantity or metadata seat_count; an unclassifiable subscription is 0', () => {
     expect(
       realReadSeatQuantity({ items: { data: [{ quantity: 7 }] }, metadata: {} } as unknown as Stripe.Subscription),
-    ).toBe(7);
+    ).toBe(0);
     expect(
       realReadSeatQuantity({ items: { data: [] }, metadata: { seat_count: '9' } } as unknown as Stripe.Subscription),
-    ).toBe(9);
+    ).toBe(0);
     expect(
       realReadSeatQuantity({ items: { data: [] }, metadata: {} } as unknown as Stripe.Subscription),
     ).toBe(0);
@@ -147,6 +149,17 @@ describe('handleSubscriptionEvent — plan routing (created/updated)', () => {
     const arg = team.upsertTeamSubscription.mock.calls[0][0] as { seatLimit: number; plan: string };
     expect(arg.seatLimit).toBe(5);
     expect(arg.plan).toBe('starter');
+  });
+
+  it('routes the business_owner Teams plan (GP-773) → team store only, never the org store', async () => {
+    await handleSubscriptionEvent(
+      subEvent('customer.subscription.updated', { plan: 'business_owner', carsi_team_id: 'team-1' }),
+    );
+    expect(team.upsertTeamSubscription).toHaveBeenCalledTimes(1);
+    expect(org.updateOrgSubscriptionFromStripe).not.toHaveBeenCalled();
+    expect(indiv.upsertSubscription).not.toHaveBeenCalled();
+    const arg = team.upsertTeamSubscription.mock.calls[0][0] as { plan: string };
+    expect(arg.plan).toBe('business_owner');
   });
 
   it('routes org_monthly → org store only', async () => {
