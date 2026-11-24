@@ -20,7 +20,10 @@ import {
 import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { purchaseSurveyCheckoutField, rememberPurchaseSurveyKey } from '@/lib/marketing/purchase-survey-key';
+import {
+  purchaseSurveyCheckoutFieldFor,
+  rememberPurchaseSurveyKey,
+} from '@/lib/marketing/purchase-survey-key';
 import { analyticsConsentCheckoutField } from '@/lib/analytics/consent-client';
 
 /**
@@ -237,7 +240,10 @@ export function EnrolButton({
         undefined,
         buyMode === 'team' ? { teamSeats } : undefined,
       );
-      const surveyField = purchaseSurveyCheckoutField();
+      // GP-783: a repeat of this purchase sends the same key, so it reuses the first Stripe session.
+      const surveyField = purchaseSurveyCheckoutFieldFor(
+        `${slug}:${buyMode}:${buyMode === 'team' ? teamSeats : 1}`
+      );
       const data = await apiClient.post<CheckoutResponse>('/api/lms/checkout', {
         slug,
         success_url,
