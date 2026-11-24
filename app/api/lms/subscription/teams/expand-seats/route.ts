@@ -2,7 +2,11 @@
  * POST /api/lms/subscription/teams/expand-seats — buy additional seats on an
  * active Teams seat subscription (WS1-E2, GP-442; seat billing GP-773).
  *
- * Body: { additional_seats: number }  (1..50)
+ * Body: { additional_seats: number (1..50), request_id: string (one per click, GP-759) }
+ *
+ * Idempotent (GP-759): the page's per-click request id is the Stripe idempotency key, so a
+ * retried request never adds or charges the seats twice. A replay still running at Stripe, or
+ * arriving after the seat count moved, answers 409 with a code the page understands.
  *
  * Seat billing (see the checkout route): the subscription has the owner plan item (quantity 1,
  * includes the owner's seat) and at most one A$695 yearly extra-seat item. Expansion first
@@ -28,6 +32,7 @@ import type Stripe from 'stripe';
 
 import { prisma } from '@/lib/prisma';
 import { getStripeClient } from '@/lib/api/stripe';
+import { SEAT_ADD_IN_PROGRESS, SEATS_ALREADY_ADDED } from '@/lib/lms/seat-expansion-request';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { decideTeamSeatSubscription } from '@/lib/server/entitlements';
 import { resolveTeamSeatPriceId } from '@/lib/server/team-subscription-price';
@@ -40,6 +45,20 @@ import { getTeamForUser } from '@/lib/server/teams';
 import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
 const MAX_ADDITIONAL = 50;
+const REQUEST_ID_PATTERN = /^[A-Za-z0-9_-]{8,100}$/;
+
+/** Stripe is still executing an earlier request with the same idempotency key (GP-759). */
+function isStripeKeyInUse(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  return (error as { code?: unknown }).code === 'idempotency_key_in_use';
+}
+
+/** The same idempotency key was already used with different parameters (GP-759). */
+function isStripeIdempotencyError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const e = error as { type?: unknown; rawType?: unknown };
+  return e.type === 'StripeIdempotencyError' || e.rawType === 'idempotency_error';
+}
 
 /**
  * Stripe refused to take the payment for the added seats: a card error, or HTTP 402 (what
@@ -77,11 +96,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: 'Payments not configured.' }, { status: 503 });
   }
 
-  const body = (await request.json().catch(() => ({}))) as { additional_seats?: number };
+  const body = (await request.json().catch(() => ({}))) as {
+    additional_seats?: number;
+    request_id?: unknown;
+  };
   const additional = Number(body.additional_seats);
   if (!Number.isInteger(additional) || additional < 1 || additional > MAX_ADDITIONAL) {
     return NextResponse.json(
       { detail: `Choose between 1 and ${MAX_ADDITIONAL} additional seats.` },
+      { status: 400 },
+    );
+  }
+  // GP-759: one id per click, made by the page and resent unchanged on every retry (the API
+  // client retries a 5xx). It becomes the Stripe idempotency key, so a retried request can
+  // never add (and charge for) the seats twice, even after the seat count moved in between.
+  const requestId = typeof body.request_id === 'string' ? body.request_id.trim() : '';
+  if (!REQUEST_ID_PATTERN.test(requestId)) {
+    return NextResponse.json(
+      { detail: 'Refresh the page and try adding seats again.' },
       { status: 400 },
     );
   }
@@ -177,7 +209,12 @@ export async function POST(request: NextRequest) {
     // added seats now and applies the change only if that invoice is paid.
     let updated: Stripe.Subscription;
     try {
-      updated = await stripe.subscriptions.update(sub.stripeSubscriptionId, update);
+      // GP-759: a retry of this click reuses the key. If the first attempt already added the
+      // seats, the retry's parameters differ (the seat item moved), so Stripe answers with an
+      // idempotency error and nothing is charged twice.
+      updated = await stripe.subscriptions.update(sub.stripeSubscriptionId, update, {
+        idempotencyKey: `carsi-expand-seats:${sub.stripeSubscriptionId}:${requestId}`,
+      });
     } catch (error) {
       if (isSeatPaymentRefused(error)) {
         // Declined, or needs the buyer's action: Stripe applied nothing, so neither do we.
@@ -205,6 +242,27 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, seat_limit: newSeatLimit, added: additional });
   } catch (error) {
+    if (isStripeKeyInUse(error)) {
+      // The earlier attempt with this id is still running at Stripe: its outcome is unknown,
+      // so the page keeps the id and the buyer's next try waits on the same purchase.
+      return NextResponse.json(
+        {
+          detail: 'Your earlier request is still being processed. Wait a moment, then try again.',
+          error_code: SEAT_ADD_IN_PROGRESS,
+        },
+        { status: 409 },
+      );
+    }
+    if (isStripeIdempotencyError(error)) {
+      // This purchase was already applied; the retry arrived after the seat count moved.
+      return NextResponse.json(
+        {
+          detail: 'These seats were already added. Refresh the page to see them.',
+          error_code: SEATS_ALREADY_ADDED,
+        },
+        { status: 409 },
+      );
+    }
     console.error('[subscription/teams/expand-seats] Stripe error:', error);
     return NextResponse.json({ detail: 'Failed to add seats.' }, { status: 500 });
   }

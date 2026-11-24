@@ -251,7 +251,7 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
     mocks.subsRetrieve.mockResolvedValue(
       live({ items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_extra_seat', 69_500) }] } }),
     );
-    const res = await expandSeats(request({ additional_seats: 1 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 1 }));
     expect(res.status).toBe(200);
     const [, params] = mocks.subsUpdate.mock.calls[0];
     expect(params.proration_behavior).toBe('always_invoice');
@@ -268,7 +268,7 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
         code: 'card_declined',
       }),
     );
-    const res = await expandSeats(request({ additional_seats: 2 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 2 }));
     expect(res.status).toBe(402);
     const body = await res.json();
     expect(body.reason).toBe('seat_payment_failed');
@@ -285,7 +285,7 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
         code: 'subscription_payment_intent_requires_action',
       }),
     );
-    const res = await expandSeats(request({ additional_seats: 2 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 2 }));
     expect(res.status).toBe(402);
     expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
   });
@@ -293,14 +293,14 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
   it('update returned but the invoice is not paid: no seats granted', async () => {
     mocks.subsRetrieve.mockResolvedValue(live());
     mocks.subsUpdate.mockResolvedValue({ id: 'sub_1', latest_invoice: { id: 'in_1', status: 'open' } });
-    const res = await expandSeats(request({ additional_seats: 2 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 2 }));
     expect(res.status).toBe(402);
     expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
   });
 
   it('a subscription not charged automatically is refused before any change', async () => {
     mocks.subsRetrieve.mockResolvedValue(live({ collection_method: 'send_invoice' }));
-    const res = await expandSeats(request({ additional_seats: 2 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 2 }));
     expect(res.status).toBe(409);
     expect(mocks.subsUpdate).not.toHaveBeenCalled();
     expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
@@ -308,7 +308,7 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
 
   it('successful payment grants the paid seats (owner + 3 staff = 4)', async () => {
     mocks.subsRetrieve.mockResolvedValue(live());
-    const res = await expandSeats(request({ additional_seats: 3 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 3 }));
     expect(res.status).toBe(200);
     expect((await res.json()).seat_limit).toBe(4);
     expect(mocks.teamSubUpdate).toHaveBeenCalledWith(
@@ -320,7 +320,7 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
     mocks.subsRetrieve.mockResolvedValue(
       live({ items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_extra_seat', 69_500) }] } }),
     );
-    const res = await expandSeats(request({ additional_seats: 2 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 2 }));
     expect(res.status).toBe(200);
     expect(mocks.subsUpdate).toHaveBeenCalledTimes(1);
     const [subId, params] = mocks.subsUpdate.mock.calls[0];
@@ -334,7 +334,7 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
 
   it('adds the seat item at the verified A$695 Price when the subscription has none', async () => {
     mocks.subsRetrieve.mockResolvedValue(live());
-    const res = await expandSeats(request({ additional_seats: 2 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 2 }));
     expect(res.status).toBe(200);
     const [, params] = mocks.subsUpdate.mock.calls[0];
     expect(params.items).toEqual([{ price: 'price_extra_seat', quantity: 2 }]);
@@ -347,7 +347,7 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
   it('seat Price unresolvable: 503, no Stripe update, no seat change', async () => {
     vi.stubEnv('STRIPE_PRICE_TEAMS_EXTRA_SEAT', '');
     mocks.subsRetrieve.mockResolvedValue(live());
-    const res = await expandSeats(request({ additional_seats: 1 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 1 }));
     expect(res.status).toBe(503);
     expect(mocks.subsUpdate).not.toHaveBeenCalled();
     expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
@@ -359,7 +359,7 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
       metadata: { plan: 'starter' },
       items: { data: [{ id: 'si_1', quantity: 5, price: price('price_team_starter', 5_980) }] },
     });
-    const res = await expandSeats(request({ additional_seats: 1 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 1 }));
     expect(res.status).toBe(409);
     expect(mocks.subsUpdate).not.toHaveBeenCalled();
     expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
@@ -372,7 +372,7 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
         items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_old_seat', 4_900) }] },
       }),
     );
-    const res = await expandSeats(request({ additional_seats: 1 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 1 }));
     expect(res.status).toBe(409);
     expect(mocks.subsUpdate).not.toHaveBeenCalled();
   });
@@ -384,7 +384,7 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
         items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_lookalike', 69_500) }] },
       }),
     );
-    const res = await expandSeats(request({ additional_seats: 1 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 1 }));
     expect(res.status).toBe(409);
     expect(mocks.subsUpdate).not.toHaveBeenCalled();
   });
@@ -395,7 +395,7 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
   const SEAT_ITEM = { id: 'si_seat', quantity: 2, price: price('price_extra_seat', 69_500) };
   const refusedUntouched = async (sub: Record<string, unknown>) => {
     mocks.subsRetrieve.mockResolvedValue(sub);
-    const res = await expandSeats(request({ additional_seats: 1 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 1 }));
     expect(res.status).toBe(409);
     expect(mocks.subsUpdate).not.toHaveBeenCalled();
     expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
@@ -419,7 +419,7 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
     mocks.subsRetrieve.mockResolvedValue(
       live({ metadata: { ...META, seat_price_id: 'price_old_seat' }, items: { data: [BASE_ITEM, SEAT_ITEM] } }),
     );
-    const res = await expandSeats(request({ additional_seats: 1 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 1 }));
     expect(res.status).toBe(200);
     const [, params] = mocks.subsUpdate.mock.calls[0];
     expect(params.items).toEqual([{ id: 'si_seat', quantity: 3 }]);
@@ -453,7 +453,7 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
     mocks.subsRetrieve.mockResolvedValue(
       live({ metadata: { plan: 'business_owner' }, items: { data: [BASE_ITEM, SEAT_ITEM] } }),
     );
-    const res = await expandSeats(request({ additional_seats: 1 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 1 }));
     expect(res.status).toBe(200);
     const [, params] = mocks.subsUpdate.mock.calls[0];
     expect(params.items).toEqual([{ id: 'si_seat', quantity: 3 }]);

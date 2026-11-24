@@ -58,6 +58,12 @@ vi.mock('@/lib/api/stripe', () => ({
   }),
 }));
 
+// Main (GP-641 / #1248): the webhook records and resolves unfulfilled paid events.
+vi.mock('./payment-integrity-ledger', () => ({
+  recordUnfulfilledPayment: vi.fn(async () => true),
+  resolveUnfulfilledPayment: vi.fn(async () => {}),
+}));
+
 import { handleSubscriptionEvent } from './subscription-webhook';
 
 const CREATED_AT = 1_760_000_000;

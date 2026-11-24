@@ -38,25 +38,32 @@ vi.mock('@/lib/prisma', () => ({
     },
   },
 }));
+// GP-773 seat billing: a Teams subscription is the A$1,295 owner plan item (quantity 1, the
+// owner's seat) plus one A$695 extra-seat item. `h.stripeQuantity` stays the TOTAL seat count
+// (owner + extra seats), so this file's GP-759 expectations read unchanged; the fake converts.
+const yearly = (id: string, unit_amount: number) => ({
+  id,
+  active: true,
+  billing_scheme: 'per_unit',
+  currency: 'aud',
+  unit_amount,
+  recurring: { interval: 'year', interval_count: 1 },
+});
+const PAID = { id: 'sub_test_teams', latest_invoice: { id: 'in_test', status: 'paid' } };
 vi.mock('@/lib/api/stripe', () => ({
   getStripeClient: () => ({
+    prices: {
+      retrieve: vi.fn(async (id: string) => yearly(id, 69_500)),
+      list: vi.fn(async () => ({ data: [] })),
+    },
     subscriptions: {
-      // GP-773 (main): the route refuses unless the item's Price is the A$695/year extra-seat Price.
       retrieve: vi.fn(async () => ({
+        collection_method: 'charge_automatically',
+        metadata: { plan: 'business_owner' },
         items: {
           data: [
-            {
-              id: 'si_test',
-              quantity: h.stripeQuantity,
-              price: {
-                id: 'price_extra_seat',
-                active: true,
-                billing_scheme: 'per_unit',
-                currency: 'aud',
-                unit_amount: 69_500,
-                recurring: { interval: 'year', interval_count: 1 },
-              },
-            },
+            { id: 'si_owner', quantity: 1, price: yearly('price_owner', 129_500) },
+            { id: 'si_test', quantity: h.stripeQuantity - 1, price: yearly('price_extra_seat', 69_500) },
           ],
         },
       })),
@@ -66,7 +73,8 @@ vi.mock('@/lib/api/stripe', () => ({
           params: { items: Array<{ quantity: number }> },
           options?: { idempotencyKey?: string },
         ) => {
-          const quantity = params.items[0]!.quantity;
+          // Total seats after the update: the owner's seat + the seat item's new quantity.
+          const quantity = 1 + params.items[0]!.quantity;
           h.updateCalls.push({ quantity, idempotencyKey: options?.idempotencyKey });
           const key = options?.idempotencyKey;
           if (key && h.inFlight.has(key)) {
@@ -84,12 +92,12 @@ vi.mock('@/lib/api/stripe', () => ({
                 rawType: 'idempotency_error',
               });
             }
-            return { id: 'sub_test_teams' }; // replayed response, nothing applied
+            return PAID; // replayed response, nothing applied
           }
           if (key) h.keys.set(key, quantity);
           h.applied.push(quantity);
           h.stripeQuantity = quantity;
-          return { id: 'sub_test_teams' };
+          return PAID; // charge first: the seat invoice is paid
         },
       ),
     },
@@ -111,6 +119,7 @@ function expand(body: Record<string, unknown>) {
 
 beforeEach(() => {
   process.env.STRIPE_SECRET_KEY = 'gp759-test-placeholder-not-a-key';
+  process.env.STRIPE_PRICE_TEAMS_EXTRA_SEAT = 'price_extra_seat';
   h.sub.seatLimit = 5;
   h.stripeQuantity = 5;
   h.applied = [];
@@ -187,6 +196,7 @@ describe('GP-759 (c): Teams seat expansion is idempotent per click', () => {
     h.inFlight.delete(key);
     h.keys.set(key, 7);
     h.applied.push(7);
+    h.stripeQuantity = 7; // GP-773: the route reads seats from the Stripe items, which moved
     h.sub.seatLimit = 7;
 
     // The buyer tries once more: same purchase id, so nothing is charged again.

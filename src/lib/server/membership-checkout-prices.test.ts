@@ -347,11 +347,13 @@ describe('extra staff seats: A$695 per year each', () => {
       metadata: META,
       items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_seat', 69_500) }] },
     });
-    const res = await expandSeats(request({ additional_seats: 2 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 2 }));
     expect(res.status).toBe(200);
     expect(mocks.subsUpdate).toHaveBeenCalledWith(
       'sub_1',
-      expect.objectContaining({ items: [{ id: 'si_seat', quantity: 4 }] })
+      expect.objectContaining({ items: [{ id: 'si_seat', quantity: 4 }] }),
+      // GP-759: the page's per-click id is the Stripe idempotency key.
+      { idempotencyKey: 'carsi-expand-seats:sub_1:seat-add-req-0001' }
     );
   });
 
@@ -371,7 +373,7 @@ describe('extra staff seats: A$695 per year each', () => {
         metadata: META,
         items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: seatPrice }] },
       });
-      const res = await expandSeats(request({ additional_seats: 2 }));
+      const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 2 }));
       expect(res.status).toBe(503);
       expect(mocks.subsUpdate).not.toHaveBeenCalled();
       expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
@@ -385,7 +387,7 @@ describe('extra staff seats: A$695 per year each', () => {
       metadata: { ...META, seat_price_id: 'price_other' },
       items: { data: [BASE_ITEM, { id: 'si_seat', quantity: 2, price: price('price_other', 4_900) }] },
     });
-    const res = await expandSeats(request({ additional_seats: 2 }));
+    const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 2 }));
     expect(res.status).toBe(409);
     expect(mocks.subsUpdate).not.toHaveBeenCalled();
     expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
