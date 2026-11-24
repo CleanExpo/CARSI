@@ -542,7 +542,7 @@ export async function POST(request: NextRequest) {
           courseSlug: slug,
           appOrigin: origin,
           payment: {
-            amountTotalCents: session.amount_total,
+            checkout: session,
             seatCount: purchaseMode === 'team' ? teamSeatCount : undefined,
           },
         }).catch((e) => console.error('[stripe webhook] email', e));

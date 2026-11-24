@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
         courseSlug: slug,
         appOrigin: origin,
         payment: {
-          amountTotalCents: session.amount_total,
+          checkout: session,
           seatCount: fulfilled.kind === 'team' ? teamSeatCount : undefined,
         },
       }).catch((e) => console.error('[guest-complete] email', e));
