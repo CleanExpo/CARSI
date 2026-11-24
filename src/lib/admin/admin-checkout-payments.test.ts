@@ -12,6 +12,7 @@ type Row = Record<string, unknown>;
 const db = vi.hoisted(() => ({
   payments: [] as Row[],
   partnerSales: [] as Row[],
+  enrolments: [] as Row[],
   ledger: [] as Row[],
 }));
 
@@ -30,6 +31,13 @@ vi.mock('@/lib/prisma', () => ({
     partnerReferralSale: {
       findMany: vi.fn(async (a?: { where?: Row }) =>
         inFilter(db.partnerSales, a?.where, 'transactionId', 'transactionId'),
+      ),
+    },
+    lmsEnrollment: {
+      findMany: vi.fn(async (a: { where: { paymentReference: { startsWith: string } } }) =>
+        db.enrolments.filter((r) =>
+          String(r.paymentReference ?? '').startsWith(a.where.paymentReference.startsWith),
+        ),
       ),
     },
     stripeWebhookEvent: {
@@ -57,6 +65,7 @@ function recorded(id: string, studentId: string, cents: number): Row {
 beforeEach(() => {
   db.payments = [];
   db.partnerSales = [];
+  db.enrolments = [];
   db.ledger = [];
 });
 
@@ -84,5 +93,38 @@ describe('admin revenue reads every recorded checkout (GP-764 review)', () => {
 
     expect(byId).toEqual({ cs_both: false, cs_partner_only: false, cs_partner_refunded: true });
     expect(summariseOpsPeriod([], [], 'all', now, payments).revenueRecordedAud).toBe(498);
+  });
+
+  it('an older unrecorded paid checkout of a learner outside the listed slice keeps the total unknown', async () => {
+    // Codex round 1 at dc3b1062: the listed slice holds only the newest learners, so an older
+    // learner's unrecorded checkout must still be counted as unknown, or a partial sum reads
+    // as the whole business total.
+    db.payments = [recorded('cs_new', 'listed', 29_900)];
+    db.enrolments = [
+      { paymentReference: 'cs_old', enrolledAt: NOV, status: 'active' },
+      { paymentReference: 'cs_new', enrolledAt: NOV, status: 'active' },
+      { paymentReference: 'cs_old_refunded', enrolledAt: NOV, status: 'revoked' },
+    ];
+
+    const payments = await loadCheckoutPaymentsForRevenue();
+    const listedSales = [
+      { enrolledAt: NOV, completedAt: null, certificateIssuedAt: null, status: 'active', paymentReference: 'cs_new' },
+    ];
+    const k = summariseOpsPeriod(listedSales, [], 'all', now, payments);
+
+    expect(k.revenueAud).toBeNull();
+    expect(k.revenueRecordedAud).toBe(299);
+    expect(k.paidPriceUnknown).toBe(1);
+  });
+
+  it('an unrecorded checkout of a listed learner is counted unknown once, not twice', async () => {
+    db.enrolments = [{ paymentReference: 'cs_listed_old', enrolledAt: NOV, status: 'active' }];
+
+    const payments = await loadCheckoutPaymentsForRevenue();
+    const listedSales = [
+      { enrolledAt: NOV, completedAt: null, certificateIssuedAt: null, status: 'active', paymentReference: 'cs_listed_old' },
+    ];
+
+    expect(summariseOpsPeriod(listedSales, [], 'all', now, payments).paidPriceUnknown).toBe(1);
   });
 });
