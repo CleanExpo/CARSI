@@ -141,6 +141,10 @@ jobs:
       - name: IICRC terminology guard self-test
         run: npm run test:iicrc-terminology
 
+      # Non-vacuity proof for the Reticle production-leak scan in the Build Check job (GP-596).
+      - name: Reticle production-leak scan self-test
+        run: npm run test:reticle-build-leak
+
       # Shared CLI entry-point helper. Eighteen scripts compared import.meta.url with argv[1]
       # without resolving symlinks, so run through a symlink they skipped their CLI body and
       # exited 0 silently. This runs the terminology and CEC-compliance guards through a
@@ -441,6 +445,12 @@ jobs:
 
       - name: Build all packages
         run: npm run build
+
+      # Reticle is development-only browser verification. Fail if any of it (package, overlay,
+      # env variables, project id) reaches .next/static or .next/server (GP-596). Also fails
+      # if the build output is missing or empty, so a skipped build cannot read as clean.
+      - name: Reticle production-leak scan
+        run: npm run check:reticle-build-leak
 
       - name: Upload build artifacts
         if: always()
