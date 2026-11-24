@@ -314,8 +314,7 @@ const confirm = (sessionId: string) =>
   );
 
 const payments = () => db.tables.lmsCheckoutPayment ?? [];
-const revenue = () =>
-  loadCheckoutPaymentsForRevenue([USER], (db.tables.lmsEnrollment ?? []) as never);
+const revenue = () => loadCheckoutPaymentsForRevenue();
 
 afterEach(() => {
   vi.useRealTimers();

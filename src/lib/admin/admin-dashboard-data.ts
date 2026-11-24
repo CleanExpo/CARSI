@@ -261,7 +261,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
   }));
   const createdAts = users.map((u) => u.createdAt);
   // GP-764: what each paid checkout actually cost, where it is recorded.
-  const payments = await loadCheckoutPaymentsForRevenue(userIds, enrollments);
+  // Read whole, not scoped to the listed learners: revenue is a business total.
+  const payments = await loadCheckoutPaymentsForRevenue();
 
   // GP-763: ranked and plotted by Stripe-paid enrolments, never valued at today's price.
   const topByPaidEnrollments = topCoursesByPaidEnrollments(enrollments);

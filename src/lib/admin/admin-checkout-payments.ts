@@ -1,10 +1,10 @@
 import { prisma } from '@/lib/prisma';
 
-import { enrollmentIsStripePaid, type CheckoutPaymentLike } from '@/lib/admin/admin-ops-metrics';
+import type { CheckoutPaymentLike } from '@/lib/admin/admin-ops-metrics';
 import { reversedCheckoutSessionIds } from '@/lib/server/payment-integrity-ledger';
 
 /**
- * GP-764: the paid course checkouts behind admin revenue, for the learners on the dashboard.
+ * GP-764: every paid course checkout behind admin revenue.
  *
  *  - `lms_checkout_payments`: the amount and currency recorded from the Stripe session at
  *    fulfilment (from this change on).
@@ -12,44 +12,33 @@ import { reversedCheckoutSessionIds } from '@/lib/server/payment-integrity-ledge
  *    checkouts that came through a partner link, so those are known too. Nothing else stored
  *    locally holds what an older session cost; its enrolment stays "price at purchase unknown".
  *
+ * Revenue is a business total, so it is read from these tables whole: never scoped to the
+ * learners the dashboard lists (at most the newest 2000) or to their enrolments. A learner who
+ * was deleted, or a partner sale no enrolment names, was still paid. A session in both tables
+ * counts once, from its recorded row.
+ *
  * Each session is marked reversed from its reversal marker (full refund, or a dispute not won).
  * Read-only.
  */
-export async function loadCheckoutPaymentsForRevenue(
-  studentIds: string[],
-  enrollments: { status: string; paymentReference: string | null }[]
-): Promise<CheckoutPaymentLike[]> {
-  if (studentIds.length === 0) return [];
+export async function loadCheckoutPaymentsForRevenue(): Promise<CheckoutPaymentLike[]> {
   const recorded = await prisma.lmsCheckoutPayment.findMany({
-    where: { studentId: { in: studentIds } },
     select: { checkoutSessionId: true, paidAt: true, amountTotalCents: true, currency: true },
   });
   const seen = new Set(recorded.map((r) => r.checkoutSessionId));
-
-  const missing = Array.from(
-    new Set(
-      enrollments
-        .filter((e) => enrollmentIsStripePaid(e))
-        .map((e) => (e.paymentReference ?? '').trim())
-        .filter((ref) => ref && !seen.has(ref))
-    )
-  );
-  const partnerSales =
-    missing.length === 0
-      ? []
-      : await prisma.partnerReferralSale.findMany({
-          where: { transactionId: { in: missing } },
-          select: { transactionId: true, paidAt: true, amountPaidCents: true, currency: true },
-        });
+  const partnerSales = await prisma.partnerReferralSale.findMany({
+    select: { transactionId: true, paidAt: true, amountPaidCents: true, currency: true },
+  });
 
   const rows = [
     ...recorded,
-    ...partnerSales.map((s) => ({
-      checkoutSessionId: s.transactionId,
-      paidAt: s.paidAt,
-      amountTotalCents: s.amountPaidCents,
-      currency: s.currency,
-    })),
+    ...partnerSales
+      .filter((s) => !seen.has(s.transactionId))
+      .map((s) => ({
+        checkoutSessionId: s.transactionId,
+        paidAt: s.paidAt,
+        amountTotalCents: s.amountPaidCents,
+        currency: s.currency,
+      })),
   ];
   const reversed = await reversedCheckoutSessionIds(
     prisma,
