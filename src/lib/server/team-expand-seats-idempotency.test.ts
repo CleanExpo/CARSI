@@ -17,8 +17,18 @@ const h = vi.hoisted(() => ({
   applied: [] as number[],
   keys: new Map<string, number>(),
   inFlight: new Set<string>(),
+  // GP-773 charge first: the card on file declines the next new request. Stripe stores the
+  // decline under that idempotency key and replays it for every reuse of the key.
+  declineNext: false,
+  declinedKeys: new Set<string>(),
   updateCalls: [] as Array<{ quantity: number; idempotencyKey?: string }>,
 }));
+const cardDeclined = () =>
+  Object.assign(new Error('Your card was declined.'), {
+    type: 'StripeCardError',
+    statusCode: 402,
+    code: 'card_declined',
+  });
 
 vi.mock('@/lib/server/subscriptions-flag', () => ({ teamSubscriptionsEnabled: () => true }));
 vi.mock('@/lib/server/auth-from-request', () => ({
@@ -85,6 +95,12 @@ vi.mock('@/lib/api/stripe', () => ({
               code: 'idempotency_key_in_use',
             });
           }
+          if (key && h.declinedKeys.has(key)) throw cardDeclined(); // replayed decline
+          if (h.declineNext) {
+            h.declineNext = false;
+            if (key) h.declinedKeys.add(key);
+            throw cardDeclined(); // nothing applied
+          }
           if (key && h.keys.has(key)) {
             if (h.keys.get(key) !== quantity) {
               throw Object.assign(new Error('Keys for idempotent requests can only be used with the same parameters'), {
@@ -125,7 +141,36 @@ beforeEach(() => {
   h.applied = [];
   h.keys.clear();
   h.inFlight.clear();
+  h.declineNext = false;
+  h.declinedKeys.clear();
   h.updateCalls = [];
+});
+
+describe('GP-773 charge first meets GP-759: a declined card', () => {
+  it('a decline ends that purchase: after the buyer fixes the card, the next try gets a new id and is applied once', async () => {
+    let n = 0;
+    const requests = createSeatExpansionRequests(() => `purchase-${String(++n).padStart(4, '0')}-id`);
+
+    h.declineNext = true;
+    const declined = await expand({ additional_seats: 2, request_id: requests.currentId() });
+    const declinedBody = (await declined.json()) as { error_code?: string };
+    expect(declined.status).toBe(402);
+    expect(h.applied).toEqual([]);
+    requests.settle(declined.status, declinedBody.error_code);
+
+    // The buyer updates the card and tries again. Reusing the declined id would replay the
+    // decline forever (Stripe keeps the result under the key); a new id reaches Stripe afresh.
+    const retry = await expand({ additional_seats: 2, request_id: requests.currentId() });
+    expect(retry.status).toBe(200);
+    expect(h.applied).toEqual([7]);
+  });
+
+  it('only a confirmed decline ends the purchase; an unconfirmed 402 or an error keeps the id', async () => {
+    const { isKnownSeatExpansionOutcome, SEAT_PAYMENT_DECLINED } = await import('@/lib/lms/seat-expansion-request');
+    expect(isKnownSeatExpansionOutcome(402, SEAT_PAYMENT_DECLINED)).toBe(true);
+    expect(isKnownSeatExpansionOutcome(402, undefined)).toBe(false);
+    expect(isKnownSeatExpansionOutcome(409, SEAT_PAYMENT_DECLINED)).toBe(false);
+  });
 });
 
 describe('GP-759 (c): Teams seat expansion is idempotent per click', () => {

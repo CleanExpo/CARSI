@@ -32,7 +32,11 @@ import type Stripe from 'stripe';
 
 import { prisma } from '@/lib/prisma';
 import { getStripeClient } from '@/lib/api/stripe';
-import { SEAT_ADD_IN_PROGRESS, SEATS_ALREADY_ADDED } from '@/lib/lms/seat-expansion-request';
+import {
+  SEAT_ADD_IN_PROGRESS,
+  SEAT_PAYMENT_DECLINED,
+  SEATS_ALREADY_ADDED,
+} from '@/lib/lms/seat-expansion-request';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { decideTeamSeatSubscription } from '@/lib/server/entitlements';
 import { resolveTeamSeatPriceId } from '@/lib/server/team-subscription-price';
@@ -71,12 +75,19 @@ function isSeatPaymentRefused(error: unknown): boolean {
   return e.type === 'StripeCardError' || e.statusCode === 402;
 }
 
-function paymentRefused() {
+/**
+ * 402: no seats were added. `declined` is true only when Stripe refused the payment and applied
+ * nothing; then `error_code: SEAT_PAYMENT_DECLINED` tells the page that purchase is over, so its
+ * next try uses a new request id (Stripe replays a stored decline for a reused id). An
+ * unconfirmed payment carries no code, so the page keeps the id and cannot pay twice.
+ */
+function paymentRefused(declined: boolean) {
   return NextResponse.json(
     {
       detail:
         'Your payment for the extra seats did not go through, so no seats were added. Check your card details and try again.',
       reason: 'seat_payment_failed',
+      ...(declined ? { error_code: SEAT_PAYMENT_DECLINED } : {}),
     },
     { status: 402 },
   );
@@ -218,7 +229,7 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       if (isSeatPaymentRefused(error)) {
         // Declined, or needs the buyer's action: Stripe applied nothing, so neither do we.
-        return paymentRefused();
+        return paymentRefused(true);
       }
       throw error;
     }
@@ -229,7 +240,7 @@ export async function POST(request: NextRequest) {
       console.error('[subscription/teams/expand-seats] seat invoice not paid after update', {
         subscriptionId: sub.stripeSubscriptionId,
       });
-      return paymentRefused();
+      return paymentRefused(false);
     }
 
     // Paid: reflect the new seat limit (included seats + extra seats); the

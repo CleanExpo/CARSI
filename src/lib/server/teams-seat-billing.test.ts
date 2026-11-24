@@ -273,6 +273,8 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
     const body = await res.json();
     expect(body.reason).toBe('seat_payment_failed');
     expect(body.detail).toMatch(/no seats were added/i);
+    // Stripe applied nothing: the page may start a new purchase id (GP-759 meets charge first).
+    expect(body.error_code).toBe('SEAT_PAYMENT_DECLINED');
     expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
   });
 
@@ -295,6 +297,9 @@ describe('expand-seats: charged first, changes the seat item, never the base ite
     mocks.subsUpdate.mockResolvedValue({ id: 'sub_1', latest_invoice: { id: 'in_1', status: 'open' } });
     const res = await expandSeats(request({ request_id: 'seat-add-req-0001', additional_seats: 2 }));
     expect(res.status).toBe(402);
+    // Outcome unknown (the update returned): no decline code, so the page keeps the same id and
+    // a retry cannot charge twice.
+    expect(((await res.json()) as { error_code?: string }).error_code).toBeUndefined();
     expect(mocks.teamSubUpdate).not.toHaveBeenCalled();
   });
 

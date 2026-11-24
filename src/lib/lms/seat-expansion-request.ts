@@ -7,9 +7,15 @@
  * earlier attempt (`SEAT_ADD_IN_PROGRESS`), or a refusal before Stripe was called (an id Stripe
  * never saw is safe to reuse). So the buyer's own retry after an ambiguous result reuses the id
  * and Stripe cannot apply the expansion twice. A page reload starts a new purchase.
+ *
+ * GP-773 (charge first): `SEAT_PAYMENT_DECLINED` with 402 is also a known outcome. Stripe refused
+ * the payment and applied nothing, and it stores that decline under the id, so reusing the id
+ * would replay the decline even after the buyer fixed their card. A 402 WITHOUT this code (the
+ * update returned but its payment could not be confirmed) keeps the id: that outcome is unknown.
  */
 export const SEATS_ALREADY_ADDED = 'SEATS_ALREADY_ADDED';
 export const SEAT_ADD_IN_PROGRESS = 'SEAT_ADD_IN_PROGRESS';
+export const SEAT_PAYMENT_DECLINED = 'SEAT_PAYMENT_DECLINED';
 
 export type SeatExpansionRequests = {
   /** The id to send with this attempt. */
@@ -21,6 +27,7 @@ export type SeatExpansionRequests = {
 export function isKnownSeatExpansionOutcome(status: number | undefined, errorCode?: string): boolean {
   if (status === undefined) return false;
   if (status >= 200 && status < 300) return true;
+  if (status === 402) return errorCode === SEAT_PAYMENT_DECLINED;
   return status === 409 && errorCode === SEATS_ALREADY_ADDED;
 }
 
