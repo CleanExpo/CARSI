@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import {
   issueTeamMemberSeat,
+  memberHoldsCourse,
   prepareTeamMemberSeat,
   runSeatStateStep,
   teamHasRoomForNewMember,
@@ -76,7 +77,10 @@ export async function POST(request: NextRequest) {
         where: { teamId_userId: { teamId: invite.teamId, userId: claims.sub } },
         select: { userId: true },
       });
-      if (!existing && !(await teamHasRoomForNewMember(tx, invite.teamId))) {
+      // A learner who already holds the course through another payment takes no paid seat, so
+      // the team's paid-seat limit does not apply to them (GP-759 follow-up, ruling 22/11/2026).
+      const holdsCourse = seat ? await memberHoldsCourse(tx, seat) : false;
+      if (!existing && !holdsCourse && !(await teamHasRoomForNewMember(tx, invite.teamId))) {
         return { seatFull: true as const };
       }
       if (seat && (await issueTeamMemberSeat(tx, seat)) === 'no_seat') {

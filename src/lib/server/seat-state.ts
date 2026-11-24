@@ -3,7 +3,7 @@ import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { isStripeCheckoutPaymentReference } from '@/lib/lms/course-prerequisites';
 import { isUniqueConstraintError } from '@/lib/server/db-errors';
 import { runSerializable } from '@/lib/server/db-tx';
-import { isRevokedStatus } from '@/lib/server/enrollment-access';
+import { isEnrolmentAccessAllowed } from '@/lib/server/enrollment-access';
 import {
   issuePreparedEnrolment,
   prepareEnrolment,
@@ -175,6 +175,20 @@ export async function prepareTeamMemberSeat(
 }
 
 /**
+ * Whether the member already holds this course through an enrolment that gives access (any
+ * payment). Such a member needs no seat and uses none (Phill's ruling 22/11/2026: only seats the
+ * team paid for). "Gives access" is `isEnrolmentAccessAllowed`, the single owner of that rule: a
+ * pending or unrecognised row does not hold the course (GP-759 follow-up, Codex round 1).
+ */
+export async function memberHoldsCourse(tx: SeatTx, seat: TeamMemberSeat): Promise<boolean> {
+  const held = await tx.lmsEnrollment.findUnique({
+    where: { studentId_courseId: { studentId: seat.enrolment.studentId, courseId: seat.enrolment.courseId } },
+    select: { status: true },
+  });
+  return held !== null && isEnrolmentAccessAllowed(held.status);
+}
+
+/**
  * Issue a member seat if the team has a paid seat free for that member. A member who already
  * holds the course (paid for elsewhere, Phill's ruling 22/11/2026) needs no seat and uses none.
  */
@@ -183,11 +197,7 @@ export async function issueTeamMemberSeat(
   seat: TeamMemberSeat,
 ): Promise<'issued' | 'no_seat' | 'already_enrolled'> {
   if (seat.enrolment.paymentReference !== `team:${seat.teamId}`) throw new Error('TEAM_SEAT_REFERENCE_MISMATCH');
-  const held = await tx.lmsEnrollment.findUnique({
-    where: { studentId_courseId: { studentId: seat.enrolment.studentId, courseId: seat.enrolment.courseId } },
-    select: { status: true },
-  });
-  if (held && !isRevokedStatus(held.status)) return 'already_enrolled';
+  if (await memberHoldsCourse(tx, seat)) return 'already_enrolled';
   if (!(await courseSeatIsFree(tx, seat.teamId, seat.slug, seat.enrolment.studentId))) return 'no_seat';
   await issuePreparedEnrolment(tx, seat.enrolment);
   return 'issued';
@@ -294,7 +304,8 @@ async function issueCheckoutEnrolment(tx: SeatTx, enrolment: PreparedEnrolment):
       where: { studentId_courseId: { studentId: enrolment.studentId, courseId: enrolment.courseId } },
       select: { status: true, paymentReference: true, revokedReason: true },
     });
-    if (!existing || isRevokedStatus(existing.status)) {
+    // The same "would this write issue access?" test as the enrolment writer.
+    if (!existing || !isEnrolmentAccessAllowed(existing.status)) {
       const revokedForThisPayment =
         existing !== null &&
         existing.paymentReference === ref &&

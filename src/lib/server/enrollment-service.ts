@@ -238,10 +238,14 @@ async function writeEnrolmentRow(
   });
 
   // Prerequisite gate (DECISIONS #41) — applied only when an enrolment is ISSUED (a new
-  // row, or a revoked row being reactivated). An existing active/completed row is
-  // grandfathered and returns 'already_enrolled' below without a re-check.
+  // row, or a row without access being (re)activated). An existing active/completed row is
+  // grandfathered and returns 'already_enrolled' below without a re-check. "Has access" is
+  // the access rule's own answer (`isEnrolmentAccessAllowed`), never restated here: a pending
+  // or unrecognised row gives no access, so it is issued over, not reported as a duplicate
+  // (GP-759 follow-up, Codex round 1).
+  const issues = !existing || !isEnrolmentAccessAllowed(existing.status);
   let prerequisiteGated = false;
-  if (!existing || isRevokedStatus(existing.status)) {
+  if (issues) {
     if (prepared.refusal) throw prepared.refusal;
     prerequisiteGated = prepared.prerequisiteGated;
   }
@@ -251,8 +255,9 @@ async function writeEnrolmentRow(
     // reactivated on a fresh fulfilment — this path only runs after a verified
     // payment (or a free-course enrol), so a customer who was refunded and pays
     // again is not left locked out by the read gates that now deny 'revoked'.
-    // An active/completed row is a genuine duplicate and stays 'already_enrolled'.
-    if (isRevokedStatus(existing.status)) {
+    // The same holds for a pending or unrecognised row (no access): it is updated in place,
+    // never duplicated. An active/completed row is a genuine duplicate and stays 'already_enrolled'.
+    if (issues) {
       await db.lmsEnrollment.update({
         where: { id: existing.id },
         data: {

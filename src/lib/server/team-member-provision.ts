@@ -76,6 +76,9 @@ export async function addCourseTeamMemberByEmail(params: {
     team.bundleTier === 'course_purchase' && teamPurchaseSlugs.size > 0;
   const teamCourseSlugs = slugs.filter((s) => teamPurchaseSlugs.has(s));
 
+  // Set when a full pool's refusal is deferred to the seat step. Only a proven holder may then
+  // join, so every selected course must reach that step as a prepared seat (see below).
+  let fullPoolDeferred = false;
   if (isCoursePurchaseTeam) {
     const notInPool = slugs.filter((s) => !teamPurchaseSlugs.has(s));
     if (notInPool.length > 0) {
@@ -86,9 +89,19 @@ export async function addCourseTeamMemberByEmail(params: {
         await assertCourseSeatsAvailable(team.id, teamCourseSlugs);
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
-        if (msg === 'COURSE_SEATS_FULL') throw new Error('COURSE_SEATS_FULL');
-        if (msg === 'NO_SEATS_FOR_COURSE') throw new Error('NO_SEATS_FOR_COURSE');
-        throw e;
+        // A full pool is decided in the seat step below, once the member is known: a learner
+        // who already holds the course through another payment joins without a seat (GP-759
+        // follow-up, ruling 22/11/2026). Everyone else is refused there with COURSE_SEATS_FULL.
+        if (msg !== 'COURSE_SEATS_FULL') {
+          if (msg === 'NO_SEATS_FOR_COURSE') throw new Error('NO_SEATS_FOR_COURSE');
+          throw e;
+        }
+        // Someone with no account cannot hold the course yet: refuse now, before an account
+        // is created for them.
+        if (!(await prisma.lmsUser.findUnique({ where: { email }, select: { id: true } }))) {
+          throw new Error('COURSE_SEATS_FULL');
+        }
+        fullPoolDeferred = true;
       }
     }
   }
@@ -141,6 +154,12 @@ export async function addCourseTeamMemberByEmail(params: {
     } catch (e) {
       console.error('[team-member-provision] enrol', slug, e);
     }
+  }
+  // A deferred full-pool refusal is only lifted by the step proving the member holds each course.
+  // A seat that could not be prepared cannot prove that, so the refusal stands (GP-759 follow-up,
+  // Codex round 2): no member row, no email.
+  if (fullPoolDeferred && seats.length !== enrollSlugs.length) {
+    throw new Error('COURSE_SEATS_FULL');
   }
 
   // GP-759 (Phill, 23/11/2026): the paid-seat checks, the member row and the seats are written
