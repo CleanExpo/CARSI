@@ -94,7 +94,7 @@ export async function processBusinessCoachingCheckoutCompleted(
       packageLabel: pkg.label,
       seatCount: result.seatCount,
       amountLabel,
-      amountTotalCents: session.amount_total,
+      checkout: session,
       registrationStatus: result.status,
       businessName: session.metadata?.company_name?.trim() || undefined,
       phone: session.metadata?.contact_phone?.trim() || undefined,

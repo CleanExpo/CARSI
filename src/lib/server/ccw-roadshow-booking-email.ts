@@ -86,7 +86,7 @@ export async function processCcwRoadshowBookingConfirmation(
     ticketLabel: ticketPackage.label,
     seatCount: ticketPackage.attendeeCount,
     amountLabel,
-    amountTotalCents: session.amount_total,
+    checkout: session,
     businessName,
     phone,
     appOrigin,
