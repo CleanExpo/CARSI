@@ -17,7 +17,8 @@
  * names no IICRC or CEC.
  */
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -179,14 +180,21 @@ const BINARY =
 
 // Untracked, non-ignored files are scanned too, so a local run sees a new file before it is
 // committed (a committed-only scan let this guard pass on its own uncommitted file).
+// Listed once per run: every test below shares this listing and the read cache further down.
+let listing: string[] | null = null;
 function repoFiles(): string[] {
-  return execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard'], {
-    cwd: ROOT,
-    encoding: 'utf8',
-    maxBuffer: 64 * 1024 * 1024,
-  })
+  listing ??= execFileSync(
+    'git',
+    ['ls-files', '-z', '--cached', '--others', '--exclude-standard'],
+    {
+      cwd: ROOT,
+      encoding: 'utf8',
+      maxBuffer: 64 * 1024 * 1024,
+    }
+  )
     .split('\0')
     .filter(Boolean);
+  return listing;
 }
 
 function trackedTextFiles(): string[] {
@@ -230,6 +238,111 @@ function sourceHits(src: string, file = ''): { line: number; match: string }[] {
 function covered(file: string, list: Record<string, string> | string[]): string | null {
   const keys = Array.isArray(list) ? list : Object.keys(list);
   return keys.find((k) => (k.endsWith('/') ? file.startsWith(k) : file === k)) ?? null;
+}
+
+/**
+ * Cheap pre-check before the reading views are built. The views walk every character of every
+ * file twice, which timed the whole-tree scan out on a busy machine.
+ *
+ * Every match of both rules contains "accredit", so a file can be flagged only if one of its
+ * reading views spells that word. Unless the file holds a character reference (`&#...;`), a `\x`
+ * or `\u` escape, or an HTML comment (these can make a letter out of non-letters, or hide `<` and
+ * `>`), every letter in a view is the same letter of the source, in source order. Between two
+ * letters that sit side by side in a view, the source can hold only what the view drops or turns
+ * into nothing: non-letters, markup tags, `&shy;`, and the `\b` `\f` `\v` escapes. PRE_CHECK allows
+ * exactly those gaps between the eight letters, so it is true for every file the full scan can
+ * flag. Each gap can be read only one way, which keeps the search linear.
+ */
+const GAP = String.raw`(?:[^A-Za-z<&\\]|<[^<>A-Za-z]*[A-Za-z][^<>]*>|<|&shy;|&|\\[bfv]|\\)*`;
+export const PRE_CHECK = new RegExp([...'accredit'].join(GAP), 'i');
+const VIEW_MAKES_LETTERS = /&#|\\[xu]|<!--/;
+
+export function couldBeFlagged(src: string): boolean {
+  return VIEW_MAKES_LETTERS.test(src) || PRE_CHECK.test(src);
+}
+
+/**
+ * The text of every regular tracked file whose working copy matches the index, read in ONE stream
+ * from git's object store. Opening thousands of files one by one on a busy disk is what timed this
+ * guard out; one `git cat-file --batch` stream reads the same bytes in a few large reads. Files that
+ * differ from the index (`git diff`), untracked files, symlinks, submodules and unmerged entries are
+ * left out, so readText() reads them from disk and the scan still sees uncommitted work.
+ */
+function cleanTrackedTexts(): Map<string, string> {
+  const git = (args: string[], input?: string) =>
+    execFileSync('git', args, { cwd: ROOT, input, maxBuffer: 512 * 1024 * 1024 });
+  const changed = new Set(git(['diff', '--name-only', '-z']).toString('utf8').split('\0'));
+  const wanted: { path: string; oid: string }[] = [];
+  for (const entry of git(['ls-files', '-s', '-z']).toString('utf8').split('\0')) {
+    const tab = entry.indexOf('\t');
+    if (tab < 0) continue;
+    const [mode, oid, stage] = entry.slice(0, tab).split(' ');
+    const path = entry.slice(tab + 1);
+    const regular = mode === '100644' || mode === '100755';
+    if (regular && stage === '0' && !changed.has(path) && !BINARY.test(path))
+      wanted.push({ path, oid });
+  }
+  const out = git(['cat-file', '--batch'], wanted.map((w) => w.oid).join('\n') + '\n');
+  const result = new Map<string, string>();
+  let pos = 0;
+  for (const { path, oid } of wanted) {
+    const eol = out.indexOf(10, pos);
+    const [gotOid, type, size] = out.toString('latin1', pos, eol).split(' ');
+    if (gotOid !== oid || type !== 'blob')
+      throw new Error(`git cat-file: unexpected ${gotOid} ${type}`);
+    const start = eol + 1;
+    const end = start + Number(size);
+    result.set(join(ROOT, path), out.toString('utf8', start, end));
+    pos = end + 1;
+  }
+  return result;
+}
+
+/** Each file is read once per run, by whichever test reaches it first. */
+const texts = new Map<string, string | null>();
+let primed = false;
+function readText(path: string): string | null {
+  if (!primed && path.startsWith(ROOT)) {
+    primed = true;
+    for (const [p, text] of cleanTrackedTexts()) texts.set(p, text);
+  }
+  if (!texts.has(path)) {
+    let text: string | null;
+    try {
+      text = readFileSync(path, 'utf8');
+    } catch {
+      text = null;
+    }
+    texts.set(path, text);
+  }
+  return texts.get(path) ?? null;
+}
+
+type Hit = { line: number; match: string };
+
+/** Hits in one file under `root`: read once, pre-checked, then scanned. Null when unreadable. */
+const hitCache = new Map<string, Hit[] | null>();
+function fileHits(root: string, file: string): Hit[] | null {
+  const path = join(root, file);
+  if (!hitCache.has(path)) {
+    const text = readText(path);
+    hitCache.set(path, text === null ? null : couldBeFlagged(text) ? sourceHits(text, file) : []);
+  }
+  return hitCache.get(path) ?? null;
+}
+
+/** Offender lines for `files` under `root`, outside the allow-lists. The one owner of the scan. */
+function offendersIn(root: string, files: string[]): string[] {
+  const offenders: string[] = [];
+  for (const file of files) {
+    if (covered(file, HISTORICAL) || covered(file, DETECTORS) || covered(file, PENDING)) continue;
+    const hits = fileHits(root, file);
+    if (hits?.length)
+      offenders.push(
+        `${file}: ${[...new Set(hits.map((h) => `L${h.line} ${h.match.replace(/\s+/g, ' ')}`))].join(' | ')}`
+      );
+  }
+  return offenders;
 }
 
 /** Visible text of server-rendered markup: tags dropped, common entities decoded, spaces folded. */
@@ -384,22 +497,53 @@ describe('tracked source carries no retired provider wording', () => {
   });
 
   it('no file outside the allow-lists uses it', () => {
-    const offenders: string[] = [];
-    for (const file of files) {
-      if (covered(file, HISTORICAL) || covered(file, DETECTORS) || covered(file, PENDING)) continue;
-      let text: string;
-      try {
-        text = readFileSync(join(ROOT, file), 'utf8');
-      } catch {
-        continue;
-      }
-      const hits = sourceHits(text, file);
-      if (hits.length)
-        offenders.push(
-          `${file}: ${[...new Set(hits.map((h) => `L${h.line} ${h.match.replace(/\s+/g, ' ')}`))].join(' | ')}`
-        );
+    expect(offendersIn(ROOT, files)).toEqual([]);
+  });
+
+  // The pre-check skips files, so prove on disk that it never skips one the full scan would flag:
+  // one planted file per way a reading view can assemble the word, run through the same scan.
+  it('the scan still flags every split shape planted in a file', () => {
+    const w = 'accre' + 'dited';
+    const W = w.toUpperCase();
+    const plants: Record<string, string> = {
+      'inline-tag.tsx': `<p>IICRC accre<span>dited</span></p>`,
+      'upper-tag.tsx': `<p>IICRC ACCRE<b>DITED</b></p>`,
+      'comment.tsx': `<p>IICRC accre<!-- a > b -->dited</p>`,
+      'soft-hyphen.html': `<p>IICRC accre&shy;dited</p>`,
+      'decimal-ref.tsx': `<p>IICRC &#97;ccredited</p>`,
+      'hex-ref.tsx': `<p>IICRC &#x61;ccredited</p>`,
+      // Plain concatenation: the test transform may rewrite escapes inside String.raw templates.
+      'hex-escape.tsx': "<p>IICRC {'\\x61ccredited'}</p>",
+      'unicode-escape.tsx': "<p>IICRC {'\\u0061ccredited'}</p>",
+      'jsx-literals.tsx': `<p>IICRC {'accre'}{"dited"}</p>`,
+      'template-literal.tsx': '<p>IICRC {`accre`}{`dited`}</p>',
+      'backspace-escape.tsx': "<p>IICRC {'accre\\bdited'}</p>",
+      'line-continuation.tsx': `<p>IICRC {'accre\\\ndited'}</p>`,
+      'markdown.md': `Courses ac**cred**ited by the IICRC.`,
+      'carsi-claim.tsx': `<p>CARSI is fully accre<em>dited</em>.</p>`,
+      'plain.ts': `const s = 'IICRC ${w}';`,
+      'plain-upper.txt': `IICRC ${W}`,
+    };
+    const dir = mkdtempSync(join(tmpdir(), 'provider-wording-'));
+    try {
+      for (const [name, src] of Object.entries(plants)) writeFileSync(join(dir, name), src);
+      writeFileSync(join(dir, 'clean.tsx'), `<p>${IICRC_APPROVED_CEC_PROVIDER}</p>`);
+      const flagged = offendersIn(dir, [...Object.keys(plants), 'clean.tsx']).map(
+        (o) => o.split(':')[0]
+      );
+      expect(flagged.sort()).toEqual(Object.keys(plants).sort());
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
     }
-    expect(offenders).toEqual([]);
+  });
+
+  it('the pre-check lets ordinary source through without building the views', () => {
+    expect(couldBeFlagged(`export const x = <p className="a">IICRC {'CEC'} hours</p>;`)).toBe(
+      false
+    );
+    expect(couldBeFlagged(`Nationally recognised; see the IICRC.`)).toBe(false);
+    // A clean file that merely holds the word still goes to the full scan.
+    expect(couldBeFlagged(`not ${'accre' + 'dited'} by anyone`)).toBe(true);
   });
 
   it('every PENDING entry still needs to be there (the list only shrinks)', () => {
@@ -408,9 +552,7 @@ describe('tracked source carries no retired provider wording', () => {
       const scope = entry.endsWith('/')
         ? files.filter((f) => f.startsWith(entry))
         : files.filter((f) => f === entry);
-      const dirty = scope.some(
-        (f) => sourceHits(readFileSync(join(ROOT, f), 'utf8'), f).length > 0
-      );
+      const dirty = scope.some((f) => (fileHits(ROOT, f)?.length ?? 0) > 0);
       if (!dirty) stale.push(`${entry} (${owner})`);
     }
     expect(stale).toEqual([]);
@@ -419,9 +561,7 @@ describe('tracked source carries no retired provider wording', () => {
   it('every allow-listed exact path still exists and still needs the entry', () => {
     const missing = [...HISTORICAL, ...DETECTORS]
       .filter((k) => !k.endsWith('/'))
-      .filter(
-        (k) => !files.includes(k) || sourceHits(readFileSync(join(ROOT, k), 'utf8'), k).length === 0
-      );
+      .filter((k) => !files.includes(k) || (fileHits(ROOT, k)?.length ?? 0) === 0);
     expect(missing).toEqual([]);
   });
 
@@ -486,7 +626,7 @@ describe('tracked source carries no retired provider wording', () => {
         !/\.test\.tsx?$/.test(f) &&
         !f.startsWith('src/lib/iicrc/approved-wording') &&
         !f.startsWith('src/lib/iicrc/approved-provider-wording') &&
-        readFileSync(join(ROOT, f), 'utf8')
+        (readText(join(ROOT, f)) ?? '')
           .split('\n')
           .some((line) => !/^\s*(?:\/\/|\*|\/\*)/.test(line) && QUOTED_PHRASE.test(line))
     );
