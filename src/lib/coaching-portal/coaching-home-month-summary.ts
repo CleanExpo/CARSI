@@ -24,6 +24,8 @@ export function buildCoachingHomeMonthSummary(input: {
   marketingHasPack: boolean;
   profileReady: boolean;
   nextActionTitle: string | null;
+  /** Pre-formatted due date (e.g. "3 Dec"), formatted by the caller so this stays pure. */
+  nextActionDueLabel?: string | null;
 }): CoachingHomeMonthSummary {
   const lines: string[] = [];
 
@@ -51,7 +53,13 @@ export function buildCoachingHomeMonthSummary(input: {
   }
 
   if (input.nextActionTitle) {
-    lines.push(`Next up: ${input.nextActionTitle}`);
+    // GP-781: the home page hides its "Your next action" card whenever this summary offers an
+    // action link, so this line is where the member sees the due date.
+    lines.push(
+      input.nextActionDueLabel
+        ? `Next up: ${input.nextActionTitle} (due ${input.nextActionDueLabel})`
+        : `Next up: ${input.nextActionTitle}`
+    );
   }
 
   const attention =
