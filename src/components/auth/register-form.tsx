@@ -30,7 +30,10 @@ import {
 } from '@/lib/membership-signup-path';
 import { confirmFreeEnrolment } from '@/lib/lms/confirm-free-enrolment';
 import { useToast } from '@/hooks/use-toast';
-import { purchaseSurveyCheckoutField, rememberPurchaseSurveyKey } from '@/lib/marketing/purchase-survey-key';
+import {
+  purchaseSurveyCheckoutFieldFor,
+  rememberPurchaseSurveyKey,
+} from '@/lib/marketing/purchase-survey-key';
 
 export const formSchema = z
   .object({
@@ -110,7 +113,8 @@ export function RegisterForm() {
         const slug = decodeURIComponent(courseMatch[1]);
         try {
           const { success_url, cancel_url } = buildCourseCheckoutUrls(window.location.origin, slug);
-          const surveyField = purchaseSurveyCheckoutField();
+          // GP-783: a repeat of this purchase sends the same key, so it reuses the first Stripe session.
+          const surveyField = purchaseSurveyCheckoutFieldFor(`${slug}:self:1`);
           const checkout = await apiClient.post<{ enrolled?: boolean; checkout_url?: string }>(
             '/api/lms/checkout',
             { slug, success_url, cancel_url, customer_email: values.email, ...surveyField, ...analyticsConsentCheckoutField() }

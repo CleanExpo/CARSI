@@ -1,7 +1,13 @@
+import type Stripe from 'stripe';
+
 import type { CheckoutCourse } from '@/lib/course-list-item';
 import { getStripeClient } from '@/lib/api/stripe';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { analyticsConsentMetadata } from '@/lib/server/analytics-consent';
+import {
+  COURSE_CHECKOUT_MAX_NETWORK_RETRIES,
+  courseCheckoutIdempotencyKey,
+} from '@/lib/server/checkout-idempotency';
 
 /**
  * The payer email (GP-760): the current session's own email when the buyer is signed in (the
@@ -81,7 +87,10 @@ export async function createStripeCheckoutForCourse(params: {
     ? `${course.title || slug} — team (${seatQty} seats)`
     : course.title || slug;
 
-  const session = await stripe.checkout.sessions.create({
+  // GP-783: the request is built first so its key can be derived from exactly what is sent. A
+  // double-click or a retry of the same purchase then gets the first Checkout Session back
+  // instead of a second one (see checkout-idempotency.ts).
+  const request: Stripe.Checkout.SessionCreateParams = {
     mode: 'payment',
     customer_email,
     success_url,
@@ -113,6 +122,10 @@ export async function createStripeCheckoutForCourse(params: {
         },
       },
     ],
+  };
+  const session = await stripe.checkout.sessions.create(request, {
+    idempotencyKey: courseCheckoutIdempotencyKey(request),
+    maxNetworkRetries: COURSE_CHECKOUT_MAX_NETWORK_RETRIES,
   });
 
   const url = session.url;

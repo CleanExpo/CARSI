@@ -36,7 +36,10 @@ import type { BusinessCoachingSession } from '@/lib/marketing/business-coaching'
 import { businessCoachingPath } from '@/lib/marketing/business-coaching';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { isProvisionalPasswordHash } from '@/lib/server/lms-auth';
-import { tryBuildTaxInvoice } from '@/lib/billing/tax-invoice';
+import {
+  tryBuildTaxInvoice,
+  type TaxInvoiceCheckout,
+} from '@/lib/billing/tax-invoice';
 
 export { isEmailConfigured };
 export type { SendEmailResult };
@@ -151,11 +154,16 @@ export async function sendEnrollmentWelcomeEmail(params: {
   appOrigin: string;
   offers?: import('@/lib/marketing/ccw-roadshow-offers').CcwAttendeeOffer[];
   /**
-   * Pass only from a paid purchase, with the GST-inclusive amount Stripe charged
-   * (`session.amount_total`). The email then carries a tax invoice (GP-761).
-   * Free, membership, team and attendance enrolments leave it out.
+   * Pass only from a purchase, with the Stripe Checkout session itself as
+   * `checkout`. The tax-invoice owner issues an invoice only when that session is
+   * paid, for its `amount_total` (GP-761).
+   * Free, membership, team and attendance enrolments leave it out. The Buyer on the
+   * invoice is the payer as that session recorded them, never the learner's account.
    */
-  payment?: { amountTotalCents: number | null | undefined; seatCount?: number };
+  payment?: {
+    checkout: TaxInvoiceCheckout;
+    seatCount?: number;
+  };
 }): Promise<SendEmailResult> {
   const { studentId, courseSlug, appOrigin } = params;
   const user = await prisma.lmsUser.findUnique({
@@ -200,7 +208,7 @@ export async function sendEnrollmentWelcomeEmail(params: {
             params.payment.seatCount && params.payment.seatCount > 1
               ? `${course.title}, team purchase (${params.payment.seatCount} seats)`
               : course.title,
-          totalCents: params.payment.amountTotalCents,
+          checkout: params.payment.checkout,
           issuedAt: new Date(),
         })
       : null,
@@ -329,8 +337,8 @@ export async function sendCcwRoadshowBookingConfirmationEmail(params: {
   ticketLabel: string;
   seatCount: number;
   amountLabel: string;
-  /** GST-inclusive amount Stripe charged; makes the email a tax invoice (GP-761). */
-  amountTotalCents?: number | null;
+  /** The Stripe Checkout session; the email is a tax invoice only when it is paid (GP-761). */
+  checkout: TaxInvoiceCheckout;
   businessName?: string;
   phone?: string;
   appOrigin: string;
@@ -355,7 +363,7 @@ export async function sendCcwRoadshowBookingConfirmationEmail(params: {
     eventPageUrl,
     taxInvoice: tryBuildTaxInvoice({
       item: `CARSI Roadshow ${params.eventCity}, ${params.ticketLabel} (${params.seatCount} ${params.seatCount === 1 ? 'seat' : 'seats'})`,
-      totalCents: params.amountTotalCents,
+      checkout: params.checkout,
       issuedAt: new Date(),
     }),
   });
@@ -646,8 +654,8 @@ export async function sendBusinessCoachingConfirmationEmail(params: {
   packageLabel: string;
   seatCount: number;
   amountLabel: string;
-  /** GST-inclusive amount Stripe charged; makes the email a tax invoice (GP-761). */
-  amountTotalCents?: number | null;
+  /** The Stripe Checkout session; the email is a tax invoice only when it is paid (GP-761). */
+  checkout: TaxInvoiceCheckout;
   registrationStatus: 'confirmed' | 'waitlisted';
   businessName?: string;
   phone?: string;
@@ -672,7 +680,7 @@ export async function sendBusinessCoachingConfirmationEmail(params: {
     programUrl: `${base}${businessCoachingPath}`,
     taxInvoice: tryBuildTaxInvoice({
       item: `Owner Circle: ${params.session.title}, ${params.packageLabel} (${params.seatCount} ${params.seatCount === 1 ? 'seat' : 'seats'})`,
-      totalCents: params.amountTotalCents,
+      checkout: params.checkout,
       issuedAt: new Date(),
     }),
   });

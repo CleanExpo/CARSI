@@ -31,8 +31,6 @@
  * out a second session while the first was still payable — reintroducing the
  * very duplicate this module exists to prevent. Change one, change the other.
  */
-import { createHash } from 'node:crypto';
-
 import { prisma } from '@/lib/prisma';
 import { CHECKOUT_RESERVATION_STATUS, PAST_DUE_GRACE_DAYS } from '@/lib/server/entitlements';
 
@@ -64,23 +62,11 @@ export function checkoutSessionExpiresAt(now: Date = new Date()): number {
   return Math.floor((now.getTime() + CHECKOUT_SESSION_TTL_MS) / 1000);
 }
 
-export type CheckoutReservationKind = 'individual' | 'team' | 'org' | 'onboarding';
-
-/**
- * Stable for one database reservation, different for the next legitimate one.
- *
- * Stripe may accept a Checkout Session and then lose the response. Supplying
- * this key lets its own network retries return that session instead of opening
- * another. Hashing keeps internal ids out of Stripe logs and bounds the key.
- */
-export function checkoutSessionIdempotencyKey(
-  kind: CheckoutReservationKind,
-  ownerId: string,
-  reservedAt: Date
-): string {
-  const ownerHash = createHash('sha256').update(ownerId.trim()).digest('hex').slice(0, 32);
-  return `carsi:${kind}:${ownerHash}:${reservedAt.getTime()}`;
-}
+// The reservation's Stripe key lives with every other checkout key (GP-783: one owner).
+export {
+  checkoutSessionIdempotencyKey,
+  type CheckoutReservationKind,
+} from '@/lib/server/checkout-idempotency';
 
 function isUniqueConstraintViolation(error: unknown): boolean {
   return (

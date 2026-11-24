@@ -17,7 +17,8 @@
  * names no IICRC or CEC.
  */
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -31,6 +32,13 @@ import {
   FROM_IICRC_APPROVED_CEC_PROVIDER,
   IICRC_APPROVED_CEC_PROVIDER,
 } from './approved-wording';
+import {
+  CARSI_ACCREDITED_CLAIM as CARSI_ACCREDITED_CLAIM_RULE,
+  RETIRED_PROVIDER_WORDING as RETIRED_PROVIDER_WORDING_RULE,
+  RETIRED_WORDING_DETECTORS,
+  RETIRED_WORDING_HISTORICAL,
+  RETIRED_WORDING_PENDING,
+} from '../../../scripts/iicrc-claim-rules.mjs';
 import { readingViews, sourceLine } from './reading-view';
 
 vi.mock('@/lib/brand/fonts', () => ({
@@ -53,123 +61,13 @@ vi.mock('@/hooks/use-toast', async (importOriginal) => ({
 
 const ROOT = process.cwd();
 
-/**
- * The retired wording: an "accredit" word directly beside IICRC or CEC, "accredited provider", or
- * "accredited" followed within four words by IICRC or CEC ("accredited as an IICRC CEC provider",
- * "accredited by the IICRC"). A negation in the two words before "accredited" ("not accredited by
- * the IICRC", "not nationally accredited and awards no IICRC CECs") is a true statement and passes.
- * Reverse forms are caught too: IICRC or CEC followed within three words by an "accredit" word ("the
- * IICRC has accredited", "IICRC CEC provider accreditation"), and "accreditation from/by the IICRC".
- * "nationally accredited" (VET qualifications) is a different claim and passes.
- */
-export const RETIRED_PROVIDER_WORDING =
-  /\b(?:IICRC|CECs?)[\s-]+accredit\w*|\baccredit\w*[\s-]+(?:IICRC|CECs?)\b|\baccredited[\s-]+provider\b|(?<!\b(?:not|never)(?:[\s-]+\w+)?[\s-]+)\baccredited(?:[\s-]+[\w'’]+){0,4}?[\s-]+(?:IICRC|CECs?)\b|\b(?:IICRC|CECs?)(?:[\s-]+[\w'’]+){0,3}?[\s-]+(?<!nationally[\s-]+)accredit\w*|\baccreditation[\s-]+(?:from|by|with)[\s-]+(?:the[\s-]+)?(?:IICRC|CECs?)\b/gi;
-
-/**
- * GP-771: an unqualified "accredited" claim about CARSI, with no IICRC or CEC named ("CARSI is fully
- * accredited."). CARSI is not accredited by anyone; it is an IICRC Approved CEC Provider and issues
- * its own designations. The proximity rule is grammatical, not a word window: the "accredit" word
- * must be said OF CARSI (or "we" / "our courses") in one of four shapes, with nothing between them
- * except words from the closed lists below:
- *   1. attached: "CARSI accreditation", "CARSI's accreditation", "CARSI-accredited";
- *   2. a linking verb: "CARSI (courses) is/are/'s (an/fully/nationally/...) accredited",
- *      "we are / we're (an) accredited", "our courses are accredited";
- *   3. possession: "CARSI holds/has/earned (full/national) accreditation", "our accreditation";
- *   4. agent: "accredited by/through/with CARSI".
- * So a negation ("CARSI is not accredited", "does not award nationally accredited VET
- * qualifications"), a question ("Is CARSI accredited?": shape 1 does not match after an auxiliary
- * that opens a question, and the others need CARSI before the verb) and "accredited" about another body
- * ("CARSI recommends a NATA-accredited laboratory") do not match. "nationally accredited" is not
- * exempt here: "CARSI courses are nationally accredited" is false (CARSI is not an RTO).
- */
-const SEP = '[\\s-]+';
-const CARSI_THING =
-  '(?:own[\\s-]+)?(?:courses?|training|programs?|programmes?|classes|designations?|credentials?|certificates?|qualifications?)';
-const SUBJECT = `(?:CARSI(?:['’]s)?(?:${SEP}${CARSI_THING})?|we|our${SEP}${CARSI_THING})`;
-const LINK = `(?:${SEP}(?:is|are|was|were|has${SEP}been|have${SEP}been|remains?|becomes?|became)|['’](?:s|re))`;
-const MODIFIER =
-  '(?:an?|the|now|also|fully|officially|nationally|internationally|formally|properly|independently|government|industry|and)';
-export const CARSI_ACCREDITED_CLAIM = new RegExp(
-  [
-    // Not after an auxiliary that opens a question ("Is CARSI accredited?").
-    `(?<!\\b(?:is|are|was|were|isn['’]t|aren['’]t|wasn['’]t)${SEP})\\bCARSI(?:['’]s)?${SEP}accredit\\w*`,
-    `\\b${SUBJECT}${LINK}(?:${SEP}${MODIFIER})*${SEP}accredit\\w*`,
-    `\\b(?:CARSI|we)${SEP}(?:holds?|has|have|gained|earned|received|achieved|obtained)${SEP}(?:(?:full|national|formal|official|government)${SEP})?accreditations?\\b`,
-    `\\bour${SEP}accreditations?\\b`,
-    `\\baccredit\\w*${SEP}(?:by|through|with)${SEP}CARSI\\b`,
-  ].join('|'),
-  'gi'
-);
-
-/**
- * Dated records of the past: audits, handoffs, session notes, specs, decision logs and applied
- * database migrations. They describe what was true or what was found then; rewriting them would
- * falsify the record. A path ending in "/" matches by prefix; any other path matches exactly.
- */
-const HISTORICAL = [
-  'docs/audit/',
-  'docs/session-handoffs/',
-  'docs/sessions/',
-  'docs/plans/archive/',
-  'docs/specs/',
-  'docs/ai-demonstration/source-of-truth/history/',
-  'docs/superpowers/specs/',
-  'docs/agent-framework/GAP-BACKLOG-2026-08-07.md',
-  'docs/agent-framework/PIPELINE.md',
-  'docs/governance/BACKLOG.md',
-  'docs/governance/DECISIONS.md',
-  'docs/governance/GOAL.md',
-  'docs/CONTENT_PARITY_AUDIT.md',
-  'docs/runbooks/course-go-live.md',
-  'docs/compliance/licence-inventory.csv',
-  'prisma/migrations/',
-  'db/ops/',
-  'scripts/audit/',
-];
-
-/**
- * Detectors: guard scripts and tests that must spell the retired wording to catch it. None of them
- * is served. Exact paths only.
- */
-const DETECTORS = [
-  // Dated record that quotes the retired wording as its "before" text.
-  'docs/governance/reports/gp-525-carpet-cec-reconciliation.md',
-  // Header comment quotes the founder rule, which uses the retired phrase.
-  'scripts/check-iicrc-scope.mjs',
-  'scripts/check-iicrc-compliance.mjs',
-  'scripts/check-iicrc-compliance.test.mjs',
-  'scripts/check-iicrc-terminology.mjs',
-  'scripts/check-iicrc-terminology.test.mjs',
-  'scripts/check-live-catalogue.mjs',
-  'scripts/check-live-catalogue.test.mjs',
-  'scripts/check-live-courses-money-path.test.mjs',
-  'scripts/check-live-guards.fixture-test.mjs',
-  'scripts/licence-inventory.mjs',
-  'scripts/probe-iicrc-guard-allows.mjs',
-  'src/components/pricing/PricingTiers.test.tsx',
-  'src/lib/course-kit/iicrc-phrases.test.ts',
-  'src/lib/marketing/industry-faq-licence.test.ts',
-  'src/lib/marketing/licence-copy-sweep.test.ts',
-  'src/lib/marketing/licence-inventory.test.ts',
-  'src/lib/marketing/public-claims-guard.test.ts',
-  'src/lib/seo/neosan-claims.test.ts',
-  'src/lib/server/public-catalogue-facts.branding.test.ts',
-  // This guard: its pattern controls spell the retired wording on purpose.
-  'src/lib/iicrc/approved-provider-wording.test.tsx',
-];
-
-/**
- * Files owned by another open change. The owner removes the wording; this test then fails until
- * the entry is deleted, so the list only shrinks. A prefix entry stays only while at least one
- * file under it still matches.
- */
-const PENDING: Record<string, string> = {
-  'data/seed/': 'GP-748 (PR #1205): seed copy; the founder runs the seed',
-  'data/courses/': 'GP-748 (PR #1205): course research and drafts',
-  'data/course-content/': 'GP-749: lesson content',
-  'data/CARSI_Specialty_Courses_Collection.txt': 'GP-749: legacy course text',
-  'docs/course-content/': 'GP-749: workshop course content',
-};
+// The rules and their exemption lists have one owner, shared with check:iicrc-compliance (GP-599).
+// Each rule is exported without the `g` flag; this test needs every match, so it builds its own.
+const RETIRED_PROVIDER_WORDING = new RegExp(RETIRED_PROVIDER_WORDING_RULE.source, 'gi');
+const CARSI_ACCREDITED_CLAIM = new RegExp(CARSI_ACCREDITED_CLAIM_RULE.source, 'gi');
+const HISTORICAL = RETIRED_WORDING_HISTORICAL;
+const DETECTORS = RETIRED_WORDING_DETECTORS;
+const PENDING: Record<string, string> = RETIRED_WORDING_PENDING;
 
 /** Served PDFs whose text still carries the wording, with the owner who regenerates them. */
 const PENDING_PDFS: Record<string, string> = {};
@@ -179,14 +77,21 @@ const BINARY =
 
 // Untracked, non-ignored files are scanned too, so a local run sees a new file before it is
 // committed (a committed-only scan let this guard pass on its own uncommitted file).
+// Listed once per run: every test below shares this listing and the read cache further down.
+let listing: string[] | null = null;
 function repoFiles(): string[] {
-  return execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard'], {
-    cwd: ROOT,
-    encoding: 'utf8',
-    maxBuffer: 64 * 1024 * 1024,
-  })
+  listing ??= execFileSync(
+    'git',
+    ['ls-files', '-z', '--cached', '--others', '--exclude-standard'],
+    {
+      cwd: ROOT,
+      encoding: 'utf8',
+      maxBuffer: 64 * 1024 * 1024,
+    }
+  )
     .split('\0')
     .filter(Boolean);
+  return listing;
 }
 
 function trackedTextFiles(): string[] {
@@ -230,6 +135,111 @@ function sourceHits(src: string, file = ''): { line: number; match: string }[] {
 function covered(file: string, list: Record<string, string> | string[]): string | null {
   const keys = Array.isArray(list) ? list : Object.keys(list);
   return keys.find((k) => (k.endsWith('/') ? file.startsWith(k) : file === k)) ?? null;
+}
+
+/**
+ * Cheap pre-check before the reading views are built. The views walk every character of every
+ * file twice, which timed the whole-tree scan out on a busy machine.
+ *
+ * Every match of both rules contains "accredit", so a file can be flagged only if one of its
+ * reading views spells that word. Unless the file holds a character reference (`&#...;`), a `\x`
+ * or `\u` escape, or an HTML comment (these can make a letter out of non-letters, or hide `<` and
+ * `>`), every letter in a view is the same letter of the source, in source order. Between two
+ * letters that sit side by side in a view, the source can hold only what the view drops or turns
+ * into nothing: non-letters, markup tags, `&shy;`, and the `\b` `\f` `\v` escapes. PRE_CHECK allows
+ * exactly those gaps between the eight letters, so it is true for every file the full scan can
+ * flag. Each gap can be read only one way, which keeps the search linear.
+ */
+const GAP = String.raw`(?:[^A-Za-z<&\\]|<[^<>A-Za-z]*[A-Za-z][^<>]*>|<|&shy;|&|\\[bfv]|\\)*`;
+export const PRE_CHECK = new RegExp([...'accredit'].join(GAP), 'i');
+const VIEW_MAKES_LETTERS = /&#|\\[xu]|<!--/;
+
+export function couldBeFlagged(src: string): boolean {
+  return VIEW_MAKES_LETTERS.test(src) || PRE_CHECK.test(src);
+}
+
+/**
+ * The text of every regular tracked file whose working copy matches the index, read in ONE stream
+ * from git's object store. Opening thousands of files one by one on a busy disk is what timed this
+ * guard out; one `git cat-file --batch` stream reads the same bytes in a few large reads. Files that
+ * differ from the index (`git diff`), untracked files, symlinks, submodules and unmerged entries are
+ * left out, so readText() reads them from disk and the scan still sees uncommitted work.
+ */
+function cleanTrackedTexts(): Map<string, string> {
+  const git = (args: string[], input?: string) =>
+    execFileSync('git', args, { cwd: ROOT, input, maxBuffer: 512 * 1024 * 1024 });
+  const changed = new Set(git(['diff', '--name-only', '-z']).toString('utf8').split('\0'));
+  const wanted: { path: string; oid: string }[] = [];
+  for (const entry of git(['ls-files', '-s', '-z']).toString('utf8').split('\0')) {
+    const tab = entry.indexOf('\t');
+    if (tab < 0) continue;
+    const [mode, oid, stage] = entry.slice(0, tab).split(' ');
+    const path = entry.slice(tab + 1);
+    const regular = mode === '100644' || mode === '100755';
+    if (regular && stage === '0' && !changed.has(path) && !BINARY.test(path))
+      wanted.push({ path, oid });
+  }
+  const out = git(['cat-file', '--batch'], wanted.map((w) => w.oid).join('\n') + '\n');
+  const result = new Map<string, string>();
+  let pos = 0;
+  for (const { path, oid } of wanted) {
+    const eol = out.indexOf(10, pos);
+    const [gotOid, type, size] = out.toString('latin1', pos, eol).split(' ');
+    if (gotOid !== oid || type !== 'blob')
+      throw new Error(`git cat-file: unexpected ${gotOid} ${type}`);
+    const start = eol + 1;
+    const end = start + Number(size);
+    result.set(join(ROOT, path), out.toString('utf8', start, end));
+    pos = end + 1;
+  }
+  return result;
+}
+
+/** Each file is read once per run, by whichever test reaches it first. */
+const texts = new Map<string, string | null>();
+let primed = false;
+function readText(path: string): string | null {
+  if (!primed && path.startsWith(ROOT)) {
+    primed = true;
+    for (const [p, text] of cleanTrackedTexts()) texts.set(p, text);
+  }
+  if (!texts.has(path)) {
+    let text: string | null;
+    try {
+      text = readFileSync(path, 'utf8');
+    } catch {
+      text = null;
+    }
+    texts.set(path, text);
+  }
+  return texts.get(path) ?? null;
+}
+
+type Hit = { line: number; match: string };
+
+/** Hits in one file under `root`: read once, pre-checked, then scanned. Null when unreadable. */
+const hitCache = new Map<string, Hit[] | null>();
+function fileHits(root: string, file: string): Hit[] | null {
+  const path = join(root, file);
+  if (!hitCache.has(path)) {
+    const text = readText(path);
+    hitCache.set(path, text === null ? null : couldBeFlagged(text) ? sourceHits(text, file) : []);
+  }
+  return hitCache.get(path) ?? null;
+}
+
+/** Offender lines for `files` under `root`, outside the allow-lists. The one owner of the scan. */
+function offendersIn(root: string, files: string[]): string[] {
+  const offenders: string[] = [];
+  for (const file of files) {
+    if (covered(file, HISTORICAL) || covered(file, DETECTORS) || covered(file, PENDING)) continue;
+    const hits = fileHits(root, file);
+    if (hits?.length)
+      offenders.push(
+        `${file}: ${[...new Set(hits.map((h) => `L${h.line} ${h.match.replace(/\s+/g, ' ')}`))].join(' | ')}`
+      );
+  }
+  return offenders;
 }
 
 /** Visible text of server-rendered markup: tags dropped, common entities decoded, spaces folded. */
@@ -384,22 +394,53 @@ describe('tracked source carries no retired provider wording', () => {
   });
 
   it('no file outside the allow-lists uses it', () => {
-    const offenders: string[] = [];
-    for (const file of files) {
-      if (covered(file, HISTORICAL) || covered(file, DETECTORS) || covered(file, PENDING)) continue;
-      let text: string;
-      try {
-        text = readFileSync(join(ROOT, file), 'utf8');
-      } catch {
-        continue;
-      }
-      const hits = sourceHits(text, file);
-      if (hits.length)
-        offenders.push(
-          `${file}: ${[...new Set(hits.map((h) => `L${h.line} ${h.match.replace(/\s+/g, ' ')}`))].join(' | ')}`
-        );
+    expect(offendersIn(ROOT, files)).toEqual([]);
+  });
+
+  // The pre-check skips files, so prove on disk that it never skips one the full scan would flag:
+  // one planted file per way a reading view can assemble the word, run through the same scan.
+  it('the scan still flags every split shape planted in a file', () => {
+    const w = 'accre' + 'dited';
+    const W = w.toUpperCase();
+    const plants: Record<string, string> = {
+      'inline-tag.tsx': `<p>IICRC accre<span>dited</span></p>`,
+      'upper-tag.tsx': `<p>IICRC ACCRE<b>DITED</b></p>`,
+      'comment.tsx': `<p>IICRC accre<!-- a > b -->dited</p>`,
+      'soft-hyphen.html': `<p>IICRC accre&shy;dited</p>`,
+      'decimal-ref.tsx': `<p>IICRC &#97;ccredited</p>`,
+      'hex-ref.tsx': `<p>IICRC &#x61;ccredited</p>`,
+      // Plain concatenation: the test transform may rewrite escapes inside String.raw templates.
+      'hex-escape.tsx': "<p>IICRC {'\\x61ccredited'}</p>",
+      'unicode-escape.tsx': "<p>IICRC {'\\u0061ccredited'}</p>",
+      'jsx-literals.tsx': `<p>IICRC {'accre'}{"dited"}</p>`,
+      'template-literal.tsx': '<p>IICRC {`accre`}{`dited`}</p>',
+      'backspace-escape.tsx': "<p>IICRC {'accre\\bdited'}</p>",
+      'line-continuation.tsx': `<p>IICRC {'accre\\\ndited'}</p>`,
+      'markdown.md': `Courses ac**cred**ited by the IICRC.`,
+      'carsi-claim.tsx': `<p>CARSI is fully accre<em>dited</em>.</p>`,
+      'plain.ts': `const s = 'IICRC ${w}';`,
+      'plain-upper.txt': `IICRC ${W}`,
+    };
+    const dir = mkdtempSync(join(tmpdir(), 'provider-wording-'));
+    try {
+      for (const [name, src] of Object.entries(plants)) writeFileSync(join(dir, name), src);
+      writeFileSync(join(dir, 'clean.tsx'), `<p>${IICRC_APPROVED_CEC_PROVIDER}</p>`);
+      const flagged = offendersIn(dir, [...Object.keys(plants), 'clean.tsx']).map(
+        (o) => o.split(':')[0]
+      );
+      expect(flagged.sort()).toEqual(Object.keys(plants).sort());
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
     }
-    expect(offenders).toEqual([]);
+  });
+
+  it('the pre-check lets ordinary source through without building the views', () => {
+    expect(couldBeFlagged(`export const x = <p className="a">IICRC {'CEC'} hours</p>;`)).toBe(
+      false
+    );
+    expect(couldBeFlagged(`Nationally recognised; see the IICRC.`)).toBe(false);
+    // A clean file that merely holds the word still goes to the full scan.
+    expect(couldBeFlagged(`not ${'accre' + 'dited'} by anyone`)).toBe(true);
   });
 
   it('every PENDING entry still needs to be there (the list only shrinks)', () => {
@@ -408,9 +449,7 @@ describe('tracked source carries no retired provider wording', () => {
       const scope = entry.endsWith('/')
         ? files.filter((f) => f.startsWith(entry))
         : files.filter((f) => f === entry);
-      const dirty = scope.some(
-        (f) => sourceHits(readFileSync(join(ROOT, f), 'utf8'), f).length > 0
-      );
+      const dirty = scope.some((f) => (fileHits(ROOT, f)?.length ?? 0) > 0);
       if (!dirty) stale.push(`${entry} (${owner})`);
     }
     expect(stale).toEqual([]);
@@ -419,9 +458,7 @@ describe('tracked source carries no retired provider wording', () => {
   it('every allow-listed exact path still exists and still needs the entry', () => {
     const missing = [...HISTORICAL, ...DETECTORS]
       .filter((k) => !k.endsWith('/'))
-      .filter(
-        (k) => !files.includes(k) || sourceHits(readFileSync(join(ROOT, k), 'utf8'), k).length === 0
-      );
+      .filter((k) => !files.includes(k) || (fileHits(ROOT, k)?.length ?? 0) === 0);
     expect(missing).toEqual([]);
   });
 
@@ -486,7 +523,7 @@ describe('tracked source carries no retired provider wording', () => {
         !/\.test\.tsx?$/.test(f) &&
         !f.startsWith('src/lib/iicrc/approved-wording') &&
         !f.startsWith('src/lib/iicrc/approved-provider-wording') &&
-        readFileSync(join(ROOT, f), 'utf8')
+        (readText(join(ROOT, f)) ?? '')
           .split('\n')
           .some((line) => !/^\s*(?:\/\/|\*|\/\*)/.test(line) && QUOTED_PHRASE.test(line))
     );

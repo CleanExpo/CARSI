@@ -239,7 +239,7 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
     coachingPageUrl,
     taxInvoice: tryBuildTaxInvoice({
       item: `${carsiCoachingProductName} (monthly)`,
-      totalCents: session.amount_total,
+      checkout: session,
       issuedAt: new Date(),
     }),
   });

@@ -1,6 +1,11 @@
 import { Prisma } from '@/generated/prisma/client';
 
 import { prisma } from '@/lib/prisma';
+import {
+  SQL_XP_COURSE_SOURCE,
+  SQL_XP_ELIGIBLE,
+  SQL_XP_LESSON_SOURCE,
+} from '@/lib/server/xp-eligibility';
 
 /** XP aligned with internal CARSI gamification design (lesson / course completion). */
 export const XP_LESSON_COMPLETE = 10;
@@ -85,76 +90,49 @@ async function queryMonthBoundsSydney(): Promise<MonthBounds | null> {
 
 type IdXpRow = { student_id: string; xp: bigint | number };
 
+function addXpRows(map: Map<string, number>, rows: IdXpRow[]): Map<string, number> {
+  for (const r of rows) {
+    const n = typeof r.xp === 'bigint' ? Number(r.xp) : r.xp;
+    map.set(r.student_id, (map.get(r.student_id) ?? 0) + n);
+  }
+  return map;
+}
+
+/**
+ * WHERE conditions shared by the lesson and course XP queries: the eligibility rule always, then
+ * the optional period (on `dateColumn`) and course filter. One query per kind, so no branch can
+ * leave the rule out.
+ */
+function xpConditions(
+  dateColumn: Prisma.Sql,
+  start: Date | null,
+  end: Date | null,
+  courseSlugs: readonly string[] | null
+): Prisma.Sql {
+  const parts: Prisma.Sql[] = [SQL_XP_ELIGIBLE];
+  if (start != null && end != null) {
+    parts.push(Prisma.sql`${dateColumn} >= ${start} AND ${dateColumn} < ${end}`);
+  }
+  if (courseSlugs) parts.push(Prisma.sql`c.slug IN (${Prisma.join(courseSlugs)})`);
+  return Prisma.join(parts, ' AND ');
+}
+
 export async function lessonXpGrouped(
   start: Date | null,
   end: Date | null,
   courseSlugs: readonly string[] | null
 ): Promise<Map<string, number>> {
-  const hasPeriod = start != null && end != null;
   const map = new Map<string, number>();
   if (courseSlugs && courseSlugs.length === 0) return map;
 
-  const addRows = (rows: IdXpRow[]) => {
-    for (const r of rows) {
-      const id = r.student_id;
-      const n = typeof r.xp === 'bigint' ? Number(r.xp) : r.xp;
-      map.set(id, (map.get(id) ?? 0) + n);
-    }
-  };
-
-  if (hasPeriod && courseSlugs) {
-    const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT lp.student_id::text AS student_id, ${SQL_LESSON_XP_TOTAL} AS xp
-      FROM lms_lesson_progress lp
-      INNER JOIN lms_lessons l ON l.id = lp.lesson_id
-      INNER JOIN lms_modules m ON m.id = l.module_id
-      INNER JOIN lms_courses c ON c.id = m.course_id
-      WHERE lp.completed = true
-        AND lp.completed_at >= ${start}
-        AND lp.completed_at < ${end}
-        AND c.slug IN (${Prisma.join(courseSlugs)})
-      GROUP BY lp.student_id
-    `;
-    addRows(rows);
-  } else if (hasPeriod) {
-    const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT lp.student_id::text AS student_id, ${SQL_LESSON_XP_TOTAL} AS xp
-      FROM lms_lesson_progress lp
-      INNER JOIN lms_lessons l ON l.id = lp.lesson_id
-      INNER JOIN lms_modules m ON m.id = l.module_id
-      INNER JOIN lms_courses c ON c.id = m.course_id
-      WHERE lp.completed = true
-        AND lp.completed_at >= ${start}
-        AND lp.completed_at < ${end}
-      GROUP BY lp.student_id
-    `;
-    addRows(rows);
-  } else if (courseSlugs) {
-    const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT lp.student_id::text AS student_id, ${SQL_LESSON_XP_TOTAL} AS xp
-      FROM lms_lesson_progress lp
-      INNER JOIN lms_lessons l ON l.id = lp.lesson_id
-      INNER JOIN lms_modules m ON m.id = l.module_id
-      INNER JOIN lms_courses c ON c.id = m.course_id
-      WHERE lp.completed = true
-        AND c.slug IN (${Prisma.join(courseSlugs)})
-      GROUP BY lp.student_id
-    `;
-    addRows(rows);
-  } else {
-    const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT lp.student_id::text AS student_id, ${SQL_LESSON_XP_TOTAL} AS xp
-      FROM lms_lesson_progress lp
-      INNER JOIN lms_lessons l ON l.id = lp.lesson_id
-      INNER JOIN lms_modules m ON m.id = l.module_id
-      INNER JOIN lms_courses c ON c.id = m.course_id
-      WHERE lp.completed = true
-      GROUP BY lp.student_id
-    `;
-    addRows(rows);
-  }
-
-  return map;
+  const rows = await prisma.$queryRaw<IdXpRow[]>`
+    SELECT lp.student_id::text AS student_id, ${SQL_LESSON_XP_TOTAL} AS xp
+    FROM ${SQL_XP_LESSON_SOURCE}
+    WHERE lp.completed = true
+      AND ${xpConditions(Prisma.raw('lp.completed_at'), start, end, courseSlugs)}
+    GROUP BY lp.student_id
+  `;
+  return addXpRows(map, rows);
 }
 
 export async function courseXpGrouped(
@@ -162,63 +140,17 @@ export async function courseXpGrouped(
   end: Date | null,
   courseSlugs: readonly string[] | null
 ): Promise<Map<string, number>> {
-  const hasPeriod = start != null && end != null;
   const map = new Map<string, number>();
   if (courseSlugs && courseSlugs.length === 0) return map;
 
-  const addRows = (rows: IdXpRow[]) => {
-    for (const r of rows) {
-      const id = r.student_id;
-      const n = typeof r.xp === 'bigint' ? Number(r.xp) : r.xp;
-      map.set(id, (map.get(id) ?? 0) + n);
-    }
-  };
-
-  if (hasPeriod && courseSlugs) {
-    const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT e.student_id::text AS student_id, ${SQL_COURSE_XP_TOTAL} AS xp
-      FROM lms_enrollments e
-      INNER JOIN lms_courses c ON c.id = e.course_id
-      WHERE e.completed_at IS NOT NULL
-        AND e.completed_at >= ${start}
-        AND e.completed_at < ${end}
-        AND c.slug IN (${Prisma.join(courseSlugs)})
-      GROUP BY e.student_id
-    `;
-    addRows(rows);
-  } else if (hasPeriod) {
-    const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT e.student_id::text AS student_id, ${SQL_COURSE_XP_TOTAL} AS xp
-      FROM lms_enrollments e
-      INNER JOIN lms_courses c ON c.id = e.course_id
-      WHERE e.completed_at IS NOT NULL
-        AND e.completed_at >= ${start}
-        AND e.completed_at < ${end}
-      GROUP BY e.student_id
-    `;
-    addRows(rows);
-  } else if (courseSlugs) {
-    const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT e.student_id::text AS student_id, ${SQL_COURSE_XP_TOTAL} AS xp
-      FROM lms_enrollments e
-      INNER JOIN lms_courses c ON c.id = e.course_id
-      WHERE e.completed_at IS NOT NULL
-        AND c.slug IN (${Prisma.join(courseSlugs)})
-      GROUP BY e.student_id
-    `;
-    addRows(rows);
-  } else {
-    const rows = await prisma.$queryRaw<IdXpRow[]>`
-      SELECT e.student_id::text AS student_id, ${SQL_COURSE_XP_TOTAL} AS xp
-      FROM lms_enrollments e
-      INNER JOIN lms_courses c ON c.id = e.course_id
-      WHERE e.completed_at IS NOT NULL
-      GROUP BY e.student_id
-    `;
-    addRows(rows);
-  }
-
-  return map;
+  const rows = await prisma.$queryRaw<IdXpRow[]>`
+    SELECT e.student_id::text AS student_id, ${SQL_COURSE_XP_TOTAL} AS xp
+    FROM ${SQL_XP_COURSE_SOURCE}
+    WHERE e.completed_at IS NOT NULL
+      AND ${xpConditions(Prisma.raw('e.completed_at'), start, end, courseSlugs)}
+    GROUP BY e.student_id
+  `;
+  return addXpRows(map, rows);
 }
 
 export function mergeXpMaps(a: Map<string, number>, b: Map<string, number>): Map<string, number> {
