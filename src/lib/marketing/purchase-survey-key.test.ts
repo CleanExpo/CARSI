@@ -3,8 +3,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   PURCHASE_SURVEY_KEY_STORAGE_NAME,
   PURCHASE_SURVEY_KEY_LIMIT,
+  PURCHASE_SURVEY_PENDING_STORAGE_NAME,
+  PURCHASE_SURVEY_REPEAT_WINDOW_MS,
   newPurchaseSurveyKey,
   purchaseSurveyCheckoutField,
+  purchaseSurveyCheckoutFieldFor,
   readPurchaseSurveyKeys,
   rememberPurchaseSurveyKey,
 } from './purchase-survey-key';
@@ -188,5 +191,62 @@ describe('purchaseSurveyCheckoutField(): the wrapper every checkout body spreads
     };
     vi.stubGlobal('window', { sessionStorage: throwing });
     expect(purchaseSurveyCheckoutField()).toEqual({});
+  });
+});
+
+describe('purchaseSurveyCheckoutFieldFor(): a repeat of one purchase sends one key (GP-783)', () => {
+  const T0 = Date.UTC(2026, 10, 23, 8, 0, 0);
+
+  it('the same purchase again inside the window sends the same key, so the server reuses its session', () => {
+    const tab = memoryStorage();
+    const first = purchaseSurveyCheckoutFieldFor('water:self:1', tab, T0).survey_key;
+    const again = purchaseSurveyCheckoutFieldFor(
+      'water:self:1',
+      tab,
+      T0 + 9 * 60 * 1000
+    ).survey_key;
+    expect(first).toMatch(/^[0-9a-f]{32}$/);
+    expect(again).toBe(first);
+  });
+
+  it('a different purchase, or the same one after the window, gets a fresh key', () => {
+    const tab = memoryStorage();
+    const water = purchaseSurveyCheckoutFieldFor('water:self:1', tab, T0).survey_key;
+    const mould = purchaseSurveyCheckoutFieldFor('mould:self:1', tab, T0 + 1000).survey_key;
+    const teamOf3 = purchaseSurveyCheckoutFieldFor('mould:team:3', tab, T0 + 2000).survey_key;
+    const teamOf4 = purchaseSurveyCheckoutFieldFor('mould:team:4', tab, T0 + 3000).survey_key;
+    expect(new Set([water, mould, teamOf3, teamOf4]).size).toBe(4);
+    const later = purchaseSurveyCheckoutFieldFor(
+      'mould:team:4',
+      tab,
+      T0 + 3000 + PURCHASE_SURVEY_REPEAT_WINDOW_MS
+    ).survey_key;
+    expect(later).not.toBe(teamOf4);
+  });
+
+  it('a pending key never joins the five-key list until checkout returns a checkout_url (GP-694)', () => {
+    const tab = memoryStorage();
+    const paid = paidCheckout(tab);
+    for (let i = 0; i < PURCHASE_SURVEY_KEY_LIMIT; i++)
+      purchaseSurveyCheckoutFieldFor(`course-${i}:self:1`, tab, T0 + i);
+    expect(readPurchaseSurveyKeys(tab)).toEqual([paid]);
+  });
+
+  it('a malformed pending entry, a clock that went back, or no storage: a fresh key or none, never a throw', () => {
+    const tab = memoryStorage();
+    tab.setItem(PURCHASE_SURVEY_PENDING_STORAGE_NAME, '{not json');
+    const k = purchaseSurveyCheckoutFieldFor('water:self:1', tab, T0).survey_key;
+    expect(k).toMatch(/^[0-9a-f]{32}$/);
+    // The malformed entry was replaced, so the repeat reuses the new key.
+    expect(purchaseSurveyCheckoutFieldFor('water:self:1', tab, T0 + 1).survey_key).toBe(k);
+    expect(purchaseSurveyCheckoutFieldFor('water:self:1', tab, T0 - 1).survey_key).not.toBe(k);
+    tab.setItem(
+      PURCHASE_SURVEY_PENDING_STORAGE_NAME,
+      JSON.stringify({ p: 'water:self:1', k: 'NOT-A-KEY', t: T0 })
+    );
+    expect(purchaseSurveyCheckoutFieldFor('water:self:1', tab, T0).survey_key).toMatch(
+      /^[0-9a-f]{32}$/
+    );
+    expect(purchaseSurveyCheckoutFieldFor('water:self:1', null, T0)).toEqual({});
   });
 });
