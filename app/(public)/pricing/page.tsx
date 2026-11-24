@@ -8,6 +8,7 @@ import {
   PER_COURSE_PRICE_FALLBACK_LABEL,
   perCoursePriceLabel,
 } from '@/lib/lms/pricing-tiers';
+import { FREE_OFFER } from '@/lib/pricing/free-offer';
 import { pricingFaqs } from '@/lib/seo/answer-engine';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 import { getPublicCatalogueFacts } from '@/lib/server/public-catalogue-facts';
@@ -28,10 +29,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Pricing — Restoration Training Online',
     description: teamsLive
-      ? 'Buy any CARSI course individually or choose yearly membership and Teams plans. Free Library available to everyone, no card required.'
+      ? 'Buy any CARSI course individually or choose yearly membership and Teams plans. Free courses and free resources, no card required.'
       : live
-        ? 'Buy any CARSI course individually or choose yearly membership. Free Library available to everyone, no card required. Team seats are sold per course.'
-        : 'Buy any CARSI course individually — with IICRC CEC tracking and verified certificates. Free Library available to everyone, no card required. Team seats are sold per course. Yearly membership is coming soon.',
+        ? 'Buy any CARSI course individually or choose yearly membership. Free courses and free resources, no card required. Team seats are sold per course.'
+        : 'Buy any CARSI course individually — with IICRC CEC tracking and verified certificates. Free courses and free resources, no card required. Team seats are sold per course. Yearly membership is coming soon.',
     keywords: [
       'CARSI pricing',
       'restoration training membership',
@@ -45,10 +46,10 @@ export async function generateMetadata(): Promise<Metadata> {
       images: OG_IMAGES,
       title: 'Pricing | CARSI — Restoration Training Online',
       description: teamsLive
-        ? 'Free Library, per-course enrolment, yearly membership, and Teams seat plans.'
+        ? 'Free courses and resources, per-course enrolment, yearly membership, and Teams seat plans.'
         : live
-          ? 'Free Library, per-course enrolment and yearly membership. Team seats are sold per course.'
-          : 'Free Library for everyone and per-course enrolment, available today. Team seats are sold per course. Yearly membership is coming soon.',
+          ? 'Free courses and resources, per-course enrolment and yearly membership. Team seats are sold per course.'
+          : 'Free courses and resources, and per-course enrolment, available today. Team seats are sold per course. Yearly membership is coming soon.',
       type: 'website',
       url: 'https://carsi.com.au/pricing',
     },
@@ -59,19 +60,6 @@ export async function generateMetadata(): Promise<Metadata> {
 const breadcrumbs = [
   { name: 'Home', url: 'https://carsi.com.au' },
   { name: 'Pricing', url: 'https://carsi.com.au/pricing' },
-];
-
-const FREE_FEATURES = [
-  'Australian Government Resources',
-  'Standard Operating Procedures',
-  'Cleaning Essentials guide',
-  'Job Safety & Environmental Analysis',
-  'Safe Work Method Statement',
-  'Free Webinar Series',
-  'Industry Terminology guide',
-  'Technician Flow Chart',
-  'Moisture & Dehumidification guide',
-  'ChatGPT Cheat Sheet for Restorers',
 ];
 
 export default async function PricingPage() {
@@ -111,7 +99,7 @@ export default async function PricingPage() {
                 ? 'Buy any course individually, unlock 100% access with yearly membership, or choose Teams seat plans for your crew.'
                 : live
                   ? 'Buy any course individually or unlock 100% access with yearly membership. Team seats are sold per course.'
-                  : 'Buy any course individually. Free Library for everyone — no card required. Team seats are sold per course. Yearly membership is coming soon.'}
+                  : 'Buy any course individually. Free courses and resources — no card required. Team seats are sold per course. Yearly membership is coming soon.'}
             </p>
             <p className="mx-auto mt-4 max-w-2xl rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-4 py-3 text-sm leading-relaxed text-[#7a3500]">
               CARSI courses carry CARSI Southern Hemisphere Restoration Designations. CARSI does not
@@ -182,17 +170,27 @@ export default async function PricingPage() {
             perCoursePriceLabel={perCourseLabel}
           />
 
-          <section aria-label="Free Library" className="mb-16">
+          <section aria-label={FREE_OFFER.title} className="mb-16">
             <div className="mx-auto max-w-md">
               <MembershipCard
-                title="Free Library"
+                title={FREE_OFFER.title}
                 price="FREE"
-                priceSuffix="No card required"
-                features={FREE_FEATURES}
-                cta="Create Free Account"
-                href="/register"
+                priceSuffix={FREE_OFFER.priceSuffix}
+                features={[...FREE_OFFER.features]}
+                cta={FREE_OFFER.cta}
+                href={FREE_OFFER.href}
                 tone="neutral"
               />
+              <p className="mt-3 text-center text-sm text-slate-600">
+                Or open the{' '}
+                <Link
+                  href={FREE_OFFER.resourcesHref}
+                  className="font-medium text-[#146fc2] underline underline-offset-2"
+                >
+                  Free Resources page
+                </Link>
+                , with no account needed.
+              </p>
             </div>
           </section>
 
