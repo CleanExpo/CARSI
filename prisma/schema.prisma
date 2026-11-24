@@ -956,6 +956,32 @@ model ReferralPartnerTerms {
   @@map("referral_partner_terms")
 }
 
+/// GP-764: what one paid course checkout actually cost, written once when the Stripe Checkout
+/// Session is fulfilled (webhook, confirm, guest-complete or activate-purchase), inside the seat
+/// step (seat-state.ts), from the session's own `amount_total` and `currency`. One row per
+/// session: a team purchase pays for all its seats in one session, so the amount belongs to the
+/// purchase, never to each seat. Null amount or currency means Stripe did not report it
+/// (unknown), never 0. A replayed fulfilment changes nothing. Refunds and disputes are read from
+/// the reversal marker, not stored here. Admin revenue sums these rows by `paidAt`. No foreign
+/// keys: a deleted learner or course must not delete what was paid.
+model LmsCheckoutPayment {
+  checkoutSessionId String   @id @map("checkout_session_id") @db.VarChar(255)
+  studentId         String   @map("student_id") @db.Uuid
+  courseId          String   @map("course_id") @db.Uuid
+  purchaseMode      String   @map("purchase_mode") @db.VarChar(8)
+  seatCount         Int      @map("seat_count")
+  amountTotalCents  Int?     @map("amount_total_cents")
+  currency          String?  @db.VarChar(3)
+  /// When the Checkout Session was created (Stripe `created`; it can be paid only within 24 hours
+  /// of that), so a session fulfilled late (a revisited success page) is dated by its purchase,
+  /// not by the fulfilment. The fulfilment time when Stripe did not report it.
+  paidAt            DateTime @map("paid_at") @db.Timestamptz(6)
+  recordedAt        DateTime @default(now()) @map("recorded_at") @db.Timestamptz(6)
+
+  @@index([paidAt], map: "ix_lms_checkout_payments_paid_at")
+  @@map("lms_checkout_payments")
+}
+
 /// GP-767: one row per paid course checkout that came through a referral partner link
 /// (`?ref=<partner>`). Keyed by the Stripe Checkout Session id, the same key the reversal ledger
 /// uses, so the settlement report reads refunds from `event_attribution_reversals`. The terms in

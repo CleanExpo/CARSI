@@ -208,7 +208,18 @@ vi.mock('@/lib/prisma', () => {
     };
   }
 
-  const NAMES = ['lmsTeam', 'lmsTeamMember', 'lmsTeamInvite', 'lmsTeamCoursePurchase', 'lmsTeamSubscription', 'lmsEnrollment', 'lmsCourse', 'lmsUser', 'stripeWebhookEvent'];
+  const NAMES = [
+    'lmsTeam',
+    'lmsTeamMember',
+    'lmsTeamInvite',
+    'lmsTeamCoursePurchase',
+    'lmsTeamSubscription',
+    'lmsEnrollment',
+    'lmsCourse',
+    'lmsUser',
+    'stripeWebhookEvent',
+    'lmsCheckoutPayment',
+  ];
   function client(inTx: boolean): Row {
     const c: Row = Object.fromEntries(NAMES.map((n) => [n, model(n, inTx)]));
     c.$executeRaw = async () => 0;
@@ -286,6 +297,11 @@ function fulfil(sessionId: string) {
     paymentReference: sessionId,
     purchaseMode: 'team',
     teamSeatCount: 3,
+    amountPaid: {
+      amountTotalCents: 89700,
+      currency: 'aud',
+      sessionCreatedAt: new Date(Date.UTC(2026, 10, 23)),
+    },
   });
 }
 
@@ -325,6 +341,7 @@ beforeEach(() => {
       { id: 'e-owner', studentId: 'owner', courseId: OTHER_TEAM_COURSE.id, status: 'active', paymentReference: 'cs_test_block', enrolledAt: new Date(Date.UTC(2026, 10, 1)), revokedReason: null, statusEventAt: null },
     ],
     stripeWebhookEvent: [],
+    lmsCheckoutPayment: [],
   };
 });
 

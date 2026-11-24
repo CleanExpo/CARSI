@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 
 import { loadAdminCatalogSource } from '@/lib/admin/admin-catalog-source';
+import { loadCheckoutPaymentsForRevenue } from '@/lib/admin/admin-checkout-payments';
 import {
   enrollmentIsStripePaid,
   summariseOpsMonthly,
@@ -259,6 +260,9 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
     paymentReference: e.paymentReference,
   }));
   const createdAts = users.map((u) => u.createdAt);
+  // GP-764: what each paid checkout actually cost, where it is recorded.
+  // Read whole, not scoped to the listed learners: revenue is a business total.
+  const payments = await loadCheckoutPaymentsForRevenue();
 
   // GP-763: ranked and plotted by Stripe-paid enrolments, never valued at today's price.
   const topByPaidEnrollments = topCoursesByPaidEnrollments(enrollments);
@@ -320,11 +324,11 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
     },
     ops: {
       revenueNote:
-        'Paid enrolments are Stripe Checkout purchases that were not refunded or revoked. Price at purchase unknown: the database keeps no amount paid per enrolment, so no dollar figure is shown. Free, admin, team-seat, membership and discount enrolments are not counted. Not a Stripe payout ledger.',
-      allTime: summariseOpsPeriod(saleRows, createdAts, 'all', now),
-      thisMonth: summariseOpsPeriod(saleRows, createdAts, 'this_month', now),
-      lastMonth: summariseOpsPeriod(saleRows, createdAts, 'last_month', now),
-      thisYear: summariseOpsPeriod(saleRows, createdAts, 'this_year', now),
+        "Paid enrolments are Stripe Checkout purchases that were not refunded or revoked. Revenue is the amount Stripe charged for each checkout (all seats of a team purchase, in AUD, before Stripe fees), recorded when the purchase was fulfilled; a full refund or an open dispute removes it, a partial refund does not. Checkouts paid before amounts were recorded show as price at purchase unknown and are never valued at today's price. Free, admin, team-seat, membership and discount enrolments are not counted. Not a Stripe payout ledger.",
+      allTime: summariseOpsPeriod(saleRows, createdAts, 'all', now, payments),
+      thisMonth: summariseOpsPeriod(saleRows, createdAts, 'this_month', now, payments),
+      lastMonth: summariseOpsPeriod(saleRows, createdAts, 'last_month', now, payments),
+      thisYear: summariseOpsPeriod(saleRows, createdAts, 'this_year', now, payments),
       monthly,
       topByPaidEnrollments,
       attention: {
