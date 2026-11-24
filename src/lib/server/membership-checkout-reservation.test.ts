@@ -13,6 +13,7 @@ import {
   reserveOrgCheckout,
   reserveTeamCheckout,
 } from './membership-checkout-reservation';
+import { PAST_DUE_GRACE_DAYS } from './entitlements';
 
 const mocks = vi.hoisted(() => ({
   create: vi.fn(),
@@ -249,6 +250,10 @@ describe('a payer whose subscription lapsed can buy again', () => {
     // Both forms: unknown period end (unprovable, so lapsed) and beyond grace.
     expect(pastDue).toHaveLength(2);
     expect(pastDue.some((b) => b.currentPeriodEnd === null)).toBe(true);
+    // The dated form, exactly: a past-due row whose period ended inside the grace window is
+    // still entitled, so offering it would open a second checkout for a paying member.
+    const graceCutoff = new Date(NOW.getTime() - PAST_DUE_GRACE_DAYS * 24 * 60 * 60 * 1000);
+    expect(pastDue).toContainEqual({ status: 'past_due', currentPeriodEnd: { lt: graceCutoff } });
   });
 
   it('never offers a live status as claimable', async () => {

@@ -553,6 +553,40 @@ describe('GP-641: a blocked row gives no access, on every entitlement reader', (
   });
 });
 
+describe('Finding 1 end-to-end: a refund or chargeback writes the row unpaid and access is denied', () => {
+  const FUTURE = new Date((T0 + 365 * 86_400) * 1000);
+  const NOW = new Date((T0 + 1_000) * 1000);
+  const decideFor = (kind: Kind) =>
+    kind === 'coaching' ? decideCoachingPortalEntitlement : decideMembershipEntitlement;
+  const REVERSALS = { refund: (at: number) => refund(at), chargeback: (at: number) => dispute(at) };
+  const CASES = ALL_KINDS.flatMap((kind) =>
+    (Object.keys(REVERSALS) as Array<keyof typeof REVERSALS>).map((reversal) => [kind, reversal] as const),
+  );
+
+  it.each(CASES)('%s: a %s through the webhook leaves an unpaid row that is not entitled', async (kind, reversal) => {
+    db.tables[KINDS[kind].table].push({ ...KINDS[kind].reservation, stripeSubscriptionId: null });
+    expect(await created(kind, 50)).toBe(200);
+    // Control: the same row gives access before the reversal, so a denial below is the
+    // reversal's doing, not a row that never had access.
+    const before = rowFor(kind)!;
+    expect(before.status).toBe('active');
+    expect(
+      decideFor(kind)({ status: before.status as string, currentPeriodEnd: before.currentPeriodEnd as Date }, NOW).entitled,
+    ).toBe(true);
+
+    expect(await REVERSALS[reversal](200)).toBe(200);
+
+    // The status the decision reads is the one the reversal step wrote, with the period still
+    // paid through: only the status can be what removes access.
+    const after = rowFor(kind)!;
+    expect(after.status).toBe('unpaid');
+    expect(after.currentPeriodEnd).toEqual(FUTURE);
+    expect(
+      decideFor(kind)({ status: after.status as string, currentPeriodEnd: after.currentPeriodEnd as Date }, NOW).entitled,
+    ).toBe(false);
+  });
+});
+
 describe('GP-641: a reversed subscription with no owner yet is owed nothing', () => {
   it('team: a chargeback landing between the hold check and its record leaves nothing open', async () => {
     db.beforeNextTx = () => dispute(200);
