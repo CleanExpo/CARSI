@@ -13,13 +13,41 @@ import type Stripe from 'stripe';
  *  - an email failure throws (route → 5xx → Stripe retries) and records nothing
  */
 
+type NotificationRow = {
+  id: string;
+  userId: string;
+  dedupeKey: string;
+  type: string;
+  createdAt: Date;
+};
+type NotificationWhere = {
+  dedupeKey: string;
+  type?: string | { in: string[] };
+  createdAt?: Date | { lt: Date };
+};
+
 const h = vi.hoisted(() => {
-  const notifications = new Map<string, { id: string; userId: string; dedupeKey: string }>();
+  const notifications = new Map<string, NotificationRow>();
+  /** True when a row satisfies a Prisma-style `where` (dedupeKey, type, createdAt equals / lt). */
+  const matches = (row: NotificationRow, where: NotificationWhere): boolean => {
+    if (row.dedupeKey !== where.dedupeKey) return false;
+    const t = where.type;
+    if (typeof t === 'string' && row.type !== t) return false;
+    if (t && typeof t === 'object' && !t.in.includes(row.type)) return false;
+    const at = where.createdAt;
+    if (at instanceof Date) return row.createdAt.getTime() === at.getTime();
+    if (at && 'lt' in at) return row.createdAt.getTime() < at.lt.getTime();
+    return true;
+  };
   const race = {
     /** When set, the NEXT dedupe lookup reads the store, then waits on this gate. */
     gate: null as Promise<void> | null,
     /** Resolves once the gated call has read the store and is parked. */
     parked: null as (() => void) | null,
+    /** When set, the NEXT takeover (updateMany with a createdAt cutoff) parks BEFORE it
+     *  evaluates its condition, so another delivery can run in between (GP-595). */
+    takeoverGate: null as Promise<void> | null,
+    takeoverParked: null as (() => void) | null,
   };
   return {
     notifications,
@@ -30,12 +58,15 @@ const h = vi.hoisted(() => {
       reason?: string;
     }),
     subscriptionsRetrieve: vi.fn(),
+    captureServerError: vi.fn(async (..._a: unknown[]) => {}),
     resolveUserId: vi.fn(async () => 'user-ind-1' as string | null),
     resolveTeamId: vi.fn(async () => 'team-1' as string | null),
     prisma: {
       lmsNotification: {
         findUnique: vi.fn(async ({ where }: { where: { dedupeKey: string } }) => {
-          const row = notifications.get(where.dedupeKey) ?? null;
+          // A snapshot, as a database read returns: later writes do not change it.
+          const stored = notifications.get(where.dedupeKey);
+          const row = stored ? { ...stored } : null;
           if (race.gate) {
             const gate = race.gate;
             race.gate = null;
@@ -45,15 +76,50 @@ const h = vi.hoisted(() => {
           return row;
         }),
         create: vi.fn(
-          async ({ data }: { data: { userId: string; dedupeKey: string } }) => {
+          async ({
+            data,
+          }: {
+            data: { userId: string; dedupeKey: string; type: string; createdAt?: Date };
+          }) => {
             if (notifications.has(data.dedupeKey)) {
               throw Object.assign(new Error('unique'), { code: 'P2002' });
             }
-            const row = { id: `n-${notifications.size + 1}`, ...data };
+            const row = {
+              id: `n-${notifications.size + 1}`,
+              ...data,
+              createdAt: data.createdAt ?? new Date(),
+            };
             notifications.set(data.dedupeKey, row);
             return { id: row.id };
-          },
+          }
         ),
+        updateMany: vi.fn(
+          async ({
+            where,
+            data,
+          }: {
+            where: NotificationWhere;
+            data: Partial<Omit<NotificationRow, 'id' | 'dedupeKey'>>;
+          }) => {
+            const cutoff = where.createdAt;
+            if (race.takeoverGate && cutoff && !(cutoff instanceof Date) && 'lt' in cutoff) {
+              const gate = race.takeoverGate;
+              race.takeoverGate = null;
+              race.takeoverParked?.();
+              await gate;
+            }
+            const row = notifications.get(where.dedupeKey);
+            if (!row || !matches(row, where)) return { count: 0 };
+            Object.assign(row, data);
+            return { count: 1 };
+          }
+        ),
+        deleteMany: vi.fn(async ({ where }: { where: NotificationWhere }) => {
+          const row = notifications.get(where.dedupeKey);
+          if (!row || !matches(row, where)) return { count: 0 };
+          notifications.delete(where.dedupeKey);
+          return { count: 1 };
+        }),
         delete: vi.fn(async ({ where }: { where: { dedupeKey: string } }) => {
           const row = notifications.get(where.dedupeKey);
           if (!row) throw Object.assign(new Error('not found'), { code: 'P2025' });
@@ -80,6 +146,10 @@ const h = vi.hoisted(() => {
 });
 
 vi.mock('@/lib/prisma', () => ({ prisma: h.prisma }));
+vi.mock('@/lib/server/sentry', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/server/sentry')>()),
+  captureServerError: (...a: unknown[]) => h.captureServerError(...a),
+}));
 vi.mock('@/lib/server/email', () => ({
   sendEmail: (p: unknown) => h.sendEmail(p),
   isEmailConfigured: () => true,
@@ -114,6 +184,9 @@ vi.mock('./subscription-analytics', () => ({
 }));
 
 import { handleSubscriptionEvent, isSubscriptionEvent } from './subscription-webhook';
+
+/** The fixture's own updateMany, restored after tests that wrap it. */
+const realUpdateImpl = h.prisma.lmsNotification.updateMany.getMockImplementation()!;
 
 // 2026-10-17T00:00:00Z — 17 October 2026 in Australia/Sydney (AEDT, +11).
 const RENEWAL_AT = 1_792_195_200;
@@ -198,8 +271,9 @@ describe('invoice.upcoming renewal reminder', () => {
       type: string;
     };
     expect(created.userId).toBe('user-ind-1');
-    expect(created.type).toBe('renewal_reminder');
     expect(created.dedupeKey).toBe('renewal_reminder:sub_ind_1:2026-10-17');
+    // Once the email is out, the stored record reads as a sent reminder.
+    expect(h.notifications.get(created.dedupeKey)?.type).toBe('renewal_reminder');
   });
 
   it('team plan: emails the billing contact about the team plan and records it for the owner', async () => {
@@ -252,6 +326,7 @@ describe('invoice.upcoming renewal reminder', () => {
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
     h.sendEmail.mockResolvedValueOnce({ sent: false, reason: 'send_failed' });
     h.prisma.lmsNotification.delete.mockRejectedValueOnce(new Error('db down'));
+    h.prisma.lmsNotification.deleteMany.mockRejectedValueOnce(new Error('db down'));
     await expect(handleSubscriptionEvent(upcomingEvent('sub_ind_1'))).rejects.toThrow(
       /renewal reminder/i,
     );
@@ -322,5 +397,325 @@ describe('invoice.upcoming renewal reminder', () => {
     await handleSubscriptionEvent(upcomingEvent('sub_ind_1', { parent: null }));
     expect(h.subscriptionsRetrieve).not.toHaveBeenCalled();
     expect(h.sendEmail).not.toHaveBeenCalled();
+  });
+});
+
+describe('GP-595: a claim left behind by a failed attempt never loses the reminder', () => {
+  const KEY = 'renewal_reminder:sub_ind_1:2026-10-17';
+  const MINUTE = 60_000;
+
+  /** A claim row as a killed attempt leaves it: saved, email never confirmed. */
+  function leftBehindClaim(ageMs: number) {
+    h.notifications.set(KEY, {
+      id: 'n-orphan',
+      userId: 'user-ind-1',
+      dedupeKey: KEY,
+      type: 'renewal_reminder_pending',
+      createdAt: new Date(Date.now() - ageMs),
+    });
+  }
+
+  it('process killed after claiming: the redelivery after the stale window sends the email once', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    leftBehindClaim(10 * MINUTE);
+
+    await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_retry_after_kill'));
+
+    expect(h.sendEmail).toHaveBeenCalledTimes(1);
+    expect(h.notifications.get(KEY)?.type).toBe('renewal_reminder');
+    // A later delivery for the same renewal sends nothing more.
+    await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_after_recovery'));
+    expect(h.sendEmail).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+  });
+
+  it('send failed and its record could not be removed: a redelivery never guesses, it throws and reports', async () => {
+    // Accepted limit, the same as main: the record is left as "sending", and a later
+    // delivery can not tell this case from "sent, but not marked sent", so it does not send.
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    h.sendEmail.mockResolvedValueOnce({ sent: false, reason: 'provider_error' });
+    h.prisma.lmsNotification.deleteMany.mockRejectedValueOnce(new Error('db down'));
+    await expect(handleSubscriptionEvent(upcomingEvent('sub_ind_1'))).rejects.toThrow(
+      /renewal reminder/i
+    );
+    expect(h.notifications.get(KEY)?.type).toBe('renewal_reminder_sending');
+
+    h.notifications.get(KEY)!.createdAt = new Date(Date.now() - 10 * MINUTE);
+    await expect(
+      handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_retry_after_stuck'))
+    ).rejects.toThrow(/renewal reminder/i);
+    expect(h.sendEmail).toHaveBeenCalledTimes(1); // only the failed try
+    expect(JSON.stringify(h.captureServerError.mock.calls)).toContain(
+      'renewal_reminder_send_unconfirmed'
+    );
+    err.mockRestore();
+  });
+
+  it('two redeliveries that both find the same stale claim send one email', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    leftBehindClaim(10 * MINUTE);
+    let release!: () => void;
+    h.race.takeoverGate = new Promise<void>((r) => (release = r));
+    const parked = new Promise<void>((r) => (h.race.takeoverParked = r));
+
+    // A reaches its takeover of the stale claim and is parked before the takeover's
+    // condition is checked; B takes the claim over, sends and confirms meanwhile. When A
+    // resumes, only the takeover condition (pending AND older than the window) stops it.
+    const a = handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_stale_a')).then(
+      () => 'done',
+      () => 'threw'
+    );
+    await parked;
+    await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_stale_b'));
+    release();
+    await a;
+
+    expect(h.sendEmail).toHaveBeenCalledTimes(1);
+    expect(h.notifications.get(KEY)?.type).toBe('renewal_reminder');
+    warn.mockRestore();
+    err.mockRestore();
+  });
+
+  it('a young claim (another delivery may still be sending) sends nothing and throws so Stripe retries', async () => {
+    leftBehindClaim(30_000);
+    await expect(
+      handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_while_in_flight'))
+    ).rejects.toThrow(/renewal reminder/i);
+    expect(h.sendEmail).not.toHaveBeenCalled();
+    // The other delivery's claim is left alone.
+    expect(h.notifications.get(KEY)?.id).toBe('n-orphan');
+  });
+
+  it('a claim write so slow that another delivery took it over: the slow attempt sends nothing, the taker sends once', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      const realCreate = h.prisma.lmsNotification.create.getMockImplementation()!;
+      let landed!: () => void;
+      let resume!: () => void;
+      const claimLanded = new Promise<void>((r) => (landed = r));
+      const gate = new Promise<void>((r) => (resume = r));
+      // A's claim is written, then A's database call stalls before returning.
+      h.prisma.lmsNotification.create.mockImplementationOnce(async (args) => {
+        const out = await realCreate(args);
+        landed();
+        await gate;
+        return out;
+      });
+      const a = handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_slow_a')).then(
+        () => 'done',
+        () => 'threw'
+      );
+      await claimLanded;
+      vi.setSystemTime(Date.now() + 6 * MINUTE);
+      await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_slow_b'));
+      resume();
+      expect(await a).toBe('threw');
+      expect(h.sendEmail).toHaveBeenCalledTimes(1);
+      expect(h.notifications.get(KEY)?.type).toBe('renewal_reminder');
+    } finally {
+      vi.useRealTimers();
+      err.mockRestore();
+      warn.mockRestore();
+    }
+  });
+
+  it('a sent reminder is never resent, however old its record is', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    leftBehindClaim(60 * MINUTE);
+    h.notifications.get(KEY)!.type = 'renewal_reminder';
+    await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_old_sent'));
+    expect(h.sendEmail).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('a failed send removes only its own claim, never a sent reminder', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    // While this attempt's email fails, another delivery's sent record replaces the claim.
+    h.sendEmail.mockImplementationOnce(async () => {
+      const row = h.notifications.get(KEY)!;
+      h.notifications.set(KEY, { ...row, id: 'n-other', type: 'renewal_reminder' });
+      return { sent: false, reason: 'provider_error' };
+    });
+    await expect(handleSubscriptionEvent(upcomingEvent('sub_ind_1'))).rejects.toThrow(
+      /renewal reminder/i
+    );
+    expect(h.notifications.get(KEY)?.id).toBe('n-other');
+    err.mockRestore();
+  });
+});
+
+describe('GP-595 design: a send that has started is never sent again', () => {
+  const KEY = 'renewal_reminder:sub_ind_1:2026-10-17';
+  const MINUTE = 60_000;
+  type UpdateArgs = { where: NotificationWhere; data: { type?: string } };
+  const isConfirm = (args: UpdateArgs) => args.data.type === 'renewal_reminder';
+  const isMarkSending = (args: UpdateArgs) => args.data.type === 'renewal_reminder_sending';
+
+  /** The type of the record at the moment the email provider is called. */
+  function recordTypeAtSend(): { value?: string } {
+    const seen: { value?: string } = {};
+    h.sendEmail.mockImplementationOnce(async () => {
+      seen.value = h.notifications.get(KEY)?.type;
+      return { sent: true, messageId: 'msg_1' };
+    });
+    return seen;
+  }
+
+  it('send ok, confirm ok: the record says "sending" before the email call and "sent" after; one email', async () => {
+    const seen = recordTypeAtSend();
+    await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_ok'));
+    expect(seen.value).toBe('renewal_reminder_sending');
+    expect(h.sendEmail).toHaveBeenCalledTimes(1);
+    expect(h.notifications.get(KEY)?.type).toBe('renewal_reminder');
+  });
+
+  it('send ok, confirm FAILS: a live delivery after the stale window sends nothing (reviewer probe 1)', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      const realUpdate = h.prisma.lmsNotification.updateMany.getMockImplementation()!;
+      h.prisma.lmsNotification.updateMany.mockImplementation(async (args) => {
+        if (isConfirm(args as UpdateArgs)) throw new Error('transient confirm failure');
+        return realUpdate(args);
+      });
+      await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_confirm_fail_a'));
+      expect(h.sendEmail).toHaveBeenCalledTimes(1);
+
+      vi.setSystemTime(Date.now() + 6 * MINUTE);
+      await expect(
+        handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_confirm_fail_b'))
+      ).rejects.toThrow(/renewal reminder/i);
+      expect(h.sendEmail).toHaveBeenCalledTimes(1);
+      expect(JSON.stringify(h.captureServerError.mock.calls)).toContain(
+        'confirm_renewal_reminder_claim'
+      );
+      expect(JSON.stringify(h.captureServerError.mock.calls)).toContain(
+        'renewal_reminder_send_unconfirmed'
+      );
+    } finally {
+      h.prisma.lmsNotification.updateMany.mockReset();
+      h.prisma.lmsNotification.updateMany.mockImplementation(realUpdateImpl);
+      vi.useRealTimers();
+      err.mockRestore();
+    }
+  });
+
+  it('send ok, confirm STALLS past the stale window: a second live delivery sends nothing (reviewer probe 2)', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    const realUpdate = h.prisma.lmsNotification.updateMany.getMockImplementation()!;
+    let release!: () => void;
+    let parked!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const atConfirm = new Promise<void>((r) => (parked = r));
+    let firstConfirm = true;
+    h.prisma.lmsNotification.updateMany.mockImplementation(async (args) => {
+      // Park only the FIRST confirmation (delivery A's), before its condition is checked.
+      if (firstConfirm && isConfirm(args as UpdateArgs)) {
+        firstConfirm = false;
+        parked();
+        await gate;
+      }
+      return realUpdate(args);
+    });
+    const a = handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_slow_confirm_a'));
+    try {
+      await atConfirm;
+      expect(h.sendEmail).toHaveBeenCalledTimes(1);
+      vi.setSystemTime(Date.now() + 6 * MINUTE);
+      await expect(
+        handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_slow_confirm_b'))
+      ).rejects.toThrow(/renewal reminder/i);
+      expect(h.sendEmail).toHaveBeenCalledTimes(1);
+    } finally {
+      release();
+      await a;
+      h.prisma.lmsNotification.updateMany.mockReset();
+      h.prisma.lmsNotification.updateMany.mockImplementation(realUpdateImpl);
+      vi.useRealTimers();
+    }
+    expect(h.notifications.get(KEY)?.type).toBe('renewal_reminder');
+  });
+
+  it('send FAILS: the record was "sending" during the call, is removed after, and the retry sends once', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const seen: { value?: string } = {};
+    h.sendEmail.mockImplementationOnce(async () => {
+      seen.value = h.notifications.get(KEY)?.type;
+      return { sent: false, reason: 'provider_error' };
+    });
+    await expect(handleSubscriptionEvent(upcomingEvent('sub_ind_1'))).rejects.toThrow(
+      /renewal reminder/i
+    );
+    expect(seen.value).toBe('renewal_reminder_sending');
+    expect(h.notifications.has(KEY)).toBe(false);
+    await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_retry'));
+    expect(h.sendEmail).toHaveBeenCalledTimes(2);
+    expect(h.notifications.get(KEY)?.type).toBe('renewal_reminder');
+    err.mockRestore();
+  });
+
+  it('the "about to send" write fails: nothing is sent, the claim is removed, and it throws', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const realUpdate = h.prisma.lmsNotification.updateMany.getMockImplementation()!;
+    let saw = false;
+    h.prisma.lmsNotification.updateMany.mockImplementation(async (args) => {
+      if (isMarkSending(args as UpdateArgs)) {
+        saw = true;
+        throw new Error('db down');
+      }
+      return realUpdate(args);
+    });
+    try {
+      await expect(handleSubscriptionEvent(upcomingEvent('sub_ind_1'))).rejects.toThrow('db down');
+      expect(saw).toBe(true);
+      expect(h.sendEmail).not.toHaveBeenCalled();
+      expect(h.notifications.has(KEY)).toBe(false);
+    } finally {
+      h.prisma.lmsNotification.updateMany.mockReset();
+      h.prisma.lmsNotification.updateMany.mockImplementation(realUpdateImpl);
+      err.mockRestore();
+    }
+  });
+
+  it('process killed while sending (record left "sending"): no delivery sends it again, however old', async () => {
+    h.notifications.set(KEY, {
+      id: 'n-sending',
+      userId: 'user-ind-1',
+      dedupeKey: KEY,
+      type: 'renewal_reminder_sending',
+      createdAt: new Date(Date.now() - 60 * MINUTE),
+    });
+    await expect(
+      handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_after_kill_mid_send'))
+    ).rejects.toThrow(/renewal reminder/i);
+    expect(h.sendEmail).not.toHaveBeenCalled();
+    expect(h.notifications.get(KEY)?.id).toBe('n-sending');
+  });
+});
+
+describe('GP-595: renewal reminders state the GST in the price (fixed 10% line)', () => {
+  it('Teams owner plan at A$1,295: amount incl. GST and a GST line of A$117.73 (total / 11)', async () => {
+    await handleSubscriptionEvent(
+      upcomingEvent('sub_team_1', { amount_due: 129_500, customer_email: null }, 'evt_team_gst')
+    );
+    const email = lastEmail();
+    for (const body of [email.text, email.html]) {
+      expect(body).toContain('A$1,295.00 incl. GST');
+      expect(body).toContain('GST included');
+      expect(body).toContain('A$117.73');
+    }
+  });
+
+  it('individual membership at A$795: GST line of A$72.27', async () => {
+    await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_ind_gst'));
+    const email = lastEmail();
+    for (const body of [email.text, email.html]) {
+      expect(body).toContain('A$795.00 incl. GST');
+      expect(body).toContain('GST included');
+      expect(body).toContain('A$72.27');
+    }
   });
 });

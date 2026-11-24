@@ -16,15 +16,27 @@
  *  - Idempotency: the route already dedupes by Stripe event id. On top of that,
  *    each renewal is CLAIMED before sending by inserting an `LmsNotification`
  *    whose `dedupeKey` (subscription + renewal date) is unique in the database.
- *    Only the delivery that wins the insert sends, so concurrent deliveries with
- *    different event ids send once. A failed send removes the claim and throws
- *    so Stripe's retry can send. Known limit: a process killed between the claim
- *    and the send leaves a claim with no email; that reminder is then not
- *    retried automatically.
+ *    The record moves through three types (GP-595):
+ *      renewal_reminder_pending  claimed, nothing sent yet
+ *      renewal_reminder_sending  this attempt has committed to send (written by a
+ *                                compare-and-set on its own claim BEFORE the email call)
+ *      renewal_reminder          the email has gone
+ *    Only a PENDING claim older than RENEWAL_REMINDER_STALE_CLAIM_MS may be taken
+ *    over by another delivery. A record that reached SENDING is never taken over and
+ *    never sent again, so a slow or failed "mark sent" write can not lead to a second
+ *    email. The decision to send is the compare-and-set, not the clock.
+ *    A failed send removes its own record and throws so Stripe's retry can send. A
+ *    delivery that finds a young pending claim, or any SENDING record, throws (route
+ *    5xx, Stripe retries) and never acknowledges, so a reminder whose outcome is
+ *    unknown stays visible (Sentry `renewal_reminder_send_unconfirmed`) instead of
+ *    being silently dropped. Accepted limit, the same as main: if the process dies
+ *    while sending, or a failed send's record can not be removed, the reminder is not
+ *    sent automatically; a person checks the Mailtrap log (runbook Step C2).
  */
 
 import type Stripe from 'stripe';
 
+import { formatAudCents, gstFromGstInclusiveCents } from '@/lib/billing/tax-invoice';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { sendEmail } from '@/lib/server/email';
@@ -39,6 +51,15 @@ import { resolveUserIdForStripeSubscription } from '@/lib/server/subscription-st
 import { resolveTeamIdForStripeSubscription } from '@/lib/server/team-subscription-store';
 
 export const RENEWAL_REMINDER_TYPE = 'renewal_reminder';
+/** A claim whose email has not been confirmed as sent yet (GP-595). */
+export const RENEWAL_REMINDER_PENDING_TYPE = 'renewal_reminder_pending';
+/**
+ * This attempt has committed to send: set by a compare-and-set on its own pending claim
+ * immediately before the email call. Never taken over, never sent again (GP-595).
+ */
+export const RENEWAL_REMINDER_SENDING_TYPE = 'renewal_reminder_sending';
+/** How old a PENDING claim must be before another delivery may take it over. */
+export const RENEWAL_REMINDER_STALE_CLAIM_MS = 5 * 60 * 1000;
 
 const SUPPORT_EMAIL = 'support@carsi.com.au';
 const AU_TIME_ZONE = 'Australia/Sydney';
@@ -104,6 +125,14 @@ export function formatRenewalDate(date: Date): string {
     month: 'long',
     year: 'numeric',
   });
+}
+
+/**
+ * Pure: the GST inside a GST-inclusive renewal amount, "A$117.73" for A$1,295.00. GST is a
+ * fixed 10% line (ruling 22/11/2026): total / 11 from the one tax-invoice helper.
+ */
+export function formatRenewalGst(cents: number): string {
+  return `A${formatAudCents(gstFromGstInclusiveCents(cents))}`;
 }
 
 /** Pure: idempotency key — one reminder per subscription per renewal date. */
@@ -254,28 +283,138 @@ function isUniqueViolation(error: unknown): boolean {
 }
 
 /**
- * Remove the claim after a failed send so Stripe's retry can send. If the
- * removal itself fails the claim stays and blocks every retry, so that is
- * reported to Sentry for a person to clear; the caller still throws.
+ * Remove this attempt's own record when it knows it did not send, so Stripe's retry can
+ * send. Only a pending or sending row carrying this attempt's claim time is removed, never a
+ * sent reminder or a claim another delivery has taken over. If the removal fails the record
+ * stays and the reminder needs a person (runbook Step C2); the caller still throws.
  */
-async function releaseClaim(subscriptionId: string, dedupeKey: string): Promise<void> {
+async function releaseClaim(
+  subscriptionId: string,
+  dedupeKey: string,
+  claimedAt: Date
+): Promise<void> {
   try {
-    await prisma.lmsNotification.delete({ where: { dedupeKey } });
-  } catch (error) {
-    if ((error as { code?: unknown } | null)?.code === 'P2025') return; // already gone
-    console.error(
-      '[renewal-reminder] could not release claim after failed send; reminder is blocked',
-      {
-        subscriptionId,
+    await prisma.lmsNotification.deleteMany({
+      where: {
         dedupeKey,
-      }
-    );
+        type: { in: [RENEWAL_REMINDER_PENDING_TYPE, RENEWAL_REMINDER_SENDING_TYPE] },
+        createdAt: claimedAt,
+      },
+    });
+  } catch (error) {
+    console.error('[renewal-reminder] could not release claim after a send that did not happen', {
+      subscriptionId,
+      dedupeKey,
+    });
     void captureServerError(error, {
       route: '/api/lms/webhooks/stripe',
       tags: { eventType: 'invoice.upcoming', stage: 'release_renewal_reminder_claim' },
       extra: { dedupeKey },
     });
   }
+}
+
+/**
+ * Commit this attempt to sending: compare-and-set its own pending claim to SENDING. Only
+ * on success may the email be sent. From then on no other delivery can take the record
+ * over, however long the email or its confirmation takes. Returns false when the claim is
+ * no longer this attempt's (another delivery took it over); THROWS on a database error.
+ */
+async function markSending(dedupeKey: string, claimedAt: Date): Promise<boolean> {
+  const marked = await prisma.lmsNotification.updateMany({
+    where: { dedupeKey, type: RENEWAL_REMINDER_PENDING_TYPE, createdAt: claimedAt },
+    data: { type: RENEWAL_REMINDER_SENDING_TYPE },
+  });
+  return marked.count === 1;
+}
+
+/**
+ * Mark this attempt's record as a sent reminder. The email has already gone. A failure here
+ * leaves the record as SENDING, which no delivery sends again; it is reported so a person
+ * can mark it sent.
+ */
+async function confirmClaim(
+  subscriptionId: string,
+  dedupeKey: string,
+  claimedAt: Date
+): Promise<void> {
+  try {
+    const confirmed = await prisma.lmsNotification.updateMany({
+      where: { dedupeKey, type: RENEWAL_REMINDER_SENDING_TYPE, createdAt: claimedAt },
+      data: { type: RENEWAL_REMINDER_TYPE },
+    });
+    if (confirmed.count !== 1) {
+      console.error("[renewal-reminder] sent, but the record was no longer this attempt's", {
+        subscriptionId,
+        dedupeKey,
+      });
+    }
+  } catch (error) {
+    console.error('[renewal-reminder] sent, but could not mark the record sent', {
+      subscriptionId,
+      dedupeKey,
+    });
+    void captureServerError(error, {
+      route: '/api/lms/webhooks/stripe',
+      tags: { eventType: 'invoice.upcoming', stage: 'confirm_renewal_reminder_claim' },
+      extra: { dedupeKey },
+    });
+  }
+}
+
+type ClaimData = { userId: string; title: string; body: string; linkUrl: string };
+
+/**
+ * Take the right to send this renewal's reminder. Returns 'claimed' (this attempt may go on
+ * to markSending), or 'already_sent'. THROWS while another delivery may still be sending, or
+ * when a send started but was never confirmed, so the route answers 5xx and Stripe
+ * redelivers later. Never acknowledges a record whose email is not known to have gone.
+ */
+async function claimRenewal(
+  dedupeKey: string,
+  data: ClaimData,
+  claimedAt: Date
+): Promise<'claimed' | 'already_sent'> {
+  try {
+    await prisma.lmsNotification.create({
+      data: { ...data, type: RENEWAL_REMINDER_PENDING_TYPE, dedupeKey, createdAt: claimedAt },
+      select: { id: true },
+    });
+    return 'claimed';
+  } catch (error) {
+    if (!isUniqueViolation(error)) throw error; // transient: 5xx, Stripe retries, nothing sent
+  }
+
+  // A record exists. Take it over only if it is a PENDING claim (nothing sent) older than
+  // the stale window (compare-and-set: one delivery can win). SENDING is never taken over.
+  const staleBefore = new Date(claimedAt.getTime() - RENEWAL_REMINDER_STALE_CLAIM_MS);
+  const takenOver = await prisma.lmsNotification.updateMany({
+    where: { dedupeKey, type: RENEWAL_REMINDER_PENDING_TYPE, createdAt: { lt: staleBefore } },
+    data: { ...data, createdAt: claimedAt },
+  });
+  if (takenOver.count === 1) {
+    console.warn('[renewal-reminder] took over a claim left by an earlier attempt', {
+      dedupeKey,
+    });
+    return 'claimed';
+  }
+
+  const current = await prisma.lmsNotification.findUnique({
+    where: { dedupeKey },
+    select: { type: true, createdAt: true },
+  });
+  // Allow-list: only a confirmed reminder counts as sent.
+  if (current?.type === RENEWAL_REMINDER_TYPE) return 'already_sent';
+  if (current?.type === RENEWAL_REMINDER_SENDING_TYPE && current.createdAt < staleBefore) {
+    void captureServerError(new Error('renewal reminder send started but never confirmed'), {
+      route: '/api/lms/webhooks/stripe',
+      tags: { eventType: 'invoice.upcoming', stage: 'renewal_reminder_send_unconfirmed' },
+      extra: { dedupeKey },
+    });
+  }
+  throw new Error(
+    'renewal reminder is being sent by another delivery (or its outcome is not confirmed); retry later'
+  );
 }
 
 function skip(subscriptionId: string, reason: RenewalReminderSkipReason): RenewalReminderOutcome {
@@ -316,9 +455,13 @@ export async function sendUpcomingRenewalReminder(params: {
   const dedupeKey = renewalReminderDedupeKey(subscriptionId, renewalAt);
   const existing = await prisma.lmsNotification.findUnique({
     where: { dedupeKey },
-    select: { id: true },
+    select: { type: true },
   });
-  if (existing) return skip(subscriptionId, 'already_sent');
+  // Only a confirmed reminder ends here (allow-list); any other record is judged by
+  // claimRenewal below.
+  if (existing?.type === RENEWAL_REMINDER_TYPE) {
+    return skip(subscriptionId, 'already_sent');
+  }
 
   const origin = getAppOrigin();
   const recipient = await resolveRecipient(invoice, subscription, kind, origin);
@@ -326,6 +469,7 @@ export async function sendUpcomingRenewalReminder(params: {
 
   const renewalDateLabel = formatRenewalDate(renewalAt);
   const amountLabel = formatRenewalAmount(amountCents);
+  const gstLabel = formatRenewalGst(amountCents);
   const yearRecap =
     kind === 'individual' && recipient.deliversToAccountEmail
       ? await loadYearRecap(recipient.userId, origin)
@@ -337,6 +481,7 @@ export async function sendUpcomingRenewalReminder(params: {
     teamName: recipient.teamName,
     renewalDateLabel,
     amountLabel,
+    gstLabel,
     manageUrl: recipient.manageUrl,
     cancelInstruction: recipient.cancelInstruction,
     yearRecap,
@@ -344,23 +489,34 @@ export async function sendUpcomingRenewalReminder(params: {
   const subject = `Your ${recipient.planLabel} renews on ${renewalDateLabel}`;
 
   // Claim before send (compare-and-set on the unique dedupe_key). Only the
-  // delivery whose insert wins may send; a concurrent delivery for the same
-  // renewal hits the unique violation and sends nothing.
+  // delivery holding the claim may send. The claim time identifies this attempt's
+  // claim when it is later confirmed or released.
+  const claimedAt = new Date();
+  const claim = await claimRenewal(
+    dedupeKey,
+    {
+      userId: recipient.userId,
+      title: subject,
+      body: `Your ${recipient.planLabel} renews automatically on ${renewalDateLabel} for ${amountLabel}.`,
+      linkUrl: recipient.manageUrl,
+    },
+    claimedAt
+  );
+  if (claim === 'already_sent') return skip(subscriptionId, 'already_sent');
+
+  // Commit to sending (compare-and-set on this attempt's own claim). This is the only
+  // gate on the email call: no clock reading decides whether to send.
+  let committed: boolean;
   try {
-    await prisma.lmsNotification.create({
-      data: {
-        userId: recipient.userId,
-        type: RENEWAL_REMINDER_TYPE,
-        title: subject,
-        body: `Your ${recipient.planLabel} renews automatically on ${renewalDateLabel} for ${amountLabel}.`,
-        linkUrl: recipient.manageUrl,
-        dedupeKey,
-      },
-      select: { id: true },
-    });
+    committed = await markSending(dedupeKey, claimedAt);
   } catch (error) {
-    if (isUniqueViolation(error)) return skip(subscriptionId, 'already_sent');
-    throw error; // transient — 5xx, Stripe retries, nothing was sent
+    // Nothing was sent. The write may or may not have landed, so remove either state.
+    await releaseClaim(subscriptionId, dedupeKey, claimedAt);
+    throw error;
+  }
+  if (!committed) {
+    // Another delivery took the claim over while this one was slow; it sends, not us.
+    throw new Error('renewal reminder claim was taken over by another delivery; not sending');
   }
 
   let result: Awaited<ReturnType<typeof sendEmail>>;
@@ -381,10 +537,11 @@ export async function sendUpcomingRenewalReminder(params: {
       subscriptionId,
       reason: result.reason,
     });
-    await releaseClaim(subscriptionId, dedupeKey);
+    await releaseClaim(subscriptionId, dedupeKey, claimedAt);
     throw new Error(`renewal reminder email not sent (${result.reason ?? 'unknown'})`);
   }
 
+  await confirmClaim(subscriptionId, dedupeKey, claimedAt);
   console.info('[renewal-reminder] sent', {
     subscriptionId,
     dedupeKey,
