@@ -38,6 +38,26 @@ function faqText(): string {
     .join('\n');
 }
 
+const HOME_PRICING = readFileSync(
+  join(ROOT, 'src/components/landing/HomePricingSection.tsx'),
+  'utf8'
+);
+
+/**
+ * Every place the free-offer wording can come from: both page sources, the shared FREE_OFFER
+ * strings both pages render, and the pricing FAQ. A banned-wording rule is checked against all
+ * of them at once, so moving wording from a page into the helper (or back) cannot hide it.
+ */
+async function allOfferWording(): Promise<Array<[string, string]>> {
+  const { FREE_OFFER } = await import('./free-offer');
+  return [
+    ['pricing page source', PRICING_PAGE],
+    ['homepage pricing source', HOME_PRICING],
+    ['FREE_OFFER', JSON.stringify(FREE_OFFER)],
+    ['pricing FAQ', faqText()],
+  ];
+}
+
 /** A public page path ("/resources") exists when app/(public)/<path>/page.tsx exists. */
 function publicPageExists(path: string): boolean {
   const segment = path.split('?')[0].replace(/^\/+|\/+$/g, '');
@@ -64,10 +84,13 @@ describe('pricing page free offer (GP-574)', () => {
     expect(PRICING_PAGE).toContain('FREE_OFFER.resourcesHref');
   });
 
-  it('names no "Free Library" and none of the ten unbacked items', () => {
-    expect(PRICING_PAGE).not.toMatch(/free library/i);
-    expect(faqText()).not.toMatch(/free library/i);
-    for (const item of UNBACKED_ITEMS) expect(PRICING_PAGE).not.toContain(item);
+  it('names no "Free Library" and none of the ten unbacked items, on any surface', async () => {
+    for (const [surface, text] of await allOfferWording()) {
+      expect(text, surface).not.toMatch(/free library/i);
+      for (const item of UNBACKED_ITEMS) {
+        expect(text.toLowerCase(), `${surface}: ${item}`).not.toContain(item.toLowerCase());
+      }
+    }
   });
 
   it('never links the missing /library or /free-library pages', () => {
@@ -83,7 +106,7 @@ describe('pricing page free offer (GP-574)', () => {
  * wording must say so. The homepage reads its free tier from FREE_OFFER so the two cannot drift.
  */
 describe('homepage free tier (GP-574)', () => {
-  const HOME = readFileSync(join(ROOT, 'src/components/landing/HomePricingSection.tsx'), 'utf8');
+  const HOME = HOME_PRICING;
 
   it('reads its free tier from FREE_OFFER', () => {
     expect(HOME).toContain("from '@/lib/pricing/free-offer'");
@@ -100,10 +123,9 @@ describe('homepage free tier (GP-574)', () => {
 
   it('names no "Free Library" and makes no unconditional certificate promise', async () => {
     const { FREE_OFFER } = await import('./free-offer');
-    const wording = [HOME, JSON.stringify(FREE_OFFER)];
-    for (const text of wording) {
-      expect(text).not.toMatch(/free library/i);
-      expect(text).not.toMatch(/certificates included|real certificates/i);
+    for (const [surface, text] of await allOfferWording()) {
+      expect(text, surface).not.toMatch(/free library/i);
+      expect(text, surface).not.toMatch(/certificates included|real certificates/i);
     }
     const certificateLines = FREE_OFFER.home.features.filter((f) => /certificate/i.test(f));
     for (const line of certificateLines) expect(line).toMatch(/when you (finish|complete)/i);
