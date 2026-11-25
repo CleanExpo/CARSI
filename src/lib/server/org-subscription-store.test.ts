@@ -65,7 +65,21 @@ const db = vi.hoisted(() => {
   return { store, findUnique, update, upsert, updateMany };
 });
 
-const markers = vi.hoisted(() => new Map<string, { id: string; type: string }>());
+const markers = vi.hoisted(
+  () => new Map<string, { id: string; type: string; processedAt?: Date | null }>(),
+);
+
+// GP-796: Stripe's answer for the subscription's latest invoice. The guard reads it before the
+// transaction whenever a blocking reversal marker names an invoice (`<state>@<invoice id>`).
+const stripe = vi.hoisted(() => ({
+  latestInvoice: null as null | { id: string; created: number; status: string; amount_paid: number },
+  retrieve: null as unknown as ReturnType<typeof vi.fn>,
+}));
+stripe.retrieve = vi.fn(async (id: string) => ({ id, latest_invoice: stripe.latestInvoice }));
+
+vi.mock('@/lib/api/stripe', () => ({
+  getStripeClient: () => ({ subscriptions: { retrieve: stripe.retrieve } }),
+}));
 
 vi.mock('@/lib/prisma', () => ({
   prisma: {
@@ -94,8 +108,33 @@ const T1 = new Date('2026-07-05T10:00:00.000Z');
 const T2 = new Date('2026-07-05T11:00:00.000Z');
 const row = () => db.store.row;
 
+/**
+ * Plant a reversal in the ledger's current format (GP-641): the per-invoice row and the
+ * most-recent pointer `payment_reversed:<state>@<invoice id>`, stamped with the invoice's
+ * Stripe `created` time. The legacy marker without `@<invoice id>` only exercises the
+ * unknown-invoice block and never reaches Stripe's latest-invoice answer.
+ */
+function plantReversal(subId: string, state: 'refunded' | 'disputed', invoiceId: string, createdAt: Date) {
+  const pointer = `payment-reversed:${subId}`;
+  markers.set(pointer, { id: pointer, type: `payment_reversed:${state}@${invoiceId}`, processedAt: createdAt });
+  const own = `payment-reversed:${subId}:${invoiceId}`;
+  markers.set(own, { id: own, type: `payment_reversed:${state}`, processedAt: createdAt });
+}
+
+/** What Stripe returns as the subscription's latest invoice. */
+function stripeLatestInvoice(id: string, createdAt: Date, paid: boolean) {
+  stripe.latestInvoice = {
+    id,
+    created: Math.floor(createdAt.getTime() / 1000),
+    status: paid ? 'paid' : 'open',
+    amount_paid: paid ? 29900 : 0,
+  };
+}
+
 beforeEach(() => {
   db.store.row = null;
+  markers.clear();
+  stripe.latestInvoice = null;
   vi.clearAllMocks();
 });
 
@@ -167,8 +206,6 @@ describe('updateOrgSubscriptionFromStripe', () => {
 });
 
 describe('GP-641: a reversal or deletion marker makes the write org row canceled', () => {
-  beforeEach(() => markers.clear());
-
   it('writes unpaid (no paid-through access) when the latest payment was refunded', async () => {
     markers.set(`payment-reversed:${SUB}`, { id: `payment-reversed:${SUB}`, type: 'payment_reversed:refunded' });
     await upsertOrgSubscription({
@@ -211,6 +248,101 @@ describe('GP-641: a reversal or deletion marker makes the write org row canceled
       currentPeriodEnd: T2,
       cancelAtPeriodEnd: false,
     });
+    expect(row()?.status).toBe('active');
+  });
+});
+
+describe('GP-796: the webhook path (updateOrgSubscriptionFromStripe) on current-format reversal markers', () => {
+  const INVOICE_AT = new Date('2026-07-05T09:00:00.000Z');
+  const NEWER_AT = new Date('2026-07-05T09:30:00.000Z');
+
+  /** Seed the org row the way provisioning does, linked to `subId`. */
+  async function seed(subId: string, status = 'incomplete') {
+    await upsertOrgSubscription({
+      teamId: TEAM,
+      organisationName: 'Acme Pty Ltd',
+      contactEmail: 'ops@acme.example',
+      stripeCustomerId: null,
+      stripeSubscriptionId: subId,
+      status,
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+    });
+  }
+
+  function webhookUpdate(subId: string, eventTimestamp: Date) {
+    return updateOrgSubscriptionFromStripe({
+      teamId: TEAM,
+      stripeCustomerId: 'cus_1',
+      stripeSubscriptionId: subId,
+      status: 'active',
+      currentPeriodEnd: T2,
+      cancelAtPeriodEnd: false,
+      eventTimestamp,
+    });
+  }
+
+  it('a refund of Stripe\'s latest invoice writes unpaid, after reading Stripe', async () => {
+    await seed(SUB);
+    plantReversal(SUB, 'refunded', 'in_1', INVOICE_AT);
+    stripeLatestInvoice('in_1', INVOICE_AT, true);
+    expect(await webhookUpdate(SUB, T1)).toBe(true);
+    expect(stripe.retrieve).toHaveBeenCalledWith(SUB, { expand: ['latest_invoice'] });
+    expect(row()?.status).toBe('unpaid');
+    expect(row()?.statusEventAt).toEqual(T1);
+  });
+
+  it('a chargeback of Stripe\'s latest invoice writes unpaid', async () => {
+    await seed(SUB);
+    plantReversal(SUB, 'disputed', 'in_1', INVOICE_AT);
+    stripeLatestInvoice('in_1', INVOICE_AT, true);
+    expect(await webhookUpdate(SUB, T1)).toBe(true);
+    expect(row()?.status).toBe('unpaid');
+  });
+
+  it('an older refunded invoice does not block once Stripe\'s latest invoice is a newer paid one', async () => {
+    await seed(SUB);
+    plantReversal(SUB, 'refunded', 'in_1', INVOICE_AT);
+    stripeLatestInvoice('in_2', NEWER_AT, true);
+    expect(await webhookUpdate(SUB, T1)).toBe(true);
+    expect(stripe.retrieve).toHaveBeenCalled();
+    expect(row()?.status).toBe('active');
+  });
+
+  it('an older charged-back invoice does not block once Stripe\'s latest invoice is a newer paid one', async () => {
+    await seed(SUB);
+    plantReversal(SUB, 'disputed', 'in_1', INVOICE_AT);
+    stripeLatestInvoice('in_2', NEWER_AT, true);
+    expect(await webhookUpdate(SUB, T1)).toBe(true);
+    expect(row()?.status).toBe('active');
+  });
+
+  it('a reversal still writes nothing when the org row does not exist yet', async () => {
+    plantReversal(SUB, 'refunded', 'in_1', INVOICE_AT);
+    stripeLatestInvoice('in_1', INVOICE_AT, true);
+    expect(await webhookUpdate(SUB, T1)).toBe(false);
+    expect(db.update).not.toHaveBeenCalled();
+    expect(row()).toBeNull();
+  });
+
+  it('keeps the replacement subscription: a refund of the old one never overwrites the new row', async () => {
+    await seed('sub_org_new', 'active');
+    plantReversal(SUB, 'refunded', 'in_1', INVOICE_AT);
+    stripeLatestInvoice('in_1', INVOICE_AT, true);
+    // Handled (the row exists and belongs to the replacement), but nothing is written.
+    expect(await webhookUpdate(SUB, T2)).toBe(true);
+    expect(db.update).not.toHaveBeenCalled();
+    expect(row()?.stripeSubscriptionId).toBe('sub_org_new');
+    expect(row()?.status).toBe('active');
+  });
+
+  it('keeps the replacement subscription against a chargeback of the old one', async () => {
+    await seed('sub_org_new', 'active');
+    plantReversal(SUB, 'disputed', 'in_1', INVOICE_AT);
+    stripeLatestInvoice('in_1', INVOICE_AT, true);
+    expect(await webhookUpdate(SUB, T2)).toBe(true);
+    expect(db.update).not.toHaveBeenCalled();
+    expect(row()?.stripeSubscriptionId).toBe('sub_org_new');
     expect(row()?.status).toBe('active');
   });
 });
