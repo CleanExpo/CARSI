@@ -26,6 +26,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 
 import { NextRequest } from 'next/server';
+import ts from 'typescript';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -252,11 +253,40 @@ describe('Teams and org status routes need BOTH flags (GP-597)', () => {
 });
 
 const REPO = resolve(__dirname, '../../..');
-const ROUTE_IMPORT = /['"](?:\.\.\/)+(app\/api\/[^'"]+\/route)['"]/g;
+const ROUTE_SPECIFIER = /^(?:\.\.\/)+(app\/api\/.+\/route)$/;
+
+/**
+ * Route files a source really imports: static `import ... from` declarations and dynamic
+ * `import()` calls, read from the parsed source. A route path that appears only in a comment or
+ * a plain string is not an import, so it does not count as covered (GP-792).
+ */
+function routesImportedIn(source: string): Set<string> {
+  const file = ts.createSourceFile('suite.ts', source, ts.ScriptTarget.Latest, true);
+  const specifiers: string[] = [];
+  const visit = (node: ts.Node): void => {
+    if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
+      specifiers.push(node.moduleSpecifier.text);
+    } else if (
+      ts.isCallExpression(node) &&
+      node.expression.kind === ts.SyntaxKind.ImportKeyword &&
+      node.arguments.length > 0 &&
+      ts.isStringLiteralLike(node.arguments[0])
+    ) {
+      specifiers.push(node.arguments[0].text);
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(file);
+  const routes = new Set<string>();
+  for (const spec of specifiers) {
+    const m = ROUTE_SPECIFIER.exec(spec);
+    if (m) routes.add(`${m[1]}.ts`);
+  }
+  return routes;
+}
 
 function routesImportedBy(testFile: string): Set<string> {
-  const source = readFileSync(join(REPO, testFile), 'utf8');
-  return new Set([...source.matchAll(ROUTE_IMPORT)].map((m) => `${m[1]}.ts`));
+  return routesImportedIn(readFileSync(join(REPO, testFile), 'utf8'));
 }
 
 function routesReadingTeamsFlag(dir: string): string[] {
@@ -286,5 +316,19 @@ describe('route inventory', () => {
       ...routesImportedBy('src/lib/server/onboarding-org-flag.test.ts'),
     ]);
     expect(readers.filter((r) => !covered.has(r))).toEqual([]);
+  });
+
+  it('counts a route only when the suite really imports it, never from a comment or string (GP-792)', () => {
+    const source = [
+      "import { POST } from '../../../app/api/real/static/route';",
+      "const load = () => import('../../../app/api/real/dynamic/route');",
+      "// import('../../../app/api/comment/line/route')",
+      "/* '../../../app/api/comment/block/route' */",
+      "const note = '../../../app/api/plain/string/route';",
+    ].join('\n');
+    expect([...routesImportedIn(source)].sort()).toEqual([
+      'app/api/real/dynamic/route.ts',
+      'app/api/real/static/route.ts',
+    ]);
   });
 });
