@@ -60,6 +60,9 @@ const h = vi.hoisted(() => {
     subscriptionsRetrieve: vi.fn(),
     captureServerError: vi.fn(async (..._a: unknown[]) => {}),
     resolveUserId: vi.fn(async () => 'user-ind-1' as string | null),
+    /** GP-796: the event the signed route verifies, and its event-id claims (id → state). */
+    routeEvent: null as Stripe.Event | null,
+    eventClaims: new Map<string, 'claimed' | 'processed'>(),
     resolveTeamId: vi.fn(async () => 'team-1' as string | null),
     prisma: {
       lmsNotification: {
@@ -155,6 +158,11 @@ vi.mock('@/lib/server/email', () => ({
   isEmailConfigured: () => true,
 }));
 vi.mock('@/lib/api/stripe', () => ({
+  // GP-796: the signed webhook route's verification, so the route itself can be driven.
+  constructWebhookEvent: () => h.routeEvent,
+  resolveStripeWebhookSecret: () => 'whsec_test_placeholder',
+  isVerifiedStripeEventShape: () => true,
+  webhookLivemodeMatchesApiKey: () => true,
   getStripeClient: () => ({
     customers: { retrieve: vi.fn(async () => ({ email: 'member@example.com' })) },
     subscriptions: { retrieve: (...a: unknown[]) => h.subscriptionsRetrieve(...a) },
@@ -182,8 +190,21 @@ vi.mock('./event-attribution', () => ({
 vi.mock('./subscription-analytics', () => ({
   trackSubscriptionLifecycleEvent: vi.fn(async () => {}),
 }));
+// GP-796: the route's event-id claim, as one in-memory row per event id.
+const idem = vi.hoisted(() => ({
+  claim: vi.fn(),
+  markProcessed: vi.fn(),
+  release: vi.fn(),
+}));
+vi.mock('@/lib/server/stripe-webhook-idempotency', () => ({
+  claimStripeWebhookEvent: (_db: unknown, event: { id: string }) => idem.claim(event.id),
+  markStripeWebhookEventProcessed: (_db: unknown, id: string) => idem.markProcessed(id),
+  releaseStripeWebhookEventClaim: (_db: unknown, id: string) => idem.release(id),
+}));
 
 import { handleSubscriptionEvent, isSubscriptionEvent } from './subscription-webhook';
+
+const { POST } = await import('../../../app/api/lms/webhooks/stripe/route');
 
 /** The fixture's own updateMany, restored after tests that wrap it. */
 const realUpdateImpl = h.prisma.lmsNotification.updateMany.getMockImplementation()!;
@@ -236,6 +257,19 @@ beforeEach(() => {
   h.notifications.clear();
   h.race.gate = null;
   h.race.parked = null;
+  h.routeEvent = null;
+  h.eventClaims.clear();
+  idem.claim.mockImplementation(async (id: string) => {
+    if (h.eventClaims.has(id)) return { claimed: false };
+    h.eventClaims.set(id, 'claimed');
+    return { claimed: true };
+  });
+  idem.markProcessed.mockImplementation(async (id: string) => {
+    h.eventClaims.set(id, 'processed');
+  });
+  idem.release.mockImplementation(async (id: string) => {
+    h.eventClaims.delete(id);
+  });
   h.subscriptionsRetrieve.mockImplementation(async (id: string) =>
     id === 'sub_ind_1' ? subscription('pro_annual') : subscription('business_owner'),
   );
@@ -717,5 +751,72 @@ describe('GP-595: renewal reminders state the GST in the price (fixed 10% line)'
       expect(body).toContain('GST included');
       expect(body).toContain('A$72.27');
     }
+  });
+});
+
+describe('GP-796: the signed webhook route turns a failed reminder into a 5xx and a retry', () => {
+  const KEY = 'renewal_reminder:sub_ind_1:2026-10-17';
+
+  beforeEach(() => {
+    process.env.DATABASE_URL = 'postgresql://offline.invalid/test';
+  });
+
+  /** Deliver `event` through the real route, as Stripe would. Returns the HTTP status. */
+  async function deliver(event: Stripe.Event): Promise<number> {
+    h.routeEvent = { ...event, object: 'event', livemode: false } as Stripe.Event;
+    const res = await POST(
+      new Request('https://carsi.com.au/api/lms/webhooks/stripe', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'stripe-signature': `t=${RENEWAL_AT},v1=${'ab'.repeat(32)}`,
+        },
+        body: '{}',
+      }) as never,
+    );
+    return res.status;
+  }
+
+  it('a failed send returns 500 and releases both claims; the redelivered event sends once and is acknowledged', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    h.sendEmail.mockResolvedValueOnce({ sent: false, reason: 'provider_error' });
+
+    expect(await deliver(upcomingEvent('sub_ind_1'))).toBe(500);
+    // The event-id claim is released (not marked processed), so Stripe's retry is processed,
+    // not skipped as a duplicate; and no reminder record is left to block it.
+    expect(idem.release).toHaveBeenCalledWith('evt_upcoming_1');
+    expect(idem.markProcessed).not.toHaveBeenCalled();
+    expect(h.eventClaims.has('evt_upcoming_1')).toBe(false);
+    expect(h.notifications.has(KEY)).toBe(false);
+
+    // Stripe redelivers the SAME event id.
+    expect(await deliver(upcomingEvent('sub_ind_1'))).toBe(200);
+    expect(h.sendEmail).toHaveBeenCalledTimes(2);
+    expect(h.notifications.get(KEY)?.type).toBe('renewal_reminder');
+    expect(h.eventClaims.get('evt_upcoming_1')).toBe('processed');
+
+    // A third delivery of that event is a duplicate: no further email.
+    expect(await deliver(upcomingEvent('sub_ind_1'))).toBe(200);
+    expect(h.sendEmail).toHaveBeenCalledTimes(2);
+    err.mockRestore();
+  });
+
+  it('a failed send whose reminder claim cannot be removed still returns 500, never an acknowledgement', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    h.sendEmail.mockResolvedValueOnce({ sent: false, reason: 'send_failed' });
+    h.prisma.lmsNotification.delete.mockRejectedValueOnce(new Error('db down'));
+    h.prisma.lmsNotification.deleteMany.mockRejectedValueOnce(new Error('db down'));
+
+    expect(await deliver(upcomingEvent('sub_ind_1'))).toBe(500);
+    expect(idem.release).toHaveBeenCalledWith('evt_upcoming_1');
+    expect(idem.markProcessed).not.toHaveBeenCalled();
+    err.mockRestore();
+  });
+
+  it('control: a reminder sent first time is acknowledged with 200 and its event marked processed', async () => {
+    expect(await deliver(upcomingEvent('sub_ind_1'))).toBe(200);
+    expect(h.sendEmail).toHaveBeenCalledTimes(1);
+    expect(idem.markProcessed).toHaveBeenCalledWith('evt_upcoming_1');
+    expect(idem.release).not.toHaveBeenCalled();
   });
 });
