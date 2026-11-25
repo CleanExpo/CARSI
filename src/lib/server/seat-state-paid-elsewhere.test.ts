@@ -203,6 +203,13 @@ vi.mock('@/lib/prisma', () => {
         rows.forEach((r) => Object.assign(r, a.data));
         return { count: rows.length };
       },
+      deleteMany: async (a: { where: Row }) => {
+        await late();
+        const keep = t().filter((x) => !match(x, a.where));
+        const count = t().length - keep.length;
+        db.tables[name] = keep;
+        return { count };
+      },
       upsert: async (a: { where: Row; create: Row; update: Row }) => {
         await late();
         const r = t().find((x) => match(x, a.where));
@@ -428,5 +435,49 @@ describe('GP-759 follow-up: a seat that cannot be prepared at a full pool refuse
     expect(await accept('ub', 'tok-b')).not.toBe(200);
     expect(db.tables.lmsTeamMember.map((m) => m.userId)).not.toContain('ub');
     expect(paidHolders()).toHaveLength(2);
+  });
+});
+
+/**
+ * GP-795 (GP-787 review, risk 2): a direct invite creates the new member's account, with a
+ * temporary password, before the seat step. If the seat step then refuses (here another member
+ * takes the last paid seat in between), the password is never emailed. The account must not be
+ * left behind: a later invite would find it and send no password.
+ */
+describe('GP-795: a direct invite refused at the seat step leaves no new account behind', () => {
+  function takeLastSeat() {
+    db.tables.lmsEnrollment.push({ id: 'e-late', studentId: 'ux', courseId: COURSE.id, status: 'active', paymentReference: 'team:team-1', enrolledAt: new Date(Date.UTC(2026, 10, 4)), revokedReason: null, statusEventAt: null });
+    db.tables.lmsTeamMember.push({ teamId: 'team-1', userId: 'ux', role: 'member' });
+  }
+
+  beforeEach(() => {
+    vi.mocked(sendTeamMemberAddedEmail).mockClear();
+  });
+
+  it('the last seat goes to someone else first: refused, no account, no email', async () => {
+    db.beforeNextTx = async () => takeLastSeat();
+    expect(await direct('late@seat-race-test.invalid')).toBe(409);
+    expect(db.tables.lmsUser.map((u) => u.email)).not.toContain('late@seat-race-test.invalid');
+    expect(db.tables.lmsTeamMember.map((m) => m.userId)).not.toContain('late');
+    expect(vi.mocked(sendTeamMemberAddedEmail)).not.toHaveBeenCalled();
+  });
+
+  it('a later invite with a free seat creates the account afresh and emails its password', async () => {
+    db.beforeNextTx = async () => takeLastSeat();
+    expect(await direct('late@seat-race-test.invalid')).toBe(409);
+    // The seat frees up again (the other member's seat is released).
+    db.tables.lmsEnrollment = db.tables.lmsEnrollment.filter((e) => e.id !== 'e-late');
+    expect(await direct('late@seat-race-test.invalid')).toBe(200);
+    expect(vi.mocked(sendTeamMemberAddedEmail)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(sendTeamMemberAddedEmail).mock.calls[0]![0]).toMatchObject({
+      to: 'late@seat-race-test.invalid',
+      temporaryPassword: expect.any(String),
+    });
+  });
+
+  it('control: an existing account refused at the seat step is kept', async () => {
+    db.beforeNextTx = async () => takeLastSeat();
+    expect(await direct('ub@seat-race-test.invalid')).toBe(409);
+    expect(db.tables.lmsUser.map((u) => u.id)).toContain('ub');
   });
 });

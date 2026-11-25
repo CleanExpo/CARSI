@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { prisma } from '@/lib/prisma';
+import { runSerializable } from '@/lib/server/db-tx';
 import { hashPassword, sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { generateMemberTempPassword } from '@/lib/server/member-temp-password';
 import { sendTeamMemberAddedEmail } from '@/lib/server/transactional-email';
@@ -120,10 +121,13 @@ export async function addCourseTeamMemberByEmail(params: {
   let user = await prisma.lmsUser.findUnique({ where: { email } });
   let accountCreated = false;
   let memberPassword: string | null = null;
+  /** Set when this invite made the account: its password is only ever sent in the email below. */
+  let newAccountHash: string | null = null;
 
   if (!user) {
     memberPassword = generateMemberTempPassword();
     const hashedPassword = await hashPassword(memberPassword);
+    newAccountHash = hashedPassword;
     const id = randomUUID();
     user = await prisma.lmsUser.create({
       data: {
@@ -140,47 +144,54 @@ export async function addCourseTeamMemberByEmail(params: {
     accountCreated = true;
   }
 
-  const memberClaims = await sessionClaimsForUserId(user.id);
-  if (!memberClaims) {
-    throw new Error('USER_INACTIVE');
-  }
-
-  // Reading half of each seat before the step (the step may be retried).
-  const seats: TeamMemberSeat[] = [];
-  for (const slug of enrollSlugs) {
-    try {
-      const seat = await prepareTeamMemberSeat(user.id, team.id, slug);
-      if (seat) seats.push(seat);
-    } catch (e) {
-      console.error('[team-member-provision] enrol', slug, e);
-    }
-  }
-  // A deferred full-pool refusal is only lifted by the step proving the member holds each course.
-  // A seat that could not be prepared cannot prove that, so the refusal stands (GP-759 follow-up,
-  // Codex round 2): no member row, no email.
-  if (fullPoolDeferred && seats.length !== enrollSlugs.length) {
-    throw new Error('COURSE_SEATS_FULL');
-  }
-
-  // GP-759 (Phill, 23/11/2026): the paid-seat checks, the member row and the seats are written
-  // together in the one seat step (seat-state.ts), so two invites at the last seat cannot both
-  // take it. The check above is only an early answer; this one decides. A member with no paid
-  // seat left is not added (COURSE_SEATS_FULL), and no email is sent.
   const memberUserId = user.id;
-  await runSeatStateStep(async (tx) => {
-    for (const seat of seats) {
-      // A member without the course prerequisite still gets their seat, issued LOCKED
-      // (prerequisiteGated) until they complete it - founder decision 02/11/2026.
-      if ((await issueTeamMemberSeat(tx, seat)) === 'no_seat') {
-        throw new Error('COURSE_SEATS_FULL');
+  try {
+    const memberClaims = await sessionClaimsForUserId(memberUserId);
+    if (!memberClaims) {
+      throw new Error('USER_INACTIVE');
+    }
+
+    // Reading half of each seat before the step (the step may be retried).
+    const seats: TeamMemberSeat[] = [];
+    for (const slug of enrollSlugs) {
+      try {
+        const seat = await prepareTeamMemberSeat(memberUserId, team.id, slug);
+        if (seat) seats.push(seat);
+      } catch (e) {
+        console.error('[team-member-provision] enrol', slug, e);
       }
     }
-    await tx.lmsTeamMember.upsert({
-      where: { teamId_userId: { teamId: team.id, userId: memberUserId } },
-      create: { teamId: team.id, userId: memberUserId, role: 'member' },
-      update: {},
+    // A deferred full-pool refusal is only lifted by the step proving the member holds each course.
+    // A seat that could not be prepared cannot prove that, so the refusal stands (GP-759 follow-up,
+    // Codex round 2): no member row, no email.
+    if (fullPoolDeferred && seats.length !== enrollSlugs.length) {
+      throw new Error('COURSE_SEATS_FULL');
+    }
+
+    // GP-759 (Phill, 23/11/2026): the paid-seat checks, the member row and the seats are written
+    // together in the one seat step (seat-state.ts), so two invites at the last seat cannot both
+    // take it. The check above is only an early answer; this one decides. A member with no paid
+    // seat left is not added (COURSE_SEATS_FULL), and no email is sent.
+    await runSeatStateStep(async (tx) => {
+      for (const seat of seats) {
+        // A member without the course prerequisite still gets their seat, issued LOCKED
+        // (prerequisiteGated) until they complete it - founder decision 02/11/2026.
+        if ((await issueTeamMemberSeat(tx, seat)) === 'no_seat') {
+          throw new Error('COURSE_SEATS_FULL');
+        }
+      }
+      await tx.lmsTeamMember.upsert({
+        where: { teamId_userId: { teamId: team.id, userId: memberUserId } },
+        create: { teamId: team.id, userId: memberUserId, role: 'member' },
+        update: {},
+      });
     });
-  });
+  } catch (e) {
+    // GP-795: a refused invite sends no email, so an account it made would be left with a
+    // password nobody was told; a later invite would find it and send no password. Remove it.
+    if (newAccountHash) await removeUnusedNewAccount(memberUserId, newAccountHash);
+    throw e;
+  }
 
   const memberName = user.fullName?.trim() || email.split('@')[0] || 'there';
 
@@ -195,4 +206,24 @@ export async function addCourseTeamMemberByEmail(params: {
   }).catch((e) => console.error('[team-member-provision] email', e));
 
   return { email, account_created: accountCreated, courses: courseTitles };
+}
+
+/**
+ * Remove an account a refused direct invite just made, if it is still unused: the same password
+ * hash (no reset since), no team membership and no enrolment (no other invite has taken it up).
+ * The check and the delete run in one serialisable transaction, so an invite that takes the
+ * account up at the same time either commits first (the account is kept) or conflicts. A failure
+ * here is logged, never thrown over the invite's own refusal (GP-795).
+ */
+async function removeUnusedNewAccount(userId: string, hashedPassword: string): Promise<void> {
+  try {
+    await runSerializable(async (tx) => {
+      const memberships = await tx.lmsTeamMember.count({ where: { userId } });
+      const enrolments = await tx.lmsEnrollment.count({ where: { studentId: userId } });
+      if (memberships > 0 || enrolments > 0) return;
+      await tx.lmsUser.deleteMany({ where: { id: userId, hashedPassword } });
+    });
+  } catch (e) {
+    console.error('[team-member-provision] remove unused account', userId, e);
+  }
 }
