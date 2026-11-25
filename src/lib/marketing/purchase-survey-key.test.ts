@@ -269,6 +269,29 @@ describe('purchaseSurveyCheckoutFieldFor(): a repeat of one purchase sends one k
     expect(readPurchaseSurveyKeys(tab)).toEqual([paid]);
   });
 
+  it('storage that refuses or drops the write still repeats the key for one purchase (GP-789)', () => {
+    const refusing = memoryStorage();
+    refusing.setItem = () => {
+      throw new DOMException('full', 'QuotaExceededError');
+    };
+    const dropping = memoryStorage();
+    dropping.setItem = () => undefined;
+    for (const tab of [refusing, dropping]) {
+      const first = purchaseSurveyCheckoutFieldFor('water:self:1', tab, T0).survey_key;
+      const second = purchaseSurveyCheckoutFieldFor('water:self:1', tab, T0 + 1).survey_key;
+      expect(first).toMatch(/^[0-9a-f]{32}$/);
+      expect(second).toBe(first);
+      // A different purchase is still a different key, and the window still ends.
+      expect(purchaseSurveyCheckoutFieldFor('mould:self:1', tab, T0 + 2).survey_key).not.toBe(
+        first
+      );
+      expect(
+        purchaseSurveyCheckoutFieldFor('water:self:1', tab, T0 + PURCHASE_SURVEY_REPEAT_WINDOW_MS)
+          .survey_key
+      ).not.toBe(first);
+    }
+  });
+
   it('a malformed pending entry, a clock that went back, or no storage: a fresh key or none, never a throw', () => {
     const tab = memoryStorage();
     tab.setItem(PURCHASE_SURVEY_PENDING_STORAGE_NAME, '{not json');

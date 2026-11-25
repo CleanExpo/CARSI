@@ -130,18 +130,35 @@ function readPendingKeys(storage: Storage, now: number): PendingEntry[] {
     return [];
   }
   const list: unknown[] = Array.isArray(parsed) ? parsed : parsed ? [parsed] : [];
-  return list.filter((e): e is PendingEntry => {
-    if (!e || typeof e !== 'object') return false;
-    const { p, k, t } = e as { p?: unknown; k?: unknown; t?: unknown };
-    return (
-      typeof p === 'string' &&
-      typeof k === 'string' &&
-      KEY_SHAPE.test(k) &&
-      typeof t === 'number' &&
-      now - t >= 0 &&
-      now - t < PURCHASE_SURVEY_REPEAT_WINDOW_MS
-    );
-  });
+  return list.filter((e): e is PendingEntry => isPendingEntry(e, now));
+}
+
+function isPendingEntry(e: unknown, now: number): e is PendingEntry {
+  if (!e || typeof e !== 'object') return false;
+  const { p, k, t } = e as { p?: unknown; k?: unknown; t?: unknown };
+  return (
+    typeof p === 'string' &&
+    typeof k === 'string' &&
+    KEY_SHAPE.test(k) &&
+    typeof t === 'number' &&
+    now - t >= 0 &&
+    now - t < PURCHASE_SURVEY_REPEAT_WINDOW_MS
+  );
+}
+
+/**
+ * The same pending entries, kept in memory per storage object. A storage that is writable-looking
+ * but refuses or drops the write (quota, private mode) would otherwise give every click of one
+ * purchase its own key, and so its own Stripe session (GP-789). Storage is read first; memory only
+ * adds an entry storage did not return.
+ */
+const PENDING_MEMORY = new WeakMap<Storage, PendingEntry[]>();
+
+function mergedPendingKeys(storage: Storage, now: number): PendingEntry[] {
+  const stored = readPendingKeys(storage, now);
+  const remembered = (PENDING_MEMORY.get(storage) ?? []).filter((e) => isPendingEntry(e, now));
+  const extra = remembered.filter((m) => !stored.some((s) => s.p === m.p && s.k === m.k));
+  return [...stored, ...extra];
 }
 
 /**
@@ -163,16 +180,18 @@ export function purchaseSurveyCheckoutFieldFor(
   now: number = Date.now()
 ): { survey_key?: string } {
   if (!storage) return {};
-  const pending = readPendingKeys(storage, now);
+  const pending = mergedPendingKeys(storage, now);
   const repeat = pending.find((e) => e.p === purchase);
   if (repeat) return { survey_key: repeat.k };
   const key = newPurchaseSurveyKey(storage);
   if (!key) return {};
   const next = [...pending, { p: purchase, k: key, t: now }].slice(-PENDING_LIMIT);
+  // Memory first: a write the storage then refuses or drops still repeats this key (GP-789).
+  PENDING_MEMORY.set(storage, next);
   try {
     storage.setItem(PURCHASE_SURVEY_PENDING_STORAGE_NAME, JSON.stringify(next));
   } catch {
-    // A storage that refuses writes: this attempt still gets its own fresh key, as before.
+    // The key is still repeated from memory for this tab.
   }
   return { survey_key: key };
 }

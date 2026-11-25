@@ -9,6 +9,16 @@ import { describe, expect, it } from 'vitest';
  * owner, `src/lib/server/checkout-idempotency.ts`. A new checkout that sends no key, or builds its
  * own, fails here. Creators not yet keyed are listed by name with the card that will key them;
  * the list may only shrink.
+ *
+ * THIS SCAN IS A HINT, NOT THE GUARD (GP-789). It reads the shape of the source, and a shape can
+ * be written around: `stripe.checkout.sessions['create'](...)`, a later `...{ idempotencyKey }`
+ * spread in the options, a whole-file exemption below that hides a second create in the same
+ * file, a local function that shadows the builder's name, or a non-Stripe object that happens to
+ * be called `checkout`. Each of these was planted and passed (or, for the last, failed) the scan.
+ * The guard that holds is `createKeyedCheckoutSession` in the owner, which checks the key on the
+ * real call (checkout-idempotency.test.ts plants each of them against it). The scan stays to
+ * catch the common mistake early, a create that names no key at all. A creator that must be
+ * trusted moves to the checked create; the scan is not made cleverer.
  */
 
 const ROOT = join(__dirname, '..', '..', '..');
@@ -98,11 +108,14 @@ function checkoutCreateCalls(text: string, path: string): ts.CallExpression[] {
 
 /** `path` for every create call in the tree that does not take its key from the owner. */
 function unkeyedCreators(files: { path: string; text: string }[]): string[] {
-  return files.flatMap((f) =>
-    checkoutCreateCalls(f.text, f.path)
-      .filter((call) => !sendsOwnerKey(call))
-      .map(() => f.path)
-  );
+  // The owner's own create is the checked one: it refuses a foreign key at run time.
+  return files
+    .filter((f) => f.path !== OWNER)
+    .flatMap((f) =>
+      checkoutCreateCalls(f.text, f.path)
+        .filter((call) => !sendsOwnerKey(call))
+        .map(() => f.path)
+    );
 }
 
 describe('GP-783: every Stripe checkout key comes from checkout-idempotency.ts', () => {
@@ -114,7 +127,12 @@ describe('GP-783: every Stripe checkout key comes from checkout-idempotency.ts',
     const course = FILES.find(
       (f) => f.path === join('src', 'lib', 'server', 'local-course-checkout.ts')
     );
-    expect(checkoutCreateCalls(course?.text ?? '', 'local-course-checkout.ts')).toHaveLength(1);
+    // The keyed course checkout opens its session through the owner's checked create (GP-789).
+    expect(course?.text).toMatch(/createKeyedCheckoutSession\(/);
+    expect(checkoutCreateCalls(course?.text ?? '', 'local-course-checkout.ts')).toHaveLength(0);
+    // The owner holds the one checked create, and it is the one create this scan does not read.
+    expect(owner).toMatch(/export async function createKeyedCheckoutSession\(/);
+    expect(checkoutCreateCalls(owner, OWNER)).toHaveLength(1);
   });
 
   it('control: an unkeyed create and a hand-made key are both caught', () => {
