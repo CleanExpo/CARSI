@@ -10,7 +10,7 @@ import {
   type EnrollResult,
   type PreparedEnrolment,
 } from '@/lib/server/enrollment-service';
-import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
+import { claimsForNewStudent, sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import {
   reactivateDisputeWonEnrollmentsByPaymentReference,
   revokeEnrollmentsByPaymentReference,
@@ -165,9 +165,36 @@ export async function prepareTeamMemberSeat(
   if (!courseSlug) return null;
   const claims = await sessionClaimsForUserId(userId);
   if (!claims) return null;
+  return prepareSeatForClaims(claims, teamId, courseSlug, {});
+}
+
+/**
+ * The reading half of a seat for an account that does not exist yet (GP-795). The caller makes
+ * the account in the same step that issues the seat, so nothing is written for it here: the
+ * enrolment is prepared from the claims a new student gets, and no user row is upserted.
+ */
+export async function prepareNewMemberSeat(
+  user: { id: string; email: string },
+  teamId: string,
+  slug: string,
+): Promise<TeamMemberSeat | null> {
+  return prepareSeatForClaims(claimsForNewStudent(user.id, user.email), teamId, slug, {
+    userWrittenByCaller: true,
+  });
+}
+
+async function prepareSeatForClaims(
+  claims: SessionClaims,
+  teamId: string,
+  courseSlug: string,
+  options: { userWrittenByCaller?: boolean },
+): Promise<TeamMemberSeat | null> {
   try {
     // Without the prerequisite the seat is issued LOCKED, not skipped (02/11/2026).
-    const enrolment = await prepareEnrolment(claims, courseSlug, `team:${teamId}`, { onPrerequisiteNotMet: 'lock' });
+    const enrolment = await prepareEnrolment(claims, courseSlug, `team:${teamId}`, {
+      onPrerequisiteNotMet: 'lock',
+      ...options,
+    });
     return { teamId, slug: courseSlug, enrolment };
   } catch (e) {
     if (e instanceof Error && e.message === 'COURSE_NOT_FOUND') return null;

@@ -137,6 +137,13 @@ export type EnrollOptions = {
    * A Stripe-paid fulfilment (`cs_*`) always behaves as 'lock': the money is already taken.
    */
   onPrerequisiteNotMet?: 'refuse' | 'lock';
+  /**
+   * The caller makes the learner's user row itself, in the transaction that writes the
+   * enrolment (GP-795: a new team member's account is made with their seat, so a refused seat
+   * leaves no account). The reading half then does not upsert the row. Only `prepareNewMemberSeat`
+   * sets it.
+   */
+  userWrittenByCaller?: boolean;
 };
 
 /**
@@ -185,7 +192,7 @@ export async function prepareEnrolment(
   paymentReference: string,
   options: EnrollOptions = {},
 ): Promise<PreparedEnrolment> {
-  await ensureLmsUserFromClaims(claims);
+  if (!options.userWrittenByCaller) await ensureLmsUserFromClaims(claims);
   const course = await getOrCreateCourseBySlug(slug);
 
   // Cohort-only courses (the CARSI roadshow workshop): learners enter only through the

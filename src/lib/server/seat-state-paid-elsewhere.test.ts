@@ -32,6 +32,8 @@ const db = vi.hoisted(() => ({
   tables: {} as Record<string, Array<Record<string, unknown>>>,
   beforeNextTx: null as null | (() => Promise<unknown>),
   seq: 0,
+  /** How many times anything deleted a user row (GP-795: nothing should). */
+  userDeletes: 0,
 }));
 const h = vi.hoisted(() => ({ event: null as Record<string, unknown> | null, refundedSession: '' }));
 
@@ -64,6 +66,7 @@ vi.mock('@/lib/server/auth-from-request', () => ({
 }));
 vi.mock('@/lib/server/lms-auth', () => ({
   sessionClaimsForUserId: vi.fn(async (userId: string) => ({ sub: userId, email: `${userId}@seat-race-test.invalid` })),
+  claimsForNewStudent: (id: string, email: string) => ({ sub: id, email }),
   hashPassword: vi.fn(async () => 'hashed-placeholder'),
 }));
 vi.mock('@/lib/server/lms-user-sync', () => ({ ensureLmsUserFromClaims: vi.fn(async () => {}) }));
@@ -141,6 +144,8 @@ function match(row: Row, where: Row | undefined): boolean {
 vi.mock('@/lib/prisma', () => {
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
   let chain: Promise<unknown> = Promise.resolve();
+  // Rows created inside the running transaction, undone if it throws (what PostgreSQL does).
+  const txLog: Array<{ name: string; row: Row }> = [];
 
   function model(name: string, inTx: boolean) {
     const t = () => db.tables[name];
@@ -164,6 +169,7 @@ vi.mock('@/lib/prisma', () => {
         if (members) db.tables.lmsTeamMember.push({ teamId: row.id, ...members });
       }
       t().push(row);
+      if (inTx) txLog.push({ name, row });
       return row;
     };
     return {
@@ -205,6 +211,7 @@ vi.mock('@/lib/prisma', () => {
       },
       deleteMany: async (a: { where: Row }) => {
         await late();
+        if (name === 'lmsUser') db.userDeletes += 1;
         const keep = t().filter((x) => !match(x, a.where));
         const count = t().length - keep.length;
         db.tables[name] = keep;
@@ -237,7 +244,15 @@ vi.mock('@/lib/prisma', () => {
       db.beforeNextTx = null;
       await f();
     }
-    const run = chain.then(() => fn(txClient));
+    const run = chain.then(async () => {
+      txLog.length = 0;
+      try {
+        return await fn(txClient);
+      } catch (error) {
+        for (const { name, row } of txLog.reverse()) db.tables[name] = db.tables[name].filter((r) => r !== row);
+        throw error;
+      }
+    });
     chain = run.catch(() => {});
     return run;
   };
@@ -283,6 +298,7 @@ beforeEach(() => {
   process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test_placeholder';
   process.env.DATABASE_URL = 'postgresql://offline.invalid/test';
   db.beforeNextTx = null;
+  db.userDeletes = 0;
   const expiresAt = new Date(Date.UTC(2099, 0, 1));
   db.tables = {
     lmsCourse: [{ ...COURSE }],
@@ -439,10 +455,12 @@ describe('GP-759 follow-up: a seat that cannot be prepared at a full pool refuse
 });
 
 /**
- * GP-795 (GP-787 review, risk 2): a direct invite creates the new member's account, with a
- * temporary password, before the seat step. If the seat step then refuses (here another member
- * takes the last paid seat in between), the password is never emailed. The account must not be
- * left behind: a later invite would find it and send no password.
+ * GP-795 (GP-787 review, risk 2): a direct invite's new member account carries a temporary
+ * password whose only delivery is the invite email. If the seat step refuses (here another member
+ * takes the last paid seat in between), no email is sent, so no account may be left behind: a
+ * later invite would find it and send no password. The account is made INSIDE the seat step, with
+ * the seats, so a refusal rolls it back (the fake below undoes a failed step's creates, as
+ * PostgreSQL does); nothing deletes an account.
  */
 describe('GP-795: a direct invite refused at the seat step leaves no new account behind', () => {
   function takeLastSeat() {
@@ -479,5 +497,77 @@ describe('GP-795: a direct invite refused at the seat step leaves no new account
     db.beforeNextTx = async () => takeLastSeat();
     expect(await direct('ub@seat-race-test.invalid')).toBe(409);
     expect(db.tables.lmsUser.map((u) => u.id)).toContain('ub');
+  });
+
+  // The design (GP-795): the account is made inside the seat step and a refusal rolls it back, so
+  // no code deletes an account. Cleaning up after a refusal by deleting (the first fix) lost data
+  // the moment anything else attached to the account in between, and let a second invite use an
+  // account that was then deleted under it.
+  it('a refused invite deletes no account at all', async () => {
+    db.beforeNextTx = async () => takeLastSeat();
+    expect(await direct('late@seat-race-test.invalid')).toBe(409);
+    expect(db.userDeletes).toBe(0);
+  });
+
+  it('a paid subscription that attaches to the same email meanwhile is never lost', async () => {
+    // A Stripe subscription webhook resolves the email to an account and writes the subscription
+    // between the invite's first read and its seat step.
+    db.tables.lmsSubscription = [];
+    db.beforeNextTx = async () => {
+      takeLastSeat();
+      let user = db.tables.lmsUser.find((u) => u.email === 'late@seat-race-test.invalid');
+      if (!user) {
+        user = { id: 'late-webhook', email: 'late@seat-race-test.invalid', fullName: null };
+        db.tables.lmsUser.push(user);
+      }
+      db.tables.lmsSubscription.push({ id: 'sub-1', userId: user.id, status: 'active' });
+    };
+    expect(await direct('late@seat-race-test.invalid')).toBe(409);
+    const subscription = db.tables.lmsSubscription[0]!;
+    expect(db.tables.lmsUser.map((u) => u.id)).toContain(subscription.userId);
+    expect(db.tables.lmsTeamMember.map((m) => m.userId)).not.toContain(subscription.userId);
+    expect(vi.mocked(sendTeamMemberAddedEmail)).not.toHaveBeenCalled();
+  });
+
+  it('a second invite for the same email while the first is refused never ends with a member and no account', async () => {
+    const prerequisite = vi.mocked(findCoursePrerequisiteBlock);
+    prerequisite.mockClear();
+    let releaseA!: () => void;
+    let releaseB!: () => void;
+    const gateA = new Promise<void>((resolve) => (releaseA = resolve));
+    const gateB = new Promise<void>((resolve) => (releaseB = resolve));
+    // Both invites stop in their own preparation, A first, so B has read the team and the email
+    // while A's step has not run yet.
+    prerequisite.mockImplementationOnce(async () => {
+      await gateA;
+      return null;
+    });
+    prerequisite.mockImplementationOnce(async () => {
+      await gateB;
+      return null;
+    });
+    db.beforeNextTx = async () => takeLastSeat();
+    const a = direct('late@seat-race-test.invalid');
+    await vi.waitFor(() => expect(prerequisite).toHaveBeenCalledTimes(1));
+    const b = direct('late@seat-race-test.invalid');
+    await vi.waitFor(() => expect(prerequisite).toHaveBeenCalledTimes(2));
+    // A's step runs and is refused (the last seat went to someone else).
+    releaseA();
+    expect(await a).toBe(409);
+    // The other member's seat is released, and B carries on.
+    db.tables.lmsEnrollment = db.tables.lmsEnrollment.filter((e) => e.id !== 'e-late');
+    db.tables.lmsTeamMember = db.tables.lmsTeamMember.filter((m) => m.userId !== 'ux');
+    releaseB();
+    expect(await b).toBe(200);
+    for (const member of db.tables.lmsTeamMember) {
+      expect(db.tables.lmsUser.map((u) => u.id)).toContain(member.userId);
+    }
+    expect(db.tables.lmsUser.filter((u) => u.email === 'late@seat-race-test.invalid')).toHaveLength(1);
+    expect(db.userDeletes).toBe(0);
+    // B made the account, so B's email carries the password.
+    expect(vi.mocked(sendTeamMemberAddedEmail)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(sendTeamMemberAddedEmail).mock.calls[0]![0]).toMatchObject({
+      temporaryPassword: expect.any(String),
+    });
   });
 });
