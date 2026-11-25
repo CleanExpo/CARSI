@@ -56,6 +56,8 @@ describe.runIf(RUNNABLE)('retention metrics (real PostgreSQL)', () => {
     visits: Visit[];
     /** An admin force-complete audit row on this day (same clock time as the visits). */
     forceCompletedDay?: number;
+    /** The audit action written for `forceCompletedDay` (default force_complete). */
+    auditAction?: 'force_complete' | 'quiz_attempts_reset';
   }) {
     const student = randomUUID();
     students.push(student);
@@ -82,9 +84,17 @@ describe.runIf(RUNNABLE)('retention metrics (real PostgreSQL)', () => {
       await db.query(
         `INSERT INTO lms_learner_admin_audit_events
            (id, action, reason, actor_kind, actor_ref, actor_email, student_ref, enrollment_ref, course_ref, created_at)
-         VALUES ($1, 'force_complete', 'retention test', 'bootstrap_admin', NULL, 'admin@retention-test.invalid',
+         VALUES ($1, $7, 'retention test', 'bootstrap_admin', NULL, 'admin@retention-test.invalid',
            $2, $3, $4, now() - make_interval(days => $5) + make_interval(days => $6, hours => 1, secs => 2))`,
-        [randomUUID(), student, enrolment, course, opts.enrolledDaysAgo, opts.forceCompletedDay]
+        [
+          randomUUID(),
+          student,
+          enrolment,
+          course,
+          opts.enrolledDaysAgo,
+          opts.forceCompletedDay,
+          opts.auditAction ?? 'force_complete',
+        ]
       );
     }
     for (const v of opts.visits) {
@@ -212,6 +222,19 @@ describe.runIf(RUNNABLE)('retention metrics (real PostgreSQL)', () => {
       forceCompletedDay: 2,
     });
 
+    // 10. Two real visits (day 0 and day 3) and an admin quiz-attempts reset on day 3, a moment
+    //     after the day-3 visit. Only a force-complete is an admin write to the lessons, so the
+    //     reset leaves both visits counted: activated and returned in 7 and 30 (GP-794).
+    await seed({
+      enrolledDaysAgo: 40,
+      visits: [
+        { lesson: lessonA, accessedDay: 0 },
+        { lesson: lessonB, accessedDay: 3 },
+      ],
+      forceCompletedDay: 3,
+      auditAction: 'quiz_attempts_reset',
+    });
+
     after = await metrics.getRetentionMetrics();
   });
 
@@ -225,23 +248,23 @@ describe.runIf(RUNNABLE)('retention metrics (real PostgreSQL)', () => {
   });
 
   it('counts enrolled, activated and completed, leaving refunded enrolments out', () => {
-    expect(after.enrolled - before.enrolled).toBe(8);
+    expect(after.enrolled - before.enrolled).toBe(9);
     // An admin force-complete alone is not activation (GP-794).
-    expect(after.activated - before.activated).toBe(6);
+    expect(after.activated - before.activated).toBe(7);
     expect(after.completed - before.completed).toBe(2);
   });
 
   it('counts a 7-day return only from two stored days inside the window, once it has passed', () => {
     expect(after.returnWithin7Days.days).toBe(7);
-    expect(after.returnWithin7Days.eligible - before.returnWithin7Days.eligible).toBe(5);
+    expect(after.returnWithin7Days.eligible - before.returnWithin7Days.eligible).toBe(6);
     // A force-complete day plus one learner day is not a return (GP-794).
-    expect(after.returnWithin7Days.returned - before.returnWithin7Days.returned).toBe(2);
+    expect(after.returnWithin7Days.returned - before.returnWithin7Days.returned).toBe(3);
   });
 
   it('counts a 30-day return the same way', () => {
     expect(after.returnWithin30Days.days).toBe(30);
-    expect(after.returnWithin30Days.eligible - before.returnWithin30Days.eligible).toBe(4);
-    expect(after.returnWithin30Days.returned - before.returnWithin30Days.returned).toBe(3);
+    expect(after.returnWithin30Days.eligible - before.returnWithin30Days.eligible).toBe(5);
+    expect(after.returnWithin30Days.returned - before.returnWithin30Days.returned).toBe(4);
   });
 
   it('holds numbers only: nothing that could identify a learner', () => {
