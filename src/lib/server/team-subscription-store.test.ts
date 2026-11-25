@@ -172,6 +172,27 @@ describe('upsertTeamSubscription — seat + ordering guard', () => {
     expect(row()?.seatLimit).toBe(10);
     expect(row()?.statusEventAt).toEqual(T2);
   });
+
+  it('APPLIES a snapshot stamped at the SAME second as the stored state (equal is not stale)', async () => {
+    await upsertTeamSubscription(activeInput(T1, 5));
+    await upsertTeamSubscription(activeInput(T1, 12));
+    expect(row()?.seatLimit).toBe(12);
+    expect(row()?.statusEventAt).toEqual(T1);
+  });
+
+  it('a terminal cancel at the SAME second as the stored active state is applied', async () => {
+    await upsertTeamSubscription(activeInput(T1, 5));
+    await upsertTerminalTeamSubscriptionStatus({
+      teamId: TEAM,
+      stripeCustomerId: 'cus_1',
+      stripeSubscriptionId: SUB,
+      status: 'canceled',
+      seatLimit: 5,
+      eventTimestamp: T1,
+    });
+    expect(row()?.status).toBe('canceled');
+    expect(row()?.statusEventAt).toEqual(T1);
+  });
 });
 
 describe('upsertTerminalTeamSubscriptionStatus — sticky cancel', () => {

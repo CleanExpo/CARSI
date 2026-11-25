@@ -203,6 +203,50 @@ describe('updateOrgSubscriptionFromStripe', () => {
     expect(applied).toBe(true); // row exists → handled
     expect(row()?.status).toBe('active'); // but stale write was dropped
   });
+
+  it('APPLIES an update stamped at the SAME second as the stored state (equal is not stale)', async () => {
+    await upsertOrgSubscription({
+      teamId: TEAM,
+      organisationName: 'Acme',
+      contactEmail: 'ops@acme.example',
+      stripeCustomerId: null,
+      stripeSubscriptionId: SUB,
+      status: 'active',
+      currentPeriodEnd: T2,
+      cancelAtPeriodEnd: false,
+      eventTimestamp: T1,
+    });
+    const applied = await updateOrgSubscriptionFromStripe({
+      teamId: TEAM,
+      stripeCustomerId: 'cus_1',
+      stripeSubscriptionId: SUB,
+      status: 'canceled', // same event second as the stored active state: a replay, not stale
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+      eventTimestamp: T1,
+    });
+    expect(applied).toBe(true);
+    expect(row()?.status).toBe('canceled');
+    expect(row()?.statusEventAt).toEqual(T1);
+  });
+
+  it('upsertOrgSubscription APPLIES a provisioning write stamped at the SAME second (equal is not stale)', async () => {
+    const seed = {
+      teamId: TEAM,
+      organisationName: 'Acme',
+      contactEmail: 'ops@acme.example',
+      stripeCustomerId: null,
+      stripeSubscriptionId: SUB,
+      status: 'active',
+      currentPeriodEnd: T2,
+      cancelAtPeriodEnd: false,
+      eventTimestamp: T1,
+    };
+    await upsertOrgSubscription(seed);
+    await upsertOrgSubscription({ ...seed, cancelAtPeriodEnd: true });
+    expect(row()?.cancelAtPeriodEnd).toBe(true);
+    expect(row()?.statusEventAt).toEqual(T1);
+  });
 });
 
 describe('GP-641: a reversal or deletion marker makes the write org row canceled', () => {
