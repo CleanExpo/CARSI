@@ -47,7 +47,10 @@ function isCheckoutCreate(call: ts.CallExpression): boolean {
   if (!ts.isPropertyAccessExpression(create) || create.name.text !== 'create') return false;
   const sessions = create.expression;
   if (!ts.isPropertyAccessExpression(sessions) || sessions.name.text !== 'sessions') return false;
+  // `stripe.checkout.sessions.create(...)`, or `checkout.sessions.create(...)` after
+  // `const { checkout } = stripe`.
   const checkout = sessions.expression;
+  if (ts.isIdentifier(checkout)) return checkout.text === 'checkout';
   return ts.isPropertyAccessExpression(checkout) && checkout.name.text === 'checkout';
 }
 
@@ -72,15 +75,17 @@ function sendsOwnerKey(call: ts.CallExpression): boolean {
 }
 
 /** Every `checkout.sessions.create(...)` call in `text`, parsed. */
-function checkoutCreateCalls(text: string): ts.CallExpression[] {
+function checkoutCreateCalls(text: string, path: string): ts.CallExpression[] {
   // Sound shortcut: such a call must spell the identifier `sessions` somewhere in the file.
   if (!text.includes('sessions')) return [];
   const file = ts.createSourceFile(
-    'scan.tsx',
+    path,
     text,
     ts.ScriptTarget.Latest,
     true,
-    ts.ScriptKind.TSX
+    // A .ts file is parsed as TS, not TSX: `<string>x` is a type assertion there, and parsing it
+    // as JSX would swallow the code after it.
+    path.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS
   );
   const calls: ts.CallExpression[] = [];
   const visit = (node: ts.Node): void => {
@@ -94,7 +99,7 @@ function checkoutCreateCalls(text: string): ts.CallExpression[] {
 /** `path` for every create call in the tree that does not take its key from the owner. */
 function unkeyedCreators(files: { path: string; text: string }[]): string[] {
   return files.flatMap((f) =>
-    checkoutCreateCalls(f.text)
+    checkoutCreateCalls(f.text, f.path)
       .filter((call) => !sendsOwnerKey(call))
       .map(() => f.path)
   );
@@ -109,7 +114,7 @@ describe('GP-783: every Stripe checkout key comes from checkout-idempotency.ts',
     const course = FILES.find(
       (f) => f.path === join('src', 'lib', 'server', 'local-course-checkout.ts')
     );
-    expect(checkoutCreateCalls(course?.text ?? '')).toHaveLength(1);
+    expect(checkoutCreateCalls(course?.text ?? '', 'local-course-checkout.ts')).toHaveLength(1);
   });
 
   it('control: an unkeyed create and a hand-made key are both caught', () => {
@@ -153,6 +158,33 @@ describe('GP-783: every Stripe checkout key comes from checkout-idempotency.ts',
       'planted/comment.ts',
       'planted/metadata.ts',
       'planted/nested-option.ts',
+    ]);
+  });
+
+  it('control: a .ts file with a type assertion and a destructured `checkout` are still scanned', () => {
+    const planted = [
+      {
+        // Parsed as TSX, `<string>x;` opens a JSX element that swallows the create call.
+        path: 'planted/assertion.ts',
+        text: 'const y = <string>x;\nawait stripe.checkout.sessions.create(req);',
+      },
+      {
+        path: 'planted/destructured.ts',
+        text: 'const { checkout } = stripe;\nawait checkout.sessions.create(req);',
+      },
+      {
+        path: 'planted/destructured-keyed.ts',
+        text: 'const { checkout } = stripe;\nawait checkout.sessions.create(req, { idempotencyKey: courseCheckoutIdempotencyKey(req) });',
+      },
+      {
+        path: 'planted/component.tsx',
+        text: 'const el = <div />;\nawait stripe.checkout.sessions.create(req);',
+      },
+    ];
+    expect(unkeyedCreators(planted)).toEqual([
+      'planted/assertion.ts',
+      'planted/destructured.ts',
+      'planted/component.tsx',
     ]);
   });
 
