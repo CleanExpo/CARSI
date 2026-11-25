@@ -25,7 +25,23 @@ import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
  * latest completion, so earlier visits are overwritten; but every timestamp still stored is a real
  * visit, so two stored days inside the window prove a return. `enrolled_at` is set once, at
  * creation, so the window does not move.
+ *
+ * An admin force-complete is not a visit (GP-794). It stamps every lesson of the enrolment with the
+ * time of the change and writes a `force_complete` audit row for that enrolment. Lesson timestamps
+ * within a few minutes of such a row are left out of activation and return, so the force-complete
+ * alone is never activation, and a force-complete day plus one learner day is never a return. A
+ * real visit inside those few minutes is also left out, which keeps the figures a floor. The course
+ * completion itself still counts as completed. Force-completes from before the audit table
+ * (GP-432, 23/11/2026) have no audit row and cannot be told apart.
  */
+/**
+ * How far a lesson timestamp may sit from its force-complete audit row and still be the admin's
+ * write. `forceCompleteEnrollment` stamps the lessons with the app server's clock just before its
+ * transaction and the audit row with the database's clock at the transaction start, so the two are
+ * a moment apart, not equal.
+ */
+const ADMIN_WRITE_TOLERANCE = '5 minutes';
+
 export type ReturnWindow = {
   days: number;
   /** Activated enrolments whose window has fully passed. */
@@ -67,6 +83,14 @@ export async function getRetentionMetrics(asOf: Date = new Date()): Promise<Rete
       INNER JOIN lms_lesson_progress lp ON lp.lesson_id = l.id AND lp.student_id = b.student_id
       CROSS JOIN LATERAL (VALUES (lp.last_accessed_at), (lp.completed_at)) AS t(at)
       WHERE t.at IS NOT NULL
+        AND NOT EXISTS (
+          SELECT 1
+          FROM lms_learner_admin_audit_events ev
+          WHERE ev.action = 'force_complete'
+            AND ev.enrollment_ref = b.id
+            AND t.at BETWEEN ev.created_at - ${ADMIN_WRITE_TOLERANCE}::interval
+                         AND ev.created_at + ${ADMIN_WRITE_TOLERANCE}::interval
+        )
     ),
     per_enrolment AS (
       SELECT

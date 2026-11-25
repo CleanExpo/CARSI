@@ -89,7 +89,7 @@ export default async function AdminRetentionPage() {
       ) : (
         <div className="overflow-x-auto rounded-lg border border-white/10">
           <table className="min-w-full text-left text-sm text-white/80">
-            <thead className="bg-white/5 text-xs uppercase tracking-wide text-white/60">
+            <thead className="bg-white/5 text-xs tracking-wide text-white/60 uppercase">
               <tr>
                 <th className="px-4 py-3">Measure</th>
                 <th className="px-4 py-3">Count</th>
@@ -109,7 +109,7 @@ export default async function AdminRetentionPage() {
                 value={metrics.activated}
                 base={metrics.enrolled}
                 baseLabel="enrolments"
-                note="Enrolled, then opened at least one lesson of that course."
+                note="Enrolled, then opened at least one lesson of that course. Lessons an admin marked complete are not counted as opened."
               />
               <MetricRow
                 label="Returned within 7 days"
