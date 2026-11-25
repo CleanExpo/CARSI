@@ -804,10 +804,19 @@ describe('GP-796: the signed webhook route turns a failed reminder into a 5xx an
   it('a failed send whose reminder claim cannot be removed still returns 500, never an acknowledgement', async () => {
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
     h.sendEmail.mockResolvedValueOnce({ sent: false, reason: 'send_failed' });
-    h.prisma.lmsNotification.delete.mockRejectedValueOnce(new Error('db down'));
     h.prisma.lmsNotification.deleteMany.mockRejectedValueOnce(new Error('db down'));
 
     expect(await deliver(upcomingEvent('sub_ind_1'))).toBe(500);
+    // The removal of this attempt's own pending or sending claim WAS attempted (the failed send
+    // reached releaseClaim), and because it failed the claim is still there: the reminder then
+    // needs a person (runbook Step C2), but Stripe's retry is never told it succeeded.
+    expect(h.prisma.lmsNotification.deleteMany).toHaveBeenCalledTimes(1);
+    expect(h.prisma.lmsNotification.deleteMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ dedupeKey: KEY }),
+      })
+    );
+    expect(h.notifications.has(KEY)).toBe(true);
     expect(idem.release).toHaveBeenCalledWith('evt_upcoming_1');
     expect(idem.markProcessed).not.toHaveBeenCalled();
     err.mockRestore();
