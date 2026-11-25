@@ -44,33 +44,54 @@ const field =
   'w-full rounded-lg border border-white/15 bg-[#0b1220] px-3 py-2 text-sm text-white placeholder:text-white/30';
 const label = 'text-xs font-semibold tracking-wide text-white/45 uppercase';
 
+/** A member's loaded workspace, tagged with the member it is for. */
+type Loaded = { userId: string; workspace: Workspace };
+/** The chapter assignment being edited, tagged with the member it is for. */
+type ChapterDraft = { userId: string; chapterSlug: string; coachUserId: string };
+
 export function AdminCoachingMemberWorkspaceClient() {
   const [members, setMembers] = useState<Member[]>([]);
   const [selected, setSelected] = useState('');
-  const [workspace, setWorkspace] = useState<Workspace | null>(null);
-  const [chapterSlug, setChapterSlug] = useState(DEFAULT_COACHING_CHAPTER_SLUG);
-  const [coachUserId, setCoachUserId] = useState(DEFAULT_COACHING_COACH.id);
+  // GP-799: every piece of member data carries the member it belongs to, and is shown or saved
+  // only while that member is selected. Picking member B never shows A's chapter or brief under
+  // B, and a save can never post B's userId with A's chapter and coach.
+  const [loaded, setLoaded] = useState<Loaded | null>(null);
+  const [draft, setDraft] = useState<ChapterDraft | null>(null);
   const selectedRef = useRef('');
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
 
-  const loadWorkspace = useCallback(async (userId: string) => {
-    const res = await fetch(
-      `/api/admin/coaching/member-workspace?userId=${encodeURIComponent(userId)}`
-    );
-    if (!res.ok) {
-      setError((await res.json().catch(() => ({}))).detail ?? 'Could not load member.');
-      setWorkspace(null);
-      return;
-    }
-    const data = (await res.json()) as { workspace: Workspace };
-    if (selectedRef.current !== userId) return;
-    setWorkspace(data.workspace);
-    setChapterSlug(data.workspace.chapterSlug);
-    setCoachUserId(data.workspace.coachUserId);
-    setError('');
+  const workspace = loaded && loaded.userId === selected ? loaded.workspace : null;
+  const chapter = workspace && draft && draft.userId === selected ? draft : null;
+  const chapterSlug = chapter?.chapterSlug ?? DEFAULT_COACHING_CHAPTER_SLUG;
+  const coachUserId = chapter?.coachUserId ?? DEFAULT_COACHING_COACH.id;
+
+  const showWorkspace = useCallback((userId: string, ws: Workspace) => {
+    setLoaded({ userId, workspace: ws });
+    setDraft({ userId, chapterSlug: ws.chapterSlug, coachUserId: ws.coachUserId });
   }, []);
+
+  const loadWorkspace = useCallback(
+    async (userId: string) => {
+      const res = await fetch(
+        `/api/admin/coaching/member-workspace?userId=${encodeURIComponent(userId)}`
+      );
+      const data = (await res.json().catch(() => ({}))) as {
+        detail?: string;
+        workspace?: Workspace;
+      };
+      // A response for a member the admin has since left is dropped, error or not.
+      if (selectedRef.current !== userId) return;
+      if (!res.ok || !data.workspace) {
+        setError(data.detail ?? 'Could not load member.');
+        return;
+      }
+      showWorkspace(userId, data.workspace);
+      setError('');
+    },
+    [showWorkspace]
+  );
 
   useEffect(() => {
     void (async () => {
@@ -92,8 +113,19 @@ export function AdminCoachingMemberWorkspaceClient() {
     })();
   }, [selected, loadWorkspace]);
 
+  function selectMember(userId: string) {
+    // Clear the last member's notice and error at once (a setState in the selection effect trips
+    // react-hooks/set-state-in-effect). Their workspace is hidden by its member tag.
+    selectedRef.current = userId;
+    setNotice('');
+    setError('');
+    setSelected(userId);
+  }
+
   async function post(op: string, extra: Record<string, unknown> = {}) {
-    if (!selected) return;
+    // Only for the member whose workspace is on screen.
+    const forUser = selected;
+    if (!forUser || !workspace) return;
     setBusy(true);
     setNotice('');
     setError('');
@@ -101,21 +133,19 @@ export function AdminCoachingMemberWorkspaceClient() {
       const res = await fetch('/api/admin/coaching/member-workspace', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: selected, op, ...extra }),
+        body: JSON.stringify({ userId: forUser, op, ...extra }),
       });
       const data = (await res.json().catch(() => ({}))) as {
         detail?: string;
         workspace?: Workspace;
       };
+      // The admin moved to another member while this was in flight: say nothing under them.
+      if (selectedRef.current !== forUser) return;
       if (!res.ok) {
         setError(data.detail ?? 'Request failed.');
         return;
       }
-      if (data.workspace && selectedRef.current === selected) {
-        setWorkspace(data.workspace);
-        setChapterSlug(data.workspace.chapterSlug);
-        setCoachUserId(data.workspace.coachUserId);
-      }
+      if (data.workspace) showWorkspace(forUser, data.workspace);
       setNotice('Saved.');
     } finally {
       setBusy(false);
@@ -126,9 +156,13 @@ export function AdminCoachingMemberWorkspaceClient() {
   const chapterOptions = listCoachingChapterOptions();
 
   function pickChapter(slug: string) {
+    if (!chapter) return;
     const opt = chapterOptions.find((c) => c.slug === slug);
-    setChapterSlug(slug);
-    if (opt) setCoachUserId(opt.coachUserId);
+    setDraft({
+      userId: chapter.userId,
+      chapterSlug: slug,
+      coachUserId: opt ? opt.coachUserId : chapter.coachUserId,
+    });
   }
 
   return (
@@ -152,12 +186,7 @@ export function AdminCoachingMemberWorkspaceClient() {
           id="coaching-member-select"
           className={`${field} mt-2`}
           value={selected}
-          onChange={(e) => {
-            // Clear the last save notice when the admin picks another member (was in the
-            // selection effect; a setState there trips react-hooks/set-state-in-effect).
-            setNotice('');
-            setSelected(e.target.value);
-          }}
+          onChange={(e) => selectMember(e.target.value)}
         >
           {members.length === 0 ? <option value="">No coaching subscribers yet</option> : null}
           {members.map((m) => (
@@ -179,6 +208,12 @@ export function AdminCoachingMemberWorkspaceClient() {
       {notice ? (
         <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
           {notice}
+        </p>
+      ) : null}
+
+      {selected && !workspace && !error ? (
+        <p className="text-sm text-white/55" role="status">
+          Loading member…
         </p>
       ) : null}
 
@@ -221,7 +256,7 @@ export function AdminCoachingMemberWorkspaceClient() {
             <button
               type="button"
               className={primaryBtn}
-              disabled={busy || !selected}
+              disabled={busy || !chapter}
               onClick={() => void post('save-chapter', { chapterSlug, coachUserId })}
             >
               Save chapter assignment
