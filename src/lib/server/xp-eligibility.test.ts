@@ -74,7 +74,7 @@ describe('one XP eligibility rule', () => {
     // Status is compared lower-cased and trimmed, the same answer as isEnrolmentAccessAllowed,
     // so a learner who can open the course also earns its XP (GP-786).
     expect(SQL_XP_ELIGIBLE.sql).toBe(
-      "lower(trim(e.status)) IN (?,?) AND lower(c.status) = 'published'"
+      "lower(regexp_replace(e.status, '^[[:space:]]+|[[:space:]]+$', '', 'g')) IN (?,?) AND lower(c.status) = 'published'"
     );
     expect(SQL_XP_ELIGIBLE.values).toEqual(['active', 'completed']);
   });

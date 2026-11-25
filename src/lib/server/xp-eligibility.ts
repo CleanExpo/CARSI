@@ -10,7 +10,7 @@ import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
  *   - the learner's enrolment on that course still grants access: the same allow-list as
  *     `isEnrolmentAccessAllowed` (`active`, `completed`), so a refund, dispute or revocation
  *     removes the XP and any unknown status fails closed. Like that check, the status is compared
- *     lower-cased and trimmed: rows written before the ws6 status constraint were never validated
+ *     lower-cased and trimmed of every kind of whitespace, tabs and newlines included (PostgreSQL `trim` strips only spaces, so the rule uses `regexp_replace`): rows written before the ws6 status constraint were never validated
  *     and may read `Active` or ` completed`, and a learner who can open the course must also earn
  *     its XP (GP-786); and
  *   - the course is published: `status` is canonical (#137), compared case-insensitively and
@@ -22,9 +22,9 @@ import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
  * Callers select FROM one of the two sources below, which fix the aliases the rule uses
  * (`e` = lms_enrollments, `c` = lms_courses).
  */
-export const SQL_XP_ELIGIBLE = Prisma.sql`lower(trim(e.status)) IN (${Prisma.join([
-  ...ACCESS_GRANTING_STATUS_LIST,
-])}) AND lower(c.status) = 'published'`;
+export const SQL_XP_ELIGIBLE = Prisma.sql`lower(regexp_replace(e.status, '^[[:space:]]+|[[:space:]]+$', '', 'g')) IN (${Prisma.join(
+  [...ACCESS_GRANTING_STATUS_LIST]
+)}) AND lower(c.status) = 'published'`;
 
 /** Lesson completions, joined to their course and to the learner's enrolment on it. */
 export const SQL_XP_LESSON_SOURCE = Prisma.sql`lms_lesson_progress lp

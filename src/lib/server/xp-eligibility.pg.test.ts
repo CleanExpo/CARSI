@@ -50,6 +50,10 @@ describe.runIf(RUNNABLE)('XP eligibility (real PostgreSQL)', () => {
     padded: randomUUID(),
     /** legacy status ' REVOKED ' (mixed case, padded): still no access and no XP. */
     paddedRevoked: randomUUID(),
+    /** legacy status padded with a tab and a newline: access is allowed (JS trim), so XP is too (GP-786). */
+    tabbed: randomUUID(),
+    /** legacy status 'revoked' padded with a tab and a newline: no access and no XP. */
+    tabbedRevoked: randomUUID(),
     /** active enrolment on a course that is no longer published. */
     unpublished: randomUUID(),
     /** lesson progress on the published course with no enrolment row at all. */
@@ -69,6 +73,8 @@ describe.runIf(RUNNABLE)('XP eligibility (real PostgreSQL)', () => {
     ids.revoked,
     ids.padded,
     ids.paddedRevoked,
+    ids.tabbed,
+    ids.tabbedRevoked,
     ids.unpublished,
     ids.orphan,
     ids.mixed,
@@ -152,6 +158,13 @@ describe.runIf(RUNNABLE)('XP eligibility (real PostgreSQL)', () => {
     await enrolLegacy(ids.paddedRevoked, ids.published, ' REVOKED ');
     await complete(ids.paddedRevoked, ids.p1);
 
+    await enrolLegacy(ids.tabbed, ids.published, '\tActive\n');
+    await complete(ids.tabbed, ids.p1);
+    await complete(ids.tabbed, ids.p2);
+
+    await enrolLegacy(ids.tabbedRevoked, ids.published, '\nrevoked\t');
+    await complete(ids.tabbedRevoked, ids.p1);
+
     await enrol(ids.unpublished, ids.draft, 'active');
     await complete(ids.unpublished, ids.d1);
 
@@ -191,7 +204,9 @@ describe.runIf(RUNNABLE)('XP eligibility (real PostgreSQL)', () => {
     expect(totals.get(ids.mixed)).toBe(xp.XP_LESSON_COMPLETE);
     expect(totals.get(ids.padded)).toBe(2 * xp.XP_LESSON_COMPLETE + xp.XP_COURSE_COMPLETE);
     expect(totals.get(ids.revoked) ?? 0).toBe(0);
+    expect(totals.get(ids.tabbed)).toBe(2 * xp.XP_LESSON_COMPLETE + xp.XP_COURSE_COMPLETE);
     expect(totals.get(ids.paddedRevoked) ?? 0).toBe(0);
+    expect(totals.get(ids.tabbedRevoked) ?? 0).toBe(0);
     expect(totals.get(ids.unpublished) ?? 0).toBe(0);
     expect(totals.get(ids.orphan) ?? 0).toBe(0);
   });
@@ -221,7 +236,14 @@ describe.runIf(RUNNABLE)('XP eligibility (real PostgreSQL)', () => {
     expect(labels.has(xp.anonymousLeaderboardLabel(ids.counted))).toBe(true);
     expect(labels.has(xp.anonymousLeaderboardLabel(ids.mixed))).toBe(true);
     expect(labels.has(xp.anonymousLeaderboardLabel(ids.padded))).toBe(true);
-    for (const id of [ids.revoked, ids.paddedRevoked, ids.unpublished, ids.orphan]) {
+    expect(labels.has(xp.anonymousLeaderboardLabel(ids.tabbed))).toBe(true);
+    for (const id of [
+      ids.revoked,
+      ids.paddedRevoked,
+      ids.tabbedRevoked,
+      ids.unpublished,
+      ids.orphan,
+    ]) {
       expect(labels.has(xp.anonymousLeaderboardLabel(id))).toBe(false);
     }
   });
