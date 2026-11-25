@@ -46,6 +46,10 @@ describe.runIf(RUNNABLE)('XP eligibility (real PostgreSQL)', () => {
     counted: randomUUID(),
     /** refunded: status 'revoked', but its completion timestamps survived. */
     revoked: randomUUID(),
+    /** legacy status ' Completed ' (mixed case, padded): access is allowed, so XP is too (GP-786). */
+    padded: randomUUID(),
+    /** legacy status ' REVOKED ' (mixed case, padded): still no access and no XP. */
+    paddedRevoked: randomUUID(),
     /** active enrolment on a course that is no longer published. */
     unpublished: randomUUID(),
     /** lesson progress on the published course with no enrolment row at all. */
@@ -60,7 +64,15 @@ describe.runIf(RUNNABLE)('XP eligibility (real PostgreSQL)', () => {
     p2: randomUUID(),
     d1: randomUUID(),
   };
-  const learners = [ids.counted, ids.revoked, ids.unpublished, ids.orphan, ids.mixed];
+  const learners = [
+    ids.counted,
+    ids.revoked,
+    ids.padded,
+    ids.paddedRevoked,
+    ids.unpublished,
+    ids.orphan,
+    ids.mixed,
+  ];
   const publishedSlug = `xp-elig-pub-${ids.published}`;
   const draftSlug = `xp-elig-draft-${ids.draft}`;
 
@@ -69,6 +81,32 @@ describe.runIf(RUNNABLE)('XP eligibility (real PostgreSQL)', () => {
       'INSERT INTO lms_enrollments (id, student_id, course_id, status, completed_at) VALUES ($1, $2, $3, $4, now())',
       [randomUUID(), student, course, status]
     );
+  }
+  /**
+   * A legacy enrolment row with a non-canonical status. New writes cannot make one: the
+   * `lms_enrollments_status_check` constraint (ws6, NOT VALID) refuses them, but rows written
+   * before it were never validated and may still carry `Active` or ` completed`. The constraint is
+   * dropped and re-added with its own definition inside one transaction, which recreates exactly
+   * that state (GP-786).
+   */
+  async function enrolLegacy(student: string, course: string, status: string) {
+    const def = await db.query<{ def: string }>(
+      "SELECT pg_get_constraintdef(oid) AS def FROM pg_constraint WHERE conname = 'lms_enrollments_status_check'"
+    );
+    const constraint = def.rows[0]?.def;
+    if (!constraint) throw new Error('lms_enrollments_status_check is missing');
+    await db.query('BEGIN');
+    try {
+      await db.query('ALTER TABLE lms_enrollments DROP CONSTRAINT lms_enrollments_status_check');
+      await enrol(student, course, status);
+      await db.query(
+        `ALTER TABLE lms_enrollments ADD CONSTRAINT lms_enrollments_status_check ${constraint}`
+      );
+      await db.query('COMMIT');
+    } catch (err) {
+      await db.query('ROLLBACK');
+      throw err;
+    }
   }
   async function complete(student: string, lesson: string) {
     await db.query(
@@ -107,6 +145,13 @@ describe.runIf(RUNNABLE)('XP eligibility (real PostgreSQL)', () => {
     await complete(ids.revoked, ids.p1);
     await complete(ids.revoked, ids.p2);
 
+    await enrolLegacy(ids.padded, ids.published, ' Completed ');
+    await complete(ids.padded, ids.p1);
+    await complete(ids.padded, ids.p2);
+
+    await enrolLegacy(ids.paddedRevoked, ids.published, ' REVOKED ');
+    await complete(ids.paddedRevoked, ids.p1);
+
     await enrol(ids.unpublished, ids.draft, 'active');
     await complete(ids.unpublished, ids.d1);
 
@@ -127,8 +172,12 @@ describe.runIf(RUNNABLE)('XP eligibility (real PostgreSQL)', () => {
 
   afterAll(async () => {
     // Courses cascade to modules, lessons and enrolments; users cascade to progress.
-    await db.query('DELETE FROM lms_courses WHERE id = ANY($1::uuid[])', [[ids.published, ids.draft]]);
-    await db.query('DELETE FROM lms_users WHERE id = ANY($1::uuid[])', [[ids.instructor, ...learners]]);
+    await db.query('DELETE FROM lms_courses WHERE id = ANY($1::uuid[])', [
+      [ids.published, ids.draft],
+    ]);
+    await db.query('DELETE FROM lms_users WHERE id = ANY($1::uuid[])', [
+      [ids.instructor, ...learners],
+    ]);
     await db.end().catch(() => {});
     await prisma?.$disconnect().catch(() => {});
   });
@@ -140,7 +189,9 @@ describe.runIf(RUNNABLE)('XP eligibility (real PostgreSQL)', () => {
     );
     expect(totals.get(ids.counted)).toBe(2 * xp.XP_LESSON_COMPLETE + xp.XP_COURSE_COMPLETE);
     expect(totals.get(ids.mixed)).toBe(xp.XP_LESSON_COMPLETE);
+    expect(totals.get(ids.padded)).toBe(2 * xp.XP_LESSON_COMPLETE + xp.XP_COURSE_COMPLETE);
     expect(totals.get(ids.revoked) ?? 0).toBe(0);
+    expect(totals.get(ids.paddedRevoked) ?? 0).toBe(0);
     expect(totals.get(ids.unpublished) ?? 0).toBe(0);
     expect(totals.get(ids.orphan) ?? 0).toBe(0);
   });
@@ -169,7 +220,8 @@ describe.runIf(RUNNABLE)('XP eligibility (real PostgreSQL)', () => {
     const labels = new Set(board.items.map((i) => i.display_name));
     expect(labels.has(xp.anonymousLeaderboardLabel(ids.counted))).toBe(true);
     expect(labels.has(xp.anonymousLeaderboardLabel(ids.mixed))).toBe(true);
-    for (const id of [ids.revoked, ids.unpublished, ids.orphan]) {
+    expect(labels.has(xp.anonymousLeaderboardLabel(ids.padded))).toBe(true);
+    for (const id of [ids.revoked, ids.paddedRevoked, ids.unpublished, ids.orphan]) {
       expect(labels.has(xp.anonymousLeaderboardLabel(id))).toBe(false);
     }
   });
@@ -178,7 +230,10 @@ describe.runIf(RUNNABLE)('XP eligibility (real PostgreSQL)', () => {
     const counted = await learnerXp.getLearnerLevelPayload(ids.counted);
     expect(counted.total_xp).toBe(2 * xp.XP_LESSON_COMPLETE + xp.XP_COURSE_COMPLETE);
     expect(counted.current_streak).toBe(1);
-    for (const id of [ids.revoked, ids.unpublished, ids.orphan]) {
+    const padded = await learnerXp.getLearnerLevelPayload(ids.padded);
+    expect(padded.total_xp).toBe(2 * xp.XP_LESSON_COMPLETE + xp.XP_COURSE_COMPLETE);
+    expect(padded.current_streak).toBe(1);
+    for (const id of [ids.revoked, ids.paddedRevoked, ids.unpublished, ids.orphan]) {
       const p = await learnerXp.getLearnerLevelPayload(id);
       expect(p.total_xp).toBe(0);
       expect(p.current_streak).toBe(0);
