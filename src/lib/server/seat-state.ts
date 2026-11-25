@@ -342,23 +342,26 @@ export function fulfilCheckoutInStep(
  * A checkout enrolment: a reversed session never issues or reactivates access, whether the
  * reversal is on the row (revoked for this very session) or only in the marker (it landed before
  * any row existed). A new paid session still reactivates a revoked row (re-purchase).
+ *
+ * GP-790: the marker is checked for every Stripe fulfilment, including a buyer who already holds
+ * the course through another payment. A reversed session answers `PAYMENT_REVERSED`, never
+ * "already enrolled" (the team path already answered this way). The access held through the
+ * other payment is left as it is.
  */
 async function issueCheckoutEnrolment(tx: SeatTx, enrolment: PreparedEnrolment): Promise<EnrollResult> {
   const ref = enrolment.paymentReference;
   if (isStripeCheckoutPaymentReference(ref)) {
+    if (await isCheckoutSessionReversed(tx, ref)) throw new Error(PAYMENT_REVERSED);
     const existing = await tx.lmsEnrollment.findUnique({
       where: { studentId_courseId: { studentId: enrolment.studentId, courseId: enrolment.courseId } },
       select: { status: true, paymentReference: true, revokedReason: true },
     });
     // The same "would this write issue access?" test as the enrolment writer.
-    if (!existing || !isEnrolmentAccessAllowed(existing.status)) {
+    if (existing && !isEnrolmentAccessAllowed(existing.status)) {
       const revokedForThisPayment =
-        existing !== null &&
         existing.paymentReference === ref &&
         (existing.revokedReason === 'refunded' || existing.revokedReason === 'disputed');
-      if (revokedForThisPayment || (await isCheckoutSessionReversed(tx, ref))) {
-        throw new Error(PAYMENT_REVERSED);
-      }
+      if (revokedForThisPayment) throw new Error(PAYMENT_REVERSED);
     }
   }
   return issuePreparedEnrolment(tx, enrolment);
