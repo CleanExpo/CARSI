@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
+import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -22,8 +23,8 @@ const NOT_YET_KEYED: Record<string, string> = {
   [join('src', 'lib', 'api', 'stripe.ts')]: 'GP-785: generic wrapper with no production caller',
 };
 
-const KEY_BUILDERS =
-  /idempotencyKey:\s*(courseCheckoutIdempotencyKey|checkoutSessionIdempotencyKey)\(/;
+/** The owner's key builders: the only calls a create may take its key from. */
+const KEY_BUILDERS = new Set(['courseCheckoutIdempotencyKey', 'checkoutSessionIdempotencyKey']);
 
 function sourceFiles(dir: string, out: string[] = []): string[] {
   for (const name of readdirSync(dir)) {
@@ -40,19 +41,53 @@ const FILES = [...sourceFiles(join(ROOT, 'app')), ...sourceFiles(join(ROOT, 'src
   text: readFileSync(f, 'utf8'),
 }));
 
-/** The argument text of every `checkout.sessions.create(...)` call in `text`. */
-function checkoutCreateCalls(text: string): string[] {
-  const calls: string[] = [];
-  const pattern = /checkout\.sessions\.create\(/g;
-  for (let match = pattern.exec(text); match; match = pattern.exec(text)) {
-    let depth = 1;
-    let i = match.index + match[0].length;
-    for (; i < text.length && depth > 0; i++) {
-      if (text[i] === '(') depth++;
-      else if (text[i] === ')') depth--;
-    }
-    calls.push(text.slice(match.index + match[0].length, i - 1));
-  }
+/** Whether `call` is a `<something>.checkout.sessions.create(...)` call. */
+function isCheckoutCreate(call: ts.CallExpression): boolean {
+  const create = call.expression;
+  if (!ts.isPropertyAccessExpression(create) || create.name.text !== 'create') return false;
+  const sessions = create.expression;
+  if (!ts.isPropertyAccessExpression(sessions) || sessions.name.text !== 'sessions') return false;
+  const checkout = sessions.expression;
+  return ts.isPropertyAccessExpression(checkout) && checkout.name.text === 'checkout';
+}
+
+/**
+ * Whether the create call sends the owner's key: its second argument (Stripe's request options)
+ * is an object literal with a top-level `idempotencyKey` whose value is a call to one of the
+ * owner's builders. Read from the parsed source (GP-789), so a key named only in a comment, or
+ * nested in the request data or deeper in the options, does not count: Stripe would get no key.
+ */
+function sendsOwnerKey(call: ts.CallExpression): boolean {
+  const options = call.arguments[1];
+  if (!options || !ts.isObjectLiteralExpression(options)) return false;
+  return options.properties.some(
+    (p) =>
+      ts.isPropertyAssignment(p) &&
+      (ts.isIdentifier(p.name) || ts.isStringLiteral(p.name)) &&
+      p.name.text === 'idempotencyKey' &&
+      ts.isCallExpression(p.initializer) &&
+      ts.isIdentifier(p.initializer.expression) &&
+      KEY_BUILDERS.has(p.initializer.expression.text)
+  );
+}
+
+/** Every `checkout.sessions.create(...)` call in `text`, parsed. */
+function checkoutCreateCalls(text: string): ts.CallExpression[] {
+  // Sound shortcut: such a call must spell the identifier `sessions` somewhere in the file.
+  if (!text.includes('sessions')) return [];
+  const file = ts.createSourceFile(
+    'scan.tsx',
+    text,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX
+  );
+  const calls: ts.CallExpression[] = [];
+  const visit = (node: ts.Node): void => {
+    if (ts.isCallExpression(node) && isCheckoutCreate(node)) calls.push(node);
+    ts.forEachChild(node, visit);
+  };
+  visit(file);
   return calls;
 }
 
@@ -60,7 +95,7 @@ function checkoutCreateCalls(text: string): string[] {
 function unkeyedCreators(files: { path: string; text: string }[]): string[] {
   return files.flatMap((f) =>
     checkoutCreateCalls(f.text)
-      .filter((args) => !KEY_BUILDERS.test(args))
+      .filter((call) => !sendsOwnerKey(call))
       .map(() => f.path)
   );
 }
@@ -93,6 +128,32 @@ describe('GP-783: every Stripe checkout key comes from checkout-idempotency.ts',
       },
     ];
     expect(unkeyedCreators(planted)).toEqual(['planted/no-key.ts', 'planted/own-key.ts']);
+  });
+
+  it('control: the owner key named only in a comment or nested in request data is caught (GP-789)', () => {
+    const planted = [
+      {
+        path: 'planted/comment.ts',
+        text: 'await stripe.checkout.sessions.create(req /* idempotencyKey: courseCheckoutIdempotencyKey(req) */);',
+      },
+      {
+        path: 'planted/metadata.ts',
+        text: 'await stripe.checkout.sessions.create({ mode: "payment", metadata: { idempotencyKey: courseCheckoutIdempotencyKey(req) } });',
+      },
+      {
+        path: 'planted/nested-option.ts',
+        text: 'await stripe.checkout.sessions.create(req, { extra: { idempotencyKey: checkoutSessionIdempotencyKey(id) } });',
+      },
+      {
+        path: 'planted/keyed-session.ts',
+        text: 'await getStripeClient().checkout.sessions.create(\n  { mode: "subscription" },\n  { idempotencyKey: checkoutSessionIdempotencyKey(id) }\n);',
+      },
+    ];
+    expect(unkeyedCreators(planted)).toEqual([
+      'planted/comment.ts',
+      'planted/metadata.ts',
+      'planted/nested-option.ts',
+    ]);
   });
 
   it('every checkout create outside the named not-yet-keyed list takes its key from the owner', () => {

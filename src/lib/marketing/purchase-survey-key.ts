@@ -95,43 +95,67 @@ export function rememberPurchaseSurveyKey(
  * stored here: pass `field.survey_key` to `rememberPurchaseSurveyKey` once the checkout returns
  * a `checkout_url`.
  */
-export function purchaseSurveyCheckoutField(
-  storage: Storage | null = tabStorage()
-): { survey_key?: string } {
+export function purchaseSurveyCheckoutField(storage: Storage | null = tabStorage()): {
+  survey_key?: string;
+} {
   const key = newPurchaseSurveyKey(storage);
   return key ? { survey_key: key } : {};
 }
 
-/** Where this tab keeps the key of its latest checkout attempt, for a repeat of that purchase. */
+/**
+ * Where this tab keeps the keys of its recent checkout attempts, one per purchase, for a repeat of
+ * that purchase (GP-789: one slot per purchase, so buying A, then B, then A again inside the
+ * window still repeats A's key).
+ */
 export const PURCHASE_SURVEY_PENDING_STORAGE_NAME = 'carsi_svk_pending';
 /** Matches the server's course checkout repeat window (checkout-idempotency.ts). */
 export const PURCHASE_SURVEY_REPEAT_WINDOW_MS = 10 * 60 * 1000;
+/** At most this many recent purchases are remembered; the oldest drops off first. */
+const PENDING_LIMIT = 10;
 
-/** The pending entry as stored, or null when absent, malformed or unreadable (never a throw). */
-function readPendingKey(storage: Storage): { p?: unknown; k?: unknown; t?: unknown } | null {
+type PendingEntry = { p: string; k: string; t: number };
+
+/**
+ * The pending entries still inside their window at `now`, oldest first. Absent, malformed or
+ * unreadable storage gives none (never a throw). The earlier one-purchase shape `{ p, k, t }` is
+ * read as a list of one.
+ */
+function readPendingKeys(storage: Storage, now: number): PendingEntry[] {
+  let parsed: unknown;
   try {
     const raw = storage.getItem(PURCHASE_SURVEY_PENDING_STORAGE_NAME);
-    const parsed: unknown = raw ? JSON.parse(raw) : null;
-    return parsed && typeof parsed === 'object'
-      ? (parsed as { p?: unknown; k?: unknown; t?: unknown })
-      : null;
+    parsed = raw ? JSON.parse(raw) : null;
   } catch {
     // A malformed entry is replaced by the caller; blocked storage yields no key there.
-    return null;
+    return [];
   }
+  const list: unknown[] = Array.isArray(parsed) ? parsed : parsed ? [parsed] : [];
+  return list.filter((e): e is PendingEntry => {
+    if (!e || typeof e !== 'object') return false;
+    const { p, k, t } = e as { p?: unknown; k?: unknown; t?: unknown };
+    return (
+      typeof p === 'string' &&
+      typeof k === 'string' &&
+      KEY_SHAPE.test(k) &&
+      typeof t === 'number' &&
+      now - t >= 0 &&
+      now - t < PURCHASE_SURVEY_REPEAT_WINDOW_MS
+    );
+  });
 }
 
 /**
  * `{ survey_key }` for one course purchase (GP-783). A repeat of the SAME purchase from this tab
  * within the repeat window (a double-click, or pressing "Buy course" again after a stall or an
  * error) sends the same key as the first attempt, so the checkout request is identical and the
- * server hands back the first Stripe session instead of opening a second one. A different
- * purchase, or the same one after the window, gets a fresh key.
+ * server hands back the first Stripe session instead of opening a second one. This holds even
+ * when other purchases were tried in between (GP-789). A different purchase, or the same one
+ * after the window, gets a fresh key.
  *
  * `purchase` names the purchase, not the buyer (course, mode and seats; never an email). The
- * pending key is kept apart from the five-key list, so an attempt still joins the list only when
+ * pending keys are kept apart from the five-key list, so an attempt still joins the list only when
  * checkout returns a `checkout_url` (GP-694). A tab opened from this one inside the window
- * copies the pending key; the boundary stays "this browser", as the module note says.
+ * copies the pending keys; the boundary stays "this browser", as the module note says.
  */
 export function purchaseSurveyCheckoutFieldFor(
   purchase: string,
@@ -139,25 +163,14 @@ export function purchaseSurveyCheckoutFieldFor(
   now: number = Date.now()
 ): { survey_key?: string } {
   if (!storage) return {};
-  const pending = readPendingKey(storage);
-  if (
-    pending &&
-    pending.p === purchase &&
-    typeof pending.k === 'string' &&
-    KEY_SHAPE.test(pending.k) &&
-    typeof pending.t === 'number' &&
-    now - pending.t >= 0 &&
-    now - pending.t < PURCHASE_SURVEY_REPEAT_WINDOW_MS
-  ) {
-    return { survey_key: pending.k };
-  }
+  const pending = readPendingKeys(storage, now);
+  const repeat = pending.find((e) => e.p === purchase);
+  if (repeat) return { survey_key: repeat.k };
   const key = newPurchaseSurveyKey(storage);
   if (!key) return {};
+  const next = [...pending, { p: purchase, k: key, t: now }].slice(-PENDING_LIMIT);
   try {
-    storage.setItem(
-      PURCHASE_SURVEY_PENDING_STORAGE_NAME,
-      JSON.stringify({ p: purchase, k: key, t: now })
-    );
+    storage.setItem(PURCHASE_SURVEY_PENDING_STORAGE_NAME, JSON.stringify(next));
   } catch {
     // A storage that refuses writes: this attempt still gets its own fresh key, as before.
   }

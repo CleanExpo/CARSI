@@ -164,7 +164,10 @@ describe('purchaseSurveyCheckoutField(): the wrapper every checkout body spreads
     expect(Object.keys(field)).toEqual(['survey_key']);
     expect(field.survey_key).toMatch(/^[0-9a-f]{32}$/);
     // The body a checkout sends carries the key under exactly this name.
-    expect(JSON.parse(JSON.stringify({ slug: 'x', ...field }))).toEqual({ slug: 'x', survey_key: field.survey_key });
+    expect(JSON.parse(JSON.stringify({ slug: 'x', ...field }))).toEqual({
+      slug: 'x',
+      survey_key: field.survey_key,
+    });
     expect(rememberPurchaseSurveyKey(field.survey_key)).toBe(true);
     expect(readPurchaseSurveyKeys()).toEqual([field.survey_key]);
   });
@@ -222,6 +225,40 @@ describe('purchaseSurveyCheckoutFieldFor(): a repeat of one purchase sends one k
       T0 + 3000 + PURCHASE_SURVEY_REPEAT_WINDOW_MS
     ).survey_key;
     expect(later).not.toBe(teamOf4);
+  });
+
+  it('A, then B, then A again inside the window: A keeps its first key (GP-789)', () => {
+    const tab = memoryStorage();
+    const a = purchaseSurveyCheckoutFieldFor('water:self:1', tab, T0).survey_key;
+    const b = purchaseSurveyCheckoutFieldFor('mould:self:1', tab, T0 + 60_000).survey_key;
+    const aAgain = purchaseSurveyCheckoutFieldFor('water:self:1', tab, T0 + 120_000).survey_key;
+    const bAgain = purchaseSurveyCheckoutFieldFor('mould:self:1', tab, T0 + 180_000).survey_key;
+    expect(b).not.toBe(a);
+    expect(aAgain).toBe(a);
+    expect(bAgain).toBe(b);
+    // Each purchase's own window still ends: A after the window is a fresh key.
+    expect(
+      purchaseSurveyCheckoutFieldFor('water:self:1', tab, T0 + PURCHASE_SURVEY_REPEAT_WINDOW_MS)
+        .survey_key
+    ).not.toBe(a);
+  });
+
+  it('an entry in the earlier one-purchase shape is still honoured (GP-789)', () => {
+    const tab = memoryStorage();
+    const k = 'a'.repeat(32);
+    tab.setItem(
+      PURCHASE_SURVEY_PENDING_STORAGE_NAME,
+      JSON.stringify({ p: 'water:self:1', k, t: T0 })
+    );
+    expect(purchaseSurveyCheckoutFieldFor('water:self:1', tab, T0 + 1000).survey_key).toBe(k);
+  });
+
+  it('the pending list stays small however many purchases are tried (GP-789)', () => {
+    const tab = memoryStorage();
+    for (let i = 0; i < 50; i++) purchaseSurveyCheckoutFieldFor(`course-${i}:self:1`, tab, T0 + i);
+    const stored = JSON.parse(tab.getItem(PURCHASE_SURVEY_PENDING_STORAGE_NAME) ?? '[]');
+    expect(Array.isArray(stored)).toBe(true);
+    expect(stored.length).toBeLessThanOrEqual(10);
   });
 
   it('a pending key never joins the five-key list until checkout returns a checkout_url (GP-694)', () => {
