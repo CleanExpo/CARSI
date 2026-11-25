@@ -10,10 +10,11 @@
  *  - Membership, Teams, org and onboarding checkouts hold a database reservation first. Their
  *    key is the reservation (kind, owner, reservation time): stable for one reservation,
  *    different for the next legitimate one.
- *  - A course purchase ("Buy course") holds no reservation. Its key is the exact request it
- *    protects plus a short time window, so a double-click or a retry of the same purchase within
- *    the window gets the first session back, and any change to the purchase (course, price,
- *    seats, buyer, return links, metadata) is a different key by construction.
+ *  - A course purchase ("Buy course"), event and monthly coaching, and the one-off onboarding
+ *    checkout (Teams off) hold no reservation. Their key is the exact request it protects plus a
+ *    short time window, so a double-click or a retry of the same purchase within the window gets
+ *    the first session back, and any change to the purchase (course, price, seats, buyer, return
+ *    links, metadata) is a different key by construction (GP-783, GP-785).
  *
  * Hashing keeps internal ids and emails out of Stripe logs and bounds the key length.
  */
@@ -66,16 +67,35 @@ function canonicalJson(value: unknown): string {
 }
 
 /**
- * The key for one course purchase: the exact Checkout Session request, hashed, plus the repeat
- * window it falls in. The same purchase inside one window always gets the same key; a different
- * purchase never shares one, so Stripe can never refuse it for mismatched parameters.
+ * Checkouts keyed by their own request (no database reservation). Each kind has its own key
+ * space, so two kinds can never share a key.
  */
-export function courseCheckoutIdempotencyKey(
+export type CheckoutRequestKind =
+  | 'course'
+  | 'business-coaching'
+  | 'coaching-monthly'
+  | 'onboarding-one-off';
+
+/**
+ * The key for one unreserved checkout: the exact Checkout Session request, hashed, plus the
+ * repeat window it falls in. The same purchase inside one window always gets the same key; a
+ * different purchase never shares one, so Stripe can never refuse it for mismatched parameters.
+ */
+export function checkoutRequestIdempotencyKey(
+  kind: CheckoutRequestKind,
   request: Stripe.Checkout.SessionCreateParams,
   now: Date = new Date()
 ): string {
   const window = Math.floor(now.getTime() / COURSE_CHECKOUT_REPEAT_WINDOW_MS);
-  return `carsi:course:${sha256Hex(canonicalJson(request)).slice(0, 40)}:${window}`;
+  return `carsi:${kind}:${sha256Hex(canonicalJson(request)).slice(0, 40)}:${window}`;
+}
+
+/** The key for one course purchase ("Buy course"); see `checkoutRequestIdempotencyKey`. */
+export function courseCheckoutIdempotencyKey(
+  request: Stripe.Checkout.SessionCreateParams,
+  now: Date = new Date()
+): string {
+  return checkoutRequestIdempotencyKey('course', request, now);
 }
 
 /**
