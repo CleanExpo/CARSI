@@ -75,9 +75,9 @@ export function AdminCoachingMemberWorkspaceClient() {
   // The selection a save is running for. Busy only counts on that selection, so a save for A
   // that never answers cannot lock B's buttons.
   const [busyGeneration, setBusyGeneration] = useState<number | null>(null);
-  // Counts the admin's chapter edits, so a save answer can tell "nothing changed since I was
-  // sent" from "the admin has picked something newer" and leave the newer pick alone.
-  const chapterEditsRef = useRef(0);
+  // While a request runs the chapter choice is locked (see the select below), so the answer to
+  // a save can never meet a newer pick: what the server answers is what is shown, and "Saved."
+  // always names the chapter that was posted.
   const busy = busyGeneration === generation;
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
@@ -153,15 +153,6 @@ export function AdminCoachingMemberWorkspaceClient() {
     return () => controller.abort();
   }, [selected, loadWorkspace]);
 
-  const mountedRef = useRef(true);
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      // Unmount: a save still in flight must not touch state afterwards.
-      mountedRef.current = false;
-    };
-  }, []);
-
   function selectMember(userId: string) {
     // Clear the last member's notice and error at once (a setState in the selection effect trips
     // react-hooks/set-state-in-effect). Their workspace is hidden by its member tag.
@@ -179,8 +170,7 @@ export function AdminCoachingMemberWorkspaceClient() {
     const forUser = selected;
     if (!forUser || !workspace) return;
     const startedGeneration = generationRef.current;
-    const editsAtStart = chapterEditsRef.current;
-    const stale = () => !mountedRef.current || generationRef.current !== startedGeneration;
+    const stale = () => generationRef.current !== startedGeneration;
     setBusyGeneration(startedGeneration);
     setNotice('');
     setError('');
@@ -205,14 +195,7 @@ export function AdminCoachingMemberWorkspaceClient() {
         setError(data.detail ?? 'Request failed.');
         return;
       }
-      if (data.workspace) {
-        if (chapterEditsRef.current === editsAtStart) {
-          showWorkspace(forUser, startedGeneration, data.workspace);
-        } else {
-          // Keep the admin's newer chapter pick; refresh only what the server owns.
-          setLoaded({ generation: startedGeneration, userId: forUser, workspace: data.workspace });
-        }
-      }
+      if (data.workspace) showWorkspace(forUser, startedGeneration, data.workspace);
       setNotice('Saved.');
     } finally {
       setBusyGeneration((current) => (current === startedGeneration ? null : current));
@@ -224,7 +207,6 @@ export function AdminCoachingMemberWorkspaceClient() {
 
   function pickChapter(slug: string) {
     if (!chapter) return;
-    chapterEditsRef.current += 1;
     const opt = chapterOptions.find((c) => c.slug === slug);
     setDraft({
       generation: chapter.generation,
@@ -299,6 +281,7 @@ export function AdminCoachingMemberWorkspaceClient() {
                   id="chapter-slug"
                   className={`${field} mt-2`}
                   value={chapterSlug}
+                  disabled={busy}
                   onChange={(e) => pickChapter(e.target.value)}
                 >
                   {chapterOptions.map((c) => (

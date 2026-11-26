@@ -458,17 +458,15 @@ describe('AdminCoachingMemberWorkspaceClient: away and back (A, B, A)', () => {
     expect(container.textContent).not.toContain('Saved.');
   });
 
-  it('a save answer does not wipe a chapter the admin picked while the save was running', async () => {
+  it('the chapter choice is locked while a request runs, so "Saved." always names what was posted', async () => {
     await renderAndLoadA();
+    const select = () => container.querySelector<HTMLSelectElement>('#chapter-slug')!;
+    expect(select().disabled).toBe(false);
     await act(async () => saveButton()!.click());
     expect(posts).toHaveLength(1);
 
-    const newer = chapters[chapters.length - 1];
-    const select = container.querySelector<HTMLSelectElement>('#chapter-slug')!;
-    await act(async () => {
-      select.value = newer.slug;
-      select.dispatchEvent(new Event('change', { bubbles: true }));
-    });
+    // The admin cannot pick another chapter while the save is out, so the answer cannot meet it.
+    expect(select().disabled).toBe(true);
     await act(async () =>
       posts[0].resolve(
         json({ workspace: ws('Member A', chapters[0].slug, chapters[0].coachUserId) })
@@ -477,7 +475,8 @@ describe('AdminCoachingMemberWorkspaceClient: away and back (A, B, A)', () => {
     await flush();
 
     expect(container.textContent).toContain('Saved.');
-    expect(container.querySelector<HTMLSelectElement>('#chapter-slug')!.value).toBe(newer.slug);
+    expect(select().disabled).toBe(false);
+    expect(select().value).toBe(chapters[0].slug);
   });
 
   it("a save for A that never answers does not lock member B's buttons", async () => {
@@ -508,19 +507,30 @@ describe('AdminCoachingMemberWorkspaceClient: away and back (A, B, A)', () => {
     expect(saveButton()).toBeDefined();
   });
 
-  it('an answer that arrives after the page is closed changes nothing and does not throw', async () => {
-    await renderAndLoadA();
-    await act(async () => saveButton()!.click());
-    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
-    await act(async () => root.unmount());
-    root = createRoot(container);
+  it('an old load whose body arrives after A, B, A does not replace the newer load for A', async () => {
+    await act(async () => root.render(<AdminCoachingMemberWorkspaceClient />));
+    await flush();
+    // The first A request answers at once, but its body is still being read.
+    let releaseBody: (body: unknown) => void = () => {};
+    const slowBody = new Promise<unknown>((resolve) => (releaseBody = resolve));
     await act(async () =>
-      posts[0].resolve(
-        json({ workspace: ws('Member A', chapters[0].slug, chapters[0].coachUserId) })
-      )
+      gets[A][0].resolve({ ok: true, json: () => slowBody } as unknown as Response)
     );
     await flush();
-    expect(errors).not.toHaveBeenCalled();
-    errors.mockRestore();
+
+    await pick(B);
+    await pick(A);
+    expect(gets[A]).toHaveLength(2);
+    await answerGet(A, 1, 'New A');
+    expect(container.textContent).toContain('Brief for New A');
+
+    await act(async () =>
+      releaseBody({
+        workspace: ws('Old A', chapters[0].slug, chapters[0].coachUserId),
+      })
+    );
+    await flush();
+    expect(container.textContent).toContain('Brief for New A');
+    expect(container.textContent).not.toContain('Brief for Old A');
   });
 });
