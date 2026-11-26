@@ -542,8 +542,8 @@ export function DashboardLearningSection({
             <p className={`mt-4 text-[14px] ${muted}`}>
               Next pathway course:{' '}
               <Link
-                href={`/courses/${encodeURIComponent(learningJourney.pathway_next.slug)}`}
-                className="font-semibold text-sky-200 hover:text-white"
+                href={`/dashboard/courses/${encodeURIComponent(learningJourney.pathway_next.slug)}`}
+                className="font-semibold text-sky-200 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
               >
                 {learningJourney.pathway_next.title}
               </Link>{' '}

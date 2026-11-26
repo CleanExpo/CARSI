@@ -878,19 +878,12 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                 onSelectLesson={selectLesson}
                 onSelectModule={selectModuleOverview}
               />
-              <LearnerLearningJourneyPanel
-                courseSlug={curriculum.course.slug}
-                className="mt-4 hidden lg:block"
-              />
+              <LearnerLearningJourneyPanel courseSlug={curriculum.course.slug} className="mt-4" />
             </>
           )}
         </aside>
 
         <div className="min-w-0 flex-1">
-          <LearnerLearningJourneyPanel
-            courseSlug={curriculum.course.slug}
-            className="mb-4 lg:hidden"
-          />
           {curriculum.course.delivery_profile && activeLessonId ? (() => {
             const profile = curriculum.course.delivery_profile;
             const index = profile.sessions.findIndex((session) => session.readingLessonId === activeLessonId || session.assessmentLessonId === activeLessonId);

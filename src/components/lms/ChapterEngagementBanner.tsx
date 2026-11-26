@@ -25,9 +25,13 @@ export function ChapterEngagementBanner({ resources, lessonTitle, className = ''
         className
       )}
       data-testid="chapter-engagement-banner"
-      role="note"
+      role="region"
+      aria-labelledby="chapter-engagement-title"
     >
-      <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-900">
+      <p
+        id="chapter-engagement-title"
+        className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-900"
+      >
         <ShieldAlert className="h-4 w-4 text-sky-600" aria-hidden />
         Active learning in this chapter
       </p>

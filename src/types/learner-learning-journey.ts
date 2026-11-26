@@ -35,3 +35,11 @@ export interface LearnerLearningJourneyPayload {
   /** Human-readable summary for the learner home rail. */
   headline: string | null;
 }
+
+export const EMPTY_LEARNER_LEARNING_JOURNEY: LearnerLearningJourneyPayload = {
+  course_recommendations: [],
+  activity_nudges: [],
+  skill_gaps: [],
+  pathway_next: null,
+  headline: null,
+};

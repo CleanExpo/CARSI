@@ -99,12 +99,14 @@ export function buildActivityNudges(args: {
     if (args.focusCourseSlug && offer.courseSlug !== args.focusCourseSlug) continue;
     const enr = args.enrollments.find((e) => e.course_slug === offer.courseSlug);
     if (!enr || enr.all_lessons_complete) continue;
+    const lessonId = getPilotLessonQuery(offer);
+    if (!lessonId) continue;
     nudges.push({
       id: `interactive-${offer.experienceId}`,
       kind: 'interactive',
       title: offer.heroTitle ?? offer.teaser.slice(0, 72),
       reason: `${offer.disciplineLabel} practice — work through scenarios before marking the module complete.`,
-      href: `/dashboard/learn/${encodeURIComponent(offer.courseSlug)}?lesson=${encodeURIComponent(getPilotLessonQuery(offer))}`,
+      href: `/dashboard/learn/${encodeURIComponent(offer.courseSlug)}?lesson=${encodeURIComponent(lessonId)}`,
       course_slug: offer.courseSlug,
       course_title: offer.courseTitle,
       discipline_label: offer.disciplineLabel,

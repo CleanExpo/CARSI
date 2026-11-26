@@ -38,6 +38,7 @@ const STEPS = [
       '--config',
       'config/vitest.config.ts',
       'src/lib/lms/learner-journey-insights.test.ts',
+      'src/lib/lms/learner-journey-query.test.ts',
     ],
   },
   {
