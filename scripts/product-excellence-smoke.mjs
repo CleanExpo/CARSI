@@ -72,6 +72,7 @@ const STEPS = [
       'src/lib/coaching-portal/coaching-chapters.test.ts',
       'src/lib/coaching-portal/trade-hall-seminar.test.ts',
       'src/components/admin/AdminCoachingChaptersClient.test.tsx',
+      'src/components/admin/admin-coaching-ui.test.tsx',
       'src/lib/server/carsi-coaching-member-workspace.test.ts',
       'src/components/admin/AdminCoachingMemberWorkspaceClient.test.tsx',
     ],
