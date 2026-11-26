@@ -1,19 +1,20 @@
 import { randomUUID } from 'node:crypto';
 
-import type { SessionClaims } from '@/lib/auth/session-jwt';
 import type { Prisma } from '@/generated/prisma/client';
-import { prisma } from '@/lib/prisma';
-import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
-import { ensureLmsUserFromClaims } from '@/lib/server/lms-user-sync';
-import { isUniqueConstraintError } from '@/lib/server/db-errors';
-import { decideEnrollmentCompleted } from '@/lib/server/lms-completion';
-import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
-import { extractQuizIdFromLesson } from '@/lib/lms/quiz-from-lesson';
-import { parseLessonResources } from '@/lib/lms/lesson-resources';
-import { requireCurrentAdmin, type AdminSessionProvenance } from '@/lib/server/current-admin';
-import { EnrollmentLockRefusal, withLockedEnrollment } from '@/lib/server/enrollment-row-lock';
-import { isEnrolmentAccessAllowed, isRevokedStatus } from '@/lib/server/enrollment-access';
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
+import type { SessionClaims } from '@/lib/auth/session-jwt';
+import { mergeLessonInteractivePilots } from '@/lib/lms/append-interactive-pilot';
+import {
+  isAdminOverridePaymentReference,
+  isStripeCheckoutPaymentReference,
+} from '@/lib/lms/course-prerequisites';
+import {
+  isInteractiveExperienceComplete,
+  parseInteractiveProgressDocument,
+} from '@/lib/lms/interactive-progress-store';
+import { isInteractiveLessonResource, parseLessonResources } from '@/lib/lms/lesson-resources';
+import { extractQuizIdFromLesson } from '@/lib/lms/quiz-from-lesson';
+import { prisma } from '@/lib/prisma';
 import {
   isAdminClaims,
   isCohortOnlyCourse,
@@ -21,14 +22,18 @@ import {
   mayIssueEnrolment,
   shouldStaffAutoEnrol,
 } from '@/lib/server/carsi-workshop-access';
-import {
-  isAdminOverridePaymentReference,
-  isStripeCheckoutPaymentReference,
-} from '@/lib/lms/course-prerequisites';
+import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
+import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import {
   findCoursePrerequisiteBlock,
   PrerequisiteNotMetError,
 } from '@/lib/server/course-prerequisites';
+import { requireCurrentAdmin, type AdminSessionProvenance } from '@/lib/server/current-admin';
+import { isUniqueConstraintError } from '@/lib/server/db-errors';
+import { isEnrolmentAccessAllowed, isRevokedStatus } from '@/lib/server/enrollment-access';
+import { EnrollmentLockRefusal, withLockedEnrollment } from '@/lib/server/enrollment-row-lock';
+import { decideEnrollmentCompleted } from '@/lib/server/lms-completion';
+import { ensureLmsUserFromClaims } from '@/lib/server/lms-user-sync';
 
 /**
  * Assessment gate for completion: the ONE rule for "has this learner passed every required
@@ -43,7 +48,7 @@ async function requiredAssessmentsPassed(
   db: Prisma.TransactionClient,
   courseId: string,
   courseSlug: string | null,
-  studentId: string,
+  studentId: string
 ): Promise<boolean> {
   const [quizzes, practicals] = await Promise.all([
     db.lmsQuiz.findMany({ where: { courseId }, select: { id: true } }),
@@ -86,8 +91,12 @@ async function requiredAssessmentsPassed(
  * lesson whose resources attach a quiz): it needs a passing attempt, graded on the server.
  */
 export class LessonCompletionEvidenceError extends Error {
-  constructor(public readonly code: 'QUIZ_NOT_PASSED') {
-    super('Pass the quiz to complete this lesson.');
+  constructor(public readonly code: 'QUIZ_NOT_PASSED' | 'INTERACTIVE_NOT_COMPLETE') {
+    super(
+      code === 'QUIZ_NOT_PASSED'
+        ? 'Pass the quiz to complete this lesson.'
+        : 'Complete the interactive practice to mark this lesson done.'
+    );
     this.name = 'LessonCompletionEvidenceError';
   }
 }
@@ -95,6 +104,8 @@ export class LessonCompletionEvidenceError extends Error {
 /**
  * Server evidence a lesson may be marked complete by the learner (GP-432):
  *  - quiz lesson, or any lesson whose resources attach a quiz: a passing attempt on that quiz;
+ *  - interactive lesson resources (including merged pilots): all activities complete in
+ *    `interactive_progress` on the server;
  *  - reading, video and file lessons: the lesson model records nothing the server can check
  *    (video position is reported by the browser, durationMinutes is usually null and embedded
  *    video saves nothing), so the learner's mark stands. Such lessons cannot by themselves
@@ -103,29 +114,51 @@ export class LessonCompletionEvidenceError extends Error {
 async function assertLessonCompletionEvidence(
   db: Prisma.TransactionClient,
   studentId: string,
-  lessonId: string,
+  lessonId: string
 ): Promise<void> {
   const lesson = await db.lmsLesson.findUnique({
     where: { id: lessonId },
-    select: { contentType: true, contentBody: true, resources: true },
+    select: {
+      contentType: true,
+      contentBody: true,
+      resources: true,
+      module: { select: { course: { select: { slug: true } } } },
+    },
   });
   if (!lesson) return;
-  const quizId = extractQuizIdFromLesson(
-    lesson.contentType,
-    lesson.contentBody,
-    parseLessonResources(lesson.resources),
+  const mergedResources = mergeLessonInteractivePilots(
+    lesson.module.course.slug,
+    lessonId,
+    parseLessonResources(lesson.resources)
   );
-  if (!quizId) return;
-  const passed = await db.lmsQuizAttempt.findFirst({
-    where: { quizId, studentId, passed: true },
-    select: { id: true },
+  const quizId = extractQuizIdFromLesson(lesson.contentType, lesson.contentBody, mergedResources);
+  if (quizId) {
+    const passed = await db.lmsQuizAttempt.findFirst({
+      where: { quizId, studentId, passed: true },
+      select: { id: true },
+    });
+    if (!passed) throw new LessonCompletionEvidenceError('QUIZ_NOT_PASSED');
+  }
+
+  const interactiveResources = mergedResources.filter(isInteractiveLessonResource);
+  if (interactiveResources.length === 0) return;
+
+  const progressRow = await db.lmsLessonProgress.findUnique({
+    where: { studentId_lessonId: { studentId, lessonId } },
+    select: { interactiveProgress: true },
   });
-  if (!passed) throw new LessonCompletionEvidenceError('QUIZ_NOT_PASSED');
+  const progressDoc = parseInteractiveProgressDocument(progressRow?.interactiveProgress);
+
+  for (const resource of interactiveResources) {
+    const { experience } = resource;
+    const snapshot = progressDoc[experience.id] ?? null;
+    if (!isInteractiveExperienceComplete(experience, snapshot)) {
+      throw new LessonCompletionEvidenceError('INTERACTIVE_NOT_COMPLETE');
+    }
+  }
 }
 
-export type EnrollResult =
-  | 'already_enrolled'
-  | { enrollmentId: string; courseId: string };
+export type EnrollResult = 'already_enrolled' | { enrollmentId: string; courseId: string };
 
 export type EnrollOptions = {
   /**
@@ -161,7 +194,7 @@ export async function enrollStudentInCourse(
   claims: SessionClaims,
   slug: string,
   paymentReference: string,
-  options: EnrollOptions = {},
+  options: EnrollOptions = {}
 ): Promise<EnrollResult> {
   if (isSeatStatePaymentReference(paymentReference)) {
     throw new Error('SEAT_STATE_OUTSIDE_STEP');
@@ -190,7 +223,7 @@ export async function prepareEnrolment(
   claims: SessionClaims,
   slug: string,
   paymentReference: string,
-  options: EnrollOptions = {},
+  options: EnrollOptions = {}
 ): Promise<PreparedEnrolment> {
   if (!options.userWrittenByCaller) await ensureLmsUserFromClaims(claims);
   const course = await getOrCreateCourseBySlug(slug);
@@ -209,13 +242,19 @@ export async function prepareEnrolment(
       claims,
       course,
       paymentReference,
-      options.onPrerequisiteNotMet ?? 'refuse',
+      options.onPrerequisiteNotMet ?? 'refuse'
     );
   } catch (e) {
     if (!(e instanceof PrerequisiteNotMetError)) throw e;
     refusal = e;
   }
-  return { studentId: claims.sub, courseId: course.id, paymentReference, prerequisiteGated, refusal };
+  return {
+    studentId: claims.sub,
+    courseId: course.id,
+    paymentReference,
+    prerequisiteGated,
+    refusal,
+  };
 }
 
 /**
@@ -224,7 +263,7 @@ export async function prepareEnrolment(
  */
 export function issuePreparedEnrolment(
   db: Prisma.TransactionClient,
-  prepared: PreparedEnrolment,
+  prepared: PreparedEnrolment
 ): Promise<EnrollResult> {
   return writeEnrolmentRow(db, prepared, { swallowUniqueClash: false });
 }
@@ -233,7 +272,7 @@ export function issuePreparedEnrolment(
 async function writeEnrolmentRow(
   db: Prisma.TransactionClient | typeof prisma,
   prepared: PreparedEnrolment,
-  { swallowUniqueClash }: { swallowUniqueClash: boolean },
+  { swallowUniqueClash }: { swallowUniqueClash: boolean }
 ): Promise<EnrollResult> {
   const { studentId, paymentReference } = prepared;
   const course = { id: prepared.courseId };
@@ -319,7 +358,7 @@ async function checkPrerequisitesForNewEnrolment(
   claims: SessionClaims,
   course: { slug: string; meta?: unknown },
   paymentReference: string,
-  mode: 'refuse' | 'lock',
+  mode: 'refuse' | 'lock'
 ): Promise<boolean> {
   if (isAdminOverridePaymentReference(paymentReference)) return false;
   const block = await findCoursePrerequisiteBlock({
@@ -330,11 +369,14 @@ async function checkPrerequisitesForNewEnrolment(
   if (!block) return false;
   if (mode === 'lock') return true;
   if (isStripeCheckoutPaymentReference(paymentReference)) {
-    console.warn('[enrollment] paid fulfilment for a course whose prerequisite is not met; issued locked', {
-      course: course.slug,
-      studentId: claims.sub,
-      paymentReference,
-    });
+    console.warn(
+      '[enrollment] paid fulfilment for a course whose prerequisite is not met; issued locked',
+      {
+        course: course.slug,
+        studentId: claims.sub,
+        paymentReference,
+      }
+    );
     return true;
   }
   throw new PrerequisiteNotMetError(block);
@@ -474,7 +516,7 @@ export const ADMIN_AUDIT_REASON_MAX = 1000;
 export async function forceCompleteEnrollment(
   enrollmentId: string,
   studentId: string,
-  options: { session: AdminSessionProvenance | null; reason: string },
+  options: { session: AdminSessionProvenance | null; reason: string }
 ): Promise<{ lessonsMarked: number; completed: boolean }> {
   const reason = options.reason.trim();
   if (!reason || reason.length > ADMIN_AUDIT_REASON_MAX) throw new Error('INVALID_REASON');
@@ -535,7 +577,7 @@ export async function forceCompleteEnrollment(
           },
         });
         return current;
-      },
+      }
     );
   });
 
@@ -558,7 +600,7 @@ export async function forceCompleteEnrollment(
 export async function recordFirstCompletion(
   enrollmentId: string,
   at: Date,
-  db: Prisma.TransactionClient = prisma,
+  db: Prisma.TransactionClient = prisma
 ): Promise<void> {
   await db.lmsEnrollment.updateMany({
     where: { id: enrollmentId, firstCompletedAt: null },
@@ -576,7 +618,7 @@ export async function recordFirstCompletion(
  */
 export async function syncCompletionAfterAssessmentPassed(
   studentId: string,
-  courseId: string,
+  courseId: string
 ): Promise<void> {
   try {
     const row = await prisma.lmsEnrollment.findFirst({
@@ -597,7 +639,7 @@ export async function syncEnrollmentCompletion(
   options?: {
     initiatedByAdminEmail?: string | null;
     skipIicrcAutoSubmit?: boolean;
-  },
+  }
 ): Promise<void> {
   const { ids, total, slug } = await lessonTotalsForCourse(courseId);
   // Cohort-only course: completion (and its certificate of attendance) is written only by
@@ -679,7 +721,7 @@ export async function syncEnrollmentCompletion(
           // Only a genuinely new, fully-gated completion written by THIS transaction may fire the
           // (irreversible) IICRC CEC auto-submit; it runs below, after the commit.
           return allLessonsDone && quizGateSatisfied && !wasAlreadyCompleted;
-        },
+        }
       );
     } catch (e) {
       if (e instanceof EnrollmentLockRefusal) return false;
@@ -688,14 +730,11 @@ export async function syncEnrollmentCompletion(
   });
 
   if (newlyGatedCompletion && !options?.skipIicrcAutoSubmit) {
-    const { processIicrcCecSubmissionForEnrollment } = await import(
-      '@/lib/server/iicrc-cec-submission'
-    );
+    const { processIicrcCecSubmissionForEnrollment } =
+      await import('@/lib/server/iicrc-cec-submission');
     void processIicrcCecSubmissionForEnrollment(enrollmentId, {
       initiatedByAdminEmail: options?.initiatedByAdminEmail ?? null,
-    }).catch((e) =>
-      console.error('[enrollment] IICRC CEC auto-submit', enrollmentId, e),
-    );
+    }).catch((e) => console.error('[enrollment] IICRC CEC auto-submit', enrollmentId, e));
   }
 }
 
@@ -731,7 +770,7 @@ export async function touchLessonProgress(params: {
           where: { id: enrollmentId },
           data: { lastAccessedLessonId: lessonId },
         });
-      }),
+      })
     );
   } catch (e) {
     if (!(e instanceof EnrollmentLockRefusal)) throw e;
@@ -782,7 +821,7 @@ export async function patchLessonProgress(params: {
         where: { id: enrollmentId },
         data: { lastAccessedLessonId: lessonId },
       });
-    }),
+    })
   );
 
   await syncEnrollmentCompletion(enrollmentId, studentId, courseId);
