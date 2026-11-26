@@ -45,7 +45,7 @@ import { decideMembershipEntitlement } from './entitlements';
 const CREATED_AT = 1_780_000_000; // unix seconds
 const TRIAL_PERIOD_END = CREATED_AT + 7 * 24 * 60 * 60; // +7 days, unix seconds
 
-function trialCreatedEvent(): Stripe.Event {
+function trialCreatedEvent(currentPeriodEnd: number | null = TRIAL_PERIOD_END): Stripe.Event {
   return {
     type: 'customer.subscription.created',
     created: CREATED_AT,
@@ -55,12 +55,26 @@ function trialCreatedEvent(): Stripe.Event {
         status: 'trialing',
         customer: 'cus_trial_1',
         items: { data: [] },
-        current_period_end: TRIAL_PERIOD_END,
+        current_period_end: currentPeriodEnd,
         cancel_at_period_end: false,
         metadata: { carsi_user_id: 'user-trial-1', plan: 'pro_annual' },
       },
     },
   } as unknown as Stripe.Event;
+}
+
+type PersistedWrite = {
+  userId: string;
+  stripeSubscriptionId: string;
+  status: string;
+  currentPeriodEnd: Date | null;
+  eventTimestamp: Date | null;
+};
+
+/** The one write the webhook made, as the store received it. */
+function persistedWrite(): PersistedWrite {
+  expect(upsertSubscription).toHaveBeenCalledTimes(1);
+  return upsertSubscription.mock.calls[0][0] as PersistedWrite;
 }
 
 describe('customer.subscription.created (trialing) — GP-458 7-day trial webhook path', () => {
@@ -69,25 +83,48 @@ describe('customer.subscription.created (trialing) — GP-458 7-day trial webhoo
   it('upserts the trialing snapshot for the resolved user (no charge has happened yet)', async () => {
     await handleSubscriptionEvent(trialCreatedEvent());
 
-    expect(upsertSubscription).toHaveBeenCalledTimes(1);
-    const arg = upsertSubscription.mock.calls[0][0] as {
-      userId: string;
-      stripeSubscriptionId: string;
-      status: string;
-    };
+    const arg = persistedWrite();
     expect(arg.userId).toBe('user-trial-1');
     expect(arg.stripeSubscriptionId).toBe('sub_trial_1');
     expect(arg.status).toBe('trialing');
+    expect(arg.currentPeriodEnd).toEqual(new Date(TRIAL_PERIOD_END * 1000));
+    expect(arg.eventTimestamp).toEqual(new Date(CREATED_AT * 1000));
   });
 
-  it('the persisted trialing status entitles full catalogue access without inspecting period end', () => {
-    // What the webhook wrote is exactly what the entitlement gate consults on
-    // the learner's next request — prove the two agree end-to-end.
+  // GP-796: the entitlement is decided on what the webhook actually wrote, not on a hand-built copy.
+  it('the persisted trialing write entitles full catalogue access', async () => {
+    await handleSubscriptionEvent(trialCreatedEvent());
+    const { status, currentPeriodEnd } = persistedWrite();
     const decision = decideMembershipEntitlement(
-      { status: 'trialing', currentPeriodEnd: new Date(TRIAL_PERIOD_END * 1000) },
+      { status, currentPeriodEnd },
       new Date(CREATED_AT * 1000 + 1000), // one second into the trial
     );
     expect(decision).toEqual({ entitled: true, reason: 'active' });
+  });
+
+  it('a trial with no period end is written with a null period end and is still entitled while trialing', async () => {
+    await handleSubscriptionEvent(trialCreatedEvent(null));
+    const { status, currentPeriodEnd } = persistedWrite();
+    expect(status).toBe('trialing');
+    expect(currentPeriodEnd).toBeNull();
+    expect(decideMembershipEntitlement({ status, currentPeriodEnd }, new Date(CREATED_AT * 1000 + 1000))).toEqual({
+      entitled: true,
+      reason: 'active',
+    });
+  });
+
+  it('a trialing write read after its period end: Stripe\'s status decides, not the stored date', async () => {
+    // Stripe moves a subscription off `trialing` when the trial ends (to active, past_due or
+    // canceled), and that later snapshot is what changes access. Until it arrives, the stored
+    // trialing row stays entitled; the period end is not consulted for a live status.
+    await handleSubscriptionEvent(trialCreatedEvent());
+    const { status, currentPeriodEnd } = persistedWrite();
+    const afterTrial = new Date((TRIAL_PERIOD_END + 86_400) * 1000);
+    expect(currentPeriodEnd!.getTime()).toBeLessThan(afterTrial.getTime());
+    expect(decideMembershipEntitlement({ status, currentPeriodEnd }, afterTrial)).toEqual({
+      entitled: true,
+      reason: 'active',
+    });
   });
 
   it('skips silently (never mis-grants) when the CARSI user cannot be resolved', async () => {

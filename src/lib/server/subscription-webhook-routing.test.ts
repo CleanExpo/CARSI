@@ -82,14 +82,14 @@ import { handleSubscriptionEvent, subscriptionKindFromPlan } from './subscriptio
 
 const CREATED_AT = 1_760_000_000;
 
-function subEvent(type: string, metadata: Record<string, string>): Stripe.Event {
+function subEvent(type: string, metadata: Record<string, string>, status = 'active'): Stripe.Event {
   return {
     type,
     created: CREATED_AT,
     data: {
       object: {
         id: 'sub_x',
-        status: 'active',
+        status,
         customer: 'cus_1',
         items: { data: [{ id: 'si_1', quantity: 5, current_period_end: CREATED_AT + 86400 }] },
         cancel_at_period_end: false,
@@ -190,22 +190,90 @@ describe('handleSubscriptionEvent — plan routing (created/updated)', () => {
 });
 
 describe('handleSubscriptionEvent — plan routing (deleted → sticky cancel)', () => {
-  it('routes a Teams cancel → team terminal writer', async () => {
-    await handleSubscriptionEvent(subEvent('customer.subscription.deleted', { plan: 'growth', carsi_team_id: 'team-1' }));
-    expect(team.upsertTerminalTeamSubscriptionStatus).toHaveBeenCalledTimes(1);
-    expect(indiv.upsertTerminalSubscriptionStatus).not.toHaveBeenCalled();
+  // GP-796: Stripe sends `customer.subscription.deleted` with the subscription already `canceled`.
+  // Each test asserts the exact write (status, owner, subscription id, event time), not only that
+  // one writer was called, so a cancel written as active, to the wrong owner, or unstamped fails.
+  const deletedEvent = (metadata: Record<string, string>) =>
+    subEvent('customer.subscription.deleted', metadata, 'canceled');
+  const EVENT_AT = new Date(CREATED_AT * 1000);
+
+  /** No other store wrote anything. */
+  function onlyWriter(writer: ReturnType<typeof vi.fn>) {
+    const all = [
+      indiv.upsertSubscription,
+      indiv.upsertTerminalSubscriptionStatus,
+      team.upsertTeamSubscription,
+      team.upsertTerminalTeamSubscriptionStatus,
+      org.updateOrgSubscriptionFromStripe,
+      coaching.upsertCoachingMonthlySubscription,
+      coaching.upsertTerminalCoachingSubscriptionStatus,
+    ];
+    for (const fn of all) expect(fn).toHaveBeenCalledTimes(fn === writer ? 1 : 0);
+  }
+
+  it('routes a Teams cancel → team terminal writer, canceled, for the resolved team', async () => {
+    // The resolver's answer is the owner, never the raw metadata.
+    team.resolveTeamIdForStripeSubscription.mockResolvedValueOnce('team-resolved');
+    await handleSubscriptionEvent(deletedEvent({ plan: 'growth', carsi_team_id: 'team-1' }));
+    onlyWriter(team.upsertTerminalTeamSubscriptionStatus);
+    expect(team.upsertTerminalTeamSubscriptionStatus.mock.calls[0][0]).toEqual({
+      teamId: 'team-resolved',
+      stripeCustomerId: 'cus_1',
+      stripeSubscriptionId: 'sub_x',
+      status: 'canceled',
+      seatLimit: 5,
+      plan: 'growth',
+      eventTimestamp: EVENT_AT,
+    });
   });
 
-  it('routes an org cancel → org update writer', async () => {
-    await handleSubscriptionEvent(subEvent('customer.subscription.deleted', { plan: 'org_monthly', carsi_team_id: 'team-org-1' }));
-    expect(org.updateOrgSubscriptionFromStripe).toHaveBeenCalledTimes(1);
-    expect(indiv.upsertTerminalSubscriptionStatus).not.toHaveBeenCalled();
+  it('routes an org cancel → org update writer, canceled, for the resolved org', async () => {
+    org.resolveTeamIdForOrgSubscription.mockResolvedValueOnce('team-org-resolved');
+    await handleSubscriptionEvent(deletedEvent({ plan: 'org_monthly', carsi_team_id: 'team-org-1' }));
+    onlyWriter(org.updateOrgSubscriptionFromStripe);
+    expect(org.updateOrgSubscriptionFromStripe.mock.calls[0][0]).toEqual({
+      teamId: 'team-org-resolved',
+      stripeCustomerId: 'cus_1',
+      stripeSubscriptionId: 'sub_x',
+      status: 'canceled',
+      currentPeriodEnd: new Date((CREATED_AT + 86400) * 1000),
+      cancelAtPeriodEnd: false,
+      eventTimestamp: EVENT_AT,
+    });
   });
 
-  it('routes an individual cancel → individual sticky terminal writer (no regression)', async () => {
-    await handleSubscriptionEvent(subEvent('customer.subscription.deleted', { plan: 'pro_annual', carsi_user_id: 'user-1' }));
-    expect(indiv.upsertTerminalSubscriptionStatus).toHaveBeenCalledTimes(1);
-    expect(team.upsertTerminalTeamSubscriptionStatus).not.toHaveBeenCalled();
-    expect(org.updateOrgSubscriptionFromStripe).not.toHaveBeenCalled();
+  it('routes an individual cancel → individual sticky terminal writer, canceled, for the resolved member', async () => {
+    indiv.resolveUserIdForStripeSubscription.mockResolvedValueOnce('user-resolved');
+    await handleSubscriptionEvent(deletedEvent({ plan: 'pro_annual', carsi_user_id: 'user-1' }));
+    onlyWriter(indiv.upsertTerminalSubscriptionStatus);
+    expect(indiv.upsertTerminalSubscriptionStatus.mock.calls[0][0]).toEqual({
+      userId: 'user-resolved',
+      stripeCustomerId: 'cus_1',
+      stripeSubscriptionId: 'sub_x',
+      status: 'canceled',
+      eventTimestamp: EVENT_AT,
+    });
+  });
+
+  it('routes a coaching cancel → coaching terminal writer, canceled, for the resolved member', async () => {
+    coaching.resolveUserIdForCoachingSubscription.mockResolvedValueOnce('user-coach-resolved');
+    await handleSubscriptionEvent(
+      deletedEvent({ source: 'carsi-coaching-monthly', carsi_user_id: 'user-coach-1' }),
+    );
+    onlyWriter(coaching.upsertTerminalCoachingSubscriptionStatus);
+    expect(coaching.upsertTerminalCoachingSubscriptionStatus.mock.calls[0][0]).toEqual({
+      userId: 'user-coach-resolved',
+      stripeCustomerId: 'cus_1',
+      stripeSubscriptionId: 'sub_x',
+      status: 'canceled',
+      eventTimestamp: EVENT_AT,
+    });
+  });
+
+  it('an unknown plan cancel writes nothing', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    await handleSubscriptionEvent(deletedEvent({ plan: 'mystery' }));
+    onlyWriter(vi.fn());
+    warn.mockRestore();
   });
 });

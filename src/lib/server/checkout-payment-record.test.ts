@@ -232,10 +232,10 @@ describe('GP-764: the amount paid is recorded at fulfilment', () => {
     expect(payments()).toEqual([]);
   });
 
-  it('a refunded session is not recorded even when the buyer already holds the course through another payment', async () => {
-    // The enrolment step issues nothing here ('already_enrolled'), so it never reaches the
-    // reversal check; the payment record must make that check itself (GP-759 reversal rule
-    // from main, kept through the restored-main merge).
+  it('a refunded session is refused and not recorded even when the buyer already holds the course through another payment', async () => {
+    // GP-790: the enrolment step would issue nothing here ('already_enrolled'), but the session
+    // was reversed, so the caller is told PAYMENT_REVERSED, never success. The team path already
+    // answered this way; the self path returned 'already enrolled'.
     db.tables.lmsEnrollment.push({
       id: 'e-old',
       studentId: 'buyer',
@@ -248,10 +248,32 @@ describe('GP-764: the amount paid is recorded at fulfilment', () => {
       type: 'payment_reversed:refunded',
     });
 
-    const self = await fulfil('cs_test_refunded_held');
-
-    expect(self.alreadyEnrolled).toBe(true);
+    await expect(fulfil('cs_test_refunded_held')).rejects.toThrow('PAYMENT_REVERSED');
     expect(payments()).toEqual([]);
+    // The access the buyer already held through the other payment is untouched.
+    expect(db.tables.lmsEnrollment).toEqual([
+      expect.objectContaining({ paymentReference: 'cs_test_old', status: 'active' }),
+    ]);
+  });
+
+  it('a refunded team session is refused the same way when the buyer already holds the course', async () => {
+    db.tables.lmsEnrollment.push({
+      id: 'e-old',
+      studentId: 'buyer',
+      courseId: 'course-1',
+      paymentReference: 'cs_test_old',
+      status: 'active',
+    });
+    db.tables.stripeWebhookEvent.push({
+      id: 'payment-reversed:cs_test_refunded_team',
+      type: 'payment_reversed:refunded',
+    });
+
+    await expect(
+      fulfil('cs_test_refunded_team', { purchaseMode: 'team', teamSeatCount: 3 })
+    ).rejects.toThrow('PAYMENT_REVERSED');
+    expect(payments()).toEqual([]);
+    expect(db.tables.lmsTeamCoursePurchase).toEqual([]);
   });
 
   it('a grant that is not a Stripe checkout (free, discount) records nothing', async () => {
