@@ -8,9 +8,11 @@ import {
   getLessonContextForStudent,
   touchLessonProgress,
 } from '@/lib/server/enrollment-service';
-import { appendWaterDamageInteractivePilot } from '@/lib/lms/append-interactive-pilot';
+import { mergeLessonInteractivePilots } from '@/lib/lms/append-interactive-pilot';
 import { parseLessonResources } from '@/lib/lms/lesson-resources';
+import { readLessonInteractiveProgress } from '@/lib/server/lesson-interactive-progress';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
+import { prisma } from '@/lib/prisma';
 
 type Ctx = { params: Promise<{ lessonId: string }> };
 
@@ -75,11 +77,13 @@ export async function GET(request: NextRequest, ctx: Ctx) {
       : null;
 
   const courseSlug = lesson.module.course.slug;
-  const resources = appendWaterDamageInteractivePilot(
+  const resources = mergeLessonInteractivePilots(
     courseSlug,
     lesson.id,
     parseLessonResources(lesson.resources)
   );
+
+  const interactiveProgress = await readLessonInteractiveProgress(prisma, claims.sub, lesson.id);
 
   return NextResponse.json({
     lesson: {
@@ -94,6 +98,7 @@ export async function GET(request: NextRequest, ctx: Ctx) {
       course_id: lesson.module.courseId,
     },
     resources,
+    interactive_progress: interactiveProgress,
     enrollment_id: ctxRow.enrollmentId,
     course: {
       id: lesson.module.course.id,

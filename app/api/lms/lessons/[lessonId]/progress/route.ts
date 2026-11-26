@@ -6,6 +6,7 @@ import { findEnrolledCoursePrerequisiteBlock, prerequisiteBlockBody } from '@/li
 import {
   ensureStaffEnrollmentForLesson,
   getLessonContextForStudent,
+  LessonCompletionEvidenceError,
   patchLessonProgress,
 } from '@/lib/server/enrollment-service';
 import { EnrollmentLockRefusal } from '@/lib/server/enrollment-row-lock';
@@ -88,9 +89,10 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
     });
   } catch (e) {
     // GP-432: the server holds no evidence for this lesson (a quiz not yet passed).
-    if (e instanceof Error && e.name === 'LessonCompletionEvidenceError') {
+    if (e instanceof LessonCompletionEvidenceError) {
+      const code = e.code === 'INTERACTIVE_NOT_COMPLETE' ? 'interactive_not_complete' : 'quiz_not_passed';
       return NextResponse.json(
-        { detail: e.message, code: 'quiz_not_passed' },
+        { detail: e.message, code },
         { status: 409, headers: { 'Cache-Control': 'no-store' } },
       );
     }

@@ -36,6 +36,19 @@ const OFFERS: InteractiveLearningOffer[] = [
     durationLabel: '12–18 min',
   },
   {
+    experienceId: 'fire-smoke-module-3-pilot',
+    courseSlug: 'fire-smoke-damage-restoration-fundamentals',
+    courseTitle: 'Fire & smoke damage restoration fundamentals',
+    discipline: 'safety',
+    disciplineLabel: 'Fire & smoke hazards',
+    status: 'live',
+    lessonAnchor: 'Asbestos in fire-damaged buildings',
+    heroTitle: 'Practise asbestos and debris decisions before disturbance',
+    teaser:
+      'Fire-loss scenario — asbestos fragments, insurer pressure, and licensed handover sequencing for AU/NZ jobs.',
+    durationLabel: '12–16 min',
+  },
+  {
     experienceId: 'moisture-instruments-pilot',
     courseSlug: 'moisture-meters-readings-and-dry-standards',
     courseTitle: 'Moisture meters & dry standards',

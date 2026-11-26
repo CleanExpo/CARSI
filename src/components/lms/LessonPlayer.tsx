@@ -6,6 +6,7 @@ import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
 import type { LessonPosition } from '@/lib/lms/lesson-checkpoint';
 import { findScrollRoot, scrollLessonToTop } from '@/lib/lms/lesson-scroll';
 
+import { ChapterEngagementBanner } from '@/components/lms/ChapterEngagementBanner';
 import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { DriveFileViewer } from '@/components/lms/DriveFileViewer';
 import { FlashcardDeck } from '@/components/lms/FlashcardDeck';
@@ -56,6 +57,8 @@ interface LessonPlayerProps {
    */
   enrolled?: boolean;
   onInteractivePilotComplete?: () => void;
+  learnerUserId?: string;
+  initialInteractiveProgress?: import('@/lib/lms/interactive-progress-store').InteractiveProgressDocument;
 }
 
 export function LessonPlayer({
@@ -74,6 +77,8 @@ export function LessonPlayer({
   onPositionChange,
   enrolled = false,
   onInteractivePilotComplete,
+  learnerUserId,
+  initialInteractiveProgress,
 }: LessonPlayerProps) {
   const showPreviewBadge = lesson.is_preview && !enrolled;
   const rootRef = useRef<HTMLDivElement>(null);
@@ -145,6 +150,9 @@ export function LessonPlayer({
                 label={exp.label}
                 experience={exp.experience}
                 progressKey={lesson.id}
+                syncLessonId={lesson.id}
+                learnerUserId={learnerUserId}
+                initialServerProgress={initialInteractiveProgress}
                 enterprise
                 lessonCompleted={completed}
                 onAllComplete={onInteractivePilotComplete}
@@ -186,6 +194,10 @@ export function LessonPlayer({
         </div>
       </div>
 
+      {enrolled ? (
+        <ChapterEngagementBanner resources={resources} lessonTitle={lesson.title} />
+      ) : null}
+
       <PositionedContent lesson={lesson} initialPosition={initialPosition} onPositionChange={onPositionChange} />
 
       {slideResources.map((slidesResource, i) => (
@@ -204,6 +216,9 @@ export function LessonPlayer({
           label={exp.label}
           experience={exp.experience}
           progressKey={lesson.id}
+          syncLessonId={lesson.id}
+          learnerUserId={learnerUserId}
+          initialServerProgress={initialInteractiveProgress}
           lessonCompleted={completed}
           onAllComplete={onInteractivePilotComplete}
         />

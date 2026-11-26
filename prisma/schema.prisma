@@ -338,6 +338,8 @@ model LmsLessonProgress {
   lessonId       String    @map("lesson_id") @db.Uuid
   completed      Boolean   @default(false)
   checkpoint     Json?
+  /// Per-experience interactive practice snapshots keyed by experience id (GP-636).
+  interactiveProgress Json?  @map("interactive_progress")
   completedAt    DateTime? @map("completed_at") @db.Timestamptz(6)
   lastAccessedAt DateTime  @default(now()) @map("last_accessed_at") @db.Timestamptz(6)
   updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)

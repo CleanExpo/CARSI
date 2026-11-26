@@ -37,7 +37,13 @@ const state = vi.hoisted(() => ({
   passedQuizIds: [] as string[],
   practicals: [] as { id: string }[],
   passedPracticalIds: [] as string[],
-  lesson: null as null | { contentType: string; contentBody: string | null; resources: unknown },
+  lesson: null as null | {
+    contentType: string;
+    contentBody: string | null;
+    resources: unknown;
+    module?: { course: { slug: string } };
+  },
+  lessonInteractiveProgress: null as unknown,
   progressWrites: [] as Array<{ lessonId: string; completed: boolean }>,
 }));
 
@@ -50,7 +56,13 @@ vi.mock('@/lib/prisma', () => ({
       })),
     },
     lmsLesson: {
-      findUnique: vi.fn(async () => state.lesson),
+      findUnique: vi.fn(async () => {
+        if (!state.lesson) return null;
+        return {
+          ...state.lesson,
+          module: state.lesson.module ?? { course: { slug: state.courseSlug } },
+        };
+      }),
     },
     lmsEnrollment: {
       findUnique: vi.fn(async () => state.enrollment),
@@ -68,6 +80,11 @@ vi.mock('@/lib/prisma', () => ({
     },
     lmsLessonProgress: {
       count: vi.fn(async () => state.completedLessonCount),
+      findUnique: vi.fn(async () =>
+        state.lessonInteractiveProgress === null
+          ? null
+          : { interactiveProgress: state.lessonInteractiveProgress },
+      ),
       upsert: vi.fn(async (args: { where: { studentId_lessonId: { lessonId: string } }; update: { completed: boolean } }) => {
         state.progressWrites.push({
           lessonId: args.where.studentId_lessonId.lessonId,
@@ -148,6 +165,7 @@ function reset(overrides: Partial<typeof state> = {}) {
   state.practicals = [];
   state.passedPracticalIds = [];
   state.lesson = null;
+  state.lessonInteractiveProgress = null;
   state.progressWrites = [];
   Object.assign(state, overrides);
 }
@@ -282,6 +300,79 @@ describe('GP-432 path 2: the browser cannot mark a quiz lesson complete', () => 
     });
 
     expect(state.progressWrites).toEqual([{ lessonId: 'quiz-lesson', completed: true }]);
+  });
+
+  it('refuses a hazard lesson with incomplete interactive practice', async () => {
+    const { WATER_DAMAGE_HAZARD_LESSON_ID } = await import('@/lib/lms/append-interactive-pilot');
+    const { WATER_DAMAGE_INTERACTIVE_PILOT } = await import('@/lib/lms/interactive-experience-data');
+
+    reset({
+      enrollment: activeEnrollment('course-plain'),
+      courseSlug: 'water-damage-restoration-fundamentals',
+      lessonIds: [WATER_DAMAGE_HAZARD_LESSON_ID],
+      lesson: {
+        contentType: 'text',
+        contentBody: '<p>Read</p>',
+        resources: null,
+      },
+      lessonInteractiveProgress: {
+        [WATER_DAMAGE_INTERACTIVE_PILOT.id]: {
+          activityIndex: 0,
+          completedActivityIds: [],
+          earnedXp: 0,
+        },
+      },
+    });
+
+    await expect(
+      patchLessonProgress({
+        studentId: 'student-1',
+        lessonId: WATER_DAMAGE_HAZARD_LESSON_ID,
+        enrollmentId: 'enr-1',
+        courseId: 'course-plain',
+        completed: true,
+      }),
+    ).rejects.toMatchObject({
+      name: 'LessonCompletionEvidenceError',
+      code: 'INTERACTIVE_NOT_COMPLETE',
+    });
+    expect(state.progressWrites).toEqual([]);
+  });
+
+  it('control: accepts hazard lesson when server holds completed interactive practice', async () => {
+    const { WATER_DAMAGE_HAZARD_LESSON_ID } = await import('@/lib/lms/append-interactive-pilot');
+    const { WATER_DAMAGE_INTERACTIVE_PILOT } = await import('@/lib/lms/interactive-experience-data');
+    const allIds = WATER_DAMAGE_INTERACTIVE_PILOT.activities.map((a) => a.id);
+
+    reset({
+      enrollment: activeEnrollment('course-plain'),
+      courseSlug: 'water-damage-restoration-fundamentals',
+      lessonIds: [WATER_DAMAGE_HAZARD_LESSON_ID],
+      lesson: {
+        contentType: 'text',
+        contentBody: '<p>Read</p>',
+        resources: null,
+      },
+      lessonInteractiveProgress: {
+        [WATER_DAMAGE_INTERACTIVE_PILOT.id]: {
+          activityIndex: allIds.length - 1,
+          completedActivityIds: allIds,
+          earnedXp: 100,
+        },
+      },
+    });
+
+    await patchLessonProgress({
+      studentId: 'student-1',
+      lessonId: WATER_DAMAGE_HAZARD_LESSON_ID,
+      enrollmentId: 'enr-1',
+      courseId: 'course-plain',
+      completed: true,
+    });
+
+    expect(state.progressWrites).toEqual([
+      { lessonId: WATER_DAMAGE_HAZARD_LESSON_ID, completed: true },
+    ]);
   });
 
   it('control: un-marking a quiz lesson needs no evidence', async () => {
@@ -701,6 +792,7 @@ const LEARNER_RECORD_WRITERS = new Set<string>([
   `${join('app', 'api', 'lms', 'quizzes', '[quizId]', 'attempt', 'route.ts')}#POST`,
   `${join('src', 'lib', 'server', 'practical-assessment.ts')}#submitPracticalAssessment`,
   `${join('src', 'lib', 'server', 'practical-assessment.ts')}#reviewSubmission`,
+  `${join('src', 'lib', 'server', 'lesson-interactive-progress.ts')}#writeLessonInteractiveProgress`,
 ]);
 
 function ownerScanFiles(root: string): Array<{ rel: string; text: string }> {

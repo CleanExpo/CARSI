@@ -7,7 +7,9 @@ import {
 } from '@/lib/server/learner-dashboard-data';
 import { getLearnerLevelPayload } from '@/lib/server/learner-xp';
 import { listOnboardingProgramsForUser } from '@/lib/server/onboarding-programs';
+import { getLearnerLearningJourney } from '@/lib/server/learner-learning-journey';
 import { getRenewalSummaryForStudent } from '@/lib/server/renewal-summary';
+import type { LearnerLearningJourneyPayload } from '@/types/learner-learning-journey';
 import { getServerSessionClaims } from '@/lib/server/session-server';
 
 export const dynamic = 'force-dynamic';
@@ -30,6 +32,14 @@ export default async function DashboardPage() {
   // getNextCourseRecommendationsForStudent read from this same summary.
   const renewal = userId && dbConfigured ? await getRenewalSummaryForStudent(userId) : null;
   const recommendations = renewal?.suggested_courses ?? [];
+  let learningJourney: LearnerLearningJourneyPayload | null = null;
+  if (userId && dbConfigured) {
+    try {
+      learningJourney = await getLearnerLearningJourney(userId);
+    } catch {
+      learningJourney = null;
+    }
+  }
   let streakDays = 0;
   if (userId && dbConfigured) {
     try {
@@ -50,6 +60,7 @@ export default async function DashboardPage() {
       enrolmentQueryFailed={enrolmentQueryFailed}
       streakDays={streakDays}
       renewal={renewal}
+      learningJourney={learningJourney}
     />
   );
 }
