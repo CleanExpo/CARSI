@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { prisma } from '@/lib/prisma';
+import { isUniqueConstraintError } from '@/lib/server/db-errors';
 import { hashPassword, sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { generateMemberTempPassword } from '@/lib/server/member-temp-password';
 import { sendTeamMemberAddedEmail } from '@/lib/server/transactional-email';
@@ -9,6 +10,7 @@ import { listTeamCoursePurchaseSlugs } from '@/lib/server/team-course-purchase-d
 import { readTeamCourseSlug } from '@/lib/server/team-course-slug-db';
 import {
   issueTeamMemberSeat,
+  prepareNewMemberSeat,
   prepareTeamMemberSeat,
   runSeatStateStep,
   type TeamMemberSeat,
@@ -19,13 +21,27 @@ import { repairAndGetTeamForUser } from '@/lib/server/teams';
  * Add a team member by email and grant access only to the selected courses.
  * Each person gets their own unique sign-in password in the email.
  */
-export async function addCourseTeamMemberByEmail(params: {
+export function addCourseTeamMemberByEmail(
+  params: AddMemberParams
+): Promise<{ email: string; account_created: boolean; courses: string[] }> {
+  return addByEmail(params, 0);
+}
+
+type AddMemberParams = {
   ownerId: string;
   inviterName: string;
   email: string;
   appOrigin: string;
   courseSlugs: string[];
-}): Promise<{ email: string; account_created: boolean; courses: string[] }> {
+};
+
+/** How often one invite starts over because the account it meant to make appeared meanwhile. */
+const MAX_ACCOUNT_APPEARED_RESTARTS = 2;
+
+async function addByEmail(
+  params: AddMemberParams,
+  restarts: number
+): Promise<{ email: string; account_created: boolean; courses: string[] }> {
   const email = params.email.trim().toLowerCase();
   if (!email.includes('@')) {
     throw new Error('INVALID_EMAIL');
@@ -117,31 +133,21 @@ export async function addCourseTeamMemberByEmail(params: {
     throw new Error('ALREADY_MEMBER');
   }
 
-  let user = await prisma.lmsUser.findUnique({ where: { email } });
-  let accountCreated = false;
-  let memberPassword: string | null = null;
+  const existingUser = await prisma.lmsUser.findUnique({ where: { email } });
 
-  if (!user) {
-    memberPassword = generateMemberTempPassword();
-    const hashedPassword = await hashPassword(memberPassword);
-    const id = randomUUID();
-    user = await prisma.lmsUser.create({
-      data: {
-        id,
-        email,
-        hashedPassword,
-        // No email-derived name — store null when unknown (#302). The member
-        // sets their real name on first login / before certificate issuance.
-        fullName: null,
-        isActive: true,
-        isVerified: false,
-      },
-    });
-    accountCreated = true;
+  // GP-795: a new member's account is made INSIDE the seat step, with the seats and the member
+  // row, so a refusal rolls it back and nothing is ever deleted. Its temporary password is sent
+  // only after that step commits. Nothing is written for the account before the step: its seat
+  // is prepared from the claims a new student gets (`prepareNewMemberSeat`), and the step makes
+  // the account first.
+  let newAccount: { id: string; password: string; hashedPassword: string } | null = null;
+  if (!existingUser) {
+    const password = generateMemberTempPassword();
+    newAccount = { id: randomUUID(), password, hashedPassword: await hashPassword(password) };
   }
+  const memberUserId = existingUser ? existingUser.id : (newAccount as { id: string }).id;
 
-  const memberClaims = await sessionClaimsForUserId(user.id);
-  if (!memberClaims) {
+  if (existingUser && !(await sessionClaimsForUserId(memberUserId))) {
     throw new Error('USER_INACTIVE');
   }
 
@@ -149,7 +155,9 @@ export async function addCourseTeamMemberByEmail(params: {
   const seats: TeamMemberSeat[] = [];
   for (const slug of enrollSlugs) {
     try {
-      const seat = await prepareTeamMemberSeat(user.id, team.id, slug);
+      const seat = newAccount
+        ? await prepareNewMemberSeat({ id: memberUserId, email }, team.id, slug)
+        : await prepareTeamMemberSeat(memberUserId, team.id, slug);
       if (seat) seats.push(seat);
     } catch (e) {
       console.error('[team-member-provision] enrol', slug, e);
@@ -166,23 +174,50 @@ export async function addCourseTeamMemberByEmail(params: {
   // together in the one seat step (seat-state.ts), so two invites at the last seat cannot both
   // take it. The check above is only an early answer; this one decides. A member with no paid
   // seat left is not added (COURSE_SEATS_FULL), and no email is sent.
-  const memberUserId = user.id;
-  await runSeatStateStep(async (tx) => {
-    for (const seat of seats) {
-      // A member without the course prerequisite still gets their seat, issued LOCKED
-      // (prerequisiteGated) until they complete it - founder decision 02/11/2026.
-      if ((await issueTeamMemberSeat(tx, seat)) === 'no_seat') {
-        throw new Error('COURSE_SEATS_FULL');
+  try {
+    await runSeatStateStep(async (tx) => {
+      if (newAccount) {
+        // Someone made this account since we looked (another invite, a sign-up, a payment): this
+        // invite is then for an existing account, which only a fresh start can tell.
+        if (await tx.lmsUser.findUnique({ where: { email }, select: { id: true } })) {
+          throw new AccountAppearedError();
+        }
+        await tx.lmsUser.create({
+          data: {
+            id: newAccount.id,
+            email,
+            hashedPassword: newAccount.hashedPassword,
+            // No email-derived name: null when unknown (#302). The member sets their real name
+            // on first login / before certificate issuance.
+            fullName: null,
+            isActive: true,
+            isVerified: false,
+          },
+        });
       }
-    }
-    await tx.lmsTeamMember.upsert({
-      where: { teamId_userId: { teamId: team.id, userId: memberUserId } },
-      create: { teamId: team.id, userId: memberUserId, role: 'member' },
-      update: {},
+      for (const seat of seats) {
+        // A member without the course prerequisite still gets their seat, issued LOCKED
+        // (prerequisiteGated) until they complete it - founder decision 02/11/2026.
+        if ((await issueTeamMemberSeat(tx, seat)) === 'no_seat') {
+          throw new Error('COURSE_SEATS_FULL');
+        }
+      }
+      await tx.lmsTeamMember.upsert({
+        where: { teamId_userId: { teamId: team.id, userId: memberUserId } },
+        create: { teamId: team.id, userId: memberUserId, role: 'member' },
+        update: {},
+      });
     });
-  });
+  } catch (e) {
+    if (newAccount && (e instanceof AccountAppearedError || isUniqueConstraintError(e))) {
+      if (restarts >= MAX_ACCOUNT_APPEARED_RESTARTS) throw e;
+      return addByEmail(params, restarts + 1);
+    }
+    throw e;
+  }
 
-  const memberName = user.fullName?.trim() || email.split('@')[0] || 'there';
+  const memberName =
+    (existingUser?.fullName ?? null)?.trim() || email.split('@')[0] || 'there';
 
   void sendTeamMemberAddedEmail({
     to: email,
@@ -191,8 +226,15 @@ export async function addCourseTeamMemberByEmail(params: {
     teamName: team.name,
     courseTitles,
     appOrigin: params.appOrigin,
-    ...(memberPassword ? { temporaryPassword: memberPassword } : {}),
+    ...(newAccount ? { temporaryPassword: newAccount.password } : {}),
   }).catch((e) => console.error('[team-member-provision] email', e));
 
-  return { email, account_created: accountCreated, courses: courseTitles };
+  return { email, account_created: newAccount !== null, courses: courseTitles };
+}
+
+/** The account for this email was made while this invite was in flight (GP-795). */
+class AccountAppearedError extends Error {
+  constructor() {
+    super('ACCOUNT_APPEARED');
+  }
 }

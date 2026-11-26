@@ -223,6 +223,16 @@ function claimsFromUser(user: LmsUserNow): SessionClaims {
 }
 
 /**
+ * The claims a brand-new student account gets (GP-795): no name, the student role and the first
+ * session generation (the `session_generation` column default). For a seat prepared before the
+ * account is made, in the same step that makes it. The one owner of those defaults, so a seat is
+ * prepared for the account the database will then hold.
+ */
+export function claimsForNewStudent(id: string, email: string): SessionClaims {
+  return claimsFromUser({ id, email, fullName: null, active: true, role: 'student', generation: 0 });
+}
+
+/**
  * Claims for a new session, read from the database now in one statement (readLmsUserNow): the user
  * must be active, the role is the current database role and the session generation is the current
  * one. With `sessionGeneration` (GP-760, token refresh), the session being renewed must also carry

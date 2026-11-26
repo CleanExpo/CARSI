@@ -57,6 +57,7 @@ vi.mock('@/lib/server/auth-from-request', () => ({
 }));
 vi.mock('@/lib/server/lms-auth', () => ({
   sessionClaimsForUserId: vi.fn(async (userId: string) => ({ sub: userId, email: `${userId}@seat-race-test.invalid` })),
+  claimsForNewStudent: (id: string, email: string) => ({ sub: id, email }),
   hashPassword: vi.fn(async () => 'hashed-placeholder'),
 }));
 vi.mock('@/lib/server/lms-user-sync', () => ({ ensureLmsUserFromClaims: vi.fn(async () => {}) }));
@@ -134,6 +135,8 @@ function match(row: Row, where: Row | undefined): boolean {
 vi.mock('@/lib/prisma', () => {
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
   let chain: Promise<unknown> = Promise.resolve();
+  // Rows created inside the running transaction, undone if it throws (what PostgreSQL does).
+  const txLog: Array<{ name: string; row: Row }> = [];
 
   function model(name: string, inTx: boolean) {
     const t = () => db.tables[name];
@@ -157,6 +160,7 @@ vi.mock('@/lib/prisma', () => {
         if (members) db.tables.lmsTeamMember.push({ teamId: row.id, ...members });
       }
       t().push(row);
+      if (inTx) txLog.push({ name, row });
       return row;
     };
     return {
@@ -234,7 +238,15 @@ vi.mock('@/lib/prisma', () => {
       db.beforeNextTx = null;
       await f();
     }
-    const run = chain.then(() => fn(txClient));
+    const run = chain.then(async () => {
+      txLog.length = 0;
+      try {
+        return await fn(txClient);
+      } catch (error) {
+        for (const { name, row } of txLog.reverse()) db.tables[name] = db.tables[name].filter((r) => r !== row);
+        throw error;
+      }
+    });
     chain = run.catch(() => {});
     return run;
   };
