@@ -1,4 +1,10 @@
+import type Stripe from 'stripe';
+
 import { getStripeClient } from '@/lib/api/stripe';
+import {
+  checkoutRequestIdempotencyKey,
+  COURSE_CHECKOUT_MAX_NETWORK_RETRIES,
+} from '@/lib/server/checkout-idempotency';
 import {
   carsiCoachingMonthlyPriceCents,
   carsiCoachingProductName,
@@ -20,7 +26,7 @@ export async function createCarsiCoachingMonthlyCheckoutSession(
 ): Promise<{ checkout_url: string; checkout_session_id: string }> {
   const stripe = getStripeClient();
 
-  const stripeSession = await stripe.checkout.sessions.create({
+  const request: Stripe.Checkout.SessionCreateParams = {
     mode: 'subscription',
     customer_email: input.contactEmail,
     client_reference_id: input.userId,
@@ -53,6 +59,11 @@ export async function createCarsiCoachingMonthlyCheckoutSession(
         },
       },
     ],
+  };
+  // GP-785: a double-click or a retry of the same subscription gets the same Checkout Session.
+  const stripeSession = await stripe.checkout.sessions.create(request, {
+    idempotencyKey: checkoutRequestIdempotencyKey('coaching-monthly', request),
+    maxNetworkRetries: COURSE_CHECKOUT_MAX_NETWORK_RETRIES,
   });
 
   const url = stripeSession.url;
