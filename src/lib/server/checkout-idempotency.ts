@@ -10,19 +10,21 @@
  *  - Membership, Teams, org and onboarding checkouts hold a database reservation first. Their
  *    key is the reservation (kind, owner, reservation time): stable for one reservation,
  *    different for the next legitimate one.
- *  - A course purchase ("Buy course") holds no reservation. Its key is the exact request it
- *    protects (plus a short time window only when the request carries nothing that tells one
- *    attempt from the next, see `courseCheckoutIdempotencyKey`), so a double-click or a retry of
- *    the same purchase gets the first session back, and any change to the purchase (course,
- *    price, seats, buyer, return links, metadata) is a different key by construction.
+ *  - A course purchase ("Buy course"), event and monthly coaching, and the one-off onboarding
+ *    checkout (Teams off) hold no reservation. Their key is the exact request it protects (plus a
+ *    short time window only when the request carries nothing that tells one attempt from the next,
+ *    see `checkoutRequestIdempotencyKey`), so a double-click or a retry of the same purchase gets
+ *    the first session back, and any change to the purchase (course, price, seats, buyer, return
+ *    links, metadata) is a different key by construction (GP-783, GP-785, GP-789).
  *
  * Hashing keeps internal ids and emails out of Stripe logs and bounds the key length.
  *
  * The guard (GP-789). A key is only worth sending if this module made it, for this request.
  * `createKeyedCheckoutSession` is the checkout create that checks that at run time: it refuses a
- * key this module never issued (a hand-made one, or a shadowed builder's) and a course key issued
- * for a different request. The test that scans the source for unkeyed creates is only a hint (see
- * checkout-idempotency-owner.test.ts for its limits); this check runs on the real call.
+ * key this module never issued (a hand-made one, or a shadowed builder's) and a request key issued
+ * for a different request. The course checkout uses it; the coaching and onboarding creates send
+ * their key directly and are covered by the source scan only. That scan is only a hint (see
+ * checkout-idempotency-owner.test.ts for its limits); the run-time check is the stronger one.
  */
 import { createHash } from 'node:crypto';
 
@@ -100,7 +102,17 @@ function requestDigest(request: Stripe.Checkout.SessionCreateParams): string {
 }
 
 /**
- * The key for one course purchase: the exact Checkout Session request, hashed. A different
+ * Checkouts keyed by their own request (no database reservation). Each kind has its own key
+ * space, so two kinds can never share a key.
+ */
+export type CheckoutRequestKind =
+  | 'course'
+  | 'business-coaching'
+  | 'coaching-monthly'
+  | 'onboarding-one-off';
+
+/**
+ * The key for one unreserved checkout: the exact Checkout Session request, hashed. A different
  * purchase never shares a key, so Stripe can never refuse it for mismatched parameters.
  *
  * How long a repeat gets the first session back depends on who bounds it:
@@ -113,7 +125,8 @@ function requestDigest(request: Stripe.Checkout.SessionCreateParams): string {
  *    back to a wall-clock window. A repeat that straddles a window edge can still open a second
  *    session; that is a named limit of an anonymous request, not something a key can fix.
  */
-export function courseCheckoutIdempotencyKey(
+export function checkoutRequestIdempotencyKey(
+  kind: CheckoutRequestKind,
   request: Stripe.Checkout.SessionCreateParams,
   now: Date = new Date()
 ): CheckoutIdempotencyKey {
@@ -121,12 +134,20 @@ export function courseCheckoutIdempotencyKey(
   const binding = request.metadata?.[PURCHASE_SURVEY_BINDING_METADATA_KEY];
   const bound = typeof binding === 'string' && binding.length > 0;
   const suffix = bound ? 'k' : String(Math.floor(now.getTime() / COURSE_CHECKOUT_REPEAT_WINDOW_MS));
-  return issue(`carsi:course:${digest.slice(0, 40)}:${suffix}`, digest);
+  return issue(`carsi:${kind}:${digest.slice(0, 40)}:${suffix}`, digest);
+}
+
+/** The key for one course purchase ("Buy course"); see `checkoutRequestIdempotencyKey`. */
+export function courseCheckoutIdempotencyKey(
+  request: Stripe.Checkout.SessionCreateParams,
+  now: Date = new Date()
+): CheckoutIdempotencyKey {
+  return checkoutRequestIdempotencyKey('course', request, now);
 }
 
 /**
  * Open a Checkout Session with a key this module issued (GP-789). Refuses, before any request,
- * a key this module never made (`CHECKOUT_KEY_NOT_FROM_OWNER`) and a course key made for a
+ * a key this module never made (`CHECKOUT_KEY_NOT_FROM_OWNER`) and a request key made for a
  * different request (`CHECKOUT_KEY_FOR_OTHER_REQUEST`). The key goes in the options here, after
  * `options`, so nothing passed in can replace it.
  */

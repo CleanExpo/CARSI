@@ -24,17 +24,18 @@ import { describe, expect, it } from 'vitest';
 const ROOT = join(__dirname, '..', '..', '..');
 const OWNER = join('src', 'lib', 'server', 'checkout-idempotency.ts');
 
-/** Not "Buy course"; keyed under GP-785. Remove an entry when its creator is keyed. */
-const NOT_YET_KEYED: Record<string, string> = {
-  [join('src', 'lib', 'server', 'business-coaching-checkout.ts')]:
-    'GP-785: event business coaching',
-  [join('src', 'lib', 'server', 'carsi-coaching-monthly-checkout.ts')]: 'GP-785: monthly coaching',
-  [join('src', 'lib', 'server', 'onboarding-checkout.ts')]: 'GP-785: one-off onboarding',
-  [join('src', 'lib', 'api', 'stripe.ts')]: 'GP-785: generic wrapper with no production caller',
-};
+/**
+ * Creators not yet keyed. Empty since GP-785 keyed the coaching and one-off onboarding checkouts
+ * and removed the unused generic wrapper. It may only stay empty.
+ */
+const NOT_YET_KEYED: Record<string, string> = {};
 
 /** The owner's key builders: the only calls a create may take its key from. */
-const KEY_BUILDERS = new Set(['courseCheckoutIdempotencyKey', 'checkoutSessionIdempotencyKey']);
+const KEY_BUILDERS = new Set([
+  'courseCheckoutIdempotencyKey',
+  'checkoutRequestIdempotencyKey',
+  'checkoutSessionIdempotencyKey',
+]);
 
 function sourceFiles(dir: string, out: string[] = []): string[] {
   for (const name of readdirSync(dir)) {
