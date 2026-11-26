@@ -10,6 +10,7 @@ import { singleLearnerRequest } from '@/lib/lms/checkpoint-controller';
 
 import { CampusTopBar } from '@/components/layout/CampusTopBar';
 import { CourseCompletionBanner } from '@/components/lms/CourseCompletionBanner';
+import { LearnerLearningJourneyPanel } from '@/components/lms/LearnerLearningJourneyPanel';
 import { LearnerCourseOutline } from '@/components/lms/LearnerCourseOutline';
 import { LearnerCourseProgress } from '@/components/lms/LearnerCourseProgress';
 import { LearnerLessonNotes } from '@/components/lms/LearnerLessonNotes';
@@ -870,16 +871,26 @@ export function LearnCourseShell({ slug }: { slug: string }) {
               onSelectModule={selectModuleOverview}
             />
           ) : (
-            <LearnerCourseOutline
-              modules={curriculum.modules}
-              activeLessonId={activeLessonId}
-              onSelectLesson={selectLesson}
-              onSelectModule={selectModuleOverview}
-            />
+            <>
+              <LearnerCourseOutline
+                modules={curriculum.modules}
+                activeLessonId={activeLessonId}
+                onSelectLesson={selectLesson}
+                onSelectModule={selectModuleOverview}
+              />
+              <LearnerLearningJourneyPanel
+                courseSlug={curriculum.course.slug}
+                className="mt-4 hidden lg:block"
+              />
+            </>
           )}
         </aside>
 
         <div className="min-w-0 flex-1">
+          <LearnerLearningJourneyPanel
+            courseSlug={curriculum.course.slug}
+            className="mb-4 lg:hidden"
+          />
           {curriculum.course.delivery_profile && activeLessonId ? (() => {
             const profile = curriculum.course.delivery_profile;
             const index = profile.sessions.findIndex((session) => session.readingLessonId === activeLessonId || session.assessmentLessonId === activeLessonId);

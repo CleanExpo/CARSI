@@ -11,6 +11,7 @@ import type { OnboardingProgramRow } from '@/lib/server/onboarding-programs';
 import { CecRenewalFigure, CecRenewalStatus } from '@/components/lms/CecRenewalStatus';
 import { renewalProgress } from '@/lib/renewal-progress';
 import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
+import type { LearnerLearningJourneyPayload } from '@/types/learner-learning-journey';
 import type { RenewalCourseSuggestion, RenewalSummaryPayload } from '@/types/renewal';
 
 function greetingForHour(hour: number): string {
@@ -254,6 +255,7 @@ export function DashboardLearningSection({
   enrolmentQueryFailed,
   streakDays = 0,
   renewal = null,
+  learningJourney = null,
 }: {
   claims: SessionClaims | null;
   summary: LearnerDashboardSummary | null;
@@ -271,6 +273,7 @@ export function DashboardLearningSection({
   streakDays?: number;
   /** Cycle-aware renewal summary (GP-655); without it the card shows a labelled lifetime total. */
   renewal?: RenewalSummaryPayload | null;
+  learningJourney?: LearnerLearningJourneyPayload | null;
 }) {
   const firstName = claims?.full_name?.trim().split(/\s+/)[0] || 'Learner';
   const enrollments = summary?.enrollments ?? [];
@@ -491,6 +494,64 @@ export function DashboardLearningSection({
           </Link>
         </div>
       </section>
+
+      {learningJourney &&
+      (learningJourney.activity_nudges.length > 0 ||
+        learningJourney.skill_gaps.length > 0 ||
+        learningJourney.headline) ? (
+        <section className="w-full" data-testid="dashboard-smart-learning">
+          <SectionHead
+            title="Your learning journey"
+            subtitle={
+              learningJourney.headline ??
+              'Practice scenarios, knowledge checks, and your next enrolled lesson.'
+            }
+            href="/dashboard/student"
+            linkLabel="My learning"
+          />
+          <ul className="grid w-full gap-4 sm:grid-cols-2">
+            {learningJourney.activity_nudges.slice(0, 2).map((n) => (
+              <li key={n.id}>
+                <Link href={n.href} className={`${surface} flex h-full flex-col px-5 py-5`}>
+                  <p className={kicker}>{n.kind === 'interactive' ? 'Hands-on practice' : 'Continue course'}</p>
+                  <h3 className={`mt-2 text-[1.05rem] ${heading}`}>{n.title}</h3>
+                  <p className={`mt-2 flex-1 text-[14px] leading-6 ${muted}`}>{n.reason}</p>
+                  <span className={`${cta} mt-4`}>
+                    Open
+                    <ArrowRight className="h-4 w-4" aria-hidden />
+                  </span>
+                </Link>
+              </li>
+            ))}
+            {learningJourney.skill_gaps.slice(0, 1).map((g) => (
+              <li key={g.id}>
+                <Link href={g.href} className={`${surface} flex h-full flex-col border-amber-500/20 px-5 py-5`}>
+                  <p className="text-[11px] font-semibold tracking-[0.2em] text-amber-200/90 uppercase">
+                    Focus area
+                  </p>
+                  <h3 className={`mt-2 text-[1.05rem] ${heading}`}>
+                    {g.quiz_title} · {g.score_percent}%
+                  </h3>
+                  <p className={`mt-2 flex-1 text-[14px] leading-6 ${muted}`}>{g.reason}</p>
+                  <span className={`${cta} mt-4`}>Revisit lesson</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {learningJourney.pathway_next ? (
+            <p className={`mt-4 text-[14px] ${muted}`}>
+              Next pathway course:{' '}
+              <Link
+                href={`/courses/${encodeURIComponent(learningJourney.pathway_next.slug)}`}
+                className="font-semibold text-sky-200 hover:text-white"
+              >
+                {learningJourney.pathway_next.title}
+              </Link>{' '}
+              — {learningJourney.pathway_next.reason}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
 
       {recommended.length > 0 ? (
         <section className="w-full">

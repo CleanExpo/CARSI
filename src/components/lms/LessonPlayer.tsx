@@ -6,6 +6,7 @@ import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
 import type { LessonPosition } from '@/lib/lms/lesson-checkpoint';
 import { findScrollRoot, scrollLessonToTop } from '@/lib/lms/lesson-scroll';
 
+import { ChapterEngagementBanner } from '@/components/lms/ChapterEngagementBanner';
 import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { DriveFileViewer } from '@/components/lms/DriveFileViewer';
 import { FlashcardDeck } from '@/components/lms/FlashcardDeck';
@@ -185,6 +186,10 @@ export function LessonPlayer({
           ) : null}
         </div>
       </div>
+
+      {enrolled ? (
+        <ChapterEngagementBanner resources={resources} lessonTitle={lesson.title} />
+      ) : null}
 
       <PositionedContent lesson={lesson} initialPosition={initialPosition} onPositionChange={onPositionChange} />
 
