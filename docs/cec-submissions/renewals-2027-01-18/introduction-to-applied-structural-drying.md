@@ -23,7 +23,7 @@ Prepared 2 November 2026 for submission to **CECCourse@iicrcnet.org**.
 
 ## 4. Course summary and learning objectives
 
-**Summary.** This course moves from foundational concepts to applied practice, equipping technicians to assess real building components affected by water damage, understand drying dynamics in structural assemblies, deploy and operate drying equipment correctly, apply specific drying techniques to different material types, and produce monitoring and documentation records that meet IICRC and insurance requirements. Content is aligned with the IICRC S500 standard and Australian WHS legislation.
+**Summary.** This course moves from foundational concepts to applied practice, equipping technicians to assess real building components affected by water damage, understand drying dynamics in structural assemblies, deploy and operate drying equipment correctly, apply specific drying techniques to different material types, and produce monitoring and documentation records that meet insurer and client reporting requirements. Content is aligned with the IICRC S500 standard and Australian WHS legislation.
 
 **Learning objectives / curriculum outline.**
 

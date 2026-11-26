@@ -32,7 +32,6 @@ Prepared 2 November 2026 for submission to **CECCourse@iicrcnet.org**.
 - Module 3: Air Purification Methods
 - Module 4: Odour Counteractants
 - Module 5: Surface Treatments
-- SECTION 2: SMOKE AND SOOT DAMAGE COURSES
 - Module 6: Odour Documentation and Clearance
 - Module 7: Special Odour Scenarios
 - What you learnt

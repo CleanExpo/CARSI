@@ -22,13 +22,26 @@ carsi.com.au** (CARSI's own published wording) on 02/11/2026.
 
 ## Flags to review before you send
 
-- **`introduction-to-odour-control-and-removal-techniques`:** the live course lists a module
-  called "SECTION 2: SMOKE AND SOOT DAMAGE COURSES". That looks like a CMS error on the live site.
-  Fix it in the live course or delete that line from the pack.
-- **`introduction-to-structural-drying-concepts`:** the live page lists "What you learnt" twice.
-  The pack keeps it once.
-- **`introduction-to-applied-structural-drying`:** the summary says records "meet IICRC and
-  insurance requirements". That is a loose IICRC reference you may want to reword.
+Resolved in the packs on 26/11/2026 (the live course pages still carry the original text; fix them
+in the live database so the page and the pack agree):
+
+- **`introduction-to-odour-control-and-removal-techniques`:** the stray live-site heading
+  "SECTION 2: SMOKE AND SOOT DAMAGE COURSES" is removed from the pack's module list.
+- **`introduction-to-structural-drying-concepts`:** a stray "WHAT YOU WILL LEARN" heading is
+  removed from the module list ("What you learnt" was already kept once).
+- **`introduction-to-applied-structural-drying`:** the summary no longer says records "meet IICRC
+  and insurance requirements"; it now says "meet insurer and client reporting requirements".
+
+Still open:
+
+- **`introduction-to-psychrometry-and-the-drying-process`:** no summary or outline ("TBC — founder
+  to supply learning objectives"). It is one of the 4 courses not found on the live site; see below.
+- **Supporting documentation (section 7 of every pack)** lists a curriculum export, a sample
+  certificate and an assessment outline. None is attached yet. Attach them, or remove the lines,
+  before sending.
+- **Not yet checked against the IICRC's own published renewal requirements.** iicrc.org has no
+  page on CEC course approval; the IICRC links CEC providers to iicrccecevents.org, which has not
+  been read. Check that site (or ask the IICRC) before sending.
 - Several summaries say the content is "aligned with the IICRC S500 standard". Citing a standard
   nominatively like this is allowed.
 - **Instructor:** Phill McGurk in every pack (DECISIONS #36).
