@@ -45,68 +45,86 @@ const field =
 const label = 'text-xs font-semibold tracking-wide text-white/45 uppercase';
 
 /**
- * A member's loaded workspace, tagged with the member it is for and the selection it was loaded
- * for. `pick` counts every selection the admin makes, so picking A, then B, then A again is three
- * different selections: what was loaded for the first A is not what is on screen for the second.
+ * A member's loaded workspace, tagged with the selection it was loaded for. The tag is the
+ * selection (a counter that moves on every pick), not the member: coming back to A is a new
+ * selection, so the workspace loaded for the first A is not shown or saved until A loads again.
  */
-type Loaded = { userId: string; pick: number; workspace: Workspace };
-/** The chapter assignment being edited, tagged the same way. */
-type ChapterDraft = { userId: string; pick: number; chapterSlug: string; coachUserId: string };
+type Loaded = { generation: number; userId: string; workspace: Workspace };
+/** The chapter assignment being edited, tagged with the selection it is for. */
+type ChapterDraft = {
+  generation: number;
+  userId: string;
+  chapterSlug: string;
+  coachUserId: string;
+};
 
 export function AdminCoachingMemberWorkspaceClient() {
   const [members, setMembers] = useState<Member[]>([]);
   const [selected, setSelected] = useState('');
-  // GP-799: every piece of member data carries the member and the selection it was loaded for,
-  // and is shown or saved only for that selection. Picking member B never shows A's chapter or
-  // brief under B, a save can never post B's userId with A's chapter and coach, and picking A
-  // again hides the older A data until the fresh load answers (a failed reload leaves nothing to
-  // act on). `pickRef` is the one owner of "which selection is current": every answer is checked
-  // against it.
+  // GP-799: every piece of member data carries the member it belongs to, and is shown or saved
+  // only while that member is selected. Picking member B never shows A's chapter or brief under
+  // B, and a save can never post B's userId with A's chapter and coach.
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [draft, setDraft] = useState<ChapterDraft | null>(null);
-  const [pick, setPick] = useState(0);
-  const pickRef = useRef(0);
-  const [busy, setBusy] = useState(false);
+  // One counter for "which selection is this": bumped each time the admin picks a different
+  // member (so A, B, A is three selections, not two). Every
+  // load and save remembers the number it started under and is dropped if the number has moved,
+  // so comparing member ids alone can never let an old request through after A, B, A.
+  const generationRef = useRef(0);
+  const [generation, setGeneration] = useState(0);
+  // The selection a save is running for. Busy only counts on that selection, so a save for A
+  // that never answers cannot lock B's buttons.
+  const [busyGeneration, setBusyGeneration] = useState<number | null>(null);
+  // While a request runs the chapter choice is locked (see the select below), so the answer to
+  // a save can never meet a newer pick: what the server answers is what is shown, and "Saved."
+  // always names the chapter that was posted.
+  const busy = busyGeneration === generation;
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
 
-  const workspace =
-    loaded && loaded.userId === selected && loaded.pick === pick ? loaded.workspace : null;
-  const chapter =
-    workspace && draft && draft.userId === selected && draft.pick === pick ? draft : null;
+  // The one test for "is this data for what the admin is looking at": the selection counter.
+  const workspace = loaded && loaded.generation === generation ? loaded.workspace : null;
+  const chapter = workspace && draft && draft.generation === generation ? draft : null;
   const chapterSlug = chapter?.chapterSlug ?? DEFAULT_COACHING_CHAPTER_SLUG;
   const coachUserId = chapter?.coachUserId ?? DEFAULT_COACHING_COACH.id;
 
-  const showWorkspace = useCallback((userId: string, forPick: number, ws: Workspace) => {
-    setLoaded({ userId, pick: forPick, workspace: ws });
+  const showWorkspace = useCallback((userId: string, forGeneration: number, ws: Workspace) => {
+    setLoaded({ generation: forGeneration, userId, workspace: ws });
     setDraft({
+      generation: forGeneration,
       userId,
-      pick: forPick,
       chapterSlug: ws.chapterSlug,
       coachUserId: ws.coachUserId,
     });
   }, []);
 
   const loadWorkspace = useCallback(
-    async (userId: string, forPick: number) => {
-      let data: { detail?: string; workspace?: Workspace } = {};
-      let ok = false;
+    async (userId: string, startedGeneration: number, signal: AbortSignal) => {
+      const stale = () => signal.aborted || generationRef.current !== startedGeneration;
+      let res: Response;
       try {
-        const res = await fetch(
-          `/api/admin/coaching/member-workspace?userId=${encodeURIComponent(userId)}`
+        res = await fetch(
+          `/api/admin/coaching/member-workspace?userId=${encodeURIComponent(userId)}`,
+          { signal }
         );
-        ok = res.ok;
-        data = (await res.json().catch(() => ({}))) as typeof data;
-      } catch {
-        // A network failure is a failed load, shown the same way.
+      } catch (err) {
+        // An abort is the admin leaving this member; anything else is a real failure.
+        if (stale()) return;
+        throw err;
       }
-      // An answer for a selection the admin has since left is dropped, error or not.
-      if (pickRef.current !== forPick) return;
-      if (!ok || !data.workspace) {
+      if (stale()) return;
+      const data = (await res.json().catch(() => ({}))) as {
+        detail?: string;
+        workspace?: Workspace;
+      };
+      // A response from a selection the admin has since left is dropped, error or not. This
+      // check is after the second await too: the body can arrive after the switch.
+      if (stale()) return;
+      if (!res.ok || !data.workspace) {
         setError(data.detail ?? 'Could not load member.');
         return;
       }
-      showWorkspace(userId, forPick, data.workspace);
+      showWorkspace(userId, startedGeneration, data.workspace);
       setError('');
     },
     [showWorkspace]
@@ -118,38 +136,42 @@ export function AdminCoachingMemberWorkspaceClient() {
       if (!res.ok) return;
       const data = (await res.json()) as { members: Member[] };
       setMembers(data.members);
-      // No selection has been made yet (every selection bumps `pickRef`): default to the first.
-      if (data.members[0] && pickRef.current === 0) {
-        pickRef.current += 1;
-        setSelected(data.members[0].userId);
-        setPick(pickRef.current);
+      if (data.members[0]) {
+        setSelected((prev) => prev || data.members[0].userId);
       }
     })();
   }, []);
 
   useEffect(() => {
     if (!selected) return;
-    void (async () => {
-      await loadWorkspace(selected, pickRef.current);
-    })();
-  }, [selected, pick, loadWorkspace]);
+    const controller = new AbortController();
+    void loadWorkspace(selected, generationRef.current, controller.signal).catch(() => {
+      // A failed request for the member still on screen shows an error; one for a member the
+      // admin has left shows nothing.
+      if (!controller.signal.aborted) setError('Could not load member.');
+    });
+    return () => controller.abort();
+  }, [selected, loadWorkspace]);
 
   function selectMember(userId: string) {
     // Clear the last member's notice and error at once (a setState in the selection effect trips
-    // react-hooks/set-state-in-effect). Whatever was loaded before is hidden by its tag.
-    pickRef.current += 1;
+    // react-hooks/set-state-in-effect). Their workspace is hidden by its member tag.
+    if (userId !== selected) {
+      generationRef.current += 1;
+      setGeneration(generationRef.current);
+    }
     setNotice('');
     setError('');
     setSelected(userId);
-    setPick(pickRef.current);
   }
 
   async function post(op: string, extra: Record<string, unknown> = {}) {
     // Only for the member whose workspace is on screen.
     const forUser = selected;
-    const forPick = pick;
     if (!forUser || !workspace) return;
-    setBusy(true);
+    const startedGeneration = generationRef.current;
+    const stale = () => generationRef.current !== startedGeneration;
+    setBusyGeneration(startedGeneration);
     setNotice('');
     setError('');
     try {
@@ -164,18 +186,19 @@ export function AdminCoachingMemberWorkspaceClient() {
         ok = res.ok;
         data = (await res.json().catch(() => ({}))) as typeof data;
       } catch {
-        // A network failure is a failed request, shown the same way.
+        // A network failure is a failed request, shown the same way (never an unhandled error).
       }
-      // The admin moved to another selection while this was in flight: say nothing under it.
-      if (pickRef.current !== forPick) return;
+      // The admin moved to another selection while this was in flight (including away and
+      // back): say nothing, and never replace what is now on screen with this old answer.
+      if (stale()) return;
       if (!ok) {
         setError(data.detail ?? 'Request failed.');
         return;
       }
-      if (data.workspace) showWorkspace(forUser, forPick, data.workspace);
+      if (data.workspace) showWorkspace(forUser, startedGeneration, data.workspace);
       setNotice('Saved.');
     } finally {
-      setBusy(false);
+      setBusyGeneration((current) => (current === startedGeneration ? null : current));
     }
   }
 
@@ -186,8 +209,8 @@ export function AdminCoachingMemberWorkspaceClient() {
     if (!chapter) return;
     const opt = chapterOptions.find((c) => c.slug === slug);
     setDraft({
+      generation: chapter.generation,
       userId: chapter.userId,
-      pick: chapter.pick,
       chapterSlug: slug,
       coachUserId: opt ? opt.coachUserId : chapter.coachUserId,
     });
@@ -258,6 +281,7 @@ export function AdminCoachingMemberWorkspaceClient() {
                   id="chapter-slug"
                   className={`${field} mt-2`}
                   value={chapterSlug}
+                  disabled={busy}
                   onChange={(e) => pickChapter(e.target.value)}
                 >
                   {chapterOptions.map((c) => (

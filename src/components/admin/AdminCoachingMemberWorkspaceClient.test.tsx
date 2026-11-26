@@ -279,68 +279,6 @@ describe('AdminCoachingMemberWorkspaceClient: switching member', () => {
     expect(container.textContent).not.toContain('Could not load A');
   });
 
-  // A pick of the same member again is a new selection: what was loaded for the earlier pick is
-  // not on screen for it, so a failed reload leaves nothing that can be saved.
-  describe.each([
-    ['a failed reload (HTTP 500)', () => json({ detail: 'Reload failed' }, false)],
-    ['a reload with no workspace in the answer', () => json({}, true)],
-  ])('picking A, B, A again with %s', (_name, reloadAnswer) => {
-    it('hides the older A chapter and brief and offers nothing to save', async () => {
-      const base = vi.mocked(fetch).getMockImplementation()!;
-      let aLoads = 0;
-      vi.mocked(fetch).mockImplementation(async (input, init) => {
-        if (String(input).includes(`userId=${A}`) && init?.method !== 'POST') {
-          aLoads += 1;
-          if (aLoads > 1) return reloadAnswer();
-        }
-        return base(input, init);
-      });
-      await renderWithA();
-      await pick(B);
-      await pick(A);
-      await flush();
-
-      expect(aLoads).toBe(2);
-      expect(container.textContent).not.toContain('Brief for Member A');
-      expect(container.querySelector('#chapter-slug')).toBeNull();
-      expect(saveButton()).toBeUndefined();
-      expect(posts).toEqual([]);
-    });
-  });
-
-  it("drops member A's earlier load when it answers after A was picked again", async () => {
-    const heldA: Pending[] = [];
-    const base = vi.mocked(fetch).getMockImplementation()!;
-    vi.mocked(fetch).mockImplementation(async (input, init) => {
-      if (String(input).includes(`userId=${A}`) && init?.method !== 'POST') {
-        return new Promise<Response>((resolve) => heldA.push({ resolve }));
-      }
-      return base(input, init);
-    });
-    await act(async () => root.render(<AdminCoachingMemberWorkspaceClient />));
-    await flush();
-    await pick(B);
-    await pick(A);
-    expect(heldA).toHaveLength(2);
-
-    const chapters = listCoachingChapterOptions();
-    const stale = chapters.at(-1)!;
-    const fresh = chapters[0];
-    await act(async () =>
-      heldA[0].resolve(json({ workspace: workspaceFor('Member A', stale.slug, stale.coachUserId) }))
-    );
-    await flush();
-    // The earlier pick's answer is not the current selection's: nothing is shown for it.
-    expect(container.textContent).not.toContain('Brief for Member A');
-    expect(container.querySelector('#chapter-slug')).toBeNull();
-
-    await act(async () =>
-      heldA[1].resolve(json({ workspace: workspaceFor('Member A', fresh.slug, fresh.coachUserId) }))
-    );
-    await flush();
-    expect(container.querySelector<HTMLSelectElement>('#chapter-slug')?.value).toBe(fresh.slug);
-  });
-
   it('a network failure loading the member shows an error, not "Loading member" for ever', async () => {
     const base = vi.mocked(fetch).getMockImplementation()!;
     vi.mocked(fetch).mockImplementation(async (input, init) => {
@@ -369,5 +307,230 @@ describe('AdminCoachingMemberWorkspaceClient: switching member', () => {
     expect(container.textContent).toContain('Request failed.');
     expect(container.textContent).not.toContain('Saved.');
     expect(saveButton()?.disabled).toBe(false);
+  });
+});
+
+// GP-799, second round: comparing member ids is not enough. After A, then B, then A again, an
+// answer for the first A is still "for A" but belongs to a selection the admin has left. Each
+// selection (not each member) owns its requests, and a pending save belongs to its own selection.
+describe('AdminCoachingMemberWorkspaceClient: away and back (A, B, A)', () => {
+  const A = MEMBER;
+  const B = '22222222-2222-4222-8222-222222222222';
+  const chapters = listCoachingChapterOptions();
+
+  function ws(name: string, chapterSlug: string, coachUserId: string) {
+    return {
+      businessName: `${name} Co`,
+      chapterSlug,
+      coachUserId,
+      onboardingSubmittedAt: null,
+      briefGeneratedAt: '2026-01-02T00:00:00.000Z',
+      brief: {
+        version: 1,
+        generatedAt: '2026-01-02T00:00:00.000Z',
+        source: 'fallback',
+        model: null,
+        memberName: name,
+        businessName: `${name} Co`,
+        summary: `Brief for ${name}`,
+        suggestedFocusTitle: 'Focus',
+        suggestedFocusDescription: 'Desc',
+        sections: [],
+        draftActions: [],
+      },
+      growthPlan: null,
+      subscription: null,
+      hasOnboardingSnapshot: true,
+    };
+  }
+
+  type Held = { resolve: (r: Response) => void; signal: AbortSignal | undefined };
+  let gets: Record<string, Held[]>;
+  let posts: Held[];
+
+  beforeEach(() => {
+    gets = { [A]: [], [B]: [] };
+    posts = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input);
+        if (init?.method === 'POST') {
+          return new Promise<Response>((resolve) => posts.push({ resolve, signal: init.signal! }));
+        }
+        for (const id of [A, B]) {
+          if (url.includes(`userId=${id}`)) {
+            return new Promise<Response>((resolve) =>
+              gets[id].push({ resolve, signal: init?.signal ?? undefined })
+            );
+          }
+        }
+        return json({
+          members: [A, B].map((userId, i) => ({
+            userId,
+            email: `m${i}@example.test`,
+            fullName: `Member ${i === 0 ? 'A' : 'B'}`,
+            subscriptionStatus: 'active',
+            draftCount: 0,
+          })),
+        });
+      })
+    );
+  });
+
+  async function flush() {
+    await act(async () => {
+      for (let i = 0; i < 5; i++) await Promise.resolve();
+    });
+  }
+  async function pick(userId: string) {
+    const select = container.querySelector<HTMLSelectElement>('#coaching-member-select')!;
+    await act(async () => {
+      select.value = userId;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  }
+  async function answerGet(userId: string, index: number, name: string, slug = chapters[0].slug) {
+    const coach = chapters.find((c) => c.slug === slug)!.coachUserId;
+    await act(async () => gets[userId][index].resolve(json({ workspace: ws(name, slug, coach) })));
+    await flush();
+  }
+  function saveButton() {
+    return Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Save chapter assignment')
+    );
+  }
+  async function renderAndLoadA() {
+    await act(async () => root.render(<AdminCoachingMemberWorkspaceClient />));
+    await flush();
+    await answerGet(A, 0, 'Member A');
+  }
+
+  it('an old load for A that answers last does not replace the newer load for A', async () => {
+    await act(async () => root.render(<AdminCoachingMemberWorkspaceClient />));
+    await flush();
+    await pick(B);
+    await pick(A);
+    expect(gets[A]).toHaveLength(2);
+    await answerGet(A, 1, 'New A');
+    await answerGet(A, 0, 'Old A');
+    expect(container.textContent).toContain('Brief for New A');
+    expect(container.textContent).not.toContain('Brief for Old A');
+  });
+
+  it("leaving a member aborts that member's load request", async () => {
+    await act(async () => root.render(<AdminCoachingMemberWorkspaceClient />));
+    await flush();
+    expect(gets[A][0].signal?.aborted).toBe(false);
+    await pick(B);
+    expect(gets[A][0].signal?.aborted).toBe(true);
+    expect(gets[B][0].signal?.aborted).toBe(false);
+  });
+
+  it("an old save for A that answers after A, B, A does not undo the admin's newer choice", async () => {
+    await renderAndLoadA();
+    await act(async () => saveButton()!.click());
+    expect(posts).toHaveLength(1);
+
+    await pick(B);
+    await answerGet(B, 0, 'Member B');
+    await pick(A);
+    await answerGet(A, 1, 'Member A', chapters[0].slug);
+
+    // The admin now chooses another chapter for A.
+    const newer = chapters[chapters.length - 1];
+    const select = container.querySelector<HTMLSelectElement>('#chapter-slug')!;
+    await act(async () => {
+      select.value = newer.slug;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    expect(container.querySelector<HTMLSelectElement>('#chapter-slug')!.value).toBe(newer.slug);
+
+    // The first save finally answers with the old assignment.
+    await act(async () =>
+      posts[0].resolve(
+        json({ workspace: ws('Member A', chapters[0].slug, chapters[0].coachUserId) })
+      )
+    );
+    await flush();
+
+    expect(container.querySelector<HTMLSelectElement>('#chapter-slug')!.value).toBe(newer.slug);
+    expect(container.textContent).not.toContain('Saved.');
+  });
+
+  it('the chapter choice is locked while a request runs, so "Saved." always names what was posted', async () => {
+    await renderAndLoadA();
+    const select = () => container.querySelector<HTMLSelectElement>('#chapter-slug')!;
+    expect(select().disabled).toBe(false);
+    await act(async () => saveButton()!.click());
+    expect(posts).toHaveLength(1);
+
+    // The admin cannot pick another chapter while the save is out, so the answer cannot meet it.
+    expect(select().disabled).toBe(true);
+    await act(async () =>
+      posts[0].resolve(
+        json({ workspace: ws('Member A', chapters[0].slug, chapters[0].coachUserId) })
+      )
+    );
+    await flush();
+
+    expect(container.textContent).toContain('Saved.');
+    expect(select().disabled).toBe(false);
+    expect(select().value).toBe(chapters[0].slug);
+  });
+
+  it("a save for A that never answers does not lock member B's buttons", async () => {
+    await renderAndLoadA();
+    await act(async () => saveButton()!.click());
+    expect(saveButton()!.disabled).toBe(true);
+
+    await pick(B);
+    await answerGet(B, 0, 'Member B');
+
+    expect(saveButton()!.disabled).toBe(false);
+  });
+
+  it('coming back to A shows no old A and offers no save until A has loaded again', async () => {
+    await renderAndLoadA();
+    await pick(B);
+    // B never answers: A's first workspace is still the only one held in memory.
+    await pick(A);
+    // A's second load is still pending. The first A load must not stand in for it.
+    expect(gets[A]).toHaveLength(2);
+    expect(container.textContent).not.toContain('Brief for Member A');
+    expect(container.querySelector('#chapter-slug')).toBeNull();
+    expect(saveButton()).toBeUndefined();
+    expect(posts).toHaveLength(0);
+
+    await answerGet(A, 1, 'Member A again');
+    expect(container.textContent).toContain('Brief for Member A again');
+    expect(saveButton()).toBeDefined();
+  });
+
+  it('an old load whose body arrives after A, B, A does not replace the newer load for A', async () => {
+    await act(async () => root.render(<AdminCoachingMemberWorkspaceClient />));
+    await flush();
+    // The first A request answers at once, but its body is still being read.
+    let releaseBody: (body: unknown) => void = () => {};
+    const slowBody = new Promise<unknown>((resolve) => (releaseBody = resolve));
+    await act(async () =>
+      gets[A][0].resolve({ ok: true, json: () => slowBody } as unknown as Response)
+    );
+    await flush();
+
+    await pick(B);
+    await pick(A);
+    expect(gets[A]).toHaveLength(2);
+    await answerGet(A, 1, 'New A');
+    expect(container.textContent).toContain('Brief for New A');
+
+    await act(async () =>
+      releaseBody({
+        workspace: ws('Old A', chapters[0].slug, chapters[0].coachUserId),
+      })
+    );
+    await flush();
+    expect(container.textContent).toContain('Brief for New A');
+    expect(container.textContent).not.toContain('Brief for Old A');
   });
 });
