@@ -30,6 +30,17 @@ const STEPS = [
     ],
   },
   {
+    label: 'learner journey recommendations',
+    cmd: 'npx',
+    args: [
+      'vitest',
+      'run',
+      '--config',
+      'config/vitest.config.ts',
+      'src/lib/lms/learner-journey-insights.test.ts',
+    ],
+  },
+  {
     label: 'role-guide conversion',
     cmd: 'npx',
     args: [
