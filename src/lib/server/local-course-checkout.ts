@@ -7,6 +7,7 @@ import { analyticsConsentMetadata } from '@/lib/server/analytics-consent';
 import {
   COURSE_CHECKOUT_MAX_NETWORK_RETRIES,
   courseCheckoutIdempotencyKey,
+  createKeyedCheckoutSession,
 } from '@/lib/server/checkout-idempotency';
 
 /**
@@ -123,10 +124,13 @@ export async function createStripeCheckoutForCourse(params: {
       },
     ],
   };
-  const session = await stripe.checkout.sessions.create(request, {
-    idempotencyKey: courseCheckoutIdempotencyKey(request),
-    maxNetworkRetries: COURSE_CHECKOUT_MAX_NETWORK_RETRIES,
-  });
+  // The checked create (GP-789): it refuses a key the owner did not issue for this request.
+  const session = await createKeyedCheckoutSession(
+    stripe,
+    request,
+    courseCheckoutIdempotencyKey(request),
+    { maxNetworkRetries: COURSE_CHECKOUT_MAX_NETWORK_RETRIES }
+  );
 
   const url = session.url;
   if (!url) throw new Error('NO_CHECKOUT_URL');
