@@ -1,4 +1,10 @@
+import type Stripe from 'stripe';
+
 import { getStripeClient } from '@/lib/api/stripe';
+import {
+  checkoutRequestIdempotencyKey,
+  COURSE_CHECKOUT_MAX_NETWORK_RETRIES,
+} from '@/lib/server/checkout-idempotency';
 
 export function buildOnboardingCheckoutUrls(origin: string, slug: string) {
   const base = origin.replace(/\/$/, '');
@@ -30,7 +36,7 @@ export async function createOnboardingStripeCheckout(params: {
 
   const stripe = getStripeClient();
 
-  const session = await stripe.checkout.sessions.create({
+  const request: Stripe.Checkout.SessionCreateParams = {
     mode: 'subscription',
     customer_email: params.customerEmail,
     success_url: params.successUrl,
@@ -43,6 +49,12 @@ export async function createOnboardingStripeCheckout(params: {
       purchase_mode: 'self',
     },
     line_items: [{ price: params.priceId, quantity: 1 }],
+  };
+  // GP-785: a double-click or a retry of the same checkout gets the same Checkout Session. This
+  // path (Teams off) holds no reservation, so the key is the request itself.
+  const session = await stripe.checkout.sessions.create(request, {
+    idempotencyKey: checkoutRequestIdempotencyKey('onboarding-one-off', request),
+    maxNetworkRetries: COURSE_CHECKOUT_MAX_NETWORK_RETRIES,
   });
 
   const url = session.url;

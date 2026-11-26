@@ -1,4 +1,10 @@
+import type Stripe from 'stripe';
+
 import { getStripeClient } from '@/lib/api/stripe';
+import {
+  checkoutRequestIdempotencyKey,
+  COURSE_CHECKOUT_MAX_NETWORK_RETRIES,
+} from '@/lib/server/checkout-idempotency';
 import {
     businessCoachingPath,
     businessCoachingProductName,
@@ -42,7 +48,7 @@ export async function createBusinessCoachingCheckoutSession(
   const cancelUrl = `${origin}${businessCoachingPath}?session=${encodeURIComponent(session.slug)}`;
 
   const stripe = getStripeClient();
-  const stripeSession = await stripe.checkout.sessions.create({
+  const request: Stripe.Checkout.SessionCreateParams = {
     mode: 'payment',
     customer_email: input.contactEmail,
     success_url: successUrl,
@@ -70,6 +76,11 @@ export async function createBusinessCoachingCheckoutSession(
         },
       },
     ],
+  };
+  // GP-785: a double-click or a retry of the same booking gets the same Checkout Session.
+  const stripeSession = await stripe.checkout.sessions.create(request, {
+    idempotencyKey: checkoutRequestIdempotencyKey('business-coaching', request),
+    maxNetworkRetries: COURSE_CHECKOUT_MAX_NETWORK_RETRIES,
   });
 
   const url = stripeSession.url;
