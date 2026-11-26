@@ -1,4 +1,6 @@
+import { INTERACTIVE_PILOT_LESSON_IDS } from '@/lib/lms/append-interactive-pilot';
 import { getLiveInteractiveLearningOffers } from '@/lib/lms/interactive-learning-catalog';
+import { parseInteractiveProgressDocument } from '@/lib/lms/interactive-progress-store';
 import {
   assembleLearnerJourney,
   buildActivityNudges,
@@ -12,6 +14,7 @@ import { resolveFocusCourseSlug } from '@/lib/lms/learner-journey-query';
 import { isInteractiveLessonResource, parseLessonResources } from '@/lib/lms/lesson-resources';
 import { prisma } from '@/lib/prisma';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
+import { resolveDbPathwayNext } from '@/lib/server/learning-pathways';
 import { getNextCourseRecommendationsForStudent } from '@/lib/server/renewal-summary';
 import {
   EMPTY_LEARNER_LEARNING_JOURNEY,
@@ -192,6 +195,19 @@ async function loadQuizGaps(userId: string): Promise<QuizGapRow[]> {
   return rows;
 }
 
+async function loadInteractiveProgressByLesson(
+  userId: string
+): Promise<Map<string, ReturnType<typeof parseInteractiveProgressDocument>>> {
+  const pilotLessonIds = [...INTERACTIVE_PILOT_LESSON_IDS];
+  const rows = await prisma.lmsLessonProgress.findMany({
+    where: { studentId: userId, lessonId: { in: pilotLessonIds } },
+    select: { lessonId: true, interactiveProgress: true },
+  });
+  return new Map(
+    rows.map((r) => [r.lessonId, parseInteractiveProgressDocument(r.interactiveProgress)])
+  );
+}
+
 async function loadPathwayCatalog(): Promise<Map<string, { title: string; discipline: string | null }>> {
   const rows = await prisma.lmsCourse.findMany({
     where: { OR: [{ isPublished: true }, { status: 'published' }] },
@@ -208,12 +224,14 @@ export async function getLearnerLearningJourney(
   if (!userId?.trim()) return EMPTY_LEARNER_LEARNING_JOURNEY;
 
   try {
-    const [courseRecommendations, snapshot, quizGaps, courseBySlug] = await Promise.all([
-      getNextCourseRecommendationsForStudent(userId),
-      loadCurriculumSnapshot(userId),
-      loadQuizGaps(userId),
-      loadPathwayCatalog(),
-    ]);
+    const [courseRecommendations, snapshot, quizGaps, courseBySlug, interactiveProgressByLesson] =
+      await Promise.all([
+        getNextCourseRecommendationsForStudent(userId),
+        loadCurriculumSnapshot(userId),
+        loadQuizGaps(userId),
+        loadPathwayCatalog(),
+        loadInteractiveProgressByLesson(userId),
+      ]);
 
     const focus = resolveFocusCourseSlug(options?.focusCourseSlug, snapshot.enrolledSlugs);
 
@@ -224,18 +242,25 @@ export async function getLearnerLearningJourney(
       .filter((e) => e.all_lessons_complete && e.iicrc_discipline)
       .map((e) => e.iicrc_discipline as string);
 
-    const pathwayNext = buildPathwayNext({
-      completedDisciplines,
-      enrolledSlugs: snapshot.enrolledSlugs,
-      completedSlugs,
-      courseBySlug,
-    });
+    const pathwayNext =
+      (await resolveDbPathwayNext({
+        completedSlugs,
+        enrolledSlugs: snapshot.enrolledSlugs,
+        completedDisciplines,
+      })) ??
+      buildPathwayNext({
+        completedDisciplines,
+        enrolledSlugs: snapshot.enrolledSlugs,
+        completedSlugs,
+        courseBySlug,
+      });
 
     const activityNudges = buildActivityNudges({
       enrollments: snapshot.progressRows,
       nextLessons: snapshot.nextLessons,
       liveOffers: getLiveInteractiveLearningOffers(),
       focusCourseSlug: focus,
+      interactiveProgressByLessonId: interactiveProgressByLesson,
     });
 
     const skillGaps = buildSkillGaps(quizGaps);

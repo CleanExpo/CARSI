@@ -1,5 +1,9 @@
-import { WATER_DAMAGE_HAZARD_LESSON_ID } from '@/lib/lms/append-interactive-pilot';
+import { getPilotLessonIdForCourse } from '@/lib/lms/append-interactive-pilot';
+import { getInteractiveExperienceById } from '@/lib/lms/interactive-experience-registry';
 import type { InteractiveLearningOffer } from '@/lib/lms/interactive-learning-catalog';
+import { getLiveInteractiveLearningOffers } from '@/lib/lms/interactive-learning-catalog';
+import type { InteractiveProgressDocument } from '@/lib/lms/interactive-progress-store';
+import { isInteractiveExperienceComplete } from '@/lib/lms/interactive-progress-store';
 import type {
   LearnerActivityNudge,
   LearnerLearningJourneyPayload,
@@ -77,6 +81,7 @@ export function buildPathwayNext(args: {
             slug,
             title: meta.title,
             reason: `Builds on your ${disciplineLabel(disc) ?? disc} training — a logical next discipline for restoration practice.`,
+            source: 'heuristic',
           };
         }
       }
@@ -90,6 +95,8 @@ export function buildActivityNudges(args: {
   nextLessons: NextLessonRow[];
   liveOffers: InteractiveLearningOffer[];
   focusCourseSlug?: string;
+  /** Lesson id → server interactive progress for pilot lessons (suppresses completed practice nudges). */
+  interactiveProgressByLessonId?: Map<string, InteractiveProgressDocument>;
 }): LearnerActivityNudge[] {
   const nudges: LearnerActivityNudge[] = [];
   const enrolledSlugs = new Set(args.enrollments.map((e) => e.course_slug));
@@ -99,8 +106,17 @@ export function buildActivityNudges(args: {
     if (args.focusCourseSlug && offer.courseSlug !== args.focusCourseSlug) continue;
     const enr = args.enrollments.find((e) => e.course_slug === offer.courseSlug);
     if (!enr || enr.all_lessons_complete) continue;
-    const lessonId = getPilotLessonQuery(offer);
+    const lessonId = getPilotLessonIdForCourse(offer.courseSlug);
     if (!lessonId) continue;
+    const experience = getInteractiveExperienceById(offer.experienceId);
+    const lessonProgress = args.interactiveProgressByLessonId?.get(lessonId);
+    if (
+      experience &&
+      lessonProgress &&
+      isInteractiveExperienceComplete(experience, lessonProgress[offer.experienceId])
+    ) {
+      continue;
+    }
     nudges.push({
       id: `interactive-${offer.experienceId}`,
       kind: 'interactive',
@@ -115,7 +131,18 @@ export function buildActivityNudges(args: {
 
   for (const row of args.nextLessons) {
     if (args.focusCourseSlug && row.course_slug !== args.focusCourseSlug) continue;
-    const kind = row.content_type === 'quiz' ? 'quiz' : row.has_interactive ? 'interactive' : 'lesson';
+    if (
+      row.has_interactive &&
+      isPilotLessonInteractiveComplete(
+        row.lesson_id,
+        row.course_slug,
+        args.interactiveProgressByLessonId
+      )
+    ) {
+      continue;
+    }
+    const kind =
+      row.content_type === 'quiz' ? 'quiz' : row.has_interactive ? 'interactive' : 'lesson';
     const reason =
       kind === 'quiz'
         ? 'Knowledge check — review the module, then attempt the quiz when you are ready.'
@@ -138,11 +165,19 @@ export function buildActivityNudges(args: {
   return dedupeNudges(nudges).slice(0, 4);
 }
 
-function getPilotLessonQuery(offer: InteractiveLearningOffer): string {
-  if (offer.courseSlug === 'water-damage-restoration-fundamentals') {
-    return WATER_DAMAGE_HAZARD_LESSON_ID;
-  }
-  return '';
+function isPilotLessonInteractiveComplete(
+  lessonId: string,
+  courseSlug: string,
+  map?: Map<string, InteractiveProgressDocument>
+): boolean {
+  if (!map) return false;
+  const pilotLessonId = getPilotLessonIdForCourse(courseSlug);
+  if (pilotLessonId !== lessonId) return false;
+  const offer = getLiveInteractiveLearningOffers().find((o) => o.courseSlug === courseSlug) ?? null;
+  if (!offer || offer.status !== 'live') return false;
+  const experience = getInteractiveExperienceById(offer.experienceId);
+  if (!experience) return false;
+  return isInteractiveExperienceComplete(experience, map.get(lessonId)?.[offer.experienceId]);
 }
 
 function dedupeNudges(items: LearnerActivityNudge[]): LearnerActivityNudge[] {

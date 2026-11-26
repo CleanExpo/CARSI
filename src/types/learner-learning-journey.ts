@@ -25,6 +25,9 @@ export type LearnerPathwayStep = {
   title: string;
   slug: string;
   reason: string;
+  /** Published pathway record title when `source` is `database`. */
+  pathway_title?: string | null;
+  source?: 'database' | 'heuristic';
 };
 
 export interface LearnerLearningJourneyPayload {

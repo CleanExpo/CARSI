@@ -188,7 +188,14 @@ export function LearnerLearningJourneyPanel({
 
       {journey.pathway_next ? (
         <section className="mt-4 border-t border-slate-200/80 pt-4">
-          <p className="text-xs font-semibold text-slate-500 uppercase">Pathway</p>
+          <p className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500 uppercase">
+            Pathway
+            {journey.pathway_next.source === 'database' && journey.pathway_next.pathway_title ? (
+              <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-semibold tracking-normal text-sky-800 normal-case">
+                {journey.pathway_next.pathway_title}
+              </span>
+            ) : null}
+          </p>
           <Link
             href={courseCatalogHref(journey.pathway_next.slug)}
             className="mt-2 block text-sm font-semibold text-[#146fc2] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500"

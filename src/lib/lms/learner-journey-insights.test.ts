@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { WATER_DAMAGE_HAZARD_LESSON_ID } from '@/lib/lms/append-interactive-pilot';
+import { WATER_DAMAGE_INTERACTIVE_PILOT } from '@/lib/lms/interactive-experience-data';
+
 import {
   assembleLearnerJourney,
   buildActivityNudges,
@@ -36,6 +39,48 @@ describe('learner-journey-insights', () => {
     ]);
     expect(gaps).toHaveLength(1);
     expect(gaps[0].href).toContain('lesson-1');
+  });
+
+  it('skips interactive nudges when server marks practice complete', () => {
+    const allIds = WATER_DAMAGE_INTERACTIVE_PILOT.activities.map((a) => a.id);
+    const nudges = buildActivityNudges({
+      enrollments: [
+        {
+          id: 'e1',
+          course_slug: 'water-damage-restoration-fundamentals',
+          course_title: 'Water Restoration Practitioner',
+          iicrc_discipline: 'WRT',
+          completion_percentage: 40,
+          last_lesson_id: null,
+          all_lessons_complete: false,
+        },
+      ],
+      nextLessons: [],
+      liveOffers: [
+        {
+          experienceId: 'water-damage-module-3-pilot',
+          courseSlug: 'water-damage-restoration-fundamentals',
+          courseTitle: 'Water Restoration Practitioner',
+          discipline: 'water',
+          disciplineLabel: 'Water damage',
+          status: 'live',
+          teaser: 'Hazard-led investigation',
+        },
+      ],
+      interactiveProgressByLessonId: new Map([
+        [
+          WATER_DAMAGE_HAZARD_LESSON_ID,
+          {
+            'water-damage-module-3-pilot': {
+              activityIndex: 5,
+              completedActivityIds: allIds,
+              earnedXp: 100,
+            },
+          },
+        ],
+      ]),
+    });
+    expect(nudges.some((n) => n.kind === 'interactive')).toBe(false);
   });
 
   it('prioritises interactive nudges for enrolled live offers', () => {
