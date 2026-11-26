@@ -29,7 +29,7 @@ export function CoachingQuickLinks({
           <Link
             key={l.href}
             href={l.href}
-            className="group flex gap-3 rounded-lg border border-transparent p-2 transition-colors hover:border-white/10 hover:bg-white/[0.03]"
+            className="group flex gap-3 rounded-xl border border-white/[0.06] bg-[#0a101c]/40 p-3 transition-[border-color,background-color,box-shadow] hover:border-sky-500/25 hover:bg-sky-500/[0.06] hover:shadow-sm hover:shadow-sky-500/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
             data-testid={`${testId}-${l.label.replace(/\s+/g, '-').toLowerCase()}`}
           >
             <Icon

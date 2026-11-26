@@ -1,6 +1,6 @@
 'use client';
 
-import { Users } from 'lucide-react';
+import { Ticket, UserRound, Video } from 'lucide-react';
 import Link from 'next/link';
 
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
@@ -10,6 +10,7 @@ import {
   coachingEyebrow,
   coachingMuted,
   coachingSecondaryBtn,
+  coachingStatTile,
 } from '@/components/coaching-portal/coaching-ui';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 
@@ -20,28 +21,48 @@ export function CoachingCoachChapterCard({ className = '' }: { className?: strin
 
   return (
     <section className={`${coachingCard} ${className}`} data-testid="coaching-coach-chapter">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex gap-3">
-          <Users className="mt-0.5 h-5 w-5 shrink-0 text-sky-400" aria-hidden />
-          <div>
-            <p className={coachingEyebrow}>Your coaching chapter</p>
-            <h2 className={`mt-1 ${coachingCardTitle}`}>{coach.displayName}</h2>
-            <p className={`mt-1 ${coachingMuted}`}>{coach.headline}</p>
-            <p className="mt-2 text-xs text-slate-500">
-              {coach.chapterTitle}
-              <span className="text-slate-600"> · </span>
-              <span className="font-mono text-slate-400">{coach.chapterSlug}</span>
-              <span className="text-slate-600"> · </span>
-              {coach.priceLabel}
-            </p>
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+        <div className="min-w-0 flex-1">
+          <p className={coachingEyebrow}>Your coaching chapter</p>
+          <h2 className={`mt-2 ${coachingCardTitle}`}>{coach.chapterTitle}</h2>
+          <p className={`mt-2 ${coachingMuted}`}>{coach.headline}</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className={coachingStatTile}>
+              <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
+                Lead coach
+              </p>
+              <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-white">
+                <UserRound className="h-4 w-4 text-sky-400/80" aria-hidden />
+                {coach.displayName}
+              </p>
+            </div>
+            <div className={coachingStatTile}>
+              <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
+                Membership
+              </p>
+              <p className="mt-1 text-sm font-semibold text-white tabular-nums">
+                {coach.priceLabel}
+              </p>
+              <p className="mt-1 font-mono text-[11px] text-slate-500">{coach.chapterSlug}</p>
+            </div>
           </div>
         </div>
-        <Link
-          href={coachingPortalPath('/sessions')}
-          className={`inline-flex shrink-0 ${coachingSecondaryBtn}`}
-        >
-          Session hub
-        </Link>
+        <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
+          <Link
+            href={coachingPortalPath('/sessions')}
+            className={`inline-flex justify-center ${coachingSecondaryBtn}`}
+          >
+            <Video className="h-4 w-4 shrink-0" aria-hidden />
+            Session hub
+          </Link>
+          <Link
+            href={coachingPortalPath('/tradehall')}
+            className={`inline-flex justify-center ${coachingSecondaryBtn}`}
+          >
+            <Ticket className="h-4 w-4 shrink-0" aria-hidden />
+            Trade Hall
+          </Link>
+        </div>
       </div>
     </section>
   );

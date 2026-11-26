@@ -1,4 +1,4 @@
-import { ClipboardList, Compass, Megaphone, Video } from 'lucide-react';
+import { ClipboardList, Compass, Megaphone, Ticket, Video } from 'lucide-react';
 
 import type { CoachingQuickLink } from '@/components/coaching-portal/visual/CoachingQuickLinks';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
@@ -28,6 +28,12 @@ export function coachingHomeQuickLinks(options: {
       label: 'Sessions',
       description: 'Prep, join, history',
       icon: Video,
+    },
+    {
+      href: coachingPortalPath('/tradehall'),
+      label: 'Trade Hall',
+      description: 'Passport and seminar replays',
+      icon: Ticket,
     },
   ];
   if (options.marketingReady) {

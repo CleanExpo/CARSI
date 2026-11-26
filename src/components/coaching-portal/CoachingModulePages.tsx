@@ -5,8 +5,10 @@ import {
   Compass,
   ExternalLink,
   Loader2,
+  MapPin,
   Megaphone,
   Ticket,
+  UserRound,
   Video,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -825,6 +827,37 @@ export function CoachingTradeHallPage() {
     month: 'long',
     year: 'numeric',
   });
+  const passportStats = useMemo(
+    () => [
+      {
+        id: 'passport',
+        label: 'Passport',
+        value: passport.passportId,
+        hint: 'Your Trade Hall access id',
+        icon: Ticket,
+      },
+      {
+        id: 'chapter',
+        label: 'Chapter',
+        value: passport.chapterSlug,
+        hint: coach.chapterTitle,
+        icon: MapPin,
+      },
+      {
+        id: 'coach',
+        label: 'Coach',
+        value: passport.coachName,
+        icon: UserRound,
+      },
+      {
+        id: 'since',
+        label: 'Member since',
+        value: memberSince,
+        tone: 'good' as const,
+      },
+    ],
+    [coach.chapterTitle, memberSince, passport.chapterSlug, passport.coachName, passport.passportId]
+  );
 
   return (
     <div className={coachingPage} data-testid="coaching-tradehall-page">
@@ -840,30 +873,9 @@ export function CoachingTradeHallPage() {
           <Ticket className="h-4 w-4 text-sky-400" aria-hidden />
           Hall access for {coach.chapterTitle}. {COACHING_RECORDS_DEFAULT.memberFacingSummary}
         </p>
-        <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div>
-            <dt className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
-              Passport
-            </dt>
-            <dd className="mt-1 font-mono text-sm text-white">{passport.passportId}</dd>
-          </div>
-          <div>
-            <dt className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
-              Chapter
-            </dt>
-            <dd className="mt-1 text-sm text-white">{passport.chapterSlug}</dd>
-          </div>
-          <div>
-            <dt className="text-xs font-semibold tracking-wide text-slate-500 uppercase">Coach</dt>
-            <dd className="mt-1 text-sm text-white">{passport.coachName}</dd>
-          </div>
-          <div>
-            <dt className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
-              Member since
-            </dt>
-            <dd className="mt-1 text-sm text-white">{memberSince}</dd>
-          </div>
-        </dl>
+        <div className="mt-5">
+          <CoachingStatGrid items={passportStats} testIdPrefix="coaching-tradehall-passport" />
+        </div>
       </CoachingSection>
 
       <CoachingSection title="Seminar room" testId="coaching-tradehall-room">

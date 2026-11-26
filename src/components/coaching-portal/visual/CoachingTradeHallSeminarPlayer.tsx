@@ -6,6 +6,7 @@ import { youtubeNocookieEmbedUrl } from '@/lib/media/youtube-embed';
 import {
   coachingCard,
   coachingCardTitle,
+  coachingEyebrow,
   coachingMuted,
 } from '@/components/coaching-portal/coaching-ui';
 
@@ -21,13 +22,16 @@ export function CoachingTradeHallSeminarPlayer({ seminar, className = '' }: Prop
       className={`${coachingCard} ${className}`}
       data-testid={`coaching-tradehall-seminar-${seminar.id}`}
     >
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
+      <p className={coachingEyebrow}>Chapter replay</p>
+      <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2">
         <h3 className={coachingCardTitle}>{seminar.title}</h3>
-        <span className="text-xs font-medium text-sky-400/90">{seminar.durationLabel}</span>
+        <span className="rounded-full border border-sky-500/25 bg-sky-500/10 px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-sky-200/90 uppercase">
+          {seminar.durationLabel}
+        </span>
       </div>
       <p className={`mt-2 ${coachingMuted}`}>{seminar.description}</p>
       {embed ? (
-        <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-black/40">
+        <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-black/40 shadow-lg ring-1 shadow-black/30 ring-white/[0.06]">
           <div className="relative aspect-video w-full">
             <iframe
               title={seminar.title}

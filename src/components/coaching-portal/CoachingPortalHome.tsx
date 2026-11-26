@@ -6,7 +6,6 @@ import { BusinessCoachingMonthlySubscribe } from '@/components/ccw/BusinessCoach
 import {
   coachingCard,
   coachingCardTitle,
-  coachingEyebrow,
   coachingMuted,
   coachingPage,
   coachingPrimaryBtn,
@@ -16,10 +15,11 @@ import { CoachingCheckInCard } from '@/components/coaching-portal/CoachingAccoun
 import { CoachingAskCoachPanel } from '@/components/coaching-portal/CoachingAskCoachPanel';
 import { CoachingOnboardingStatusBar } from '@/components/coaching-portal/CoachingOnboardingStatusBar';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
-import { CoachingFeatureSpotlight } from '@/components/coaching-portal/visual/CoachingFeatureSpotlight';
-import { CoachingQuickLinks } from '@/components/coaching-portal/visual/CoachingQuickLinks';
 import { CoachingCoachChapterCard } from '@/components/coaching-portal/visual/CoachingCoachChapterCard';
+import { CoachingFeatureSpotlight } from '@/components/coaching-portal/visual/CoachingFeatureSpotlight';
 import { CoachingMonthSummaryCard } from '@/components/coaching-portal/visual/CoachingMonthSummaryCard';
+import { CoachingPageHeader } from '@/components/coaching-portal/visual/CoachingPageHeader';
+import { CoachingQuickLinks } from '@/components/coaching-portal/visual/CoachingQuickLinks';
 import { buildCoachingHomeMonthSummary } from '@/lib/coaching-portal/coaching-home-month-summary';
 import { coachingHomeQuickLinks } from '@/lib/coaching-portal/coaching-home-quick-links';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
@@ -51,14 +51,13 @@ function LockedHome() {
 function OnboardingChecklist() {
   const { onboarding, welcomeMessage, user } = useCoachingPortal();
   return (
-    <div className={coachingPage}>
-      <header className="mb-8">
-        <p className={coachingEyebrow}>Welcome back</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-[1.75rem]">
-          Welcome back, {user.firstName}
-        </h1>
-        <p className={`mt-2 max-w-2xl ${coachingMuted}`}>{welcomeMessage}</p>
-      </header>
+    <div className={coachingPage} data-testid="coaching-home-onboarding">
+      <CoachingPageHeader
+        eyebrow="Welcome back"
+        title={`Welcome back, ${user.firstName}`}
+        description={welcomeMessage}
+        testId="coaching-home-onboarding-header"
+      />
 
       <CoachingOnboardingStatusBar />
 
@@ -133,14 +132,13 @@ function AssessmentPendingHome() {
     : null;
 
   return (
-    <div className={coachingPage}>
-      <header className="mb-8">
-        <p className={coachingEyebrow}>Welcome back</p>
-        <h1 className="mt-1 text-2xl font-semibold text-white sm:text-[1.75rem]">
-          Welcome back, {user.firstName}
-        </h1>
-        <p className={`mt-2 ${coachingMuted}`}>{welcomeMessage}</p>
-      </header>
+    <div className={coachingPage} data-testid="coaching-home-assessment">
+      <CoachingPageHeader
+        eyebrow="Welcome back"
+        title={`Welcome back, ${user.firstName}`}
+        description={welcomeMessage}
+        testId="coaching-home-assessment-header"
+      />
       <CoachingOnboardingStatusBar />
       <section className={coachingCard}>
         <h2 className={coachingCardTitle}>Assessment submitted</h2>
@@ -189,14 +187,13 @@ function ActiveHome() {
   });
 
   return (
-    <div className={coachingPage}>
-      <header className="mb-8">
-        <p className={coachingEyebrow}>Welcome back</p>
-        <h1 className="mt-1 text-2xl font-semibold text-white sm:text-[1.75rem]">
-          Welcome back, {user.firstName}
-        </h1>
-        <p className={`mt-2 ${coachingMuted}`}>{welcomeMessage}</p>
-      </header>
+    <div className={coachingPage} data-testid="coaching-home-active">
+      <CoachingPageHeader
+        eyebrow="Welcome back"
+        title={`Welcome back, ${user.firstName}`}
+        description={welcomeMessage}
+        testId="coaching-home-header"
+      />
 
       <CoachingOnboardingStatusBar />
 
@@ -269,9 +266,7 @@ function ActiveHome() {
           </section>
         )}
 
-        {!monthSummary.ctas.some((c) =>
-          /next action|proposed fix|action board/i.test(c.label)
-        ) ? (
+        {!monthSummary.ctas.some((c) => /next action|proposed fix|action board/i.test(c.label)) ? (
           <section className={coachingCard} data-testid="coaching-home-next-action">
             <h2 className="text-sm font-semibold text-slate-300">Your next action</h2>
             {actions.nextAction ? (
