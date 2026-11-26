@@ -39,9 +39,25 @@ Still open:
 - **Supporting documentation (section 7 of every pack)** lists a curriculum export, a sample
   certificate and an assessment outline. None is attached yet. Attach them, or remove the lines,
   before sending.
-- **Not yet checked against the IICRC's own published renewal requirements.** iicrc.org has no
-  page on CEC course approval; the IICRC links CEC providers to iicrccecevents.org, which has not
-  been read. Check that site (or ask the IICRC) before sending.
+- **Provider name does not match the IICRC's record (decide before sending).** Checked on
+  26/11/2026 against the IICRC CEC Provider Directory (https://iicrccecevents.org/, "CEC
+  provider directory search"). The IICRC lists CARSI as **"CLEANING AND RESTORATION SCIENCE
+  INSTITUTE (CARSI)"**, contact Phill McGurk, support@carsi.com.au, websites
+  `carsi.com.au/courses` and `carsi.com.au/restoration-courses`, divisions Hard Surface, Textile,
+  Restoration, Inspection and Business Skills. Every pack names the provider "Centre for
+  Australian Restoration and Standards Information", the name the founder confirmed on
+  26/08/2026. A renewal under a name the IICRC does not hold may not be matched to the existing
+  approvals. Founder's choice: send under the registered name, or name both ("registered with the
+  IICRC as Cleaning and Restoration Science Institute (CARSI)") and ask the IICRC to update the
+  record. Also check that `carsi.com.au/restoration-courses`, the website on the IICRC's record,
+  still resolves.
+- **The directory listing is now verified.** The packs dropped "listed in the IICRC CEC Provider
+  Directory" in August as unverifiable. The listing exists (see above), so it can be restored.
+- **Not yet checked against the IICRC's published renewal requirements.** Neither iicrc.org nor
+  iicrccecevents.org publishes the course approval or renewal rules for providers (read
+  26/11/2026). Ask the IICRC (`IICRC4U@iicrcnet.org`, the instructors and schools helpdesk on
+  iicrc.org) what a renewal must contain and whether `CECCourse@iicrcnet.org` is still the
+  address.
 - Several summaries say the content is "aligned with the IICRC S500 standard". Citing a standard
   nominatively like this is allowed.
 - **Instructor:** Phill McGurk in every pack (DECISIONS #36).
