@@ -260,3 +260,183 @@ export const WATER_DAMAGE_INTERACTIVE_PILOT: InteractiveExperience = {
     },
   ],
 };
+
+const FIRE_ASBESTOS_DIAGRAM =
+  '/courses/fire-smoke-damage-restoration-fundamentals/diagrams/asbestos-decision.svg';
+
+/**
+ * Pilot bundle for fire & smoke Module 3 — asbestos and hazardous materials (AU/NZ scenario).
+ */
+export const FIRE_SMOKE_INTERACTIVE_PILOT: InteractiveExperience = {
+  id: 'fire-smoke-module-3-pilot',
+  title: 'Fire job-site walk: asbestos and debris',
+  subtitle: 'Practise stop–isolate–handover decisions before disturbance on a fire loss.',
+  disclaimer:
+    'Educational simulation only. Fire-damaged asbestos is friable work for licensed removalists in Australia and New Zealand — this does not replace site assessment or Class A removal.',
+  activities: [
+    {
+      id: 'fire-arrival',
+      type: 'scenario',
+      title: 'Discover — neighbour debris on the lawn',
+      xp: 25,
+      intro:
+        'After a grassfire in Toowoomba, your client’s 1998 brick house has smoke damage. The 1960s fibro cottage next door burnt down; grey sheet fragments lie across your client’s lawn along the fence.',
+      steps: [
+        {
+          prompt: 'The insurer wants indoor smoke cleaning to start this week. What is your first move?',
+          choices: [
+            {
+              id: 'sweep',
+              label: 'Sweep fragments off the lawn so the crew can access the house',
+              feedback:
+                'Sweeping or blowing fire debris can release asbestos fibres. Stop, isolate, and engage licensed assessors before any disturbance.',
+            },
+            {
+              id: 'stop',
+              label: 'Stop at the boundary, treat fragments as fire-damaged friable asbestos, and escalate',
+              correct: true,
+              feedback:
+                'Correct. Fire-damaged suspect asbestos is treated as friable — Class A removal. No cleaning route crosses uncontained debris.',
+            },
+            {
+              id: 'indoor',
+              label: 'Start indoor smoke cleaning — outdoor debris is not your scope',
+              feedback:
+                'Indoor work may be planned, but access routes must not cross hazardous debris. Hazard control comes first.',
+            },
+          ],
+        },
+        {
+          prompt: 'Your client’s house was built in 1998. What does that imply for asbestos on this job?',
+          choices: [
+            {
+              id: 'safe',
+              label: '1998 is after the ban — no asbestos possible anywhere on site',
+              feedback:
+                'The 2003 ban means suspect materials in pre-2003 builds. A 1998 house still needs assessment — and next door’s debris is the immediate hazard.',
+            },
+            {
+              id: 'suspect',
+              label: 'Pre-2003 build: suspect ACM on the house; fragments from next door are friable asbestos work',
+              correct: true,
+              feedback:
+                'Correct. Australian guidance treats pre-2003 builds as suspect. Neighbour’s fire-damaged sheet is friable regardless of your client’s build date.',
+            },
+            {
+              id: 'owner',
+              label: 'Let the owner decide whether debris is dangerous',
+              feedback:
+                'Competent persons assess; owners cannot waive WHS duties. Licensed pathway is required for fire-damaged asbestos.',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'asbestos-flow',
+      type: 'diagram',
+      title: 'Understand — asbestos decision flow',
+      xp: 20,
+      imageSrc: FIRE_ASBESTOS_DIAGRAM,
+      imageAlt:
+        'Asbestos decision for fire jobs: build or renovate before the 2003 ban in Australia or before 2000 in New Zealand, suspect material, fire damage, then stop, isolate, and engage Class A removal.',
+      hotspots: [
+        {
+          id: 'build-date',
+          label: 'Build / renovate date',
+          markerNumber: 1,
+          x: 22,
+          y: 20,
+          w: 12,
+          h: 10,
+          detail:
+            'Australia: assume possible ACM before 31 Dec 2003 (most likely before 1990). New Zealand: before 2000.',
+        },
+        {
+          id: 'fire',
+          label: 'Fire impact',
+          markerNumber: 2,
+          x: 42,
+          y: 20,
+          w: 12,
+          h: 10,
+          detail: 'Fire-damaged non-friable material is reclassified as friable — Class A licensed removal.',
+        },
+        {
+          id: 'stop',
+          label: 'Stop & hand over',
+          markerNumber: 3,
+          x: 65,
+          y: 55,
+          w: 12,
+          h: 12,
+          detail: 'Restorer stops, isolates, documents, and engages licensed assessor and Class A removalist.',
+        },
+      ],
+    },
+    {
+      id: 'hazard-spot-fire',
+      type: 'hazard-spot',
+      title: 'Practice — hazards before disturbance',
+      xp: 25,
+      prompt: 'Which hazards are genuinely present before you move equipment onto this property?',
+      options: [
+        { id: 'asbestos', label: 'Asbestos — fire-damaged fragments on the lawn' },
+        { id: 'smoke', label: 'Smoke residues — on interior surfaces' },
+        { id: 'live', label: 'Downed live power lines (possible after grassfire)' },
+        { id: 'traffic', label: 'Normal suburban traffic noise' },
+        { id: 'lead', label: 'Lead paint on older neighbour structure (possible)' },
+      ],
+      correctIds: ['asbestos', 'smoke', 'live', 'lead'],
+      successFeedback:
+        'You separated job-killing hazards (asbestos, electrical, legacy lead) from ambient noise. Controls and licencing follow from this list.',
+    },
+    {
+      id: 'first-decision-fire',
+      type: 'decision',
+      title: 'Decide — insurer pressure',
+      xp: 25,
+      scene:
+        'The broker calls daily for “progress photos” and wants your crew on site tomorrow to pre-wash the exterior.',
+      prompt: 'What do you document and do first?',
+      choices: [
+        {
+          id: 'photos',
+          label: 'Send progress photos by walking across the fragment field',
+          feedback:
+            'Photos cannot justify crossing uncontained asbestos debris. Document from safe positions and record the licensed handover.',
+        },
+        {
+          id: 'licensed',
+          label: 'Confirm site release, asbestos controls, safe access route, then scope interior work',
+          correct: true,
+          feedback:
+            'Correct. Access planning, hazard isolation, and licensed removal sequencing are documented before cleaning starts.',
+        },
+        {
+          id: 'pressure',
+          label: 'Mobilise anyway — commercial pressure overrides delay',
+          feedback:
+            'Commercial pressure is common; WHS and licensing requirements are not negotiable on fire-asbestos jobs.',
+        },
+      ],
+    },
+    {
+      id: 'sequence-fire',
+      type: 'sequence',
+      title: 'Explore — professional sequence',
+      xp: 20,
+      prompt: 'Order the first actions on this fire loss (tap to build the sequence).',
+      items: [
+        'Confirm emergency services / council release where required',
+        'Identify fire-damaged asbestos and isolate debris fields',
+        'Engage licensed assessor and Class A removal for friable material',
+        'Plan indoor smoke scope with safe access routes',
+        'Document controls and handover in the job file',
+      ],
+      correctOrder: [0, 1, 2, 3, 4],
+      successFeedback:
+        'You matched the course arc: release and hazard identification before remediation, licensed asbestos before disturbance.',
+    },
+  ],
+};
