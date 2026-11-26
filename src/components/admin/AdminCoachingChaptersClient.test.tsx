@@ -16,6 +16,10 @@ vi.mock('next/link', () => ({
   ),
 }));
 
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/admin/coaching-chapters',
+}));
+
 let root: Root;
 let container: HTMLDivElement;
 

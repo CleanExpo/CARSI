@@ -12,6 +12,16 @@ import { AdminCoachingMemberWorkspaceClient } from './AdminCoachingMemberWorkspa
   globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
+vi.mock('next/link', () => ({
+  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
+  ),
+}));
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/admin/coaching-members',
+}));
+
 const MEMBER = '11111111-1111-4111-8111-111111111111';
 
 function json(body: unknown, ok = true): Response {
