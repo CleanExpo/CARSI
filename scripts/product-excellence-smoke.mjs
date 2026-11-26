@@ -39,6 +39,10 @@ const STEPS = [
       'config/vitest.config.ts',
       'src/lib/lms/learner-journey-insights.test.ts',
       'src/lib/lms/learner-journey-query.test.ts',
+      'src/lib/lms/interactive-progress-store.test.ts',
+      'src/lib/lms/lesson-interactive-resources.test.ts',
+      'src/lib/lms/append-interactive-pilot.test.ts',
+      'src/lib/server/learning-pathways.test.ts',
     ],
   },
   {

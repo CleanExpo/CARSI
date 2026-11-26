@@ -6,7 +6,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/components/auth/auth-provider';
 import { useLessonCheckpoint } from '@/hooks/use-lesson-checkpoint';
-import { singleLearnerRequest } from '@/lib/lms/checkpoint-controller';
+import { CheckpointRequestError, singleLearnerRequest } from '@/lib/lms/checkpoint-controller';
+import { flushInteractiveProgressForLesson } from '@/lib/lms/interactive-progress-client';
+import { readInteractiveProgress } from '@/lib/lms/interactive-progress';
+import type { InteractiveProgressDocument } from '@/lib/lms/interactive-progress-store';
+import { isInteractiveLessonResource } from '@/lib/lms/lesson-resources';
 
 import { CampusTopBar } from '@/components/layout/CampusTopBar';
 import { CourseCompletionBanner } from '@/components/lms/CourseCompletionBanner';
@@ -29,7 +33,7 @@ import { OnboardingModuleOverview } from '@/components/onboarding/OnboardingModu
 import { Button } from '@/components/ui/button';
 import { useOnlineStatus } from '@/hooks/use-online-status';
 import { apiClient, ApiClientError } from '@/lib/api/client';
-import { WATER_DAMAGE_HAZARD_LESSON_ID } from '@/lib/lms/append-interactive-pilot';
+import { INTERACTIVE_PILOT_LESSON_IDS } from '@/lib/lms/append-interactive-pilot';
 import type { LessonResource } from '@/lib/lms/lesson-resources';
 import { applyNoteFormatting, type NoteFormatAction } from '@/lib/lms/note-formatting';
 import {
@@ -88,6 +92,7 @@ interface LessonApiLesson {
 interface LessonDetailResponse {
   lesson: LessonApiLesson;
   resources: LessonResource[];
+  interactive_progress?: InteractiveProgressDocument;
   enrollment_id: string;
   course: { id: string; slug: string; title: string };
 }
@@ -489,6 +494,22 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     setCompleteError(null);
     setSavingComplete(true);
     try {
+      if (completed && interactivePracticeReady && lessonDetail?.resources) {
+        const interactive = lessonDetail.resources.find(isInteractiveLessonResource);
+        if (interactive) {
+          const snap =
+            readInteractiveProgress(interactive.experience.id, activeLessonId, interactive.experience) ??
+            null;
+          if (snap) {
+            await flushInteractiveProgressForLesson({
+              lessonId: activeLessonId,
+              userId: user.id,
+              experienceId: interactive.experience.id,
+              snapshot: snap,
+            });
+          }
+        }
+      }
       await singleLearnerRequest(`/api/lms/lessons/${encodeURIComponent(activeLessonId)}/progress`, user.id, 'PATCH', {
         completed,
       });
@@ -581,7 +602,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     } catch (e) {
       if (currentScope.current !== scope) return;
       setCompleteError(
-        e instanceof ApiClientError
+        e instanceof CheckpointRequestError || e instanceof ApiClientError
           ? e.message
           : 'Could not save your progress. Please check your connection and try again.'
       );
@@ -1035,6 +1056,8 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                         moduleLessonNumber={moduleLessonPosition?.current}
                         moduleLessonTotal={moduleLessonPosition?.total}
                         courseProgressPercent={isOnboardingProgram ? onboardingProgressPct : null}
+                        learnerUserId={user?.id}
+                        initialInteractiveProgress={lessonDetail.interactive_progress}
                         onInteractivePilotComplete={handleInteractivePilotComplete}
                         footer={
                           isOnboardingProgram ? (
@@ -1078,7 +1101,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                         error={completeError}
                         emphasizeComplete={
                           interactivePracticeReady &&
-                          activeLessonId === WATER_DAMAGE_HAZARD_LESSON_ID &&
+                          Boolean(activeLessonId && INTERACTIVE_PILOT_LESSON_IDS.has(activeLessonId)) &&
                           !currentMeta?.completed
                         }
                       />

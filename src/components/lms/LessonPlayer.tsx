@@ -57,6 +57,8 @@ interface LessonPlayerProps {
    */
   enrolled?: boolean;
   onInteractivePilotComplete?: () => void;
+  learnerUserId?: string;
+  initialInteractiveProgress?: import('@/lib/lms/interactive-progress-store').InteractiveProgressDocument;
 }
 
 export function LessonPlayer({
@@ -75,6 +77,8 @@ export function LessonPlayer({
   onPositionChange,
   enrolled = false,
   onInteractivePilotComplete,
+  learnerUserId,
+  initialInteractiveProgress,
 }: LessonPlayerProps) {
   const showPreviewBadge = lesson.is_preview && !enrolled;
   const rootRef = useRef<HTMLDivElement>(null);
@@ -146,6 +150,9 @@ export function LessonPlayer({
                 label={exp.label}
                 experience={exp.experience}
                 progressKey={lesson.id}
+                syncLessonId={lesson.id}
+                learnerUserId={learnerUserId}
+                initialServerProgress={initialInteractiveProgress}
                 enterprise
                 lessonCompleted={completed}
                 onAllComplete={onInteractivePilotComplete}
@@ -209,6 +216,9 @@ export function LessonPlayer({
           label={exp.label}
           experience={exp.experience}
           progressKey={lesson.id}
+          syncLessonId={lesson.id}
+          learnerUserId={learnerUserId}
+          initialServerProgress={initialInteractiveProgress}
           lessonCompleted={completed}
           onAllComplete={onInteractivePilotComplete}
         />

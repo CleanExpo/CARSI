@@ -28,16 +28,25 @@ CARSI’s first **interactive learning experience** ships as a lesson resource o
 
 | Data                                                 | Storage                                                                                                         |
 | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Activity completion, XP, current activity tab        | `localStorage` key `carsi-interactive:v2:{experienceId}:{lessonId}` (migrates v1)                               |
-| Lesson / course completion (XP toward learner level) | Unchanged — learner uses **Mark lesson complete** (`PATCH /api/lms/lessons/{id}/progress`) after the experience |
+| Activity completion, XP, current activity tab        | `localStorage` key `carsi-interactive:v2:{experienceId}:{lessonId}` (migrates v1), merged with server on load |
+| Durable cross-device progress                        | `lms_lesson_progress.interactive_progress` JSON via `GET`/`PUT` `/api/lms/lessons/{id}/interactive-progress` |
+| Lesson / course completion                           | **Mark lesson complete** only after server evidence: all activities mastered (GP-432) or quiz passed          |
 
-The pilot does **not** auto-complete the lesson (avoids bypassing the existing LMS completion and gamification rules). Completing all six activities shows inline guidance to mark the lesson complete.
+The experience does **not** auto-complete the lesson. Completing all activities shows inline guidance; **Mark lesson complete** flushes interactive progress then `PATCH`es progress.
+
+## Fire & smoke pilot (live)
+
+- **Experience id:** `fire-smoke-module-3-pilot`
+- **Course:** `fire-smoke-damage-restoration-fundamentals`
+- **Lesson anchor:** _Asbestos in fire-damaged buildings_ (Module 3)
+- **Public demo:** `/interactive-learning/fire-smoke-module-3-pilot`
 
 ## Technical architecture
 
 - **Resource kind:** `interactive` in `LmsLesson.resources` JSON, resolved via `experienceId` in `src/lib/lms/interactive-experience-registry.ts`
 - **Parser:** `parseLessonResources` + `parseInteractiveLessonResource`
-- **API merge:** `appendWaterDamageInteractivePilot` on lesson GET so DB rows without the catalog resource still receive the pilot
+- **API merge:** `mergeLessonInteractivePilots` on lesson GET (water + fire pilots) so DB rows without catalog resources still receive live experiences
+- **Server sync:** `InteractiveExperiencePlayer` debounces `PUT`; lesson GET returns `interactive_progress` to skip an extra round trip
 - **UI:** `InteractiveExperiencePlayer` + `InteractiveActivityView` (reusable for future `experienceId` bundles)
 - **Catalog:** `data/courses/water-damage-restoration-fundamentals/v1-draft/courses-catalog.json` includes the resource for re-import
 

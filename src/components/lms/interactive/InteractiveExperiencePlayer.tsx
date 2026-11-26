@@ -15,12 +15,27 @@ import {
   writeInteractiveProgress,
   type InteractiveProgressSnapshot,
 } from '@/lib/lms/interactive-progress';
+import {
+  fetchLessonInteractiveProgress,
+  putLessonInteractiveProgress,
+} from '@/lib/lms/interactive-progress-client';
+import {
+  mergeInteractiveSnapshots,
+  type InteractiveProgressDocument,
+} from '@/lib/lms/interactive-progress-store';
 import { cn } from '@/lib/utils';
+
+type SyncStatus = 'idle' | 'loading' | 'synced' | 'syncing' | 'offline' | 'error';
 
 interface InteractiveExperiencePlayerProps {
   experience: InteractiveExperience;
   /** Lesson id or `demo` for the public walkthrough. */
   progressKey?: string;
+  /** When set with a real progress key, syncs progress to the LMS API. */
+  syncLessonId?: string;
+  learnerUserId?: string;
+  /** Optional server snapshot from lesson GET (avoids an extra round trip). */
+  initialServerProgress?: InteractiveProgressDocument;
   label?: string;
   enterprise?: boolean;
   lessonCompleted?: boolean;
@@ -32,6 +47,9 @@ interface InteractiveExperiencePlayerProps {
 export function InteractiveExperiencePlayer({
   experience,
   progressKey = 'demo',
+  syncLessonId,
+  learnerUserId,
+  initialServerProgress,
   label,
   enterprise,
   lessonCompleted,
@@ -58,18 +76,67 @@ export function InteractiveExperiencePlayer({
   const [hydrated, setHydrated] = useState(false);
   const [completionNotified, setCompletionNotified] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
+
+  const serverSyncEnabled = Boolean(syncLessonId && progressKey !== 'demo' && learnerUserId);
 
   useEffect(() => {
-    const stored = readInteractiveProgress(experience.id, progressKey, experience);
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate stored progress from localStorage after mount (not readable during SSR); behaviour-preserving
-    setSnapshot(stored ?? emptySnapshot);
-    setHydrated(true);
-  }, [experience, progressKey, emptySnapshot]);
+    let cancelled = false;
+
+    async function hydrate() {
+      const local = readInteractiveProgress(experience.id, progressKey, experience);
+      let merged = local ?? emptySnapshot;
+
+      if (serverSyncEnabled && syncLessonId && learnerUserId) {
+        setSyncStatus('loading');
+        try {
+          const doc =
+            initialServerProgress ??
+            (await fetchLessonInteractiveProgress(syncLessonId, learnerUserId));
+          const serverSnap = doc[experience.id] ?? null;
+          merged = mergeInteractiveSnapshots(experience, local, serverSnap);
+          if (!cancelled) setSyncStatus('synced');
+        } catch {
+          if (!cancelled) setSyncStatus('offline');
+        }
+      }
+
+      if (cancelled) return;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate after mount
+      setSnapshot(merged);
+      setHydrated(true);
+    }
+
+    void hydrate();
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    experience,
+    progressKey,
+    emptySnapshot,
+    serverSyncEnabled,
+    syncLessonId,
+    learnerUserId,
+    initialServerProgress,
+  ]);
 
   useEffect(() => {
     if (!hydrated) return;
     writeInteractiveProgress(key, snapshot);
   }, [hydrated, key, snapshot]);
+
+  useEffect(() => {
+    if (!hydrated || !serverSyncEnabled || !syncLessonId) return;
+    if (!learnerUserId) return;
+    const timer = window.setTimeout(() => {
+      setSyncStatus('syncing');
+      void putLessonInteractiveProgress(syncLessonId, learnerUserId, experience.id, snapshot)
+        .then(() => setSyncStatus('synced'))
+        .catch(() => setSyncStatus('error'));
+    }, 700);
+    return () => window.clearTimeout(timer);
+  }, [hydrated, serverSyncEnabled, syncLessonId, learnerUserId, experience.id, snapshot]);
 
   const activity = experience.activities[snapshot.activityIndex];
   const allDone = snapshot.completedActivityIds.length >= experience.activities.length;
@@ -123,6 +190,14 @@ export function InteractiveExperiencePlayer({
   const reset = () => {
     setSnapshot(emptySnapshot);
     setCompletionNotified(false);
+    if (serverSyncEnabled && syncLessonId && learnerUserId) {
+      void putLessonInteractiveProgress(
+        syncLessonId,
+        learnerUserId,
+        experience.id,
+        emptySnapshot
+      ).catch(() => setSyncStatus('error'));
+    }
     announce('Experience restarted.');
   };
 
@@ -205,6 +280,19 @@ export function InteractiveExperiencePlayer({
         <span className="text-xs text-slate-500">
           {activitiesDone} of {experience.activities.length} activities mastered
         </span>
+        {serverSyncEnabled ? (
+          <span className="text-[11px] font-medium text-slate-500" role="status">
+            {syncStatus === 'syncing' || syncStatus === 'loading'
+              ? 'Saving progress…'
+              : syncStatus === 'synced'
+                ? 'Progress saved to your account'
+                : syncStatus === 'offline'
+                  ? 'Offline — progress saved on this device'
+                  : syncStatus === 'error'
+                    ? 'Could not sync — will retry'
+                    : null}
+          </span>
+        ) : null}
       </div>
 
       <nav
