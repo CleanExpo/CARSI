@@ -232,7 +232,9 @@ describe('GP-759 (a): a refunded checkout session never re-grants its course', (
     });
   });
 
-  it('control: replaying a refunded session while access is live through another payment is not an error', async () => {
+  // GP-790: was "not an error" (200). A reversed session now answers PAYMENT_REVERSED on every
+  // path, as the team path already did; the access held through the other payment is untouched.
+  it('replaying a refunded session while access is live through another payment is refused, and that access is kept', async () => {
     paidSession('cs_test_refunded');
     state.ledger.set('payment-reversed:cs_test_refunded', {
       id: 'payment-reversed:cs_test_refunded',
@@ -247,7 +249,8 @@ describe('GP-759 (a): a refunded checkout session never re-grants its course', (
 
     const res = await confirm('cs_test_refunded');
 
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(403);
+    expect(await res.json()).toMatchObject({ code: 'PAYMENT_REVERSED' });
     expect(state.enrollment).toMatchObject({ status: 'active', paymentReference: 'cs_test_repurchase' });
   });
 

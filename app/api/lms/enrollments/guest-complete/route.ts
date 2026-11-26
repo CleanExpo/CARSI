@@ -6,6 +6,7 @@ import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
 import {
+  isCheckoutPaymentReversed,
   markUnfulfilledPaymentResolved,
   PAYMENT_REVERSED,
   PAYMENT_REVERSED_BODY,
@@ -57,7 +58,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ detail: 'Payment not completed' }, { status: 400 });
     }
 
-    const slug = session.metadata?.course_slug?.trim().toLowerCase();
+    // GP-790: a reversed (refunded, or disputed and not won) session never answers "ok". Read
+    // before any account is found or claimed, so the established-account answer ("sign in") and
+    // the new-account path both refuse it, self or team. Access held through another payment is
+    // left as it is.
+    if (await isCheckoutPaymentReversed(prisma, sessionId)) {
+      return NextResponse.json(PAYMENT_REVERSED_BODY, { status: 403 });
+    }
+
+    const slug =session.metadata?.course_slug?.trim().toLowerCase();
     const email = (
       session.customer_email ??
       session.customer_details?.email ??
