@@ -32,7 +32,6 @@ Prepared 2 November 2026 for submission to **CECCourse@iicrcnet.org**.
 - Monitoring Structural Drying
 - Drying Systems
 - Restorative Drying Standards
-- WHAT YOU WILL LEARN
 - Water Damage Classification and Categories
 - What you learnt
 - Equipment Selection and Job-Site Setup
