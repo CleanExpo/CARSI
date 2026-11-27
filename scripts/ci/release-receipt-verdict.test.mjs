@@ -1,11 +1,47 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { decide, renderComment, COMMENT_MARKER } from './release-receipt-verdict.mjs';
+import {
+  decide,
+  renderComment,
+  COMMENT_MARKER,
+  credentialStrings,
+  scrub,
+} from './release-receipt-verdict.mjs';
+
+test('scrub removes every credential string from auth.json and the API key', () => {
+  const auth = JSON.stringify({
+    tokens: { access_token: 'eyJaccess-token-value-123', refresh_token: 'rt_refresh-value-456789' },
+    short: 'abc',
+  });
+  const secrets = credentialStrings(auth, ['sk-proj-apikey-0123456789']);
+  const leaked = JSON.stringify({
+    verdict: 'PASS',
+    summary: 'token eyJaccess-token-value-123 and sk-proj-apikey-0123456789',
+    findings: [{ severity: 'P3', title: 'rt_refresh-value-456789', file: 'a' }],
+  });
+  const out = scrub(leaked, secrets);
+  assert.ok(!out.includes('eyJaccess-token-value-123'));
+  assert.ok(!out.includes('rt_refresh-value-456789'));
+  assert.ok(!out.includes('sk-proj-apikey-0123456789'));
+  assert.equal(out.split('[REDACTED]').length - 1, 3);
+  assert.ok(!secrets.includes('abc'), 'short values are not treated as secrets');
+});
+
+test('CLI --scrub rewrites the verdict file in place', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'scrub-'));
+  const v = join(dir, 'v.json');
+  const a = join(dir, 'auth.json');
+  writeFileSync(a, JSON.stringify({ t: 'secret-token-abcdefghijkl' }));
+  writeFileSync(v, JSON.stringify({ summary: 'saw secret-token-abcdefghijkl' }));
+  const r = spawnSync(process.execPath, [SCRIPT, '--scrub', v, a], { encoding: 'utf8' });
+  assert.equal(r.status, 0);
+  assert.ok(!readFileSync(v, 'utf8').includes('secret-token-abcdefghijkl'));
+});
 
 test('blocked comment carries the marker, the findings table and the fix instruction', () => {
   const raw = JSON.stringify({

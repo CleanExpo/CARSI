@@ -1,15 +1,44 @@
 #!/usr/bin/env node
-// Reads the Codex review verdict JSON written by `codex exec review --output-schema`
+// Reads the Codex review verdict JSON written by `codex exec --output-schema`
 // and decides the nexus/release-receipt state. Fail-closed: anything that is not a
 // well-formed PASS with zero P0/P1 findings is a failure.
 //
-// Usage: node scripts/ci/release-receipt-verdict.mjs <verdict.json>
-// Prints one line: `success|<description>` or `failure|<description>`. Exit 0 on
-// success, 1 on failure, so the workflow can branch on either.
-import { readFileSync } from 'node:fs';
+// Usage:
+//   node scripts/ci/release-receipt-verdict.mjs <verdict.json>
+//     Prints `success|<description>` or `failure|<description>`; exit 0 / 1.
+//   node scripts/ci/release-receipt-verdict.mjs --comment <verdict.json> <sha> <runUrl>
+//     Prints the PR comment body.
+//   node scripts/ci/release-receipt-verdict.mjs --scrub <verdict.json> [auth.json]
+//     Rewrites the verdict with every credential string (from auth.json and
+//     $OPENAI_API_KEY) replaced by [REDACTED], before anything is posted.
+import { readFileSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
 const BLOCKING = new Set(['P0', 'P1']);
+
+// Every string of 16+ characters anywhere in a parsed credential file.
+export function credentialStrings(authRaw, extra = []) {
+  const out = new Set(extra.filter((s) => typeof s === 'string' && s.length >= 16));
+  const walk = (v) => {
+    if (typeof v === 'string') {
+      if (v.length >= 16) out.add(v);
+    } else if (v && typeof v === 'object') {
+      for (const x of Object.values(v)) walk(x);
+    }
+  };
+  try {
+    walk(JSON.parse(authRaw));
+  } catch {
+    /* no or unreadable auth.json: only the extras are scrubbed */
+  }
+  return [...out];
+}
+
+export function scrub(text, secrets) {
+  let s = text;
+  for (const secret of secrets) s = s.split(secret).join('[REDACTED]');
+  return s;
+}
 
 export function decide(raw) {
   let v;
@@ -78,6 +107,28 @@ export function renderComment(raw, sha, runUrl) {
   }
   lines.push('', `[Review run](${runUrl})`);
   return lines.join('\n');
+}
+
+if (
+  import.meta.url === pathToFileURL(process.argv[1] ?? '').href &&
+  process.argv[2] === '--scrub'
+) {
+  const [, , , file, authFile] = process.argv;
+  const read = (p) => {
+    try {
+      return p ? readFileSync(p, 'utf8') : '';
+    } catch {
+      return '';
+    }
+  };
+  const raw = read(file);
+  if (raw) {
+    writeFileSync(
+      file,
+      scrub(raw, credentialStrings(read(authFile), [process.env.OPENAI_API_KEY]))
+    );
+  }
+  process.exit(0);
 }
 
 if (
