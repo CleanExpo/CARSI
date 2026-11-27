@@ -62,7 +62,10 @@ export function scrub(text, secrets) {
     if (typeof v === 'string') return scrubString(v, secrets);
     if (Array.isArray(v)) return v.map(walk);
     if (v && typeof v === 'object') {
-      return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, walk(x)]));
+      // Keys too: a credential used as a property name must not survive.
+      return Object.fromEntries(
+        Object.entries(v).map(([k, x]) => [scrubString(k, secrets), walk(x)])
+      );
     }
     return v;
   };
@@ -73,7 +76,8 @@ export function scrub(text, secrets) {
 export function schemaError(v) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return 'verdict is not an object';
   const keys = Object.keys(v).sort().join(',');
-  if (keys !== 'findings,summary,verdict') return `unexpected fields (${keys.slice(0, 40)})`;
+  // Never echo field names: an unexpected one could be a credential.
+  if (keys !== 'findings,summary,verdict') return 'unexpected or missing fields';
   if (v.verdict !== 'PASS' && v.verdict !== 'BLOCK') return 'verdict is not PASS or BLOCK';
   if (typeof v.summary !== 'string') return 'summary is not a string';
   if (!Array.isArray(v.findings)) return 'findings is not a list';

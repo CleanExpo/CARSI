@@ -86,6 +86,17 @@ test('scrub removes credentials, including \\u-escaped ones, and long token runs
   assert.equal(JSON.parse(path).findings[0].file, 'scripts/ci/nexus-receipt/lib.mjs');
 });
 
+test('a credential used as a property name is scrubbed and never echoed (CodeRabbit #1386)', () => {
+  const secret = 'abcdefghijklmnopqrstuvwx';
+  const raw = JSON.stringify({ verdict: 'PASS', summary: '', findings: [], [secret]: 1 });
+  const out = scrub(raw, [secret]);
+  assert.ok(!out.includes(secret));
+  assert.ok('summary' in JSON.parse(out), 'ordinary keys are unchanged');
+  const r = decide(raw);
+  assert.equal(r.state, 'failure');
+  assert.ok(!r.description.includes(secret), 'schema errors never echo field names');
+});
+
 test('blocked comment carries the marker and findings table, and no free-text summary', () => {
   const raw = verdict(
     'BLOCK',
