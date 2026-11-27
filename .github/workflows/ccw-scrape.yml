@@ -7,7 +7,11 @@ name: Scrape CCW products
 on:
   # Pushing a change to .github/ccw-run.txt triggers a fresh scrape on the
   # pushed branch's code — a reliable alternative to the "Run workflow" button.
+  # `branches` is required: GitHub ignores `paths` for tag pushes, so without it
+  # every pushed tag (e.g. the 2026-11-26 archive/* tags) ran a scrape and opened a PR.
   push:
+    branches:
+      - "**"
     paths:
       - ".github/ccw-run.txt"
   workflow_dispatch:
